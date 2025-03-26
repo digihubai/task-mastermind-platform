@@ -15,10 +15,17 @@ import {
   CreditCard, 
   ShieldCheck, 
   ChevronRight,
-  Check 
+  Check,
+  PlusCircle,
+  Trash2,
+  DollarSign,
+  Plus,
+  Save
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 interface Feature {
   id: string;
@@ -829,3 +836,4 @@ const SettingsPage = () => {
 };
 
 export default SettingsPage;
+

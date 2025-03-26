@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tag, Plus, Calendar, Percent, DollarSign, Clipboard, Check, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/Badge";
+import { Badge } from "@/components/ui/badge";
 
 const Coupons = () => {
   const { toast } = useToast();
@@ -130,9 +130,14 @@ const Coupons = () => {
                   <div className="flex items-center gap-2">
                     <Badge 
                       variant={
-                        coupon.status === "Active" ? "success" : 
-                        coupon.status === "Scheduled" ? "warning" : 
-                        "danger"
+                        coupon.status === "Active" ? "default" : 
+                        coupon.status === "Scheduled" ? "secondary" : 
+                        "outline"
+                      }
+                      className={
+                        coupon.status === "Active" ? "bg-green-100 text-green-800 border-green-200" : 
+                        coupon.status === "Scheduled" ? "bg-yellow-100 text-yellow-800 border-yellow-200" : 
+                        "bg-red-100 text-red-800 border-red-200"
                       }
                     >
                       {coupon.status}

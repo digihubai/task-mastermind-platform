@@ -1,3 +1,4 @@
+
 import React from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
@@ -11,7 +12,11 @@ import {
   MessageSquare, 
   PenTool,
   Image,
-  ExternalLink 
+  ExternalLink,
+  Bot,
+  Pencil,
+  Search,
+  RefreshCw
 } from "lucide-react";
 
 const Favorites = () => {

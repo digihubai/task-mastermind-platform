@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Plus, Edit, Settings, ExternalLink, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/Badge";
+import { Badge } from "@/components/ui/badge";
 
 const Pages = () => {
   const { toast } = useToast();
@@ -59,7 +59,7 @@ const Pages = () => {
                     </div>
                   </div>
                   
-                  <Badge variant={page.status === "Published" ? "success" : "secondary"}>
+                  <Badge variant={page.status === "Published" ? "default" : "secondary"}>
                     {page.status}
                   </Badge>
                 </div>
