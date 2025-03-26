@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Search, Plus, Bot, Trash2, PlusCircle, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, Plus, Bot, Trash2, PlusCircle, ExternalLink, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AIModel {
   id: string;
@@ -39,6 +40,8 @@ const AIModelsTab: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterProvider, setFilterProvider] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Example data - in a real app this would come from an API or context
   const [providers, setProviders] = useState<AIProvider[]>([
@@ -202,7 +205,36 @@ const AIModelsTab: React.FC = () => {
     }
   ]);
 
-  const handleToggleModelActive = (providerId: string, modelId: string) => {
+  useEffect(() => {
+    const fetchAIModels = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { data, error } = await supabase
+          .from('ai_providers')
+          .select('*');
+          
+        if (error) throw new Error(error.message);
+        
+        if (data && data.length > 0) {
+          // Transform data to match our interface
+          // This is a placeholder - actual implementation would depend on DB structure
+          setProviders(data as any);
+        }
+      } catch (err: any) {
+        console.error('Error fetching AI models:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    // Uncomment this when database is set up
+    // fetchAIModels();
+  }, []);
+
+  const handleToggleModelActive = async (providerId: string, modelId: string) => {
+    // In a real implementation, this would update the database
     setProviders(prev => 
       prev.map(provider => {
         if (provider.id === providerId) {
@@ -220,13 +252,31 @@ const AIModelsTab: React.FC = () => {
     const provider = providers.find(p => p.id === providerId);
     const model = provider?.models.find(m => m.id === modelId);
     
+    // Show toast notification
     toast({
       title: `${model?.isActive ? "Disabled" : "Enabled"} ${model?.name}`,
       description: `Model has been ${model?.isActive ? "disabled" : "enabled"} and will ${model?.isActive ? "no longer" : "now"} be available to users.`,
     });
+    
+    // In a real implementation, update the database
+    try {
+      // const { error } = await supabase
+      //   .from('ai_models')
+      //   .update({ is_active: !model?.isActive })
+      //   .eq('id', modelId);
+      
+      // if (error) throw error;
+    } catch (err: any) {
+      console.error('Error updating model status:', err);
+      toast({
+        title: "Error updating model status",
+        description: err.message,
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleToggleProviderActive = (providerId: string) => {
+  const handleToggleProviderActive = async (providerId: string) => {
     setProviders(prev => 
       prev.map(provider => {
         if (provider.id === providerId) {
@@ -259,21 +309,94 @@ const AIModelsTab: React.FC = () => {
         title: `${provider.isActive ? "Disabled" : "Enabled"} ${provider.name}`,
         description: `Provider has been ${provider.isActive ? "disabled" : "enabled"}. All models will be updated accordingly.`,
       });
+      
+      // In a real implementation, update the database
+      try {
+        // const { error } = await supabase
+        //   .from('ai_providers')
+        //   .update({ is_active: !provider.isActive })
+        //   .eq('id', providerId);
+        
+        // if (error) throw error;
+      } catch (err: any) {
+        console.error('Error updating provider status:', err);
+        toast({
+          title: "Error updating provider status",
+          description: err.message,
+          variant: "destructive"
+        });
+      }
     }
   };
 
   const handleConfigureApiKey = (providerId: string) => {
-    // In a real app, this would open a modal to enter the API key
+    // Direct user to Integrations tab
     toast({
       title: "Configure API Key",
       description: `Please enter your API key for this provider in the Integrations tab.`,
     });
   };
 
-  const handleAddToPricingTier = (providerId: string, modelId: string, tier: string) => {
+  const handleAddToPricingTier = async (providerId: string, modelId: string, tier: string) => {
+    // Update the model's pricing tiers
+    setProviders(prev => 
+      prev.map(provider => {
+        if (provider.id === providerId) {
+          return {
+            ...provider,
+            models: provider.models.map(model => {
+              if (model.id === modelId) {
+                const currentTiers = model.pricingTiers || [];
+                const newTiers = currentTiers.includes(tier)
+                  ? currentTiers.filter(t => t !== tier)
+                  : [...currentTiers, tier];
+                
+                return { ...model, pricingTiers: newTiers };
+              }
+              return model;
+            })
+          };
+        }
+        return provider;
+      })
+    );
+    
+    const model = providers
+      .find(p => p.id === providerId)
+      ?.models.find(m => m.id === modelId);
+    
+    const tierIncluded = model?.pricingTiers?.includes(tier);
+    
     toast({
       title: "Updated Pricing Tiers",
-      description: `Model is now ${tier.includes(tier) ? "removed from" : "included in"} the ${tier} pricing plan.`,
+      description: `Model is now ${tierIncluded ? "removed from" : "included in"} the ${tier} pricing plan.`,
+    });
+    
+    // In a real implementation, update the database
+    try {
+      // const { error } = await supabase
+      //   .from('model_pricing_tiers')
+      //   .upsert({ 
+      //     model_id: modelId,
+      //     tier: tier,
+      //     is_included: !tierIncluded 
+      //   });
+      
+      // if (error) throw error;
+    } catch (err: any) {
+      console.error('Error updating pricing tier:', err);
+      toast({
+        title: "Error updating pricing tier",
+        description: err.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleAddCustomModel = () => {
+    toast({
+      title: "Add Custom Model",
+      description: "This feature will be available soon.",
     });
   };
 
@@ -291,6 +414,34 @@ const AIModelsTab: React.FC = () => {
       )
     }))
     .filter(provider => provider.models.length > 0);
+
+  if (loading) {
+    return (
+      <Card className="border border-border/40">
+        <div className="p-6 flex justify-center items-center h-[400px]">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full mb-4"></div>
+            <p className="text-muted-foreground">Loading AI models...</p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="border border-border/40">
+        <div className="p-6">
+          <div className="flex items-center gap-2 text-destructive mb-4">
+            <AlertCircle size={20} />
+            <h3 className="font-medium">Error loading AI models</h3>
+          </div>
+          <p className="text-muted-foreground mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border border-border/40">
@@ -472,7 +623,7 @@ const AIModelsTab: React.FC = () => {
         </ScrollArea>
         
         <div className="mt-6 p-4 border border-dashed border-border rounded-lg text-center">
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2" onClick={handleAddCustomModel}>
             <PlusCircle size={16} />
             <span>Add Custom Model</span>
           </Button>

@@ -10,8 +10,12 @@ import FeaturesTab from "@/components/settings/FeaturesTab";
 import GeneralTab from "@/components/settings/GeneralTab";
 import IntegrationsTab from "@/components/settings/IntegrationsTab";
 import AIModelsTab from "@/components/settings/AIModelsTab";
+import LocalizationTab from "@/components/settings/LocalizationTab";
+import TwilioPhoneNumbers from "@/components/phone/TwilioPhoneNumbers";
+import { useToast } from "@/hooks/use-toast";
 
 const SettingsPage = () => {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("pricing");
   const {
     featureCategories,
@@ -26,6 +30,14 @@ const SettingsPage = () => {
     handleSaveChanges
   } = useSettings();
   
+  const handleSave = () => {
+    handleSaveChanges();
+    toast({
+      title: "Settings Saved",
+      description: "Your settings have been successfully saved.",
+    });
+  };
+  
   return (
     <AppLayout>
       <div className="space-y-6 animate-fade-in">
@@ -38,7 +50,7 @@ const SettingsPage = () => {
           </div>
           
           <Button
-            onClick={handleSaveChanges}
+            onClick={handleSave}
             className="flex items-center gap-2"
           >
             <Save size={18} />
@@ -47,12 +59,14 @@ const SettingsPage = () => {
         </div>
         
         <Tabs defaultValue="pricing" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-5 w-full md:w-auto">
+          <TabsList className="grid grid-cols-3 md:grid-cols-7 w-full md:w-auto">
             <TabsTrigger value="pricing">Pricing</TabsTrigger>
             <TabsTrigger value="features">Features</TabsTrigger>
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
             <TabsTrigger value="aimodels">AI Models</TabsTrigger>
+            <TabsTrigger value="phone">Phone</TabsTrigger>
+            <TabsTrigger value="localization">Localization</TabsTrigger>
           </TabsList>
           
           <div className="mt-6">
@@ -86,6 +100,14 @@ const SettingsPage = () => {
             
             <TabsContent value="aimodels" className="space-y-6">
               <AIModelsTab />
+            </TabsContent>
+            
+            <TabsContent value="phone" className="space-y-6">
+              <TwilioPhoneNumbers />
+            </TabsContent>
+            
+            <TabsContent value="localization" className="space-y-6">
+              <LocalizationTab />
             </TabsContent>
           </div>
         </Tabs>
