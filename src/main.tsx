@@ -2,20 +2,17 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import App from './App'
+import App from './App.tsx'
 import './index.css'
-import { ThemeProvider } from "@/components/ui/theme-provider"
-import { Toaster } from "@/components/ui/sonner"
-import { AuthProvider } from '@/contexts/AuthContext'
+import { ThemeProvider } from './components/ui/theme-provider.tsx'
+import { Toaster } from './components/ui/toaster.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <ThemeProvider defaultTheme="dark" storageKey="digihub-theme">
-        <AuthProvider>
-          <App />
-          <Toaster position="top-center" />
-        </AuthProvider>
+      <ThemeProvider defaultTheme="light" storageKey="digihub-theme">
+        <App />
+        <Toaster />
       </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>,

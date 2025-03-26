@@ -207,29 +207,21 @@ const AIModelsTab: React.FC = () => {
 
   useEffect(() => {
     const fetchAIModels = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const { data, error } = await supabase
-          .from('ai_providers')
-          .select('*');
-          
-        if (error) throw new Error(error.message);
-        
-        if (data && data.length > 0) {
-          // Transform data to match our interface
-          // This is a placeholder - actual implementation would depend on DB structure
-          setProviders(data as any);
-        }
-      } catch (err: any) {
-        console.error('Error fetching AI models:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+      // In a real implementation, this would fetch from an API or database
+      // For now, let's use the mock data already defined
+      
+      // If we had a proper database table, we would do something like:
+      // try {
+      //   const { data, error } = await supabase
+      //     .from('ai_models')
+      //     .select('*');
+      //   if (error) throw error;
+      // } catch (err) {
+      //   console.error('Error fetching models:', err);
+      // }
     };
     
-    // Uncomment this when database is set up
+    // Uncomment when database is set up
     // fetchAIModels();
   }, []);
 
@@ -257,23 +249,6 @@ const AIModelsTab: React.FC = () => {
       title: `${model?.isActive ? "Disabled" : "Enabled"} ${model?.name}`,
       description: `Model has been ${model?.isActive ? "disabled" : "enabled"} and will ${model?.isActive ? "no longer" : "now"} be available to users.`,
     });
-    
-    // In a real implementation, update the database
-    try {
-      // const { error } = await supabase
-      //   .from('ai_models')
-      //   .update({ is_active: !model?.isActive })
-      //   .eq('id', modelId);
-      
-      // if (error) throw error;
-    } catch (err: any) {
-      console.error('Error updating model status:', err);
-      toast({
-        title: "Error updating model status",
-        description: err.message,
-        variant: "destructive"
-      });
-    }
   };
 
   const handleToggleProviderActive = async (providerId: string) => {
@@ -309,23 +284,6 @@ const AIModelsTab: React.FC = () => {
         title: `${provider.isActive ? "Disabled" : "Enabled"} ${provider.name}`,
         description: `Provider has been ${provider.isActive ? "disabled" : "enabled"}. All models will be updated accordingly.`,
       });
-      
-      // In a real implementation, update the database
-      try {
-        // const { error } = await supabase
-        //   .from('ai_providers')
-        //   .update({ is_active: !provider.isActive })
-        //   .eq('id', providerId);
-        
-        // if (error) throw error;
-      } catch (err: any) {
-        console.error('Error updating provider status:', err);
-        toast({
-          title: "Error updating provider status",
-          description: err.message,
-          variant: "destructive"
-        });
-      }
     }
   };
 
@@ -371,26 +329,6 @@ const AIModelsTab: React.FC = () => {
       title: "Updated Pricing Tiers",
       description: `Model is now ${tierIncluded ? "removed from" : "included in"} the ${tier} pricing plan.`,
     });
-    
-    // In a real implementation, update the database
-    try {
-      // const { error } = await supabase
-      //   .from('model_pricing_tiers')
-      //   .upsert({ 
-      //     model_id: modelId,
-      //     tier: tier,
-      //     is_included: !tierIncluded 
-      //   });
-      
-      // if (error) throw error;
-    } catch (err: any) {
-      console.error('Error updating pricing tier:', err);
-      toast({
-        title: "Error updating pricing tier",
-        description: err.message,
-        variant: "destructive"
-      });
-    }
   };
 
   const handleAddCustomModel = () => {

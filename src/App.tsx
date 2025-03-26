@@ -48,6 +48,8 @@ import TeamChatPage from './pages/TeamChatPage'
 import CustomersPage from './pages/CustomersPage'
 import ProjectsPage from './pages/ProjectsPage'
 import SettingsPage from './pages/SettingsPage'
+import OmnichannelInboxPage from './pages/OmnichannelInboxPage'
+import TwilioNumbersPage from './pages/TwilioNumbersPage'
 
 // Analytics
 import AnalyticsDashboard from './pages/analytics/AnalyticsDashboard'
@@ -144,8 +146,10 @@ function App() {
       <Route path="/chatbot" element={<ChatbotPage />} />
       <Route path="/team-chat" element={<TeamChatPage />} />
       <Route path="/customers" element={<CustomersPage />} />
+      <Route path="/omnichannel" element={<OmnichannelInboxPage />} />
       <Route path="/projects" element={<ProjectsPage />} />
       <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/phone/numbers" element={<TwilioNumbersPage />} />
 
       {/* Automation routes */}
       <Route path="/automation/workflows" element={<Workflows />} />
