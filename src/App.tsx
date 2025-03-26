@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -77,6 +76,10 @@ import SocialMediaPage from "./pages/marketing/SocialMediaPage";
 import BrandVoicePage from "./pages/marketing/BrandVoicePage";
 import EmailMarketingPage from "./pages/marketing/EmailMarketingPage";
 
+// Finance pages
+import FinanceDashboard from "./pages/finance/FinanceDashboard";
+import TaxCalculator from "./pages/finance/TaxCalculator";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -143,6 +146,10 @@ const App = () => (
           <Route path="/crm" element={<CRM />} />
           <Route path="/workflow" element={<Workflow />} />
           <Route path="/funnel-creator" element={<FunnelCreator />} />
+          
+          {/* Finance routes */}
+          <Route path="/finance" element={<FinanceDashboard />} />
+          <Route path="/finance/tax-calculator" element={<TaxCalculator />} />
           
           {/* New AI tools routes */}
           <Route path="/ai-tools" element={<AIToolsHub />} />

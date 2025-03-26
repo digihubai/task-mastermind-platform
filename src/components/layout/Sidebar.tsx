@@ -35,7 +35,13 @@ import {
   Search,
   FileSpreadsheet,
   CreditCard,
-  Megaphone
+  Megaphone,
+  DollarSign,
+  Calculator,
+  Wallet,
+  PieChart,
+  Receipt,
+  Building
 } from "lucide-react";
 
 interface SidebarProps {
@@ -83,6 +89,16 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
         { path: "/team-chat", icon: MessageSquare, label: "Team Chat" },
         { path: "/project-management", icon: Briefcase, label: "Project Management" },
         { path: "/crm", icon: Users, label: "CRM" },
+      ]
+    },
+    {
+      title: "Finance",
+      items: [
+        { path: "/finance", icon: DollarSign, label: "Finance Dashboard" },
+        { path: "/finance/tax-calculator", icon: Calculator, label: "Tax Calculator" },
+        { path: "/finance/invoices", icon: Receipt, label: "Invoices" },
+        { path: "/finance/expenses", icon: CreditCard, label: "Expenses" },
+        { path: "/finance/reports", icon: PieChart, label: "Financial Reports" },
       ]
     },
     {
@@ -141,7 +157,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
       >
         <div className="p-4 flex justify-between items-center sticky top-0 bg-white dark:bg-sidebar z-10 border-b border-border">
           <div className={`overflow-hidden transition-opacity ${collapsed && !isMobile ? 'opacity-0 w-0' : 'opacity-100'}`}>
-            <h1 className="text-xl font-semibold">DigiHub AI</h1>
+            <h1 className="text-xl font-semibold text-modern-gradient">DigiHub AI</h1>
           </div>
           
           <button 
@@ -175,9 +191,9 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
                         to={item.path}
                         className={`
                           flex items-center px-3 py-2 rounded-md text-sm
-                          group transition-all duration-200 hover-lift
+                          group transition-all duration-200
                           ${active 
-                            ? 'bg-primary text-primary-foreground font-medium' 
+                            ? 'bg-violet-600 text-white font-medium' 
                             : 'text-foreground hover:bg-secondary'
                           }
                         `}
@@ -195,7 +211,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
         
         <div className="p-4 border-t border-border">
           <div className={`flex items-center ${collapsed && !isMobile ? 'justify-center' : 'space-x-3'}`}>
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+            <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
               <Users size={18} />
             </div>
             {(!collapsed || isMobile) && (
