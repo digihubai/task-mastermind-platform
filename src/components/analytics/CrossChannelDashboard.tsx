@@ -8,8 +8,26 @@ interface CrossChannelDashboardProps {
   dateRange: string;
 }
 
+type TrendType = "up" | "down";
+
+interface ChannelData {
+  spend: string;
+  revenue: string;
+  roas: string;
+  cpc: string;
+  ctr: string;
+  change: string;
+  trend: TrendType;
+}
+
+interface AllChannelData {
+  meta: ChannelData;
+  google: ChannelData;
+  tiktok: ChannelData;
+}
+
 const CrossChannelDashboard: React.FC<CrossChannelDashboardProps> = ({ dateRange }) => {
-  const channelData = {
+  const channelData: AllChannelData = {
     meta: {
       spend: '$15,453.28',
       revenue: '$48,976.35',

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import AnalyticsChartCard from "@/components/analytics/AnalyticsChartCard";
@@ -8,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowDownToLine, BarChart3, Calendar, ChevronDown, Copy, Download, ExternalLink, Facebook, Grid3X3, Instagram, LineChart, Plus, RefreshCw, Settings, Share2, TiktokIcon, Twitter } from "lucide-react";
+import { ArrowDownToLine, BarChart3, Calendar, ChevronDown, Copy, Download, ExternalLink, Facebook, Grid3X3, Instagram, LineChart, Plus, RefreshCw, Settings, Share2, Twitter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -16,8 +15,25 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    width="1em"
+    height="1em"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M16.0982 2.268C16.0326 2.24 15.9649 2.2247 15.896 2.223H12.8982V15.5766C12.8982 16.7533 11.9439 17.7076 10.7672 17.7076C9.5905 17.7076 8.63618 16.7533 8.63618 15.5766C8.63618 14.4076 9.5828 13.4533 10.7518 13.4456V10.4478C7.91386 10.4555 5.6231 12.7616 5.6231 15.6073C5.6231 18.4606 8.0108 20.7591 10.8487 20.7591C13.6866 20.7591 16.0743 18.453 16.0743 15.6073V8.5962C17.287 9.5735 18.7469 10.1311 20.3152 10.1465V7.14872C20.3152 7.14872 18.551 7.11489 16.0982 5.12128V2.268Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+
 const AnalyticsDashboard = () => {
-  // Sample data for charts
   const revenueData = [
     { date: "Jan", revenue: 4000, profit: 2400, target: 3000 },
     { date: "Feb", revenue: 3000, profit: 1398, target: 3000 },
@@ -54,10 +70,10 @@ const AnalyticsDashboard = () => {
   ];
 
   const channelMetrics = [
-    { channel: "Facebook", trend: "up", change: "+8.5%", value: "$5,483", icon: <Facebook size={20} className="text-blue-600" /> },
-    { channel: "Instagram", trend: "up", change: "+12.3%", value: "$7,492", icon: <Instagram size={20} className="text-pink-600" /> },
-    { channel: "Twitter", trend: "down", change: "-4.7%", value: "$1,147", icon: <Twitter size={20} className="text-blue-400" /> },
-    { channel: "TikTok", trend: "up", change: "+21.8%", value: "$3,982", icon: <TiktokIcon size={20} className="text-black dark:text-white" /> },
+    { channel: "Facebook", trend: "up" as const, change: "+8.5%", value: "$5,483", icon: <Facebook size={20} className="text-blue-600" /> },
+    { channel: "Instagram", trend: "up" as const, change: "+12.3%", value: "$7,492", icon: <Instagram size={20} className="text-pink-600" /> },
+    { channel: "Twitter", trend: "down" as const, change: "-4.7%", value: "$1,147", icon: <Twitter size={20} className="text-blue-400" /> },
+    { channel: "TikTok", trend: "up" as const, change: "+21.8%", value: "$3,982", icon: <TikTokIcon size={20} className="text-black dark:text-white" /> },
   ];
 
   const [activeTab, setActiveTab] = useState("overview");
@@ -69,24 +85,6 @@ const AnalyticsDashboard = () => {
     { id: "channels", visible: true, title: "Channel Metrics" },
     { id: "account", visible: true, title: "Account Health" },
   ]);
-
-  const TiktokIcon = (props) => (
-    <svg
-      width="1em"
-      height="1em"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M16.0982 2.268C16.0326 2.24 15.9649 2.2247 15.896 2.223H12.8982V15.5766C12.8982 16.7533 11.9439 17.7076 10.7672 17.7076C9.5905 17.7076 8.63618 16.7533 8.63618 15.5766C8.63618 14.4076 9.5828 13.4533 10.7518 13.4456V10.4478C7.91386 10.4555 5.6231 12.7616 5.6231 15.6073C5.6231 18.4606 8.0108 20.7591 10.8487 20.7591C13.6866 20.7591 16.0743 18.453 16.0743 15.6073V8.5962C17.287 9.5735 18.7469 10.1311 20.3152 10.1465V7.14872C20.3152 7.14872 18.551 7.11489 16.0982 5.12128V2.268Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
 
   return (
     <AppLayout>
