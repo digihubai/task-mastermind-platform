@@ -9,6 +9,7 @@ import PricingTab from "@/components/settings/PricingTab";
 import FeaturesTab from "@/components/settings/FeaturesTab";
 import GeneralTab from "@/components/settings/GeneralTab";
 import IntegrationsTab from "@/components/settings/IntegrationsTab";
+import AIModelsTab from "@/components/settings/AIModelsTab";
 
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState("pricing");
@@ -46,11 +47,12 @@ const SettingsPage = () => {
         </div>
         
         <Tabs defaultValue="pricing" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-4 w-full md:w-auto">
+          <TabsList className="grid grid-cols-5 w-full md:w-auto">
             <TabsTrigger value="pricing">Pricing</TabsTrigger>
             <TabsTrigger value="features">Features</TabsTrigger>
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="aimodels">AI Models</TabsTrigger>
           </TabsList>
           
           <div className="mt-6">
@@ -80,6 +82,10 @@ const SettingsPage = () => {
             
             <TabsContent value="integrations" className="space-y-6">
               <IntegrationsTab />
+            </TabsContent>
+            
+            <TabsContent value="aimodels" className="space-y-6">
+              <AIModelsTab />
             </TabsContent>
           </div>
         </Tabs>
