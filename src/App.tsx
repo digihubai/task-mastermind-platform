@@ -63,6 +63,20 @@ import CRM from "./pages/modules/CRM";
 import Workflow from "./pages/modules/Workflow";
 import FunnelCreator from "./pages/modules/FunnelCreator";
 
+// New AI tool pages
+import AIToolsHub from "./pages/ai/AIToolsHub";
+import AICopywriterPage from "./pages/ai/AICopywriterPage";
+import AISEOPage from "./pages/ai/AISEOPage";
+import AIVisionPage from "./pages/ai/AIVisionPage";
+import AIRewriterPage from "./pages/ai/AIRewriterPage";
+import PDFInsightPage from "./pages/ai/PDFInsightPage";
+
+// New marketing pages
+import CampaignsPage from "./pages/marketing/CampaignsPage";
+import SocialMediaPage from "./pages/marketing/SocialMediaPage";
+import BrandVoicePage from "./pages/marketing/BrandVoicePage";
+import EmailMarketingPage from "./pages/marketing/EmailMarketingPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -129,6 +143,20 @@ const App = () => (
           <Route path="/crm" element={<CRM />} />
           <Route path="/workflow" element={<Workflow />} />
           <Route path="/funnel-creator" element={<FunnelCreator />} />
+          
+          {/* New AI tools routes */}
+          <Route path="/ai-tools" element={<AIToolsHub />} />
+          <Route path="/ai-copywriter" element={<AICopywriterPage />} />
+          <Route path="/ai-seo" element={<AISEOPage />} />
+          <Route path="/ai-vision" element={<AIVisionPage />} />
+          <Route path="/ai-rewriter" element={<AIRewriterPage />} />
+          <Route path="/pdf-insight" element={<PDFInsightPage />} />
+          
+          {/* New marketing routes */}
+          <Route path="/campaigns" element={<CampaignsPage />} />
+          <Route path="/social" element={<SocialMediaPage />} />
+          <Route path="/brand-voice" element={<BrandVoicePage />} />
+          <Route path="/email-marketing" element={<EmailMarketingPage />} />
           
           {/* Catch all */}
           <Route path="*" element={<NotFound />} />

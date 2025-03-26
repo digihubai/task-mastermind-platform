@@ -1,352 +1,603 @@
 
-import React from "react";
+import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
-import { Card } from "@/components/ui/card";
-import { TeamChat } from "@/components/teamchat/TeamChat";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Hash, Users, Settings, Info, Download, HeadphonesIcon, PhoneOutgoing, Phone } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  PlusCircle,
+  Send,
+  User,
+  Phone,
+  Video,
+  SmilePlus,
+  Paperclip,
+  Search,
+  Hash,
+  Users,
+  Lock,
+  MoreVertical,
+  PhoneCall,
+  PhoneIncoming,
+  PhoneMissed,
+  PhoneOutgoing
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CreateChannelModal from "@/components/teamchat/CreateChannelModal";
+import GiphyPicker from "@/components/teamchat/GiphyPicker";
+import { useToast } from "@/hooks/use-toast";
+
+// Mock data
+const mockChannels = [
+  { id: "1", name: "general", icon: "hash", unreadCount: 0, isActive: true },
+  { id: "2", name: "marketing", icon: "hash", unreadCount: 3, isActive: false },
+  { id: "3", name: "design", icon: "hash", unreadCount: 0, isActive: false },
+  { id: "4", name: "development", icon: "hash", unreadCount: 2, isActive: false },
+  { id: "5", name: "sales-team", icon: "users", unreadCount: 0, isActive: false, isPrivate: true },
+];
+
+const mockDirectMessages = [
+  { id: "dm1", name: "Sarah Johnson", avatar: "/avatars/woman-1.jpg", status: "online", unreadCount: 1 },
+  { id: "dm2", name: "Michael Chen", avatar: "/avatars/man-1.jpg", status: "offline", unreadCount: 0 },
+  { id: "dm3", name: "Jessica Williams", avatar: "/avatars/woman-2.jpg", status: "online", unreadCount: 0 },
+  { id: "dm4", name: "David Kim", avatar: "/avatars/man-2.jpg", status: "away", unreadCount: 0 },
+];
+
+const mockMessages = [
+  {
+    id: "1",
+    sender: { id: "user1", name: "Sarah Johnson", avatar: "/avatars/woman-1.jpg" },
+    content: "Good morning team! Let's discuss the project timeline for the new feature.",
+    timestamp: "9:30 AM",
+    reactions: [{ emoji: "👍", count: 3 }, { emoji: "🚀", count: 2 }],
+  },
+  {
+    id: "2",
+    sender: { id: "user2", name: "Michael Chen", avatar: "/avatars/man-1.jpg" },
+    content: "I've been working on the design mockups. Should be ready by end of day.",
+    timestamp: "9:32 AM",
+    reactions: [],
+  },
+  {
+    id: "3",
+    sender: { id: "user3", name: "Jessica Williams", avatar: "/avatars/woman-2.jpg" },
+    content: "Great! I'll need those for the client presentation tomorrow.",
+    timestamp: "9:35 AM",
+    reactions: [{ emoji: "👌", count: 1 }],
+  },
+  {
+    id: "4",
+    sender: { id: "user4", name: "David Kim", avatar: "/avatars/man-2.jpg" },
+    content: "Has anyone tested the API integration yet?",
+    timestamp: "9:40 AM",
+    reactions: [],
+  },
+  {
+    id: "5",
+    sender: { id: "user1", name: "Sarah Johnson", avatar: "/avatars/woman-1.jpg" },
+    content: "Here's a screenshot of what I'm working on:",
+    timestamp: "9:45 AM",
+    attachment: { type: "image", url: "https://placehold.co/600x400" },
+    reactions: [{ emoji: "❤️", count: 2 }],
+  },
+  {
+    id: "6",
+    sender: { id: "user3", name: "Jessica Williams", avatar: "/avatars/woman-2.jpg" },
+    content: "Looks great!",
+    timestamp: "9:47 AM",
+    reactions: [],
+  },
+  {
+    id: "7",
+    sender: { id: "user2", name: "Michael Chen", avatar: "/avatars/man-1.jpg" },
+    content: "I found a bug in the login flow. Let me share my screen later to show you.",
+    timestamp: "9:50 AM",
+    reactions: [{ emoji: "🐛", count: 1 }],
+  },
+  {
+    id: "8",
+    sender: { id: "user5", name: "Emily Davis", avatar: "/avatars/woman-3.jpg" },
+    content: "Just joining the conversation. Can someone catch me up?",
+    timestamp: "10:00 AM",
+    reactions: [],
+  },
+  {
+    id: "9",
+    sender: { id: "user3", name: "Jessica Williams", avatar: "/avatars/woman-2.jpg" },
+    content: "Check the meeting notes from yesterday, I shared them in the #general channel.",
+    timestamp: "10:02 AM",
+    reactions: [{ emoji: "👆", count: 1 }],
+  },
+];
+
+const mockCalls = [
+  {
+    id: "call1",
+    user: { id: "user1", name: "Sarah Johnson", avatar: "/avatars/woman-1.jpg" },
+    type: "incoming",
+    status: "answered",
+    duration: "10:23",
+    timestamp: "Yesterday, 3:45 PM",
+  },
+  {
+    id: "call2",
+    user: { id: "user2", name: "Michael Chen", avatar: "/avatars/man-1.jpg" },
+    type: "outgoing",
+    status: "answered",
+    duration: "05:12",
+    timestamp: "Yesterday, 11:30 AM",
+  },
+  {
+    id: "call3",
+    user: { id: "user3", name: "Jessica Williams", avatar: "/avatars/woman-2.jpg" },
+    type: "missed",
+    status: "missed",
+    duration: "00:00",
+    timestamp: "Apr 15, 2:20 PM",
+  },
+  {
+    id: "call4",
+    user: { id: "user4", name: "David Kim", avatar: "/avatars/man-2.jpg" },
+    type: "incoming",
+    status: "answered",
+    duration: "15:48",
+    timestamp: "Apr 12, 10:15 AM",
+  },
+];
 
 const TeamChatPage = () => {
+  const { toast } = useToast();
+  const [activeChannel, setActiveChannel] = useState(mockChannels[0]);
+  const [messageText, setMessageText] = useState("");
+  const [showCreateChannel, setShowCreateChannel] = useState(false);
+  const [showGiphyPicker, setShowGiphyPicker] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTab, setSelectedTab] = useState("chat");
+
+  const handleSendMessage = () => {
+    if (!messageText.trim()) return;
+    
+    toast({
+      title: "Message sent",
+      description: `Your message has been sent to #${activeChannel.name}`,
+    });
+    
+    setMessageText("");
+    setShowGiphyPicker(false);
+  };
+
+  const handleCreateChannel = (channelData: any) => {
+    toast({
+      title: "Channel created",
+      description: `Channel #${channelData.name} has been created successfully`,
+    });
+  };
+
+  const handleSelectGif = (gifUrl: string) => {
+    toast({
+      title: "GIF selected",
+      description: "Your GIF will be sent with the message",
+    });
+    setShowGiphyPicker(false);
+  };
+
+  const filteredChannels = mockChannels.filter(channel => 
+    channel.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  const filteredDirectMessages = mockDirectMessages.filter(dm =>
+    dm.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getChannelIcon = (icon: string, isPrivate?: boolean) => {
+    if (isPrivate) return <Lock size={16} />;
+    if (icon === "hash") return <Hash size={16} />;
+    if (icon === "users") return <Users size={16} />;
+    return <Hash size={16} />;
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "online": return "bg-green-500";
+      case "away": return "bg-yellow-500";
+      case "busy": return "bg-red-500";
+      default: return "bg-gray-500";
+    }
+  };
+
+  const getCallIcon = (type: string) => {
+    switch (type) {
+      case "incoming": return <PhoneIncoming size={16} className="text-green-500" />;
+      case "outgoing": return <PhoneOutgoing size={16} className="text-blue-500" />;
+      case "missed": return <PhoneMissed size={16} className="text-red-500" />;
+      default: return <PhoneCall size={16} />;
+    }
+  };
+
   return (
     <AppLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight">Team Communication Hub</h1>
-            <p className="text-muted-foreground mt-1">
-              Communicate with your team in real-time through chat, voice and video
-            </p>
+      <div className="h-[calc(100vh-80px)] flex overflow-hidden animate-fade-in">
+        {/* Sidebar */}
+        <div className="w-64 border-r border-border flex flex-col bg-white dark:bg-sidebar">
+          <div className="p-4 border-b border-border">
+            <h2 className="font-semibold text-xl">Team Chat</h2>
+            <p className="text-sm text-muted-foreground">Collaborate with your team</p>
           </div>
-          
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Hash size={16} />
-              <span>New Channel</span>
-            </Button>
-            
-            <Button 
-              className="flex items-center gap-2"
-            >
-              <PlusCircle size={16} />
-              <span>New Group</span>
-            </Button>
-          </div>
-        </div>
-        
-        <Tabs defaultValue="chat" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="chat" className="flex items-center gap-2">
-              <Users size={16} />
-              <span>Team Chat</span>
-            </TabsTrigger>
-            <TabsTrigger value="ivr" className="flex items-center gap-2">
-              <HeadphonesIcon size={16} />
-              <span>IVR System</span>
-            </TabsTrigger>
-            <TabsTrigger value="outbound" className="flex items-center gap-2">
-              <PhoneOutgoing size={16} />
-              <span>Outbound Calls</span>
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <Settings size={16} />
-              <span>Settings</span>
-            </TabsTrigger>
-            <TabsTrigger value="info" className="flex items-center gap-2">
-              <Info size={16} />
-              <span>Info</span>
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="chat" className="space-y-4">
-            <TeamChat />
-          </TabsContent>
-          
-          <TabsContent value="ivr" className="space-y-4">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Interactive Voice Response (IVR) System</h2>
+
+          <div className="p-3">
+            <div className="relative mb-3">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search conversations..."
+                className="pl-9"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <Tabs defaultValue="chat" className="w-full" onValueChange={setSelectedTab}>
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="chat">Chat</TabsTrigger>
+                <TabsTrigger value="calls">Calls</TabsTrigger>
+                <TabsTrigger value="ivr">IVR</TabsTrigger>
+              </TabsList>
               
-              <div className="space-y-6">
-                <p>
-                  Configure your automated phone system to efficiently route calls and provide self-service options to your customers.
-                </p>
-                
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="border rounded-lg p-4 space-y-3">
-                    <h3 className="font-medium flex items-center gap-2">
-                      <Phone size={18} /> Current IVR Flow
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Your active call routing system with 5 decision points
-                    </p>
-                    <Button variant="outline" className="w-full">Edit Flow</Button>
-                  </div>
-                  
-                  <div className="border rounded-lg p-4 space-y-3">
-                    <h3 className="font-medium">IVR Performance</h3>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Average call duration</span>
-                        <span className="font-medium">2m 34s</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Calls handled by IVR</span>
-                        <span className="font-medium">64%</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Agent transfers</span>
-                        <span className="font-medium">36%</span>
-                      </div>
-                    </div>
-                    <Button variant="outline" className="w-full">View Reports</Button>
-                  </div>
-                </div>
-                
+              <TabsContent value="chat" className="mt-3 space-y-4">
                 <div>
-                  <h3 className="text-lg font-medium mb-3">Voice Prompts</h3>
-                  <div className="space-y-2">
-                    <div className="border rounded-lg p-3 flex justify-between items-center">
-                      <div>
-                        <p className="font-medium">Welcome Message</p>
-                        <p className="text-xs text-muted-foreground">0:15 • Last updated 3 days ago</p>
-                      </div>
-                      <Button variant="ghost" size="sm">Edit</Button>
-                    </div>
-                    <div className="border rounded-lg p-3 flex justify-between items-center">
-                      <div>
-                        <p className="font-medium">Menu Options</p>
-                        <p className="text-xs text-muted-foreground">0:42 • Last updated 7 days ago</p>
-                      </div>
-                      <Button variant="ghost" size="sm">Edit</Button>
-                    </div>
-                    <div className="border rounded-lg p-3 flex justify-between items-center">
-                      <div>
-                        <p className="font-medium">After Hours</p>
-                        <p className="text-xs text-muted-foreground">0:22 • Last updated 14 days ago</p>
-                      </div>
-                      <Button variant="ghost" size="sm">Edit</Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="outbound" className="space-y-4">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Outbound Call Campaigns</h2>
-              
-              <div className="space-y-6">
-                <p>
-                  Set up and manage outbound call campaigns for sales, marketing, or customer follow-ups.
-                </p>
-                
-                <div className="border rounded-lg p-4">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-medium">Active Campaigns</h3>
-                    <Button size="sm">New Campaign</Button>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="border rounded-lg p-3 flex justify-between items-center">
-                      <div>
-                        <p className="font-medium">Customer Feedback</p>
-                        <p className="text-xs text-muted-foreground">Progress: 45% • 128/285 calls completed</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">View</Button>
-                        <Button variant="ghost" size="sm">Pause</Button>
-                      </div>
-                    </div>
-                    
-                    <div className="border rounded-lg p-3 flex justify-between items-center">
-                      <div>
-                        <p className="font-medium">Renewal Reminder</p>
-                        <p className="text-xs text-muted-foreground">Progress: 72% • 65/90 calls completed</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">View</Button>
-                        <Button variant="ghost" size="sm">Pause</Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="border rounded-lg p-4 space-y-3">
-                    <h3 className="font-medium">Call Scripts</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Manage and update your call scripts for different campaigns
-                    </p>
-                    <Button variant="outline" className="w-full">Manage Scripts</Button>
-                  </div>
-                  
-                  <div className="border rounded-lg p-4 space-y-3">
-                    <h3 className="font-medium">Phone Number Management</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Configure caller IDs and phone numbers for outbound calls
-                    </p>
-                    <Button variant="outline" className="w-full">Manage Numbers</Button>
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium mb-3">Call Performance</h3>
-                  <div className="border rounded-lg p-4">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="p-3 bg-secondary/50 rounded-lg text-center">
-                        <p className="text-sm text-muted-foreground">Total Calls</p>
-                        <p className="text-2xl font-bold">947</p>
-                      </div>
-                      <div className="p-3 bg-secondary/50 rounded-lg text-center">
-                        <p className="text-sm text-muted-foreground">Connected</p>
-                        <p className="text-2xl font-bold">68%</p>
-                      </div>
-                      <div className="p-3 bg-secondary/50 rounded-lg text-center">
-                        <p className="text-sm text-muted-foreground">Avg. Duration</p>
-                        <p className="text-2xl font-bold">3:24</p>
-                      </div>
-                      <div className="p-3 bg-secondary/50 rounded-lg text-center">
-                        <p className="text-sm text-muted-foreground">Conversions</p>
-                        <p className="text-2xl font-bold">23%</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="settings" className="space-y-4">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Communication Settings</h2>
-              
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Notifications</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span>Desktop notifications</span>
-                      </label>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span>Email notifications</span>
-                      </label>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span>Sound notifications</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Privacy & Security</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span>Allow message formatting</span>
-                      </label>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span>Show read receipts</span>
-                      </label>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" className="rounded" />
-                        <span>Auto-delete messages after 30 days</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Call Settings</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span>Enable video calls</span>
-                      </label>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span>Auto-record calls</span>
-                      </label>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center gap-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span>Call transcription</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Data Management</h3>
-                  <div className="flex items-center gap-3">
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <Download size={16} />
-                      <span>Export Communication Data</span>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-muted-foreground">Channels</h3>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-5 w-5"
+                      onClick={() => setShowCreateChannel(true)}
+                    >
+                      <PlusCircle size={14} />
                     </Button>
                   </div>
+                  
+                  <ScrollArea className="h-36">
+                    <div className="space-y-1">
+                      {filteredChannels.map((channel) => (
+                        <Button
+                          key={channel.id}
+                          variant={channel.isActive ? "default" : "ghost"}
+                          className="w-full justify-start"
+                          onClick={() => setActiveChannel(channel)}
+                        >
+                          <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center">
+                              {getChannelIcon(channel.icon, channel.isPrivate)}
+                              <span className="ml-2">{channel.name}</span>
+                            </div>
+                            {channel.unreadCount > 0 && (
+                              <span className="bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                {channel.unreadCount}
+                              </span>
+                            )}
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
                 </div>
-              </div>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="info" className="space-y-4">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">About Team Communication Hub</h2>
+                
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground mb-2">Direct Messages</h3>
+                  <ScrollArea className="h-48">
+                    <div className="space-y-1">
+                      {filteredDirectMessages.map((dm) => (
+                        <Button
+                          key={dm.id}
+                          variant="ghost"
+                          className="w-full justify-start"
+                        >
+                          <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center">
+                              <div className="relative">
+                                <Avatar className="h-6 w-6">
+                                  <AvatarImage src={dm.avatar} />
+                                  <AvatarFallback>{dm.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <span className={`absolute bottom-0 right-0 w-2 h-2 rounded-full ${getStatusColor(dm.status)} ring-1 ring-background`}></span>
+                              </div>
+                              <span className="ml-2">{dm.name}</span>
+                            </div>
+                            {dm.unreadCount > 0 && (
+                              <span className="bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                {dm.unreadCount}
+                              </span>
+                            )}
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+              </TabsContent>
               
-              <div className="space-y-6">
-                <p>
-                  The Team Communication Hub provides comprehensive communication tools including team chat, IVR system, and outbound call management.
-                  With features like channels, direct messaging, call routing, and campaign management, it offers a complete solution for all your communication needs.
-                </p>
-                
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Key Features</h3>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Public and private channels for team collaboration</li>
-                    <li>Direct and group messaging</li>
-                    <li>File and media sharing with GIF support</li>
-                    <li>Message reactions and threading</li>
-                    <li>Interactive Voice Response (IVR) system</li>
-                    <li>Outbound call campaign management</li>
-                    <li>Call scripting and recording</li>
-                    <li>Performance analytics for all communication channels</li>
-                    <li>Comprehensive security and privacy controls</li>
-                  </ul>
+              <TabsContent value="calls" className="mt-3">
+                <ScrollArea className="h-[calc(100vh-280px)]">
+                  <div className="space-y-3">
+                    {mockCalls.map((call) => (
+                      <div 
+                        key={call.id}
+                        className="flex items-center justify-between p-2 hover:bg-secondary rounded-md"
+                      >
+                        <div className="flex items-center">
+                          <div className="mr-3">
+                            {getCallIcon(call.type)}
+                          </div>
+                          <div>
+                            <div className="flex items-center">
+                              <Avatar className="h-8 w-8 mr-2">
+                                <AvatarImage src={call.user.avatar} />
+                                <AvatarFallback>{call.user.name.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="text-sm font-medium">{call.user.name}</p>
+                                <p className="text-xs text-muted-foreground">{call.timestamp}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="text-xs mr-2">{call.duration}</span>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <PhoneCall size={16} />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+              
+              <TabsContent value="ivr" className="mt-3">
+                <div className="p-2 space-y-4">
+                  <div className="text-center py-8">
+                    <h3 className="font-medium mb-2">Interactive Voice Response</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Configure your automatic phone system to handle incoming calls
+                    </p>
+                    <Button>
+                      Configure IVR System
+                    </Button>
+                  </div>
+                  
+                  <div className="border rounded-md p-3">
+                    <h4 className="font-medium text-sm mb-2">Recent IVR Stats</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Total calls today</span>
+                        <span className="font-medium">12</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Avg. handling time</span>
+                        <span className="font-medium">2:45</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm">Transferred to agent</span>
+                        <span className="font-medium">4</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Need Help?</h3>
-                  <p>
-                    For support or questions about using the Team Communication Hub, please contact your administrator 
-                    or submit a support ticket through the Support section.
-                  </p>
-                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+
+        {/* Chat content */}
+        <div className="flex-1 flex flex-col">
+          {/* Chat header */}
+          <div className="border-b border-border p-4 flex justify-between items-center">
+            <div className="flex items-center">
+              <div className="mr-3">
+                {getChannelIcon(activeChannel.icon)}
               </div>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              <div>
+                <h3 className="font-medium">#{activeChannel.name}</h3>
+                <p className="text-xs text-muted-foreground">8 members · 2 online</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-1">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Phone size={18} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Start audio call</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Video size={18} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Start video call</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Search size={18} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Search in conversation</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <MoreVertical size={18} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Manage channel</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>View members</DropdownMenuItem>
+                  <DropdownMenuItem>Add members</DropdownMenuItem>
+                  <DropdownMenuItem>Channel settings</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-red-500">Leave channel</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+          
+          {/* Messages */}
+          <ScrollArea className="flex-1 p-4">
+            <div className="space-y-6">
+              {mockMessages.map((message) => (
+                <div key={message.id} className="flex">
+                  <Avatar className="h-10 w-10 mr-3 mt-1">
+                    <AvatarImage src={message.sender.avatar} />
+                    <AvatarFallback>{message.sender.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="flex-1">
+                    <div className="flex items-baseline">
+                      <h4 className="font-medium mr-2">{message.sender.name}</h4>
+                      <span className="text-xs text-muted-foreground">{message.timestamp}</span>
+                    </div>
+                    
+                    <div className="mt-1 space-y-2">
+                      <p className="text-sm">{message.content}</p>
+                      
+                      {message.attachment?.type === "image" && (
+                        <div className="mt-2 rounded-md overflow-hidden max-w-[300px]">
+                          <img src={message.attachment.url} alt="Attachment" className="w-full h-auto" />
+                        </div>
+                      )}
+                      
+                      {message.reactions.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {message.reactions.map((reaction, index) => (
+                            <div 
+                              key={index}
+                              className="flex items-center bg-secondary rounded-full px-2 py-0.5 text-xs"
+                            >
+                              <span className="mr-1">{reaction.emoji}</span>
+                              <span>{reaction.count}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreVertical size={16} />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>Reply</DropdownMenuItem>
+                        <DropdownMenuItem>Add reaction</DropdownMenuItem>
+                        <DropdownMenuItem>Copy text</DropdownMenuItem>
+                        <DropdownMenuItem>Forward</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+          
+          {/* Message input */}
+          <div className="p-4 border-t border-border">
+            <div className="relative">
+              <div className="absolute bottom-0 left-0 p-2 flex space-x-1">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" onClick={() => setShowGiphyPicker(!showGiphyPicker)}>
+                        <SmilePlus size={18} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Add emoji or GIF</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <Paperclip size={18} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Attach file</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              
+              <div className="absolute bottom-2 right-2">
+                <Button
+                  size="icon"
+                  disabled={!messageText.trim()}
+                  onClick={handleSendMessage}
+                >
+                  <Send size={18} />
+                </Button>
+              </div>
+              
+              <textarea
+                className="w-full bg-secondary/50 rounded-md pl-20 pr-14 py-3 min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-background"
+                placeholder={`Message #${activeChannel.name}`}
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+              />
+            </div>
+            
+            {showGiphyPicker && (
+              <div className="absolute bottom-[124px] left-4 z-10">
+                <GiphyPicker
+                  onSelect={handleSelectGif}
+                  onClose={() => setShowGiphyPicker(false)}
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
+      
+      <CreateChannelModal 
+        open={showCreateChannel}
+        onClose={() => setShowCreateChannel(false)}
+        onCreateChannel={handleCreateChannel}
+      />
     </AppLayout>
   );
 };

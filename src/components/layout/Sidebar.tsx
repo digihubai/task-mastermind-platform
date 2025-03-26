@@ -25,7 +25,17 @@ import {
   AlertCircle,
   Activity,
   BookOpen,
-  LucideIcon
+  LucideIcon,
+  Target,
+  PenTool,
+  Zap,
+  Database,
+  Layers,
+  Image,
+  Search,
+  FileSpreadsheet,
+  CreditCard,
+  Megaphone
 } from "lucide-react";
 
 interface SidebarProps {
@@ -58,28 +68,40 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
       ]
     },
     {
-      title: "Communication",
+      title: "Customer Service",
       items: [
-        { path: "/team-chat", icon: MessageSquare, label: "Team Chat" },
         { path: "/chat", icon: MessageSquare, label: "Customer Chat" },
+        { path: "/support", icon: HelpCircle, label: "Support Tickets" },
+        { path: "/chatbot", icon: Bot, label: "AI Chatbot" },
         { path: "/phone", icon: Phone, label: "IVR System" },
         { path: "/outbound", icon: PhoneOutgoing, label: "Outbound Calls" },
       ]
     },
     {
-      title: "Customer Management",
+      title: "Team Collaboration",
       items: [
-        { path: "/customers", icon: Users, label: "Customers" },
-        { path: "/support", icon: HelpCircle, label: "Support Tickets" },
-        { path: "/projects", icon: Briefcase, label: "Projects" },
+        { path: "/team-chat", icon: MessageSquare, label: "Team Chat" },
+        { path: "/project-management", icon: Briefcase, label: "Project Management" },
+        { path: "/crm", icon: Users, label: "CRM" },
       ]
     },
     {
-      title: "Marketing & AI",
+      title: "Marketing",
       items: [
         { path: "/marketing", icon: Mail, label: "Email Marketing" },
         { path: "/social", icon: Globe, label: "Social Media" },
-        { path: "/chatbot", icon: Bot, label: "AI Chatbot" },
+        { path: "/campaigns", icon: Target, label: "Campaigns" },
+        { path: "/brand-voice", icon: Megaphone, label: "Brand Voice" },
+      ]
+    },
+    {
+      title: "AI Tools",
+      items: [
+        { path: "/ai-copywriter", icon: PenTool, label: "AI Copywriter" },
+        { path: "/ai-seo", icon: Search, label: "AI SEO Writer" },
+        { path: "/ai-vision", icon: Image, label: "AI Vision" },
+        { path: "/ai-rewriter", icon: Zap, label: "AI Rewriter" },
+        { path: "/pdf-insight", icon: FileSpreadsheet, label: "PDF Insight" },
       ]
     },
     {
