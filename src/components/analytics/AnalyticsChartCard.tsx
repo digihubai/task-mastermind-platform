@@ -1,220 +1,185 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, LineChart, AreaChart, PieChart, ComposedChart, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Pie, Cell } from "recharts";
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { CalendarIcon, InfoIcon, Download, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Maximize2, Download } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-
-type ChartType = "line" | "bar" | "area" | "pie" | "horizontal-bar" | "funnel";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 interface AnalyticsChartCardProps {
   title: string;
-  subtitle?: string;
-  chartType: ChartType;
-  height?: number;
+  description?: string;
+  chartType: "bar" | "line";
+  timeRange?: string;
+  data: any[];
+  dataKeys: {
+    xAxisKey: string;
+    yAxisKeys: {key: string; color: string; name: string}[];
+  };
+  showLegend?: boolean;
+  showControls?: boolean;
+  showDateRange?: boolean;
+  showDownload?: boolean;
+  showShare?: boolean;
+  showInfo?: boolean;
+  className?: string;
+  status?: {
+    text: string;
+    variant: "default" | "success" | "warning" | "danger";
+  };
 }
 
 const AnalyticsChartCard: React.FC<AnalyticsChartCardProps> = ({
   title,
-  subtitle,
-  chartType,
-  height = 300
+  description,
+  chartType = "line",
+  timeRange,
+  data,
+  dataKeys,
+  showLegend = true,
+  showControls = true,
+  showDateRange = false,
+  showDownload = false,
+  showShare = false,
+  showInfo = false,
+  className = "",
+  status
 }) => {
-  const { toast } = useToast();
+  const [selectedRange, setSelectedRange] = useState(timeRange || "7d");
+  const [date, setDate] = useState<Date | undefined>(new Date());
   
-  // Sample data
-  const lineData = [
-    { name: 'Jan', revenue: 4000, spend: 2400 },
-    { name: 'Feb', revenue: 3000, spend: 1398 },
-    { name: 'Mar', revenue: 9800, spend: 2000 },
-    { name: 'Apr', revenue: 3908, spend: 2780 },
-    { name: 'May', revenue: 4800, spend: 1890 },
-    { name: 'Jun', revenue: 3800, spend: 2390 },
-    { name: 'Jul', revenue: 4300, spend: 3490 },
-  ];
-  
-  const barData = [
-    { name: 'Facebook', value: 3.2 },
-    { name: 'Instagram', value: 2.8 },
-    { name: 'Google', value: 4.1 },
-    { name: 'TikTok', value: 1.9 },
-  ];
-  
-  const horizontalBarData = [
-    { name: 'Summer Sale', value: 12500 },
-    { name: 'New Collection', value: 9800 },
-    { name: 'Holiday Promo', value: 8700 },
-    { name: 'Clearance', value: 7200 },
-    { name: 'Flash Sale', value: 5600 },
-  ];
-  
-  const pieData = [
-    { name: 'Desktop', value: 58 },
-    { name: 'Mobile', value: 38 },
-    { name: 'Tablet', value: 4 },
-  ];
-  
-  const funnelData = [
-    { name: 'Visits', value: 10000 },
-    { name: 'Add to Cart', value: 3000 },
-    { name: 'Checkout', value: 1200 },
-    { name: 'Purchase', value: 800 },
-  ];
-  
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
-  
-  const handleExpandChart = () => {
-    toast({
-      title: "Feature Coming Soon",
-      description: "Chart expansion will be available in the next update."
-    });
-  };
-  
-  const handleDownloadChart = () => {
-    toast({
-      title: "Downloading Chart",
-      description: "Your chart is being prepared for download."
-    });
-  };
-  
-  const renderChart = () => {
-    switch (chartType) {
-      case 'line':
-        return (
-          <ResponsiveContainer width="100%" height={height}>
-            <LineChart data={lineData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="revenue" stroke="#8884d8" activeDot={{ r: 8 }} />
-              <Line type="monotone" dataKey="spend" stroke="#82ca9d" />
-            </LineChart>
-          </ResponsiveContainer>
-        );
-        
-      case 'bar':
-        return (
-          <ResponsiveContainer width="100%" height={height}>
-            <BarChart data={lineData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="revenue" fill="#8884d8" />
-              <Bar dataKey="spend" fill="#82ca9d" />
-            </BarChart>
-          </ResponsiveContainer>
-        );
-        
-      case 'area':
-        return (
-          <ResponsiveContainer width="100%" height={height}>
-            <AreaChart data={lineData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Area type="monotone" dataKey="revenue" stroke="#8884d8" fill="#8884d8" fillOpacity={0.3} />
-              <Area type="monotone" dataKey="spend" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.3} />
-            </AreaChart>
-          </ResponsiveContainer>
-        );
-        
-      case 'pie':
-        return (
-          <ResponsiveContainer width="100%" height={height}>
-            <PieChart>
-              <Pie
-                data={pieData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        );
-        
-      case 'horizontal-bar':
-        return (
-          <ResponsiveContainer width="100%" height={height}>
-            <BarChart
-              layout="vertical"
-              data={horizontalBarData}
-              margin={{ top: 5, right: 30, left: 70, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis dataKey="name" type="category" />
-              <Tooltip />
-              <Bar dataKey="value" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
-        );
-        
-      case 'funnel':
-        return (
-          <ResponsiveContainer width="100%" height={height}>
-            <BarChart
-              data={funnelData}
-              layout="vertical"
-              margin={{ top: 5, right: 30, left: 70, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis dataKey="name" type="category" />
-              <Tooltip />
-              <Bar dataKey="value" fill="#8884d8">
-                {funnelData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        );
-        
-      default:
-        return (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-muted-foreground">Chart type not supported</p>
-          </div>
-        );
+  const getBadgeColor = (variant: string) => {
+    switch (variant) {
+      case "success": return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+      case "warning": return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
+      case "danger": return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
+      default: return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
     }
   };
   
   return (
-    <Card>
-      <CardHeader className="border-b pb-3">
-        <div className="flex justify-between items-center">
-          <div>
-            <CardTitle className="text-base font-medium">{title}</CardTitle>
-            {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+    <Card className={className}>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <CardTitle>{title}</CardTitle>
+            {status && (
+              <Badge variant="outline" className={getBadgeColor(status.variant)}>
+                {status.text}
+              </Badge>
+            )}
+            {showInfo && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <InfoIcon size={16} className="text-muted-foreground" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <p className="text-sm text-muted-foreground">{description}</p>
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
-          <div className="flex gap-1">
-            <Button variant="ghost" size="icon" onClick={handleExpandChart}>
-              <Maximize2 size={16} />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={handleDownloadChart}>
+          {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
+        </div>
+        
+        <div className="flex items-center gap-2">
+          {showControls && (
+            <Select value={selectedRange} onValueChange={setSelectedRange}>
+              <SelectTrigger className="w-[100px] h-8">
+                <SelectValue placeholder="Last 7 days" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7d">Last 7 days</SelectItem>
+                <SelectItem value="30d">Last 30 days</SelectItem>
+                <SelectItem value="90d">Last 90 days</SelectItem>
+                <SelectItem value="1y">Last year</SelectItem>
+                <SelectItem value="custom">Custom</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+          
+          {showDateRange && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 gap-1">
+                  <CalendarIcon size={16} />
+                  {date ? format(date, "PPP") : "Pick a date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          )}
+          
+          {showDownload && (
+            <Button variant="ghost" size="icon" className="h-8 w-8">
               <Download size={16} />
             </Button>
-          </div>
+          )}
+          
+          {showShare && (
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Share size={16} />
+            </Button>
+          )}
         </div>
       </CardHeader>
-      <CardContent className="pt-4">
-        {renderChart()}
+      
+      <CardContent>
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            {chartType === "line" ? (
+              <LineChart data={data} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                <XAxis dataKey={dataKeys.xAxisKey} tickLine={false} axisLine={false} />
+                <YAxis tickLine={false} axisLine={false} />
+                <Tooltip />
+                {showLegend && <Legend />}
+                {dataKeys.yAxisKeys.map((item, index) => (
+                  <Line 
+                    key={index}
+                    type="monotone" 
+                    dataKey={item.key} 
+                    name={item.name}
+                    stroke={item.color} 
+                    strokeWidth={2} 
+                    dot={{ r: 0 }}
+                    activeDot={{ r: 6 }}
+                  />
+                ))}
+              </LineChart>
+            ) : (
+              <BarChart data={data} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                <XAxis dataKey={dataKeys.xAxisKey} tickLine={false} axisLine={false} />
+                <YAxis tickLine={false} axisLine={false} />
+                <Tooltip />
+                {showLegend && <Legend />}
+                {dataKeys.yAxisKeys.map((item, index) => (
+                  <Bar 
+                    key={index} 
+                    dataKey={item.key} 
+                    name={item.name}
+                    fill={item.color} 
+                    radius={[4, 4, 0, 0]}
+                  />
+                ))}
+              </BarChart>
+            )}
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   );
