@@ -43,7 +43,7 @@ import {
   Receipt,
   Building,
   Sparkles,
-  FlowParallel
+  LayoutTemplate // Replaced FlowParallel with LayoutTemplate
 } from "lucide-react";
 
 interface SidebarProps {
@@ -106,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
     {
       title: "Workflow Automation",
       items: [
-        { path: "/automation/workflows", icon: FlowParallel, label: "Workflows" },
+        { path: "/automation/workflows", icon: LayoutTemplate, label: "Workflows" }, // Changed icon
         { path: "/automation/templates", icon: FileText, label: "Templates" },
         { path: "/automation/editor", icon: Zap, label: "Create Workflow" },
       ]

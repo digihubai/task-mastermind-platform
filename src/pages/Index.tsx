@@ -1,8 +1,15 @@
-import React from "react";
-import { Link } from "react-router-dom";
+
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, Bot, MessageSquare, Users, ArrowRight, BarChart3, Briefcase, Settings, FileText, PenTool, Search, FileSpreadsheet, Image, RefreshCw, Globe, Mail, DollarSign, Zap } from "lucide-react";
+import { 
+  PlusCircle, Bot, MessageSquare, Users, ArrowRight, BarChart3, 
+  Briefcase, Settings, FileText, PenTool, Search, FileSpreadsheet, 
+  Image, RefreshCw, Globe, Mail, DollarSign, Zap,
+  CheckCircle, AlertCircle, Clock, ArrowUp, ArrowDown, 
+  Edit, ArrowUpRight, Target, CalendarClock
+} from "lucide-react";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle, NavigationMenuGroup } from "@/components/ui/navigation-menu";
 
 import AppLayout from "@/components/layout/AppLayout";
