@@ -3,7 +3,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
-import { ArrowUpRight, Bot, Briefcase, Mail, MessageSquare, Users } from "lucide-react";
+import { 
+  ArrowUpRight, Bot, Briefcase, Mail, MessageSquare, 
+  Users, PenTool, FileText, Search, Brain, Eye, 
+  Edit, Book, Megaphone, Codepen, BarChart, Share2
+} from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -53,6 +57,113 @@ const Index = () => {
       link: "/marketing",
       color: "bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400",
       percentChange: "New"
+    },
+    {
+      title: "AI Copywriter",
+      description: "Generate marketing copy with AI",
+      count: "47",
+      icon: PenTool,
+      link: "/copywriter",
+      color: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400",
+      percentChange: "+15%"
+    },
+    {
+      title: "Documents",
+      description: "Manage your documents and templates",
+      count: "124",
+      icon: FileText,
+      link: "/documents",
+      color: "bg-cyan-50 text-cyan-600 dark:bg-cyan-900/20 dark:text-cyan-400",
+      percentChange: "+8%"
+    },
+    {
+      title: "AI SEO Writer",
+      description: "Optimize content for search engines",
+      count: "32",
+      icon: Search,
+      link: "/seo-writer",
+      color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400",
+      percentChange: "New"
+    },
+    {
+      title: "AI Vision",
+      description: "Image recognition and analysis",
+      count: "18",
+      icon: Eye,
+      link: "/vision",
+      color: "bg-violet-50 text-violet-600 dark:bg-violet-900/20 dark:text-violet-400",
+      percentChange: "+5%"
+    },
+    {
+      title: "AI Rewriter",
+      description: "Rephrase and improve your content",
+      count: "53",
+      icon: Edit,
+      link: "/rewriter",
+      color: "bg-fuchsia-50 text-fuchsia-600 dark:bg-fuchsia-900/20 dark:text-fuchsia-400",
+      percentChange: "+22%"
+    }
+  ];
+
+  const aiCards = [
+    {
+      title: "AI Bots",
+      description: "Manage your intelligent chatbots",
+      icon: Bot,
+      link: "/bots",
+      color: "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400",
+    },
+    {
+      title: "AI Editor",
+      description: "Edit and enhance content with AI",
+      icon: Edit,
+      link: "/editor",
+      color: "bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400",
+    },
+    {
+      title: "PDF Insight",
+      description: "Extract and analyze PDF documents",
+      icon: FileText,
+      link: "/pdf-insight",
+      color: "bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400",
+    },
+    {
+      title: "Brand Voice",
+      description: "Create consistent brand messaging",
+      icon: Megaphone,
+      link: "/brand-voice",
+      color: "bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400",
+    }
+  ];
+
+  const adminCards = [
+    {
+      title: "User Management",
+      description: "Manage users, roles and permissions",
+      icon: Users,
+      link: "/admin/users",
+      color: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400",
+    },
+    {
+      title: "Templates",
+      description: "Create and edit system templates",
+      icon: Codepen,
+      link: "/admin/templates",
+      color: "bg-cyan-50 text-cyan-600 dark:bg-cyan-900/20 dark:text-cyan-400",
+    },
+    {
+      title: "Analytics",
+      description: "View system usage and metrics",
+      icon: BarChart,
+      link: "/admin/dashboard",
+      color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400",
+    },
+    {
+      title: "Integrations",
+      description: "Manage third-party integrations",
+      icon: Share2,
+      link: "/admin/api-integration",
+      color: "bg-violet-50 text-violet-600 dark:bg-violet-900/20 dark:text-violet-400",
     }
   ];
 
@@ -66,8 +177,8 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {dashboardCards.map((card, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {dashboardCards.slice(0, 8).map((card, index) => (
             <Card 
               key={index}
               className="hover-lift overflow-hidden border border-border/40"
@@ -100,6 +211,56 @@ const Index = () => {
               </div>
             </Card>
           ))}
+        </div>
+        
+        <div className="mt-4">
+          <h2 className="text-xl font-semibold mb-4">AI Tools</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {aiCards.map((card, index) => (
+              <Card 
+                key={index}
+                className="hover-lift overflow-hidden border border-border/40"
+                onClick={() => navigate(card.link)}
+              >
+                <div className="p-5">
+                  <div className="flex items-center gap-3">
+                    <div className={`rounded-full p-3 ${card.color}`}>
+                      <card.icon size={18} />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">{card.title}</h3>
+                      <p className="text-xs text-muted-foreground">{card.description}</p>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+        
+        <div className="mt-4">
+          <h2 className="text-xl font-semibold mb-4">Admin Tools</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {adminCards.map((card, index) => (
+              <Card 
+                key={index}
+                className="hover-lift overflow-hidden border border-border/40"
+                onClick={() => navigate(card.link)}
+              >
+                <div className="p-5">
+                  <div className="flex items-center gap-3">
+                    <div className={`rounded-full p-3 ${card.color}`}>
+                      <card.icon size={18} />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">{card.title}</h3>
+                      <p className="text-xs text-muted-foreground">{card.description}</p>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
