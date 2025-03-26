@@ -1,1 +1,19 @@
+
 project_id = "tlvpxtwkwesbivkiejxy"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+
+[db]
+port = 54322
+
+[realtime]
+enabled = true
+
+[storage]
+enabled = true
+
+[functions.generate-analytics-sample]
+verify_jwt = true

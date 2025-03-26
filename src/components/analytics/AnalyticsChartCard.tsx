@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 interface AnalyticsChartCardProps {
   title: string;
@@ -31,6 +32,10 @@ interface AnalyticsChartCardProps {
     text: string;
     variant: "default" | "success" | "warning" | "danger";
   };
+  onTimeRangeChange?: (range: string) => void;
+  onDateChange?: (date: Date | undefined) => void;
+  onDownload?: () => void;
+  onShare?: () => void;
 }
 
 const AnalyticsChartCard: React.FC<AnalyticsChartCardProps> = ({
@@ -47,7 +52,11 @@ const AnalyticsChartCard: React.FC<AnalyticsChartCardProps> = ({
   showShare = false,
   showInfo = false,
   className = "",
-  status
+  status,
+  onTimeRangeChange,
+  onDateChange,
+  onDownload,
+  onShare
 }) => {
   const [selectedRange, setSelectedRange] = useState(timeRange || "7d");
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -58,6 +67,84 @@ const AnalyticsChartCard: React.FC<AnalyticsChartCardProps> = ({
       case "warning": return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
       case "danger": return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
       default: return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
+    }
+  };
+
+  const handleRangeChange = (value: string) => {
+    setSelectedRange(value);
+    if (onTimeRangeChange) {
+      onTimeRangeChange(value);
+    }
+  };
+
+  const handleDateChange = (newDate: Date | undefined) => {
+    setDate(newDate);
+    if (onDateChange) {
+      onDateChange(newDate);
+    }
+  };
+
+  const handleDownload = () => {
+    if (onDownload) {
+      onDownload();
+    } else {
+      // Default download behavior
+      try {
+        // Create a CSV from the data
+        const headers = [dataKeys.xAxisKey, ...dataKeys.yAxisKeys.map(key => key.name)].join(',');
+        const rows = data.map(item => {
+          return [
+            item[dataKeys.xAxisKey], 
+            ...dataKeys.yAxisKeys.map(key => item[key.key])
+          ].join(',');
+        });
+        const csv = [headers, ...rows].join('\n');
+        
+        // Create and trigger download
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('hidden', '');
+        a.setAttribute('href', url);
+        a.setAttribute('download', `${title.toLowerCase().replace(/ /g, '-')}-data.csv`);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        toast.success("Data downloaded successfully");
+      } catch (error) {
+        console.error("Error downloading data:", error);
+        toast.error("Failed to download data");
+      }
+    }
+  };
+
+  const handleShare = () => {
+    if (onShare) {
+      onShare();
+    } else {
+      // Default share behavior
+      try {
+        if (navigator.share) {
+          navigator.share({
+            title: title,
+            text: description || `${title} analytics data`,
+          })
+          .then(() => toast.success("Shared successfully"))
+          .catch((error) => {
+            console.error("Error sharing:", error);
+            toast.error("Failed to share");
+          });
+        } else {
+          // Fallback for browsers that don't support the Web Share API
+          navigator.clipboard.writeText(window.location.href)
+            .then(() => toast.success("Link copied to clipboard"))
+            .catch(() => toast.error("Failed to copy link"));
+        }
+      } catch (error) {
+        console.error("Error sharing:", error);
+        toast.error("Failed to share");
+      }
     }
   };
   
@@ -72,7 +159,7 @@ const AnalyticsChartCard: React.FC<AnalyticsChartCardProps> = ({
                 {status.text}
               </Badge>
             )}
-            {showInfo && (
+            {showInfo && description && (
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -90,11 +177,12 @@ const AnalyticsChartCard: React.FC<AnalyticsChartCardProps> = ({
         
         <div className="flex items-center gap-2">
           {showControls && (
-            <Select value={selectedRange} onValueChange={setSelectedRange}>
+            <Select value={selectedRange} onValueChange={handleRangeChange}>
               <SelectTrigger className="w-[100px] h-8">
                 <SelectValue placeholder="Last 7 days" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="1d">Last day</SelectItem>
                 <SelectItem value="7d">Last 7 days</SelectItem>
                 <SelectItem value="30d">Last 30 days</SelectItem>
                 <SelectItem value="90d">Last 90 days</SelectItem>
@@ -116,7 +204,7 @@ const AnalyticsChartCard: React.FC<AnalyticsChartCardProps> = ({
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={setDate}
+                  onSelect={handleDateChange}
                   initialFocus
                 />
               </PopoverContent>
@@ -124,13 +212,13 @@ const AnalyticsChartCard: React.FC<AnalyticsChartCardProps> = ({
           )}
           
           {showDownload && (
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleDownload}>
               <Download size={16} />
             </Button>
           )}
           
           {showShare && (
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleShare}>
               <Share size={16} />
             </Button>
           )}
