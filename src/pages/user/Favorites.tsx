@@ -1,9 +1,18 @@
-
 import React from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, FileText, Pencil, Search, Bot, Image, RefreshCw } from "lucide-react";
+import { 
+  Heart, 
+  Star, 
+  Edit, 
+  Trash2, 
+  FileText, 
+  MessageSquare, 
+  PenTool,
+  Image,
+  ExternalLink 
+} from "lucide-react";
 
 const Favorites = () => {
   return (

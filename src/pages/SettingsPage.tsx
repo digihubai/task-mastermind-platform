@@ -2,11 +2,23 @@ import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { PlusCircle, Trash2, Save, DollarSign, Check, X, Plus } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/Badge";
+import { 
+  Settings, 
+  User, 
+  Lock, 
+  Bell, 
+  Globe, 
+  Palette, 
+  CreditCard, 
+  ShieldCheck, 
+  ChevronRight,
+  Check 
+} from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Feature {
   id: string;
