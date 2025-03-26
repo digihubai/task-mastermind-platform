@@ -14,6 +14,7 @@ import CustomersPage from "./pages/CustomersPage";
 import ChatbotPage from "./pages/ChatbotPage";
 import MarketingPage from "./pages/MarketingPage";
 import SettingsPage from "./pages/SettingsPage";
+import TeamChatPage from "./pages/TeamChatPage";
 
 // User pages
 import Dashboard from "./pages/user/Dashboard";
@@ -80,6 +81,7 @@ const App = () => (
           <Route path="/chatbot" element={<ChatbotPage />} />
           <Route path="/marketing" element={<MarketingPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/team-chat" element={<TeamChatPage />} />
           
           {/* User routes */}
           <Route path="/dashboard" element={<Dashboard />} />
