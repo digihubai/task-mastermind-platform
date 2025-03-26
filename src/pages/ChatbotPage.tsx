@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/Badge";
 
 const ChatbotPage = () => {
   const { toast } = useToast();
@@ -504,3 +504,4 @@ const ChatbotPage = () => {
 };
 
 export default ChatbotPage;
+
