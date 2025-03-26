@@ -28,32 +28,32 @@ const Index = () => {
     customerSatisfaction: {
       value: "92%",
       change: "+3%",
-      trend: "up"
+      trend: "up" as "up" | "down"
     },
     salesPipeline: {
       value: "$243,578",
       change: "+12%",
-      trend: "up"
+      trend: "up" as "up" | "down"
     },
     activeProjects: {
       value: "24",
       change: "+5",
-      trend: "up"
+      trend: "up" as "up" | "down"
     },
     taskCompletion: {
       value: "87%",
       change: "-2%",
-      trend: "down"
+      trend: "down" as "up" | "down"
     },
     leadConversion: {
       value: "32%",
       change: "+5%",
-      trend: "up"
+      trend: "up" as "up" | "down"
     },
     averageResolutionTime: {
       value: "2.4h",
       change: "-15%",
-      trend: "up" // down is good for resolution time
+      trend: "up" as "up" | "down" // down is good for resolution time
     }
   };
   

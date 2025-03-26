@@ -92,6 +92,9 @@ import ApiConnector from "./pages/automation/ApiConnector";
 import IVRSystem from "./pages/phone/IVRSystem";
 import OutboundCalls from "./pages/outbound/OutboundCalls";
 
+// Analytics pages
+import AnalyticsDashboard from "./pages/analytics/AnalyticsDashboard";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -188,6 +191,9 @@ const App = () => (
           {/* Phone system routes */}
           <Route path="/phone" element={<IVRSystem />} />
           <Route path="/outbound" element={<OutboundCalls />} />
+          
+          {/* Analytics routes */}
+          <Route path="/analytics" element={<AnalyticsDashboard />} />
           
           {/* Catch all */}
           <Route path="*" element={<NotFound />} />

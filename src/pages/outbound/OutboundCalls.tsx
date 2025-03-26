@@ -1,805 +1,757 @@
 
-import React, { useState } from 'react';
-import AppLayout from '@/components/layout/AppLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import {
-  PhoneOutgoing,
-  Users,
-  CalendarClock,
+import React, { useState } from "react";
+import AppLayout from "@/components/layout/AppLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { 
+  Phone, 
+  Users, 
+  List, 
+  Settings, 
+  Plus, 
+  Play, 
+  PauseCircle, 
+  Download, 
+  MoreHorizontal, 
+  Clock, 
+  CheckCircle2, 
+  XCircle, 
+  ArrowUpRight,
   FileText,
-  Settings,
-  Play,
-  Edit,
-  Trash2,
-  Copy,
-  Plus,
-  Check,
-  AlertCircle,
-  BarChart3,
-  Clock,
-  RefreshCw,
-  ChevronRight,
-  Save,
+  VoicemailIcon,
+  CalendarClock,
+  MessageSquare,
   Upload,
-  Download,
-  Search,
-  Filter,
-  UserPlus,
-  CheckCircle,
-  Phone,
-  X,
-  Pause
-} from 'lucide-react';
+  RefreshCw,
+  ArrowUp,
+  ArrowDown
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const OutboundCalls = () => {
   const { toast } = useToast();
-  const [campaignStatus, setCampaignStatus] = useState(true);
+  const [activeTab, setActiveTab] = useState("campaigns");
+  const [twilioConnected, setTwilioConnected] = useState(false);
   
+  const connectTwilio = () => {
+    setTwilioConnected(true);
+    toast({
+      title: "Twilio Connected",
+      description: "Your Twilio account has been successfully connected.",
+    });
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-violet-600 to-indigo-600 text-transparent bg-clip-text">
-              Outbound Calls
-            </h1>
+            <h1 className="text-3xl font-semibold tracking-tight">Outbound Calls</h1>
             <p className="text-muted-foreground mt-1">
-              Manage your outbound call campaigns and agent scripts
+              Manage automated outbound call campaigns
             </p>
           </div>
           
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Switch 
-                id="campaign-active" 
-                checked={campaignStatus} 
-                onCheckedChange={setCampaignStatus} 
-              />
-              <Label htmlFor="campaign-active" className="text-sm">
-                {campaignStatus ? (
-                  <span className="text-green-600 flex items-center">
-                    <Check size={16} className="mr-1" /> Active
-                  </span>
-                ) : (
-                  <span className="text-red-600 flex items-center">
-                    <X size={16} className="mr-1" /> Paused
-                  </span>
-                )}
-              </Label>
-            </div>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" className="flex gap-2">
+              <Download size={16} />
+              <span>Export</span>
+            </Button>
             
-            <Button>
-              <PhoneOutgoing size={16} className="mr-2" />
-              New Campaign
+            <Button className="flex gap-2">
+              <Plus size={16} />
+              <span>New Campaign</span>
             </Button>
           </div>
         </div>
         
-        <Tabs defaultValue="campaigns" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-            <TabsTrigger value="scripts">Call Scripts</TabsTrigger>
-            <TabsTrigger value="contacts">Contact Lists</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="campaigns">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="overflow-hidden">
-                <CardHeader className="bg-card p-4 border-b">
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">New Customer Welcome</CardTitle>
-                    <CampaignBadge status="active" />
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Status</p>
-                      <div className="flex items-center justify-between mt-1">
-                        <p className="text-sm font-medium">Running • 42% complete</p>
-                        <div className="w-[100px] h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-green-500 rounded-full" style={{width: '42%'}}></div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <p className="text-sm text-muted-foreground">Details</p>
-                      <div className="grid grid-cols-2 gap-x-2 gap-y-1 mt-1">
-                        <p className="text-xs">Contacts:</p>
-                        <p className="text-xs font-medium">245</p>
-                        <p className="text-xs">Connected:</p>
-                        <p className="text-xs font-medium">103</p>
-                        <p className="text-xs">Script:</p>
-                        <p className="text-xs font-medium">Welcome Call v2</p>
-                        <p className="text-xs">Schedule:</p>
-                        <p className="text-xs font-medium">Weekdays 9am-5pm</p>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-2 flex space-x-2">
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <Pause size={14} className="mr-1" /> Pause
-                      </Button>
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <Edit size={14} className="mr-1" /> Edit
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="overflow-hidden">
-                <CardHeader className="bg-card p-4 border-b">
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">Renewal Reminder</CardTitle>
-                    <CampaignBadge status="scheduled" />
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Status</p>
-                      <p className="text-sm font-medium mt-1">Scheduled to start Oct 15, 2023</p>
-                    </div>
-                    
-                    <div>
-                      <p className="text-sm text-muted-foreground">Details</p>
-                      <div className="grid grid-cols-2 gap-x-2 gap-y-1 mt-1">
-                        <p className="text-xs">Contacts:</p>
-                        <p className="text-xs font-medium">178</p>
-                        <p className="text-xs">Connected:</p>
-                        <p className="text-xs font-medium">0</p>
-                        <p className="text-xs">Script:</p>
-                        <p className="text-xs font-medium">Renewal Reminder v1</p>
-                        <p className="text-xs">Schedule:</p>
-                        <p className="text-xs font-medium">Weekdays 10am-4pm</p>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-2 flex space-x-2">
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <Play size={14} className="mr-1" /> Start Now
-                      </Button>
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <Edit size={14} className="mr-1" /> Edit
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="overflow-hidden">
-                <CardHeader className="bg-card p-4 border-b">
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">Feedback Survey</CardTitle>
-                    <CampaignBadge status="completed" />
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Status</p>
-                      <p className="text-sm font-medium mt-1">Completed on Oct 2, 2023</p>
-                    </div>
-                    
-                    <div>
-                      <p className="text-sm text-muted-foreground">Results</p>
-                      <div className="grid grid-cols-2 gap-x-2 gap-y-1 mt-1">
-                        <p className="text-xs">Contacts:</p>
-                        <p className="text-xs font-medium">312</p>
-                        <p className="text-xs">Connected:</p>
-                        <p className="text-xs font-medium">287</p>
-                        <p className="text-xs">Answered:</p>
-                        <p className="text-xs font-medium">201</p>
-                        <p className="text-xs">Conversion:</p>
-                        <p className="text-xs font-medium">64.4%</p>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-2 flex space-x-2">
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <Copy size={14} className="mr-1" /> Clone
-                      </Button>
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <BarChart3 size={14} className="mr-1" /> Report
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-dashed border-2 hover:border-violet-300 transition-colors cursor-pointer h-full flex items-center justify-center">
-                <CardContent className="p-6 text-center">
-                  <div className="rounded-full w-12 h-12 bg-violet-100 dark:bg-violet-900/20 text-violet-600 flex items-center justify-center mx-auto mb-4">
-                    <PhoneOutgoing size={24} />
-                  </div>
-                  <h3 className="font-medium text-lg mb-1">New Campaign</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Create a new outbound call campaign
-                  </p>
-                  <Button variant="outline" className="mt-2">
-                    <Plus size={16} className="mr-2" />
-                    Create Campaign
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="scripts">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <CardTitle>Call Scripts</CardTitle>
-                    <Button size="sm">
-                      <Plus size={16} className="mr-2" />
-                      New Script
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <ScriptCard 
-                      title="Welcome Call v2"
-                      lastUpdated="Oct 8, 2023"
-                      usedIn={2}
-                      hasVariants={true}
-                    />
-                    
-                    <ScriptCard 
-                      title="Renewal Reminder v1"
-                      lastUpdated="Sep 25, 2023"
-                      usedIn={1}
-                      hasVariants={false}
-                    />
-                    
-                    <ScriptCard 
-                      title="Customer Satisfaction Survey"
-                      lastUpdated="Sep 12, 2023"
-                      usedIn={1}
-                      hasVariants={true}
-                    />
-                    
-                    <ScriptCard 
-                      title="Product Upgrade Offer"
-                      lastUpdated="Aug 30, 2023"
-                      usedIn={0}
-                      hasVariants={false}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <CardTitle>Script Preview: Welcome Call v2</CardTitle>
-                    <Button variant="outline" size="sm">
-                      <Edit size={16} className="mr-2" />
-                      Edit
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Introduction</h3>
-                    <p className="text-sm mb-4 bg-muted p-3 rounded-md border">
-                      "Hello [Customer.FirstName], this is [Agent.Name] from DigiHub AI. I'm calling to welcome you to our service and ensure you're getting the most from your new account. Do you have a moment to chat?"
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Key Benefits</h3>
-                    <div className="text-sm mb-4 bg-muted p-3 rounded-md border">
-                      <p className="mb-2">
-                        "I'd like to highlight some key features that our customers find most valuable:"
-                      </p>
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li>Our AI assistant that helps automate your workflow</li>
-                        <li>The analytics dashboard that provides real-time insights</li>
-                        <li>24/7 customer support through multiple channels</li>
-                      </ul>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Questions & Objections</h3>
-                    <div className="text-sm mb-4 bg-muted p-3 rounded-md border">
-                      <div className="mb-3">
-                        <p className="font-medium">If they ask about pricing:</p>
-                        <p>"Your current plan is [Customer.Plan] at [Customer.Price] per month. We also offer [UpgradeOption] with additional features at [UpgradePrice]."</p>
-                      </div>
-                      <div>
-                        <p className="font-medium">If they mention they're busy:</p>
-                        <p>"I understand. When would be a better time for me to call back? I'd love to ensure you're getting the full value from your subscription."</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Closing</h3>
-                    <p className="text-sm bg-muted p-3 rounded-md border">
-                      "Thank you for your time today, [Customer.FirstName]. Remember, you can reach our support team at support@digihubai.com or through the chat feature in your dashboard. Have a great day!"
-                    </p>
-                  </div>
-                  
-                  <div className="flex justify-between pt-2">
-                    <Button variant="outline" size="sm">
-                      <Download size={14} className="mr-1" /> Download
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Copy size={14} className="mr-1" /> Clone
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="contacts">
-            <div className="flex mb-4 gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search contacts..." 
-                  className="pl-9"
-                />
+        {!twilioConnected ? (
+          <Card className="border-dashed border-2">
+            <CardContent className="flex flex-col items-center justify-center p-6 text-center">
+              <Phone size={48} className="text-muted-foreground mb-4" />
+              <h3 className="text-xl font-medium mb-2">Connect Your Phone System</h3>
+              <p className="text-muted-foreground mb-4 max-w-md">
+                To start making outbound calls, connect your Twilio account or other VoIP service.
+              </p>
+              <div className="flex flex-col md:flex-row gap-3">
+                <Button onClick={connectTwilio} className="flex gap-2">
+                  <Phone size={16} />
+                  <span>Connect Twilio</span>
+                </Button>
+                <Button variant="outline">
+                  Connect Other Provider
+                </Button>
               </div>
-              <Button variant="outline">
-                <Filter size={16} className="mr-2" />
-                Filter
-              </Button>
-              <Button variant="outline">
-                <Upload size={16} className="mr-2" />
-                Import
-              </Button>
-              <Button>
-                <UserPlus size={16} className="mr-2" />
-                Add Contact
-              </Button>
-            </div>
-            
-            <Card>
-              <CardContent className="p-4">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left font-medium py-2 px-2">Name</th>
-                      <th className="text-left font-medium py-2 px-2">Phone</th>
-                      <th className="text-left font-medium py-2 px-2">List</th>
-                      <th className="text-left font-medium py-2 px-2">Last Contact</th>
-                      <th className="text-left font-medium py-2 px-2">Status</th>
-                      <th className="text-left font-medium py-2 px-2">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <ContactRow 
-                      name="John Smith"
-                      phone="(555) 123-4567"
-                      list="New Customers"
-                      lastContact="Oct 10, 2023"
-                      status="Contacted"
-                    />
-                    <ContactRow 
-                      name="Sarah Johnson"
-                      phone="(555) 234-5678"
-                      list="Renewals Q4"
-                      lastContact="Never"
-                      status="Scheduled"
-                    />
-                    <ContactRow 
-                      name="Michael Brown"
-                      phone="(555) 345-6789"
-                      list="Feedback Survey"
-                      lastContact="Oct 2, 2023"
-                      status="Completed"
-                    />
-                    <ContactRow 
-                      name="Emily Davis"
-                      phone="(555) 456-7890"
-                      list="New Customers"
-                      lastContact="Oct 9, 2023"
-                      status="No Answer"
-                    />
-                    <ContactRow 
-                      name="David Wilson"
-                      phone="(555) 567-8901"
-                      list="Feedback Survey"
-                      lastContact="Oct 2, 2023"
-                      status="Interested"
-                    />
-                  </tbody>
-                </table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="analytics">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <StatCard 
-                title="Total Calls" 
-                value="972" 
-                change="+15.3%" 
-                trend="up" 
-              />
-              <StatCard 
-                title="Connected Rate" 
-                value="68.4%" 
-                change="+2.7%" 
-                trend="up" 
-              />
-              <StatCard 
-                title="Avg. Call Duration" 
-                value="4:12" 
-                change="+0:22" 
-                trend="up" 
-              />
-              <StatCard 
-                title="Conversion Rate" 
-                value="23.8%" 
-                change="+5.2%" 
-                trend="up" 
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Campaign Performance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px] flex items-center justify-center border rounded-md">
-                    <div className="text-center text-muted-foreground">
-                      <BarChart3 size={48} className="mx-auto mb-2 text-muted-foreground/50" />
-                      <p>Campaign performance visualization would appear here</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid grid-cols-4 w-full md:w-[600px]">
+                <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+                <TabsTrigger value="contacts">Contact Lists</TabsTrigger>
+                <TabsTrigger value="scripts">Call Scripts</TabsTrigger>
+                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              </TabsList>
               
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Call Outcomes</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px] flex items-center justify-center border rounded-md">
-                    <div className="text-center text-muted-foreground">
-                      <PieChartIcon size={48} className="mx-auto mb-2 text-muted-foreground/50" />
-                      <p>Call outcomes distribution chart would appear here</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="settings">
-            <Card>
-              <CardHeader>
-                <CardTitle>Outbound Call Settings</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">General Settings</h3>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="caller-id">Default Caller ID</Label>
-                      <Input id="caller-id" defaultValue="(555) 987-6543" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="calling-hours">Calling Hours</Label>
-                      <Select defaultValue="9-5">
-                        <SelectTrigger id="calling-hours">
-                          <SelectValue placeholder="Select calling hours" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="9-5">9:00 AM - 5:00 PM (Mon-Fri)</SelectItem>
-                          <SelectItem value="8-6">8:00 AM - 6:00 PM (Mon-Fri)</SelectItem>
-                          <SelectItem value="10-8">10:00 AM - 8:00 PM (Mon-Sat)</SelectItem>
-                          <SelectItem value="custom">Custom Schedule</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="max-attempts">Maximum Call Attempts</Label>
-                      <Select defaultValue="3">
-                        <SelectTrigger id="max-attempts">
-                          <SelectValue placeholder="Select maximum attempts" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">1 attempt</SelectItem>
-                          <SelectItem value="2">2 attempts</SelectItem>
-                          <SelectItem value="3">3 attempts</SelectItem>
-                          <SelectItem value="4">4 attempts</SelectItem>
-                          <SelectItem value="5">5 attempts</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="retry-interval">Retry Interval</Label>
-                      <Select defaultValue="1">
-                        <SelectTrigger id="retry-interval">
-                          <SelectValue placeholder="Select retry interval" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">1 day</SelectItem>
-                          <SelectItem value="2">2 days</SelectItem>
-                          <SelectItem value="3">3 days</SelectItem>
-                          <SelectItem value="7">1 week</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Advanced Settings</h3>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="voicemail-behavior">Voicemail Behavior</Label>
-                      <Select defaultValue="leave">
-                        <SelectTrigger id="voicemail-behavior">
-                          <SelectValue placeholder="Select voicemail behavior" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="leave">Leave message</SelectItem>
-                          <SelectItem value="hang-up">Hang up</SelectItem>
-                          <SelectItem value="custom">Custom per campaign</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="default-voicemail">Default Voicemail Script</Label>
-                      <Textarea 
-                        id="default-voicemail" 
-                        placeholder="Enter your default voicemail script"
-                        defaultValue="Hello, this is [Agent.Name] from DigiHub AI. Sorry we missed you. Please call us back at (555) 987-6543 at your convenience. Thank you!"
-                        rows={3}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="call-recording">Call Recording</Label>
-                      <div className="flex items-center space-x-2">
-                        <Switch id="call-recording" defaultChecked />
-                        <Label htmlFor="call-recording">Enabled</Label>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="do-not-call-compliance">Do Not Call Compliance</Label>
-                      <div className="flex items-center space-x-2">
-                        <Switch id="do-not-call-compliance" defaultChecked />
-                        <Label htmlFor="do-not-call-compliance">Enabled</Label>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Automatically check numbers against national Do Not Call registry
-                      </p>
-                    </div>
-                  </div>
+              <TabsContent value="campaigns" className="space-y-4 mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {[
+                    {
+                      name: "Lead Follow-up",
+                      status: "Active",
+                      calls: 248,
+                      completed: 183,
+                      answered: 76,
+                      progress: 74,
+                      scheduled: "Daily at 10:00 AM"
+                    },
+                    {
+                      name: "Customer Feedback",
+                      status: "Paused",
+                      calls: 120,
+                      completed: 85,
+                      answered: 42,
+                      progress: 71,
+                      scheduled: "Mon, Wed, Fri at 2:00 PM"
+                    },
+                    {
+                      name: "Appointment Reminders",
+                      status: "Scheduled",
+                      calls: 0,
+                      completed: 0,
+                      answered: 0,
+                      progress: 0,
+                      scheduled: "Starting tomorrow at 9:00 AM"
+                    }
+                  ].map((campaign, i) => (
+                    <Card key={i} className="overflow-hidden">
+                      <CardHeader className="bg-muted/40 pb-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-base">{campaign.name}</CardTitle>
+                            <Badge 
+                              variant={campaign.status === "Active" ? "default" : campaign.status === "Paused" ? "outline" : "secondary"}
+                              className="mt-1"
+                            >
+                              {campaign.status}
+                            </Badge>
+                          </div>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal size={18} />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-4">
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-3 gap-2 text-center">
+                            <div>
+                              <p className="text-2xl font-semibold">{campaign.calls}</p>
+                              <p className="text-xs text-muted-foreground">Total Calls</p>
+                            </div>
+                            <div>
+                              <p className="text-2xl font-semibold">{campaign.completed}</p>
+                              <p className="text-xs text-muted-foreground">Completed</p>
+                            </div>
+                            <div>
+                              <p className="text-2xl font-semibold">{campaign.answered}</p>
+                              <p className="text-xs text-muted-foreground">Answered</p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <div className="flex justify-between items-center text-xs">
+                              <span className="text-muted-foreground">Progress</span>
+                              <span>{campaign.progress}%</span>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-2">
+                              <div
+                                className="bg-primary rounded-full h-2"
+                                style={{ width: `${campaign.progress}%` }}
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <Clock size={14} />
+                            <span>{campaign.scheduled}</span>
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            {campaign.status === "Active" ? (
+                              <Button variant="outline" size="sm" className="flex-1">
+                                <PauseCircle size={14} className="mr-1.5" /> Pause
+                              </Button>
+                            ) : (
+                              <Button variant="outline" size="sm" className="flex-1">
+                                <Play size={14} className="mr-1.5" /> Start
+                              </Button>
+                            )}
+                            <Button variant="outline" size="sm" className="flex-1">
+                              <Settings size={14} className="mr-1.5" /> Edit
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
                 
-                <div className="pt-4 flex items-center justify-end gap-2">
-                  <Button variant="outline">Cancel</Button>
-                  <Button onClick={() => {
-                    toast({
-                      title: "Settings saved",
-                      description: "Your outbound call settings have been updated",
-                    })
-                  }}>
-                    <Save size={16} className="mr-2" />
-                    Save Settings
-                  </Button>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recent Call Activity</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-1">
+                      {[
+                        { phone: "+1 (555) 123-4567", status: "Answered", duration: "2m 14s", time: "10 minutes ago", campaign: "Lead Follow-up" },
+                        { phone: "+1 (555) 234-5678", status: "No Answer", duration: "0s", time: "12 minutes ago", campaign: "Lead Follow-up" },
+                        { phone: "+1 (555) 345-6789", status: "Voicemail", duration: "32s", time: "15 minutes ago", campaign: "Lead Follow-up" },
+                        { phone: "+1 (555) 456-7890", status: "Answered", duration: "4m 02s", time: "20 minutes ago", campaign: "Customer Feedback" },
+                        { phone: "+1 (555) 567-8901", status: "Busy", duration: "0s", time: "25 minutes ago", campaign: "Customer Feedback" }
+                      ].map((call, i) => (
+                        <div key={i} className="flex items-center justify-between py-3 border-b border-border/40 last:border-0">
+                          <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                              <Phone size={14} />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium">{call.phone}</p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <span>{call.time}</span>
+                                <span>•</span>
+                                <span>{call.campaign}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="text-right">
+                              <Badge 
+                                variant={
+                                  call.status === "Answered" ? "default" : 
+                                  call.status === "Voicemail" ? "secondary" : 
+                                  "outline"
+                                }
+                              >
+                                {call.status}
+                              </Badge>
+                              <p className="text-xs text-muted-foreground mt-1">{call.duration}</p>
+                            </div>
+                            <Button variant="ghost" size="icon">
+                              <ArrowUpRight size={16} />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="contacts" className="space-y-4 mt-6">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle>Contact Lists</CardTitle>
+                    <Button size="sm" className="flex gap-1">
+                      <Plus size={14} />
+                      New List
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        { name: "Recent Leads", count: 124, lastUpdated: "Today", status: "Active" },
+                        { name: "Current Customers", count: 532, lastUpdated: "Yesterday", status: "Active" },
+                        { name: "Event Attendees", count: 89, lastUpdated: "Oct 15, 2023", status: "Inactive" }
+                      ].map((list, i) => (
+                        <div key={i} className="flex items-center justify-between p-3 border rounded-md">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                              <Users size={18} />
+                            </div>
+                            <div>
+                              <p className="font-medium">{list.name}</p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <span>{list.count} contacts</span>
+                                <span>•</span>
+                                <span>Updated {list.lastUpdated}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Badge variant={list.status === "Active" ? "default" : "outline"}>
+                              {list.status}
+                            </Badge>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal size={18} />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="mt-6 p-4 border rounded-md border-dashed flex flex-col items-center justify-center text-center">
+                      <Upload className="h-10 w-10 text-muted-foreground mb-3" />
+                      <h3 className="font-medium mb-1">Import Contacts</h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Upload a CSV file or import from CRM
+                      </p>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                          Upload CSV
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          Connect CRM
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="scripts" className="space-y-4 mt-6">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle>Call Scripts</CardTitle>
+                    <Button size="sm" className="flex gap-1">
+                      <Plus size={14} />
+                      New Script
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        { 
+                          name: "Lead Qualification", 
+                          description: "Script to qualify new leads and schedule a follow-up call", 
+                          lastEdited: "2 days ago",
+                          type: "Interactive"
+                        },
+                        { 
+                          name: "Product Introduction", 
+                          description: "Introduction to our product features and benefits", 
+                          lastEdited: "1 week ago",
+                          type: "Text-to-Speech"
+                        },
+                        { 
+                          name: "Appointment Reminder", 
+                          description: "Reminder for upcoming appointments with confirmation", 
+                          lastEdited: "2 weeks ago",
+                          type: "Interactive"
+                        }
+                      ].map((script, i) => (
+                        <div key={i} className="flex items-center justify-between p-3 border rounded-md">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                              <FileText size={18} />
+                            </div>
+                            <div>
+                              <p className="font-medium">{script.name}</p>
+                              <p className="text-sm text-muted-foreground">{script.description}</p>
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                                <span>Edited {script.lastEdited}</span>
+                                <span>•</span>
+                                <span>{script.type}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal size={18} />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="mt-6">
+                      <h3 className="text-sm font-medium mb-3">Script Templates</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        {[
+                          { name: "Lead Qualification", icon: <Users size={18} /> },
+                          { name: "Appointment Setting", icon: <CalendarClock size={18} /> },
+                          { name: "Feedback Collection", icon: <MessageSquare size={18} /> },
+                          { name: "Event Invitation", icon: <FileText size={18} /> },
+                          { name: "Voicemail Script", icon: <VoicemailIcon size={18} /> },
+                          { name: "Custom Script", icon: <Plus size={18} /> }
+                        ].map((template, i) => (
+                          <div key={i} className="p-3 border rounded-md flex items-center gap-2 cursor-pointer hover:bg-muted/50 transition-colors">
+                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                              {template.icon}
+                            </div>
+                            <span className="text-sm font-medium">{template.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="analytics" className="space-y-4 mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex flex-col">
+                        <p className="text-sm text-muted-foreground">Total Calls</p>
+                        <p className="text-3xl font-semibold mt-1">1,248</p>
+                        <div className="flex items-center text-green-600 text-sm mt-2">
+                          <ArrowUp size={14} className="mr-1" />
+                          <span>12% from last week</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex flex-col">
+                        <p className="text-sm text-muted-foreground">Answer Rate</p>
+                        <p className="text-3xl font-semibold mt-1">32%</p>
+                        <div className="flex items-center text-green-600 text-sm mt-2">
+                          <ArrowUp size={14} className="mr-1" />
+                          <span>5% from last week</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex flex-col">
+                        <p className="text-sm text-muted-foreground">Avg. Call Duration</p>
+                        <p className="text-3xl font-semibold mt-1">2m 48s</p>
+                        <div className="flex items-center text-green-600 text-sm mt-2">
+                          <ArrowUp size={14} className="mr-1" />
+                          <span>18s from last week</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex flex-col">
+                        <p className="text-sm text-muted-foreground">Conversion Rate</p>
+                        <p className="text-3xl font-semibold mt-1">14%</p>
+                        <div className="flex items-center text-red-600 text-sm mt-2">
+                          <ArrowDown size={14} className="mr-1" />
+                          <span>2% from last week</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Call Outcomes</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 size={14} className="text-green-500" />
+                            <span className="text-sm">Answered</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium">398</span>
+                            <span className="text-sm text-muted-foreground">32%</span>
+                            <div className="w-16 bg-muted rounded-full h-2">
+                              <div className="bg-green-500 rounded-full h-2" style={{ width: '32%' }} />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <VoicemailIcon size={14} className="text-blue-500" />
+                            <span className="text-sm">Voicemail</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium">274</span>
+                            <span className="text-sm text-muted-foreground">22%</span>
+                            <div className="w-16 bg-muted rounded-full h-2">
+                              <div className="bg-blue-500 rounded-full h-2" style={{ width: '22%' }} />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <XCircle size={14} className="text-amber-500" />
+                            <span className="text-sm">No Answer</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium">461</span>
+                            <span className="text-sm text-muted-foreground">37%</span>
+                            <div className="w-16 bg-muted rounded-full h-2">
+                              <div className="bg-amber-500 rounded-full h-2" style={{ width: '37%' }} />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <XCircle size={14} className="text-red-500" />
+                            <span className="text-sm">Busy/Failed</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium">115</span>
+                            <span className="text-sm text-muted-foreground">9%</span>
+                            <div className="w-16 bg-muted rounded-full h-2">
+                              <div className="bg-red-500 rounded-full h-2" style={{ width: '9%' }} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Best Calling Times</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">10:00 AM - 12:00 PM</span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium">43% Answer Rate</span>
+                            <div className="w-24 bg-muted rounded-full h-2">
+                              <div className="bg-green-500 rounded-full h-2" style={{ width: '43%' }} />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">2:00 PM - 4:00 PM</span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium">38% Answer Rate</span>
+                            <div className="w-24 bg-muted rounded-full h-2">
+                              <div className="bg-green-500 rounded-full h-2" style={{ width: '38%' }} />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">4:00 PM - 6:00 PM</span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium">35% Answer Rate</span>
+                            <div className="w-24 bg-muted rounded-full h-2">
+                              <div className="bg-green-500 rounded-full h-2" style={{ width: '35%' }} />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">8:00 AM - 10:00 AM</span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium">28% Answer Rate</span>
+                            <div className="w-24 bg-muted rounded-full h-2">
+                              <div className="bg-green-500 rounded-full h-2" style={{ width: '28%' }} />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">6:00 PM - 8:00 PM</span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium">18% Answer Rate</span>
+                            <div className="w-24 bg-muted rounded-full h-2">
+                              <div className="bg-green-500 rounded-full h-2" style={{ width: '18%' }} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Campaign Performance</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        { 
+                          name: "Lead Follow-up", 
+                          calls: 248, 
+                          answered: 92, 
+                          answerRate: 37, 
+                          conversions: 28, 
+                          conversionRate: 11,
+                          trend: "up" 
+                        },
+                        { 
+                          name: "Customer Feedback", 
+                          calls: 120, 
+                          answered: 45, 
+                          answerRate: 38, 
+                          conversions: 22, 
+                          conversionRate: 18,
+                          trend: "up" 
+                        },
+                        { 
+                          name: "Product Announcement", 
+                          calls: 215, 
+                          answered: 58, 
+                          answerRate: 27, 
+                          conversions: 12, 
+                          conversionRate: 6,
+                          trend: "down" 
+                        }
+                      ].map((campaign, i) => (
+                        <div key={i} className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border rounded-md">
+                          <div>
+                            <h4 className="font-medium">{campaign.name}</h4>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                              <span>{campaign.calls} calls</span>
+                              <span>•</span>
+                              <span>{campaign.answered} answered</span>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-sm text-muted-foreground">Answer Rate</p>
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">{campaign.answerRate}%</span>
+                                <div className={`flex items-center text-xs ${campaign.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                                  {campaign.trend === 'up' ? (
+                                    <ArrowUp size={12} className="mr-0.5" />
+                                  ) : (
+                                    <ArrowDown size={12} className="mr-0.5" />
+                                  )}
+                                  <span>3%</span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div>
+                              <p className="text-sm text-muted-foreground">Conversion Rate</p>
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">{campaign.conversionRate}%</span>
+                                <div className={`flex items-center text-xs ${campaign.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                                  {campaign.trend === 'up' ? (
+                                    <ArrowUp size={12} className="mr-0.5" />
+                                  ) : (
+                                    <ArrowDown size={12} className="mr-0.5" />
+                                  )}
+                                  <span>2%</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <Button variant="outline" size="sm">
+                            View Details
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </>
+        )}
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Industry Templates</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                {
+                  industry: "Healthcare",
+                  templates: [
+                    "Appointment Reminders",
+                    "Medication Refill Alerts",
+                    "Follow-up Consultations"
+                  ],
+                  icon: <CheckCircle2 size={18} className="text-blue-500" />
+                },
+                {
+                  industry: "Real Estate",
+                  templates: [
+                    "Property Viewing Confirmation",
+                    "New Listing Alerts",
+                    "Client Follow-up Call"
+                  ],
+                  icon: <CheckCircle2 size={18} className="text-green-500" />
+                },
+                {
+                  industry: "Financial Services",
+                  templates: [
+                    "Investment Opportunity Call",
+                    "Account Review Scheduler",
+                    "Service Renewal Notice"
+                  ],
+                  icon: <CheckCircle2 size={18} className="text-amber-500" />
+                },
+                {
+                  industry: "Education",
+                  templates: [
+                    "Enrollment Follow-up",
+                    "Course Registration Reminder",
+                    "Alumni Engagement"
+                  ],
+                  icon: <CheckCircle2 size={18} className="text-indigo-500" />
+                },
+                {
+                  industry: "Retail",
+                  templates: [
+                    "Order Status Updates",
+                    "Special Promotion Call",
+                    "Customer Satisfaction Survey"
+                  ],
+                  icon: <CheckCircle2 size={18} className="text-rose-500" />
+                },
+                {
+                  industry: "Professional Services",
+                  templates: [
+                    "Consultation Scheduler",
+                    "Service Follow-up",
+                    "Client Check-in Call"
+                  ],
+                  icon: <CheckCircle2 size={18} className="text-violet-500" />
+                }
+              ].map((item, i) => (
+                <Card key={i} className="bg-muted/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      {item.icon}
+                      <h3 className="font-medium">{item.industry}</h3>
+                    </div>
+                    <ul className="space-y-2">
+                      {item.templates.map((template, j) => (
+                        <li key={j} className="flex items-center gap-2 text-sm">
+                          <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                          {template}
+                        </li>
+                      ))}
+                    </ul>
+                    <Button variant="outline" size="sm" className="w-full mt-4 flex gap-1.5">
+                      <RefreshCw size={14} />
+                      Use Templates
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AppLayout>
   );
 };
-
-interface ScriptCardProps {
-  title: string;
-  lastUpdated: string;
-  usedIn: number;
-  hasVariants: boolean;
-}
-
-const ScriptCard: React.FC<ScriptCardProps> = ({ 
-  title, 
-  lastUpdated, 
-  usedIn, 
-  hasVariants 
-}) => {
-  return (
-    <div className="flex justify-between items-center p-3 border rounded-md hover:bg-muted/30 transition-colors">
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-full bg-violet-100 dark:bg-violet-900/20 flex items-center justify-center text-violet-600">
-          <FileText size={18} />
-        </div>
-        <div>
-          <h4 className="font-medium">{title}</h4>
-          <p className="text-xs text-muted-foreground">Last updated: {lastUpdated}</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-4">
-        <div className="text-right">
-          <p className="text-xs text-muted-foreground">Used in</p>
-          <p className="text-sm">{usedIn} campaign{usedIn !== 1 ? 's' : ''}</p>
-        </div>
-        {hasVariants && (
-          <div className="bg-violet-100 text-violet-800 dark:bg-violet-900/20 dark:text-violet-400 px-2 py-1 rounded text-xs">
-            Has variants
-          </div>
-        )}
-        <ChevronRight size={16} className="text-muted-foreground" />
-      </div>
-    </div>
-  );
-};
-
-interface CampaignBadgeProps {
-  status: 'active' | 'paused' | 'scheduled' | 'completed';
-}
-
-const CampaignBadge: React.FC<CampaignBadgeProps> = ({ status }) => {
-  let bgColor = '';
-  let textColor = '';
-  let label = '';
-  let icon = null;
-  
-  switch (status) {
-    case 'active':
-      bgColor = 'bg-green-100';
-      textColor = 'text-green-800';
-      label = 'Active';
-      icon = <Play size={12} className="mr-1" />;
-      break;
-    case 'paused':
-      bgColor = 'bg-yellow-100';
-      textColor = 'text-yellow-800';
-      label = 'Paused';
-      icon = <Pause size={12} className="mr-1" />;
-      break;
-    case 'scheduled':
-      bgColor = 'bg-blue-100';
-      textColor = 'text-blue-800';
-      label = 'Scheduled';
-      icon = <Clock size={12} className="mr-1" />;
-      break;
-    case 'completed':
-      bgColor = 'bg-gray-100';
-      textColor = 'text-gray-800';
-      label = 'Completed';
-      icon = <CheckCircle size={12} className="mr-1" />;
-      break;
-  }
-  
-  return (
-    <span className={`text-xs px-2 py-1 rounded-full flex items-center ${bgColor} ${textColor}`}>
-      {icon}
-      {label}
-    </span>
-  );
-};
-
-interface ContactRowProps {
-  name: string;
-  phone: string;
-  list: string;
-  lastContact: string;
-  status: 'Contacted' | 'No Answer' | 'Scheduled' | 'Completed' | 'Interested';
-}
-
-const ContactRow: React.FC<ContactRowProps> = ({ 
-  name, 
-  phone, 
-  list, 
-  lastContact, 
-  status 
-}) => {
-  const getStatusBadge = () => {
-    switch (status) {
-      case 'Contacted':
-        return <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Contacted</span>;
-      case 'No Answer':
-        return <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">No Answer</span>;
-      case 'Scheduled':
-        return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Scheduled</span>;
-      case 'Completed':
-        return <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Completed</span>;
-      case 'Interested':
-        return <span className="px-2 py-1 bg-violet-100 text-violet-800 text-xs rounded-full">Interested</span>;
-    }
-  };
-  
-  return (
-    <tr className="border-b hover:bg-muted/30 transition-colors">
-      <td className="py-3 px-2">{name}</td>
-      <td className="py-3 px-2">{phone}</td>
-      <td className="py-3 px-2">{list}</td>
-      <td className="py-3 px-2">{lastContact}</td>
-      <td className="py-3 px-2">{getStatusBadge()}</td>
-      <td className="py-3 px-2">
-        <div className="flex items-center space-x-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Phone size={16} />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Edit size={16} />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <ChevronRight size={16} />
-          </Button>
-        </div>
-      </td>
-    </tr>
-  );
-};
-
-interface StatCardProps {
-  title: string;
-  value: string;
-  change: string;
-  trend: 'up' | 'down';
-}
-
-const StatCard: React.FC<StatCardProps> = ({ title, value, change, trend }) => {
-  return (
-    <Card>
-      <CardContent className="p-6">
-        <p className="text-muted-foreground mb-1">{title}</p>
-        <div className="flex items-center justify-between">
-          <p className="text-2xl font-semibold">{value}</p>
-          <span className={`text-xs px-2 py-1 rounded-full flex items-center ${
-            trend === 'up' 
-              ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' 
-              : 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
-          }`}>
-            {trend === 'up' 
-              ? <ArrowUp size={12} className="mr-1" /> 
-              : <ArrowDown size={12} className="mr-1" />}
-            {change}
-          </span>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-const PieChartIcon = ({ size = 24, className = "" }) => (
-  <svg 
-    width={size} 
-    height={size} 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
-    <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
-  </svg>
-);
 
 export default OutboundCalls;
