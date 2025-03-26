@@ -3,42 +3,45 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Plus,
-  Hash,
-  Users,
-  Search,
-  Send,
-  Paperclip,
-  Smile,
-  MoreHorizontal,
-  Pin,
-  Edit,
-  Trash,
-  Star,
-  Reply,
-  PlusCircle,
+import { TeamChannel, TeamGroup, TeamMessage, SupportUser } from "@/types/support";
+import { 
+  Avatar, 
+  AvatarFallback, 
+  AvatarImage 
+} from "@/components/ui/avatar";
+import { 
+  Search, 
+  Plus, 
+  Hash, 
+  Settings, 
+  MoreVertical, 
+  Pin, 
+  EyeOff, 
+  UserPlus, 
+  Users, 
+  User, 
   Bell,
   BellOff,
-  Settings,
-  PhoneCall,
+  Phone,
   Video,
-  PersonStanding,
-  AtSign,
-  List,
-  ArrowDown,
-  ArrowUp,
-  Filter,
-  AlignLeft,
-  Mic,
-  Link,
-  Image as ImageIcon
+  FileText,
+  Image as ImageIcon,
+  Smile,
+  ArrowRight,
+  Reply,
+  Copy,
+  BookmarkPlus,
+  Edit,
+  Trash2,
+  Share,
+  MessageSquare,
+  Heart,
+  ThumbsUp,
+  Paperclip,
+  Send
 } from "lucide-react";
-import { TeamChannel, TeamGroup, TeamMessage, MessageReaction } from "@/types/support";
-import {
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -53,12 +56,19 @@ const mockChannels: TeamChannel[] = [
     id: "channel-1",
     name: "general",
     description: "General discussions",
-    createdAt: "2023-05-15T10:00:00Z",
+    createdAt: "2023-04-01T10:00:00Z",
     createdBy: "user-1",
     isPrivate: false,
     members: ["user-1", "user-2", "user-3"],
-    unreadCount: 0,
-    isPinned: true,
+    lastMessage: {
+      id: "msg-1",
+      channelId: "channel-1",
+      content: "Has anyone seen the new product demo?",
+      createdAt: "2023-04-15T14:30:00Z",
+      senderId: "user-2"
+    },
+    unreadCount: 3,
+    isPinned: true
   },
   {
     id: "channel-2",
@@ -87,12 +97,18 @@ const mockChannels: TeamChannel[] = [
 const mockGroups: TeamGroup[] = [
   {
     id: "group-1",
-    name: "Marketing Team",
-    members: ["user-1", "user-3"],
-    createdAt: "2023-05-15T12:00:00Z",
+    name: "Project Alpha Team",
+    members: ["user-1", "user-2", "user-3"],
+    createdAt: "2023-04-02T11:00:00Z",
     createdBy: "user-1",
-    unreadCount: 2,
-    isPinned: true,
+    lastMessage: {
+      id: "msg-7",
+      groupId: "group-1",
+      content: "Let's finalize the design by tomorrow",
+      createdAt: "2023-04-15T16:45:00Z",
+      senderId: "user-3"
+    },
+    unreadCount: 2
   },
   {
     id: "group-2",
@@ -105,18 +121,40 @@ const mockGroups: TeamGroup[] = [
   }
 ];
 
+type TeamMember = {
+  id: string;
+  name: string;
+  status: string;
+  avatar?: string;
+};
+
+const mockTeamMembers: TeamMember[] = [
+  {
+    id: "user-1",
+    name: "John Doe",
+    avatar: "/avatar-1.png",
+    status: "online"
+  },
+  {
+    id: "user-2",
+    name: "Jane Smith",
+    status: "away"
+  },
+  {
+    id: "user-3",
+    name: "Michael Johnson",
+    avatar: "/avatar-3.png",
+    status: "offline"
+  }
+];
+
 const mockMessages: TeamMessage[] = [
   {
     id: "msg-1",
     channelId: "channel-1",
-    content: "Hello everyone! Welcome to the general channel.",
-    createdAt: "2023-05-15T14:00:00Z",
-    senderId: "user-1",
-    isPinned: true,
-    reactions: [
-      { emoji: "👍", count: 2, users: ["user-2", "user-3"] },
-      { emoji: "❤️", count: 1, users: ["user-2"] }
-    ]
+    content: "Has anyone seen the new product demo?",
+    createdAt: "2023-04-15T14:30:00Z",
+    senderId: "user-2"
   },
   {
     id: "msg-2",
@@ -155,70 +193,55 @@ const mockMessages: TeamMessage[] = [
   }
 ];
 
-const mockUsers = [
-  { id: "user-1", name: "John Doe", avatar: "/avatars/john.jpg", status: "online" },
-  { id: "user-2", name: "Jane Smith", avatar: "/avatars/jane.jpg", status: "away" },
-  { id: "user-3", name: "Bob Johnson", avatar: "/avatars/bob.jpg", status: "offline" }
-];
-
-interface TeamChatProps {
-  // Props will be defined here as the component evolves
-}
-
-export const TeamChat: React.FC<TeamChatProps> = () => {
+export const TeamChat: React.FC = () => {
   const [activeTab, setActiveTab] = useState("channels");
-  const [selectedChannelId, setSelectedChannelId] = useState("channel-1");
+  const [selectedChannelId, setSelectedChannelId] = useState<string | null>("channel-1");
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [replyTo, setReplyTo] = useState<string | null>(null);
   const [messageText, setMessageText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
-  const selectedChannel = mockChannels.find(c => c.id === selectedChannelId);
-  const selectedGroup = selectedGroupId ? mockGroups.find(g => g.id === selectedGroupId) : null;
   
-  const currentMessages = mockMessages.filter(m => 
-    m.channelId === selectedChannelId || 
-    (selectedGroupId && m.groupId === selectedGroupId)
-  );
-
-  const handleSendMessage = () => {
-    if (!messageText.trim()) return;
+  const selectedChannel = selectedChannelId 
+    ? mockChannels.find(c => c.id === selectedChannelId) 
+    : null;
     
-    // In a real app, you would send this to your backend
+  const selectedGroup = selectedGroupId 
+    ? mockGroups.find(g => g.id === selectedGroupId) 
+    : null;
+  
+  const currentMessages = selectedChannelId 
+    ? mockMessages.filter(m => m.channelId === selectedChannelId)
+    : selectedGroupId 
+      ? mockMessages.filter(m => m.groupId === selectedGroupId)
+      : [];
+  
+  const getSender = (senderId: string): TeamMember => {
+    return mockTeamMembers.find(m => m.id === senderId) || { 
+      id: senderId, 
+      name: "Unknown User", 
+      status: "offline" 
+    };
+  };
+  
+  const handleSelectChannel = (channelId: string) => {
+    setSelectedChannelId(channelId);
+    setSelectedGroupId(null);
+    setActiveTab("channels");
+  };
+  
+  const handleSelectGroup = (groupId: string) => {
+    setSelectedGroupId(groupId);
+    setSelectedChannelId(null);
+    setActiveTab("direct-messages");
+  };
+  
+  const handleSendMessage = () => {
+    if (messageText.trim() === "") return;
+    
     console.log("Sending message:", messageText);
     
-    // Clear the input
     setMessageText("");
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
-  const getUserById = (userId: string) => {
-    return mockUsers.find(u => u.id === userId) || { id: userId, name: "Unknown User", status: "offline" };
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "online": return "bg-green-500";
-      case "away": return "bg-yellow-500";
-      case "offline": return "bg-gray-500";
-      default: return "bg-gray-500";
-    }
+    setReplyTo(null);
   };
 
   return (
@@ -226,9 +249,9 @@ export const TeamChat: React.FC<TeamChatProps> = () => {
       <div className="w-60 border-r flex flex-col bg-background">
         <div className="p-3 border-b">
           <div className="relative">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input 
-              placeholder="Search..." 
+            <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search conversations..."
               className="pl-8"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -236,184 +259,172 @@ export const TeamChat: React.FC<TeamChatProps> = () => {
           </div>
         </div>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <TabsList className="grid grid-cols-2 px-2 pt-2">
-            <TabsTrigger value="channels" className="flex items-center gap-1">
-              <Hash size={14} />
-              <span>Channels</span>
-            </TabsTrigger>
-            <TabsTrigger value="groups" className="flex items-center gap-1">
-              <Users size={14} />
-              <span>Groups</span>
-            </TabsTrigger>
+        <Tabs defaultValue="channels" className="flex-1 flex flex-col" onValueChange={setActiveTab}>
+          <TabsList className="grid grid-cols-2 px-3 pt-3">
+            <TabsTrigger value="channels">Channels</TabsTrigger>
+            <TabsTrigger value="direct-messages">Direct</TabsTrigger>
           </TabsList>
           
-          <ScrollArea className="flex-1">
-            <TabsContent value="channels" className="m-0 p-0">
-              <div className="px-3 pt-2 pb-1 flex items-center justify-between">
-                <h3 className="text-sm font-medium text-muted-foreground">Channels</h3>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <Plus size={14} />
-                </Button>
-              </div>
-              
-              <div className="space-y-1 px-1">
-                {mockChannels
-                  .sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0))
-                  .map((channel) => (
-                    <button
-                      key={channel.id}
-                      onClick={() => {
-                        setSelectedChannelId(channel.id);
-                        setSelectedGroupId(null);
-                      }}
-                      className={`w-full text-left px-2 py-1.5 rounded flex items-center justify-between group ${
-                        selectedChannelId === channel.id 
-                          ? 'bg-accent text-accent-foreground' 
-                          : 'text-foreground hover:bg-muted'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <Hash size={16} className="flex-shrink-0" />
-                        <span className="truncate">{channel.name}</span>
-                        {channel.isPinned && (
-                          <Pin size={12} className="flex-shrink-0 text-muted-foreground" />
-                        )}
-                      </div>
-                      
-                      {channel.unreadCount > 0 && (
-                        <Badge variant="secondary" className="ml-auto">
-                          {channel.unreadCount}
-                        </Badge>
-                      )}
-                      
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-6 w-6 opacity-0 group-hover:opacity-100 ml-1"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <MoreHorizontal size={14} />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem className="flex items-center gap-2">
-                            <Pin size={14} /> 
-                            {channel.isPinned ? "Unpin channel" : "Pin channel"}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="flex items-center gap-2">
-                            <Bell size={14} /> Notification settings
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="flex items-center gap-2">
-                            <Settings size={14} /> Channel settings
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="flex items-center gap-2 text-red-500">
-                            <Trash size={14} /> Leave channel
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </button>
-                  ))}
-              </div>
-            </TabsContent>
+          <TabsContent value="channels" className="flex-1 flex flex-col space-y-1 p-2 overflow-hidden">
+            <div className="flex items-center justify-between px-2 py-1.5">
+              <h3 className="text-sm font-semibold">Channels</h3>
+              <Button variant="ghost" size="icon" className="h-7 w-7">
+                <Plus size={16} />
+              </Button>
+            </div>
             
-            <TabsContent value="groups" className="m-0 p-0">
-              <div className="px-3 pt-2 pb-1 flex items-center justify-between">
-                <h3 className="text-sm font-medium text-muted-foreground">Groups</h3>
-                <Button variant="ghost" size="icon" className="h-6 w-6">
-                  <Plus size={14} />
-                </Button>
+            <ScrollArea className="flex-1">
+              <div className="space-y-1">
+                {mockChannels
+                  .filter(channel => 
+                    searchQuery === "" || 
+                    channel.name.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((channel) => {
+                    const isSelected = selectedChannelId === channel.id;
+                    
+                    return (
+                      <button
+                        key={channel.id}
+                        className={`w-full flex items-center gap-2 text-sm px-2 py-1.5 rounded-md ${
+                          isSelected 
+                            ? "bg-primary text-primary-foreground" 
+                            : "hover:bg-secondary"
+                        }`}
+                        onClick={() => handleSelectChannel(channel.id)}
+                      >
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <Hash size={16} />
+                          <span className="truncate">{channel.name}</span>
+                        </div>
+                        
+                        {channel.isPinned && (
+                          <Pin size={14} className="text-muted-foreground" />
+                        )}
+                        
+                        {channel.unreadCount > 0 && (
+                          <Badge variant="secondary" className="h-5 w-5 text-xs p-0 flex items-center justify-center">
+                            {channel.unreadCount}
+                          </Badge>
+                        )}
+                        
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreVertical size={14} />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem className="gap-2">
+                              <Pin size={14} /> 
+                              {channel.isPinned ? "Unpin channel" : "Pin channel"}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2">
+                              <BellOff size={14} /> Mute notifications
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2">
+                              <UserPlus size={14} /> Invite people
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="gap-2 text-destructive">
+                              <Trash2 size={14} /> Delete channel
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </button>
+                    );
+                  })}
               </div>
-              
-              <div className="space-y-1 px-1">
+            </ScrollArea>
+          </TabsContent>
+          
+          <TabsContent value="direct-messages" className="flex-1 flex flex-col space-y-1 p-2 overflow-hidden">
+            <div className="flex items-center justify-between px-2 py-1.5">
+              <h3 className="text-sm font-semibold">Direct Messages</h3>
+              <Button variant="ghost" size="icon" className="h-7 w-7">
+                <Plus size={16} />
+              </Button>
+            </div>
+            
+            <ScrollArea className="flex-1">
+              <div className="space-y-1">
+                <div className="px-2 py-1.5">
+                  <h4 className="text-xs font-medium text-muted-foreground">Groups</h4>
+                </div>
+                
                 {mockGroups
-                  .sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0))
-                  .map((group) => (
+                  .filter(group => 
+                    searchQuery === "" || 
+                    group.name.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((group) => {
+                    const isSelected = selectedGroupId === group.id;
+                    
+                    return (
+                      <button
+                        key={group.id}
+                        className={`w-full flex items-center gap-2 text-sm px-2 py-1.5 rounded-md ${
+                          isSelected 
+                            ? "bg-primary text-primary-foreground" 
+                            : "hover:bg-secondary"
+                        }`}
+                        onClick={() => handleSelectGroup(group.id)}
+                      >
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <Avatar className="h-6 w-6">
+                            <AvatarFallback>
+                              {group.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="truncate">{group.name}</span>
+                        </div>
+                        
+                        {group.unreadCount > 0 && (
+                          <Badge variant="secondary" className="h-5 w-5 text-xs p-0 flex items-center justify-center">
+                            {group.unreadCount}
+                          </Badge>
+                        )}
+                      </button>
+                    );
+                  })}
+                
+                <div className="px-2 py-1.5 pt-3">
+                  <h4 className="text-xs font-medium text-muted-foreground">Team Members</h4>
+                </div>
+                
+                {mockTeamMembers
+                  .filter(member => 
+                    searchQuery === "" || 
+                    member.name.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((member) => (
                     <button
-                      key={group.id}
-                      onClick={() => {
-                        setSelectedGroupId(group.id);
-                        setSelectedChannelId("");
-                      }}
-                      className={`w-full text-left px-2 py-1.5 rounded flex items-center justify-between group ${
-                        selectedGroupId === group.id 
-                          ? 'bg-accent text-accent-foreground' 
-                          : 'text-foreground hover:bg-muted'
-                      }`}
+                      key={member.id}
+                      className="w-full flex items-center gap-2 text-sm px-2 py-1.5 rounded-md hover:bg-secondary"
                     >
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         <Avatar className="h-6 w-6">
-                          <AvatarFallback>
-                            {group.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                          </AvatarFallback>
+                          <AvatarImage src={member.avatar || ''} />
+                          <AvatarFallback>{member.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                         </Avatar>
-                        <span className="truncate">{group.name}</span>
-                        {group.isPinned && (
-                          <Pin size={12} className="flex-shrink-0 text-muted-foreground" />
-                        )}
+                        <span className="truncate">{member.name}</span>
                       </div>
                       
-                      {group.unreadCount > 0 && (
-                        <Badge variant="secondary" className="ml-auto">
-                          {group.unreadCount}
-                        </Badge>
-                      )}
-                      
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-6 w-6 opacity-0 group-hover:opacity-100 ml-1"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <MoreHorizontal size={14} />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem className="flex items-center gap-2">
-                            <Pin size={14} /> 
-                            {group.isPinned ? "Unpin group" : "Pin group"}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="flex items-center gap-2">
-                            <Bell size={14} /> Notification settings
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="flex items-center gap-2">
-                            <Settings size={14} /> Group settings
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="flex items-center gap-2 text-red-500">
-                            <Trash size={14} /> Leave group
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className={`h-2 w-2 rounded-full ${
+                        member.status === 'online' ? 'bg-green-500' :
+                        member.status === 'away' ? 'bg-yellow-500' :
+                        'bg-gray-500'
+                      }`} />
                     </button>
                   ))}
               </div>
-            </TabsContent>
-          </ScrollArea>
-          
-          <div className="p-3 border-t mt-auto">
-            <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/avatars/john.jpg" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-sm truncate">John Doe</span>
-                  <div className={`h-2 w-2 rounded-full ${getStatusColor("online")}`}></div>
-                </div>
-                <span className="text-xs text-muted-foreground">Online</span>
-              </div>
-              <Button variant="ghost" size="icon" className="h-7 w-7">
-                <Settings size={14} />
-              </Button>
-            </div>
-          </div>
+            </ScrollArea>
+          </TabsContent>
         </Tabs>
       </div>
       
@@ -421,65 +432,56 @@ export const TeamChat: React.FC<TeamChatProps> = () => {
         <div className="p-3 border-b flex items-center justify-between">
           {selectedChannel && (
             <div className="flex items-center gap-2">
-              <Hash size={18} />
+              <Hash size={20} />
               <div>
-                <h2 className="font-medium">{selectedChannel.name}</h2>
-                <p className="text-xs text-muted-foreground">{selectedChannel.description}</p>
+                <h3 className="font-medium">{selectedChannel.name}</h3>
+                {selectedChannel.description && (
+                  <p className="text-xs text-muted-foreground">{selectedChannel.description}</p>
+                )}
               </div>
             </div>
           )}
           
           {selectedGroup && (
             <div className="flex items-center gap-2">
-              <Avatar className="h-7 w-7">
-                <AvatarFallback>
-                  {selectedGroup.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <Users size={20} />
               <div>
-                <h2 className="font-medium">{selectedGroup.name}</h2>
-                <div className="text-xs text-muted-foreground flex items-center gap-1">
-                  <PersonStanding size={12} />
-                  <span>{selectedGroup.members.length} members</span>
-                </div>
+                <h3 className="font-medium">{selectedGroup.name}</h3>
+                <p className="text-xs text-muted-foreground">
+                  {selectedGroup.members.length} members
+                </p>
               </div>
             </div>
           )}
           
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon">
-              <PhoneCall size={16} />
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <UserPlus size={18} />
             </Button>
-            <Button variant="ghost" size="icon">
-              <Video size={16} />
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Phone size={18} />
             </Button>
-            <Button variant="ghost" size="icon">
-              <Search size={16} />
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Video size={18} />
             </Button>
-            <Button variant="ghost" size="icon">
-              <PersonStanding size={16} />
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Pin size={18} />
             </Button>
-            
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Search size={18} />
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreHorizontal size={16} />
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <MoreVertical size={18} />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem className="flex items-center gap-2">
-                  <Bell size={14} /> Notification settings
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2">
-                  <Pin size={14} /> Pinned messages
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2">
-                  <List size={14} /> Manage members
-                </DropdownMenuItem>
+                <DropdownMenuItem>Mark as read</DropdownMenuItem>
+                <DropdownMenuItem>Notification settings</DropdownMenuItem>
+                <DropdownMenuItem>Create channel</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex items-center gap-2">
-                  <Settings size={14} /> Settings
-                </DropdownMenuItem>
+                <DropdownMenuItem>Leave channel</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -489,16 +491,18 @@ export const TeamChat: React.FC<TeamChatProps> = () => {
           <div className="space-y-4">
             {currentMessages.length > 0 ? (
               currentMessages.map((message) => {
-                const sender = getUserById(message.senderId);
+                const sender = getSender(message.senderId);
+                const isReplyHighlighted = replyTo === message.id;
                 
                 return (
                   <div 
                     key={message.id} 
-                    className={`group relative flex gap-3 ${message.isPinned ? 'bg-yellow-50/20 p-3 rounded-md' : ''}`}
+                    className={`flex gap-3 ${isReplyHighlighted ? 'bg-secondary/50 p-2 rounded-md' : ''}`}
                   >
-                    {message.isPinned && (
-                      <div className="absolute right-2 top-2 text-yellow-500">
-                        <Pin size={14} />
+                    {message.replyTo && (
+                      <div className="ml-10 text-xs text-muted-foreground mb-1 flex items-center gap-1">
+                        <Reply size={12} />
+                        <span>Replying to a message</span>
                       </div>
                     )}
                     
@@ -511,97 +515,86 @@ export const TeamChat: React.FC<TeamChatProps> = () => {
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{sender.name}</span>
                         <span className="text-xs text-muted-foreground">
-                          {formatTime(message.createdAt)}
+                          {new Date(message.createdAt).toLocaleTimeString([], { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
                         </span>
-                        
-                        {message.isEdited && (
-                          <span className="text-xs text-muted-foreground">(edited)</span>
-                        )}
                       </div>
                       
-                      <div className="mt-1 text-sm whitespace-pre-wrap">
-                        {message.mentions?.length && (
-                          <span className="bg-primary/10 text-primary px-1 rounded">
-                            @{getUserById(message.mentions[0]).name}
-                          </span>
-                        )} {message.content}
-                      </div>
-                      
-                      {message.attachments && message.attachments.length > 0 && (
-                        <div className="mt-2 space-y-2">
-                          {message.attachments.map((attachment) => (
-                            <div key={attachment.id} className="flex items-center gap-2 p-2 rounded-md border max-w-sm">
-                              <div className="bg-secondary p-2 rounded">
-                                <Paperclip size={14} />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium truncate">{attachment.name}</p>
-                                <p className="text-xs text-muted-foreground">
-                                  {(attachment.size / 1000000).toFixed(1)} MB
-                                </p>
-                              </div>
-                              <Button variant="ghost" size="sm">Download</Button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                      <p className="text-sm mt-1">{message.content}</p>
                       
                       {message.reactions && message.reactions.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
+                        <div className="flex flex-wrap gap-1 mt-1">
                           {message.reactions.map((reaction, index) => (
-                            <Badge key={index} variant="outline" className="px-1.5 py-0.5 hover:bg-accent cursor-pointer">
-                              <span>{reaction.emoji}</span>
-                              <span className="ml-1 text-xs">{reaction.count}</span>
+                            <Badge 
+                              key={index} 
+                              variant="secondary" 
+                              className="gap-1 text-xs cursor-pointer hover:bg-secondary/80"
+                            >
+                              {reaction.emoji} <span>{reaction.count}</span>
                             </Badge>
                           ))}
-                          <Badge variant="outline" className="px-1.5 py-0.5 hover:bg-accent cursor-pointer">
-                            <Plus size={12} />
-                          </Badge>
                         </div>
                       )}
-                    </div>
-                    
-                    <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 flex items-start gap-1">
-                      <Button variant="ghost" size="icon" className="h-6 w-6">
-                        <Reply size={14} />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-6 w-6">
-                        <Smile size={14} />
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-6 w-6">
-                            <MoreHorizontal size={14} />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem className="flex items-center gap-2">
-                            <Reply size={14} /> Reply
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="flex items-center gap-2">
-                            <Edit size={14} /> Edit message
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="flex items-center gap-2">
-                            <Pin size={14} /> {message.isPinned ? "Unpin message" : "Pin message"}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="flex items-center gap-2">
-                            <Star size={14} /> Save message
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="flex items-center gap-2 text-red-500">
-                            <Trash size={14} /> Delete message
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      
+                      <div className="flex items-center gap-1 mt-1 opacity-0 hover:opacity-100 transition-opacity">
+                        <Button variant="ghost" size="icon" className="h-6 w-6">
+                          <Smile size={14} />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => setReplyTo(message.id)}
+                        >
+                          <Reply size={14} />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6">
+                          <Copy size={14} />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-6 w-6">
+                          <BookmarkPlus size={14} />
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                              <MoreVertical size={14} />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start">
+                            <DropdownMenuItem className="gap-2">
+                              <Edit size={14} /> Edit message
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2">
+                              <Pin size={14} /> Pin message
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="gap-2">
+                              <Share size={14} /> Share message
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="gap-2 text-destructive">
+                              <Trash2 size={14} /> Delete message
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
                   </div>
                 );
               })
             ) : (
-              <div className="text-center py-8">
-                <Users className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                <h3 className="mt-2 text-lg font-medium">No messages yet</h3>
-                <p className="text-sm text-muted-foreground">Start the conversation!</p>
+              <div className="flex flex-col items-center justify-center h-full py-12">
+                <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium">No messages yet</h3>
+                <p className="text-muted-foreground text-sm">
+                  {selectedChannel 
+                    ? `Start the conversation in #${selectedChannel.name}`
+                    : selectedGroup
+                      ? `Start the conversation in ${selectedGroup.name}`
+                      : "Select a channel or direct message to start chatting"
+                  }
+                </p>
               </div>
             )}
           </div>
@@ -610,52 +603,56 @@ export const TeamChat: React.FC<TeamChatProps> = () => {
         <div className="p-3 border-t">
           <div className="flex items-center gap-2 mb-2">
             <Button variant="ghost" size="sm" className="h-7">
-              <Plus size={14} className="mr-1" />
-              <span>Format</span>
+              <Plus size={16} />
             </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7">
-              <AlignLeft size={14} />
+            <Button variant="ghost" size="sm" className="h-7">
+              <Smile size={16} />
             </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7">
-              <Link size={14} />
+            <Button variant="ghost" size="sm" className="h-7">
+              <ImageIcon size={16} />
             </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7">
-              <ImageIcon size={14} />
+            <Button variant="ghost" size="sm" className="h-7">
+              <FileText size={16} />
             </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7">
-              <AtSign size={14} />
-            </Button>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <Input
-                placeholder={`Message ${selectedChannel ? `#${selectedChannel.name}` : selectedGroup?.name}`}
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="pr-20"
-              />
-              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1.5">
-                <Button variant="ghost" size="icon" className="h-7 w-7">
-                  <Paperclip size={16} />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
-                  <Smile size={16} />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7">
-                  <Mic size={16} />
+            
+            {replyTo && (
+              <div className="flex-1 flex items-center gap-2 text-xs text-muted-foreground">
+                <Reply size={14} />
+                <span>Replying to a message</span>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-5 w-5 ml-auto"
+                  onClick={() => setReplyTo(null)}
+                >
+                  <Trash2 size={12} />
                 </Button>
               </div>
-            </div>
-            
+            )}
+          </div>
+          
+          <div className="flex gap-2">
+            <Input
+              placeholder={`Message ${
+                selectedChannel ? `#${selectedChannel.name}` : 
+                selectedGroup ? selectedGroup.name : 
+                "..."
+              }`}
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+            />
             <Button 
-              size="icon" 
-              className={`${messageText.trim() ? "" : "opacity-50"}`}
-              disabled={!messageText.trim()}
+              size="icon"
+              disabled={messageText.trim() === ""}
               onClick={handleSendMessage}
             >
-              <Send size={16} />
+              <Send size={18} />
             </Button>
           </div>
         </div>
