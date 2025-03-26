@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +48,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-// Mock data for demonstration
 const mockChannels: TeamChannel[] = [
   {
     id: "channel-1",
@@ -225,7 +223,6 @@ export const TeamChat: React.FC<TeamChatProps> = () => {
 
   return (
     <div className="flex h-[calc(100vh-12rem)] overflow-hidden rounded-md border">
-      {/* Sidebar */}
       <div className="w-60 border-r flex flex-col bg-background">
         <div className="p-3 border-b">
           <div className="relative">
@@ -349,7 +346,7 @@ export const TeamChat: React.FC<TeamChatProps> = () => {
                     >
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         <Avatar className="h-6 w-6">
-                          <AvatarFallback className="text-xs">
+                          <AvatarFallback>
                             {group.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
@@ -420,9 +417,7 @@ export const TeamChat: React.FC<TeamChatProps> = () => {
         </Tabs>
       </div>
       
-      {/* Main Chat Area */}
       <div className="flex-1 flex flex-col bg-background">
-        {/* Channel/Group Header */}
         <div className="p-3 border-b flex items-center justify-between">
           {selectedChannel && (
             <div className="flex items-center gap-2">
@@ -490,7 +485,6 @@ export const TeamChat: React.FC<TeamChatProps> = () => {
           </div>
         </div>
         
-        {/* Message List */}
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4">
             {currentMessages.length > 0 ? (
@@ -509,7 +503,7 @@ export const TeamChat: React.FC<TeamChatProps> = () => {
                     )}
                     
                     <Avatar className="h-8 w-8 mt-0.5">
-                      <AvatarImage src={sender.avatar} />
+                      <AvatarImage src={sender.avatar || ''} />
                       <AvatarFallback>{sender.name.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
                     </Avatar>
                     
@@ -613,7 +607,6 @@ export const TeamChat: React.FC<TeamChatProps> = () => {
           </div>
         </ScrollArea>
         
-        {/* Message Input */}
         <div className="p-3 border-t">
           <div className="flex items-center gap-2 mb-2">
             <Button variant="ghost" size="sm" className="h-7">

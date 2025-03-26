@@ -284,7 +284,11 @@ const initialChatFlow: ChatBotFlow = {
       next: []
     }
   ],
-  isActive: true
+  isActive: true,
+  // Added the missing required properties:
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  language: "en"
 };
 
 const SupportRequests = () => {
