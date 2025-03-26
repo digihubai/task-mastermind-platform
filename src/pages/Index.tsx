@@ -1,19 +1,12 @@
-
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import AppLayout from "@/components/layout/AppLayout";
-import { Card } from "@/components/ui/card";
+import React from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { PlusCircle, Bot, MessageSquare, Users, ArrowRight, BarChart3, Briefcase, Settings, FileText, PenTool, Search, FileSpreadsheet, Image, RefreshCw, Globe, Mail, DollarSign, Zap } from "lucide-react";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle, NavigationMenuGroup } from "@/components/ui/navigation-menu";
+
+import AppLayout from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  ArrowUpRight, Bot, Briefcase, Mail, MessageSquare, 
-  Users, PenTool, FileText, Search, Brain, Eye, 
-  Edit, Book, Megaphone, Codepen, BarChart, Share2,
-  ArrowUp, ArrowDown, Clock, CalendarClock, Target,
-  CheckCircle, AlertCircle, Zap, Bell, CreditCard,
-  Inbox, Phone, LineChart, BarChart2, PieChart,
-  FileBarChart, DollarSign, Activity
-} from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();

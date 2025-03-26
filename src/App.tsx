@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -79,6 +80,11 @@ import EmailMarketingPage from "./pages/marketing/EmailMarketingPage";
 // Finance pages
 import FinanceDashboard from "./pages/finance/FinanceDashboard";
 import TaxCalculator from "./pages/finance/TaxCalculator";
+
+// Workflow Automation pages
+import Workflows from "./pages/automation/Workflows";
+import WorkflowTemplates from "./pages/automation/WorkflowTemplates";
+import WorkflowEditor from "./pages/automation/WorkflowEditor";
 
 const queryClient = new QueryClient();
 
@@ -164,6 +170,12 @@ const App = () => (
           <Route path="/social" element={<SocialMediaPage />} />
           <Route path="/brand-voice" element={<BrandVoicePage />} />
           <Route path="/email-marketing" element={<EmailMarketingPage />} />
+          
+          {/* Workflow Automation routes */}
+          <Route path="/automation/workflows" element={<Workflows />} />
+          <Route path="/automation/templates" element={<WorkflowTemplates />} />
+          <Route path="/automation/editor" element={<WorkflowEditor />} />
+          <Route path="/automation/editor/:id" element={<WorkflowEditor />} />
           
           {/* Catch all */}
           <Route path="*" element={<NotFound />} />

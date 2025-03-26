@@ -41,7 +41,9 @@ import {
   Wallet,
   PieChart,
   Receipt,
-  Building
+  Building,
+  Sparkles,
+  FlowParallel
 } from "lucide-react";
 
 interface SidebarProps {
@@ -99,6 +101,14 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
         { path: "/finance/invoices", icon: Receipt, label: "Invoices" },
         { path: "/finance/expenses", icon: CreditCard, label: "Expenses" },
         { path: "/finance/reports", icon: PieChart, label: "Financial Reports" },
+      ]
+    },
+    {
+      title: "Workflow Automation",
+      items: [
+        { path: "/automation/workflows", icon: FlowParallel, label: "Workflows" },
+        { path: "/automation/templates", icon: FileText, label: "Templates" },
+        { path: "/automation/editor", icon: Zap, label: "Create Workflow" },
       ]
     },
     {
