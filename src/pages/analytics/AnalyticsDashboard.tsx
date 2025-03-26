@@ -1,8 +1,10 @@
+
 import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import AnalyticsChartCard from "@/components/analytics/AnalyticsChartCard";
 import MetricsCard from "@/components/analytics/MetricsCard";
 import AdAccountSummary from "@/components/analytics/AdAccountSummary";
+import CrossChannelDashboard from "@/components/analytics/CrossChannelDashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -14,8 +16,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAnalytics } from "@/hooks/useAnalytics";
+import { toast } from "sonner";
 
-const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
+// TikTok Icon as a proper React component
+const TikTokIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
     width="1em"
     height="1em"
@@ -73,18 +78,31 @@ const AnalyticsDashboard = () => {
     { channel: "Facebook", trend: "up" as const, change: "+8.5%", value: "$5,483", icon: <Facebook size={20} className="text-blue-600" /> },
     { channel: "Instagram", trend: "up" as const, change: "+12.3%", value: "$7,492", icon: <Instagram size={20} className="text-pink-600" /> },
     { channel: "Twitter", trend: "down" as const, change: "-4.7%", value: "$1,147", icon: <Twitter size={20} className="text-blue-400" /> },
-    { channel: "TikTok", trend: "up" as const, change: "+21.8%", value: "$3,982", icon: <TikTokIcon size={20} className="text-black dark:text-white" /> },
+    { channel: "TikTok", trend: "up" as const, change: "+21.8%", value: "$3,982", icon: <TikTokIcon className="text-black dark:text-white" /> },
   ];
 
   const [activeTab, setActiveTab] = useState("overview");
   const [chartViewMode, setChartViewMode] = useState("line");
+  const [dateRange, setDateRange] = useState("last7days");
   const [dashboardLayout, setDashboardLayout] = useState([
     { id: "revenue", visible: true, title: "Revenue & Profit" },
     { id: "campaigns", visible: true, title: "Campaign Performance" },
     { id: "conversions", visible: true, title: "Conversion Rate" },
     { id: "channels", visible: true, title: "Channel Metrics" },
     { id: "account", visible: true, title: "Account Health" },
+    { id: "crossChannel", visible: true, title: "Cross-Channel Performance" },
   ]);
+  
+  const { data, summary, loading, error, refreshData, generateSampleData } = useAnalytics('week');
+  
+  const handleGenerateSampleData = async () => {
+    try {
+      await generateSampleData();
+      toast.success("Sample analytics data generated successfully");
+    } catch (err) {
+      toast.error("Failed to generate sample data");
+    }
+  };
 
   return (
     <AppLayout>
@@ -98,7 +116,10 @@ const AnalyticsDashboard = () => {
           </div>
           
           <div className="flex flex-col sm:flex-row items-center gap-3">
-            <Select defaultValue="last7days">
+            <Select 
+              defaultValue={dateRange} 
+              onValueChange={setDateRange}
+            >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select time period" />
               </SelectTrigger>
@@ -107,14 +128,14 @@ const AnalyticsDashboard = () => {
                 <SelectItem value="yesterday">Yesterday</SelectItem>
                 <SelectItem value="last7days">Last 7 days</SelectItem>
                 <SelectItem value="last30days">Last 30 days</SelectItem>
-                <SelectItem value="thismonth">This month</SelectItem>
-                <SelectItem value="lastmonth">Last month</SelectItem>
+                <SelectItem value="thisMonth">This month</SelectItem>
+                <SelectItem value="lastMonth">Last month</SelectItem>
                 <SelectItem value="custom">Custom range</SelectItem>
               </SelectContent>
             </Select>
             
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" onClick={refreshData}>
                 <RefreshCw size={16} />
               </Button>
               <Button variant="outline" size="icon">
@@ -203,90 +224,121 @@ const AnalyticsDashboard = () => {
           
           <TabsContent value="overview">
             <div className="space-y-6">
-              {dashboardLayout.find(i => i.id === "channels")?.visible && (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  {channelMetrics.map((metric, index) => (
-                    <MetricsCard
-                      key={index}
-                      title={metric.channel}
-                      value={metric.value}
-                      change={metric.change}
-                      trend={metric.trend}
-                      icon={metric.icon}
-                    />
-                  ))}
+              {loading ? (
+                <div className="flex justify-center items-center h-40">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
                 </div>
+              ) : error ? (
+                <Card className="p-6">
+                  <div className="text-center space-y-4">
+                    <h3 className="text-lg font-medium">Error loading analytics data</h3>
+                    <p className="text-muted-foreground">We encountered an error while loading your analytics data.</p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <Button onClick={refreshData}>Try Again</Button>
+                      <Button variant="outline" onClick={handleGenerateSampleData}>Generate Sample Data</Button>
+                    </div>
+                  </div>
+                </Card>
+              ) : data && data.length === 0 ? (
+                <Card className="p-6">
+                  <div className="text-center space-y-4">
+                    <h3 className="text-lg font-medium">No analytics data available</h3>
+                    <p className="text-muted-foreground">Get started by generating sample analytics data.</p>
+                    <Button onClick={handleGenerateSampleData}>Generate Sample Data</Button>
+                  </div>
+                </Card>
+              ) : (
+                <>
+                  {dashboardLayout.find(i => i.id === "channels")?.visible && (
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      {channelMetrics.map((metric, index) => (
+                        <MetricsCard
+                          key={index}
+                          title={metric.channel}
+                          value={metric.value}
+                          change={metric.change}
+                          trend={metric.trend}
+                          icon={metric.icon}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  
+                  {dashboardLayout.find(i => i.id === "crossChannel")?.visible && (
+                    <CrossChannelDashboard dateRange={dateRange} />
+                  )}
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {dashboardLayout.find(i => i.id === "revenue")?.visible && (
+                      <AnalyticsChartCard
+                        title="Revenue & Profit"
+                        chartType={chartViewMode as "line" | "bar"}
+                        data={revenueData}
+                        dataKeys={{
+                          xAxisKey: "date",
+                          yAxisKeys: [
+                            { key: "revenue", color: "#2563eb", name: "Revenue" },
+                            { key: "profit", color: "#10b981", name: "Profit" },
+                            { key: "target", color: "#9333ea", name: "Target" }
+                          ]
+                        }}
+                        status={{
+                          text: "+12.5% vs Last Period",
+                          variant: "success"
+                        }}
+                        showInfo
+                        showDownload
+                        showShare
+                      />
+                    )}
+                    
+                    {dashboardLayout.find(i => i.id === "campaigns")?.visible && (
+                      <AnalyticsChartCard
+                        title="Campaign Performance"
+                        chartType="bar"
+                        data={campaignData}
+                        dataKeys={{
+                          xAxisKey: "name",
+                          yAxisKeys: [
+                            { key: "spend", color: "#f97316", name: "Ad Spend" },
+                            { key: "conversions", color: "#06b6d4", name: "Conversions" }
+                          ]
+                        }}
+                        status={{
+                          text: "Facebook +18% ROAS",
+                          variant: "success"
+                        }}
+                        showDownload
+                      />
+                    )}
+                  </div>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {dashboardLayout.find(i => i.id === "conversions")?.visible && (
+                      <AnalyticsChartCard
+                        title="Conversion Rate"
+                        description="Daily website conversion rate"
+                        chartType={chartViewMode as "line" | "bar"}
+                        data={conversionData}
+                        dataKeys={{
+                          xAxisKey: "day",
+                          yAxisKeys: [
+                            { key: "rate", color: "#8b5cf6", name: "Conversion %" }
+                          ]
+                        }}
+                        status={{
+                          text: "-0.8% vs Last Week",
+                          variant: "warning"
+                        }}
+                      />
+                    )}
+                    
+                    {dashboardLayout.find(i => i.id === "account")?.visible && (
+                      <AdAccountSummary />
+                    )}
+                  </div>
+                </>
               )}
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {dashboardLayout.find(i => i.id === "revenue")?.visible && (
-                  <AnalyticsChartCard
-                    title="Revenue & Profit"
-                    chartType={chartViewMode as "line" | "bar"}
-                    data={revenueData}
-                    dataKeys={{
-                      xAxisKey: "date",
-                      yAxisKeys: [
-                        { key: "revenue", color: "#2563eb", name: "Revenue" },
-                        { key: "profit", color: "#10b981", name: "Profit" },
-                        { key: "target", color: "#9333ea", name: "Target" }
-                      ]
-                    }}
-                    status={{
-                      text: "+12.5% vs Last Period",
-                      variant: "success"
-                    }}
-                    showInfo
-                    showDownload
-                    showShare
-                  />
-                )}
-                
-                {dashboardLayout.find(i => i.id === "campaigns")?.visible && (
-                  <AnalyticsChartCard
-                    title="Campaign Performance"
-                    chartType="bar"
-                    data={campaignData}
-                    dataKeys={{
-                      xAxisKey: "name",
-                      yAxisKeys: [
-                        { key: "spend", color: "#f97316", name: "Ad Spend" },
-                        { key: "conversions", color: "#06b6d4", name: "Conversions" }
-                      ]
-                    }}
-                    status={{
-                      text: "Facebook +18% ROAS",
-                      variant: "success"
-                    }}
-                    showDownload
-                  />
-                )}
-              </div>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {dashboardLayout.find(i => i.id === "conversions")?.visible && (
-                  <AnalyticsChartCard
-                    title="Conversion Rate"
-                    description="Daily website conversion rate"
-                    chartType={chartViewMode as "line" | "bar"}
-                    data={conversionData}
-                    dataKeys={{
-                      xAxisKey: "day",
-                      yAxisKeys: [
-                        { key: "rate", color: "#8b5cf6", name: "Conversion %" }
-                      ]
-                    }}
-                    status={{
-                      text: "-0.8% vs Last Week",
-                      variant: "warning"
-                    }}
-                  />
-                )}
-                
-                {dashboardLayout.find(i => i.id === "account")?.visible && (
-                  <AdAccountSummary />
-                )}
-              </div>
             </div>
           </TabsContent>
           
