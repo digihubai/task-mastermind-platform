@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
@@ -6,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
   FolderOpen, PlusCircle, ChevronRight, Users, Clock, Calendar,
-  BarChart2, CheckCircle, AlertTriangle
+  BarChart2, CheckCircle, AlertTriangle, Timer
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +19,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/Badge";
+import TaskTimer from "@/components/project/TaskTimer";
+import Timesheet from "@/components/project/Timesheet";
 
 const ProjectManagement = () => {
   const { toast } = useToast();
@@ -205,10 +206,11 @@ const ProjectManagement = () => {
         </div>
         
         <Tabs defaultValue="projects" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3 w-full md:w-auto">
+          <TabsList className="grid grid-cols-4 w-full md:w-auto">
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="tasks">Tasks</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
+            <TabsTrigger value="timesheet">Timesheet</TabsTrigger>
           </TabsList>
           
           <div className="mt-6">
@@ -430,11 +432,58 @@ const ProjectManagement = () => {
                         <th className="py-3 px-4 text-sm font-medium text-muted-foreground">Due Date</th>
                         <th className="py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
                         <th className="py-3 px-4 text-sm font-medium text-muted-foreground">Priority</th>
+                        <th className="py-3 px-4 text-sm font-medium text-muted-foreground">Time Tracking</th>
                         <th className="py-3 px-4 text-sm font-medium text-muted-foreground"></th>
                       </tr>
                     </thead>
                     <tbody>
-                      {mockTasks.map(task => (
+                      {[
+                        {
+                          id: 1,
+                          title: "Design homepage wireframes",
+                          project: "Website Redesign",
+                          assignee: "Sarah K.",
+                          status: "completed",
+                          dueDate: "2023-11-25",
+                          priority: "high"
+                        },
+                        {
+                          id: 2,
+                          title: "Develop authentication system",
+                          project: "Mobile App Development",
+                          assignee: "David S.",
+                          status: "in-progress",
+                          dueDate: "2023-12-05",
+                          priority: "high"
+                        },
+                        {
+                          id: 3,
+                          title: "Create content calendar",
+                          project: "Marketing Campaign",
+                          assignee: "Jessica T.",
+                          status: "completed",
+                          dueDate: "2023-11-20",
+                          priority: "medium"
+                        },
+                        {
+                          id: 4,
+                          title: "Set up analytics dashboard",
+                          project: "Website Redesign",
+                          assignee: "John D.",
+                          status: "pending",
+                          dueDate: "2023-12-08",
+                          priority: "medium"
+                        },
+                        {
+                          id: 5,
+                          title: "Review competitor products",
+                          project: "Product Launch",
+                          assignee: "Alex B.",
+                          status: "in-progress",
+                          dueDate: "2023-12-01",
+                          priority: "high"
+                        }
+                      ].map((task) => (
                         <tr key={task.id} className="border-t border-border">
                           <td className="py-3 px-4">{task.title}</td>
                           <td className="py-3 px-4">{task.project}</td>
@@ -442,6 +491,9 @@ const ProjectManagement = () => {
                           <td className="py-3 px-4">{new Date(task.dueDate).toLocaleDateString()}</td>
                           <td className="py-3 px-4">{getStatusBadge(task.status)}</td>
                           <td className="py-3 px-4">{getPriorityBadge(task.priority)}</td>
+                          <td className="py-3 px-4">
+                            <TaskTimer taskId={task.id} taskName={task.title} projectName={task.project} />
+                          </td>
                           <td className="py-3 px-4">
                             <Button variant="ghost" size="sm">View</Button>
                           </td>
@@ -524,6 +576,10 @@ const ProjectManagement = () => {
                   </Card>
                 ))}
               </div>
+            </TabsContent>
+            
+            <TabsContent value="timesheet">
+              <Timesheet />
             </TabsContent>
           </div>
         </Tabs>
