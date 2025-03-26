@@ -67,58 +67,64 @@ const ConversationList: React.FC<ConversationListProps> = ({
   return (
     <ScrollArea className="h-[calc(100vh-300px)]">
       <div className="px-4 space-y-2">
-        {conversations.map((convo) => (
-          <div 
-            key={convo.id} 
-            className={`p-3 rounded-lg cursor-pointer transition-colors ${
-              selectedConversation === convo.id ? 'bg-primary/10' : 'hover:bg-muted'
-            }`}
-            onClick={() => setSelectedConversation(convo.id)}
-          >
-            <div className="flex items-start gap-3">
-              <Avatar className="h-9 w-9">
-                <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary font-medium">
-                  {convo.name.substring(0, 2)}
-                </div>
-              </Avatar>
-              
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <p className="font-medium">{convo.name}</p>
-                    <div className={`h-2 w-2 rounded-full ${getStatusColor(convo.status)}`}></div>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{convo.time}</span>
-                </div>
-                
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <div className="p-0.5 rounded-full bg-primary/10 text-primary">
-                    {getChannelIcon(convo.channel)}
-                  </div>
-                  <p className="text-sm text-muted-foreground truncate">{convo.message}</p>
-                </div>
-                
-                <div className="flex items-center justify-between mt-1.5">
-                  <Badge variant={convo.priority === 'high' ? 'destructive' : (convo.priority === 'medium' ? 'default' : 'outline')} className="text-xs">
-                    {convo.priority.charAt(0).toUpperCase() + convo.priority.slice(1)}
-                  </Badge>
-                  
-                  {convo.agent ? (
-                    <span className="text-xs text-muted-foreground">
-                      {convo.agent === 'AI Assistant' ? '🤖 AI' : `👤 ${convo.agent}`}
-                    </span>
-                  ) : (
-                    <span className="text-xs text-amber-500 font-medium">Unassigned</span>
-                  )}
-                </div>
-              </div>
-              
-              {convo.unread && (
-                <div className="h-2.5 w-2.5 rounded-full bg-primary"></div>
-              )}
-            </div>
+        {conversations.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No conversations found
           </div>
-        ))}
+        ) : (
+          conversations.map((convo) => (
+            <div 
+              key={convo.id} 
+              className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                selectedConversation === convo.id ? 'bg-primary/10' : 'hover:bg-muted'
+              }`}
+              onClick={() => setSelectedConversation(convo.id)}
+            >
+              <div className="flex items-start gap-3">
+                <Avatar className="h-9 w-9">
+                  <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary font-medium">
+                    {convo.name.substring(0, 2)}
+                  </div>
+                </Avatar>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <p className="font-medium">{convo.name}</p>
+                      <div className={`h-2 w-2 rounded-full ${getStatusColor(convo.status)}`}></div>
+                    </div>
+                    <span className="text-xs text-muted-foreground">{convo.time}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <div className="p-0.5 rounded-full bg-primary/10 text-primary">
+                      {getChannelIcon(convo.channel)}
+                    </div>
+                    <p className="text-sm text-muted-foreground truncate">{convo.message}</p>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mt-1.5">
+                    <Badge variant={convo.priority === 'high' ? 'destructive' : (convo.priority === 'medium' ? 'default' : 'outline')} className="text-xs">
+                      {convo.priority.charAt(0).toUpperCase() + convo.priority.slice(1)}
+                    </Badge>
+                    
+                    {convo.agent ? (
+                      <span className="text-xs text-muted-foreground">
+                        {convo.agent === 'AI Assistant' ? '🤖 AI' : `👤 ${convo.agent}`}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-amber-500 font-medium">Unassigned</span>
+                    )}
+                  </div>
+                </div>
+                
+                {convo.unread && (
+                  <div className="h-2.5 w-2.5 rounded-full bg-primary"></div>
+                )}
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </ScrollArea>
   );

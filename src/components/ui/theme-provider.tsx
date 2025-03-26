@@ -10,19 +10,32 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
 }
 
 export function useTheme() {
-  const { theme, setTheme } = React.useContext(
-    React.createContext({
-      theme: "system",
+  if (typeof window === 'undefined') {
+    return {
+      theme: 'system',
       setTheme: (_theme: string) => {},
-    })
-  );
+      toggleTheme: () => {},
+      isDarkMode: false,
+      isLightMode: true,
+      isSystemTheme: true,
+    };
+  }
+
+  const storedTheme = localStorage.getItem('digihub-theme') || 'system';
+  
+  const setTheme = (theme: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('digihub-theme', theme);
+      document.documentElement.className = theme;
+    }
+  };
 
   return {
-    theme,
+    theme: storedTheme,
     setTheme,
-    toggleTheme: () => setTheme(theme === "dark" ? "light" : "dark"),
-    isDarkMode: theme === "dark",
-    isLightMode: theme === "light",
-    isSystemTheme: theme === "system",
+    toggleTheme: () => setTheme(storedTheme === "dark" ? "light" : "dark"),
+    isDarkMode: storedTheme === "dark",
+    isLightMode: storedTheme === "light",
+    isSystemTheme: storedTheme === "system",
   };
 }

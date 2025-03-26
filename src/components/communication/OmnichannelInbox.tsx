@@ -8,7 +8,27 @@ import OmnichannelInboxFilters from "./OmnichannelInboxFilters";
 import ConversationList from "./ConversationList";
 import ConversationDetails from "./ConversationDetails";
 
-// Refactored OmnichannelInbox component using the newly created sub-components
+// Define proper types to address the build error
+interface Conversation {
+  id: string;
+  name: string;
+  message: string;
+  unread: boolean;
+  time: string;
+  channel: string;
+  status: string;
+  priority: string;
+  agent: string | null;
+}
+
+interface Message {
+  id: string;
+  sender: "customer" | "ai" | "human";
+  content: string;
+  time: string;
+  channel: string;
+}
+
 const OmnichannelInbox: React.FC = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [selectedConversation, setSelectedConversation] = useState<string | null>("1");
@@ -16,7 +36,7 @@ const OmnichannelInbox: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   
   // Mock data for demonstration
-  const conversations = [
+  const conversations: Conversation[] = [
     {
       id: "1",
       name: "Sarah Johnson",
@@ -96,7 +116,7 @@ const OmnichannelInbox: React.FC = () => {
     }
   ];
 
-  const messages = [
+  const messages: Message[] = [
     {
       id: "1",
       sender: "customer",

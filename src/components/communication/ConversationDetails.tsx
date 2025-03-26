@@ -8,6 +8,19 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowUpRight, Mail, MessageSquare, Phone, Instagram, Twitter, Facebook, Send, Paperclip, Smile, Clock, CheckCircle, Info } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+// Define proper types to match with OmnichannelInbox
+interface Conversation {
+  id: string;
+  name: string;
+  message: string;
+  unread: boolean;
+  time: string;
+  channel: string;
+  status: string;
+  priority: string;
+  agent: string | null;
+}
+
 interface Message {
   id: string;
   sender: 'customer' | 'ai' | 'human';
@@ -17,7 +30,7 @@ interface Message {
 }
 
 interface ConversationDetailsProps {
-  conversation: any;
+  conversation: Conversation | undefined;
   messages: Message[];
 }
 
@@ -56,6 +69,18 @@ const ConversationDetails: React.FC<ConversationDetailsProps> = ({ conversation,
         return <MessageSquare size={16} />;
     }
   };
+
+  if (!conversation) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <MessageSquare size={48} className="mx-auto text-muted-foreground mb-3" />
+          <h3 className="text-lg font-medium">No conversation selected</h3>
+          <p className="text-muted-foreground">Select a conversation from the list to view details</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
