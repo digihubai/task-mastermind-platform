@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
@@ -8,9 +7,6 @@ import { PlusCircle, Trash2, Save, DollarSign, Check, X, Plus } from "lucide-rea
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 
 interface Feature {
   id: string;
