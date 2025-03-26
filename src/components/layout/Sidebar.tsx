@@ -1,50 +1,9 @@
 
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  MessageSquare, 
-  Users,
-  Briefcase,
-  Settings, 
-  ChevronLeft, 
-  ChevronRight,
-  BarChart3,
-  Bot,
-  Mail,
-  Headphones,
-  Server,
-  Globe,
-  FileText,
-  Phone,
-  PhoneOutgoing,
-  HelpCircle,
-  Heart,
-  Star,
-  Calendar,
-  AlertCircle,
-  Activity,
-  BookOpen,
-  LucideIcon,
-  Target,
-  PenTool,
-  Zap,
-  Database,
-  Layers,
-  Image,
-  Search,
-  FileSpreadsheet,
-  CreditCard,
-  Megaphone,
-  DollarSign,
-  Calculator,
-  Wallet,
-  PieChart,
-  Receipt,
-  Building,
-  Sparkles,
-  LayoutTemplate // Replaced FlowParallel with LayoutTemplate
-} from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { ChevronLeft, ChevronRight, Users } from "lucide-react";
+import SidebarSection from "./SidebarSection";
+import { sidebarSections } from "./SidebarData";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -52,101 +11,7 @@ interface SidebarProps {
   toggleSidebar: () => void;
 }
 
-interface SidebarItem {
-  path: string;
-  icon: LucideIcon;
-  label: string;
-}
-
-interface SidebarSection {
-  title: string;
-  items: SidebarItem[];
-}
-
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar }) => {
-  const location = useLocation();
-  
-  const sidebarSections: SidebarSection[] = [
-    {
-      title: "Dashboard",
-      items: [
-        { path: "/", icon: LayoutDashboard, label: "Overview" },
-        { path: "/analytics", icon: BarChart3, label: "Analytics" },
-        { path: "/calendar", icon: Calendar, label: "Calendar" },
-      ]
-    },
-    {
-      title: "Customer Service",
-      items: [
-        { path: "/chat", icon: MessageSquare, label: "Customer Chat" },
-        { path: "/support", icon: HelpCircle, label: "Support Tickets" },
-        { path: "/chatbot", icon: Bot, label: "AI Chatbot" },
-        { path: "/phone", icon: Phone, label: "IVR System" },
-        { path: "/outbound", icon: PhoneOutgoing, label: "Outbound Calls" },
-      ]
-    },
-    {
-      title: "Team Collaboration",
-      items: [
-        { path: "/team-chat", icon: MessageSquare, label: "Team Chat" },
-        { path: "/project-management", icon: Briefcase, label: "Project Management" },
-        { path: "/crm", icon: Users, label: "CRM" },
-      ]
-    },
-    {
-      title: "Finance",
-      items: [
-        { path: "/finance", icon: DollarSign, label: "Finance Dashboard" },
-        { path: "/finance/tax-calculator", icon: Calculator, label: "Tax Calculator" },
-        { path: "/finance/invoices", icon: Receipt, label: "Invoices" },
-        { path: "/finance/expenses", icon: CreditCard, label: "Expenses" },
-        { path: "/finance/reports", icon: PieChart, label: "Financial Reports" },
-      ]
-    },
-    {
-      title: "Workflow Automation",
-      items: [
-        { path: "/automation/workflows", icon: LayoutTemplate, label: "Workflows" }, // Changed icon
-        { path: "/automation/templates", icon: FileText, label: "Templates" },
-        { path: "/automation/editor", icon: Zap, label: "Create Workflow" },
-      ]
-    },
-    {
-      title: "Marketing",
-      items: [
-        { path: "/marketing", icon: Mail, label: "Email Marketing" },
-        { path: "/social", icon: Globe, label: "Social Media" },
-        { path: "/campaigns", icon: Target, label: "Campaigns" },
-        { path: "/brand-voice", icon: Megaphone, label: "Brand Voice" },
-      ]
-    },
-    {
-      title: "AI Tools",
-      items: [
-        { path: "/ai-copywriter", icon: PenTool, label: "AI Copywriter" },
-        { path: "/ai-seo", icon: Search, label: "AI SEO Writer" },
-        { path: "/ai-vision", icon: Image, label: "AI Vision" },
-        { path: "/ai-rewriter", icon: Zap, label: "AI Rewriter" },
-        { path: "/pdf-insight", icon: FileSpreadsheet, label: "PDF Insight" },
-      ]
-    },
-    {
-      title: "Resources",
-      items: [
-        { path: "/knowledge", icon: BookOpen, label: "Knowledge Base" },
-        { path: "/reports", icon: FileText, label: "Reports" },
-        { path: "/settings", icon: Settings, label: "Settings" },
-      ]
-    }
-  ];
-
-  const isActive = (path: string) => {
-    if (path === "/" && location.pathname === "/") {
-      return true;
-    }
-    return location.pathname.startsWith(path) && path !== "/";
-  };
-
   return (
     <>
       {/* Mobile Overlay */}
@@ -183,39 +48,13 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
         
         <nav className="flex-1 px-2 py-4 overflow-y-auto">
           {sidebarSections.map((section, index) => (
-            <div key={index} className="mb-6">
-              {!collapsed && (
-                <h2 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                  {section.title}
-                </h2>
-              )}
-              
-              <ul className="space-y-1">
-                {section.items.map((item, itemIndex) => {
-                  const Icon = item.icon;
-                  const active = isActive(item.path);
-                  
-                  return (
-                    <li key={itemIndex}>
-                      <Link
-                        to={item.path}
-                        className={`
-                          flex items-center px-3 py-2 rounded-md text-sm
-                          group transition-all duration-200
-                          ${active 
-                            ? 'bg-violet-600 text-white font-medium' 
-                            : 'text-foreground hover:bg-secondary'
-                          }
-                        `}
-                      >
-                        <Icon size={20} className={`${collapsed && !isMobile ? 'mx-auto' : 'mr-3'}`} />
-                        {(!collapsed || isMobile) && <span>{item.label}</span>}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+            <SidebarSection
+              key={index}
+              title={section.title}
+              items={section.items}
+              collapsed={collapsed}
+              isMobile={isMobile}
+            />
           ))}
         </nav>
         

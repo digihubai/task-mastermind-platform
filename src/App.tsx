@@ -85,6 +85,12 @@ import TaxCalculator from "./pages/finance/TaxCalculator";
 import Workflows from "./pages/automation/Workflows";
 import WorkflowTemplates from "./pages/automation/WorkflowTemplates";
 import WorkflowEditor from "./pages/automation/WorkflowEditor";
+import IndustryTemplates from "./pages/automation/IndustryTemplates";
+import ApiConnector from "./pages/automation/ApiConnector";
+
+// Phone pages
+import IVRSystem from "./pages/phone/IVRSystem";
+import OutboundCalls from "./pages/outbound/OutboundCalls";
 
 const queryClient = new QueryClient();
 
@@ -176,6 +182,12 @@ const App = () => (
           <Route path="/automation/templates" element={<WorkflowTemplates />} />
           <Route path="/automation/editor" element={<WorkflowEditor />} />
           <Route path="/automation/editor/:id" element={<WorkflowEditor />} />
+          <Route path="/automation/industry-templates" element={<IndustryTemplates />} />
+          <Route path="/automation/api-connector" element={<ApiConnector />} />
+          
+          {/* Phone system routes */}
+          <Route path="/phone" element={<IVRSystem />} />
+          <Route path="/outbound" element={<OutboundCalls />} />
           
           {/* Catch all */}
           <Route path="*" element={<NotFound />} />

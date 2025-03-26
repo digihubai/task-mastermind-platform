@@ -1,8 +1,9 @@
 
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   PlusCircle, Bot, MessageSquare, Users, ArrowRight, BarChart3, 
   Briefcase, Settings, FileText, PenTool, Search, FileSpreadsheet, 
@@ -10,10 +11,13 @@ import {
   CheckCircle, AlertCircle, Clock, ArrowUp, ArrowDown, 
   Edit, ArrowUpRight, Target, CalendarClock
 } from "lucide-react";
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle, NavigationMenuGroup } from "@/components/ui/navigation-menu";
 
 import AppLayout from "@/components/layout/AppLayout";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import KpiCard from "@/components/dashboard/KpiCard";
+import DashboardCard from "@/components/dashboard/DashboardCard";
+import ActivityItem from "@/components/dashboard/ActivityItem";
+import TaskItem from "@/components/dashboard/TaskItem";
+import SystemStatus from "@/components/dashboard/SystemStatus";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -163,25 +167,6 @@ const Index = () => {
       percentChange: "New"
     }
   ];
-
-  // Render a KPI card
-  const renderKpiCard = (title, data, icon) => (
-    <Card className="stat-card">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
-        <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-800">
-          {icon}
-        </div>
-      </div>
-      <div className="mt-2">
-        <p className="stat-value">{data.value}</p>
-        <div className={data.trend === "up" ? "stat-indicator-up" : "stat-indicator-down"}>
-          {data.trend === "up" ? <ArrowUp size={14} className="mr-1" /> : <ArrowDown size={14} className="mr-1" />}
-          {data.change}
-        </div>
-      </div>
-    </Card>
-  );
   
   return (
     <AppLayout>
@@ -231,12 +216,12 @@ const Index = () => {
             
             <div className="p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {renderKpiCard("Customer Satisfaction", kpiData.customerSatisfaction, <Users size={18} className="text-blue-600" />)}
-                {renderKpiCard("Sales Pipeline", kpiData.salesPipeline, <DollarSign size={18} className="text-green-600" />)}
-                {renderKpiCard("Active Projects", kpiData.activeProjects, <Briefcase size={18} className="text-purple-600" />)}
-                {renderKpiCard("Task Completion", kpiData.taskCompletion, <CheckCircle size={18} className="text-emerald-600" />)}
-                {renderKpiCard("Lead Conversion", kpiData.leadConversion, <Target size={18} className="text-amber-600" />)}
-                {renderKpiCard("Avg. Resolution Time", kpiData.averageResolutionTime, <Clock size={18} className="text-rose-600" />)}
+                <KpiCard title="Customer Satisfaction" data={kpiData.customerSatisfaction} icon={<Users size={18} className="text-blue-600" />} />
+                <KpiCard title="Sales Pipeline" data={kpiData.salesPipeline} icon={<DollarSign size={18} className="text-green-600" />} />
+                <KpiCard title="Active Projects" data={kpiData.activeProjects} icon={<Briefcase size={18} className="text-purple-600" />} />
+                <KpiCard title="Task Completion" data={kpiData.taskCompletion} icon={<CheckCircle size={18} className="text-emerald-600" />} />
+                <KpiCard title="Lead Conversion" data={kpiData.leadConversion} icon={<Target size={18} className="text-amber-600" />} />
+                <KpiCard title="Avg. Resolution Time" data={kpiData.averageResolutionTime} icon={<Clock size={18} className="text-rose-600" />} />
               </div>
             </div>
           </Card>
@@ -247,16 +232,14 @@ const Index = () => {
             </div>
             <div className="divide-y">
               {recentActivities.map((activity, i) => (
-                <div key={i} className="p-4 flex gap-4 items-start hover:bg-gray-50 transition-colors">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    {activity.icon}
-                  </div>
-                  <div>
-                    <p className="font-medium text-sm">{activity.title}</p>
-                    <p className="text-muted-foreground text-xs mt-1">{activity.description}</p>
-                    <p className="text-muted-foreground text-xs mt-2">{activity.time}</p>
-                  </div>
-                </div>
+                <ActivityItem 
+                  key={i}
+                  type={activity.type}
+                  title={activity.title}
+                  description={activity.description}
+                  time={activity.time}
+                  icon={activity.icon}
+                />
               ))}
             </div>
           </Card>
@@ -277,42 +260,14 @@ const Index = () => {
             <div className="p-4">
               <div className="divide-y">
                 {activeTasks.map((task, i) => (
-                  <div key={i} className="py-3 px-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-gray-50 transition-colors rounded-lg">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${
-                          task.priority === "High" ? "bg-red-500" : 
-                          task.priority === "Medium" ? "bg-yellow-500" : "bg-blue-500"
-                        }`}></div>
-                        <p className="font-medium">{task.title}</p>
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1 flex items-center gap-4">
-                        <span className="flex items-center gap-1">
-                          <CalendarClock size={12} />
-                          Due: {task.dueDate}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Users size={12} />
-                          {task.assignee}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 mt-2 sm:mt-0">
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        task.status === "In Progress" ? "bg-blue-100 text-blue-700" :
-                        task.status === "Pending" ? "bg-yellow-100 text-yellow-700" :
-                        "bg-gray-100 text-gray-700"
-                      }`}>
-                        {task.status}
-                      </span>
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                        <Clock size={16} />
-                      </Button>
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                        <Edit size={16} />
-                      </Button>
-                    </div>
-                  </div>
+                  <TaskItem 
+                    key={i}
+                    title={task.title}
+                    priority={task.priority as "High" | "Medium" | "Low"}
+                    dueDate={task.dueDate}
+                    assignee={task.assignee}
+                    status={task.status}
+                  />
                 ))}
               </div>
               <div className="pt-4 flex justify-center">
@@ -326,53 +281,7 @@ const Index = () => {
               <h3 className="font-semibold text-lg">System Status</h3>
             </div>
             <div className="p-4">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center pb-2 border-b border-border/40">
-                  <p className="text-sm flex items-center gap-2">
-                    <MessageSquare size={16} className="text-indigo-600" />
-                    Chatbot Integration
-                  </p>
-                  <span className="text-xs px-2 py-1 bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400 rounded-full">
-                    Operational
-                  </span>
-                </div>
-                <div className="flex justify-between items-center pb-2 border-b border-border/40">
-                  <p className="text-sm flex items-center gap-2">
-                    <Briefcase size={16} className="text-purple-600" />
-                    Project Management
-                  </p>
-                  <span className="text-xs px-2 py-1 bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400 rounded-full">
-                    Operational
-                  </span>
-                </div>
-                <div className="flex justify-between items-center pb-2 border-b border-border/40">
-                  <p className="text-sm flex items-center gap-2">
-                    <Mail size={16} className="text-blue-600" />
-                    Marketing Automation
-                  </p>
-                  <span className="text-xs px-2 py-1 bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400 rounded-full">
-                    Operational
-                  </span>
-                </div>
-                <div className="flex justify-between items-center pb-2 border-b border-border/40">
-                  <p className="text-sm flex items-center gap-2">
-                    <Users size={16} className="text-green-600" />
-                    CRM System
-                  </p>
-                  <span className="text-xs px-2 py-1 bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400 rounded-full">
-                    Operational
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <p className="text-sm flex items-center gap-2">
-                    <Bot size={16} className="text-amber-600" />
-                    AI Agents
-                  </p>
-                  <span className="text-xs px-2 py-1 bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400 rounded-full">
-                    Partial Outage
-                  </span>
-                </div>
-              </div>
+              <SystemStatus />
               <div className="pt-4 flex justify-center">
                 <Button variant="outline" size="sm">View System Dashboard</Button>
               </div>
@@ -383,37 +292,16 @@ const Index = () => {
         <h2 className="text-xl font-semibold mt-2">Quick Access</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {dashboardCards.map((card, index) => (
-            <Card 
+            <DashboardCard 
               key={index}
-              className="hover-lift overflow-hidden border border-border/40"
-              onClick={() => navigate(card.link)}
-            >
-              <div className="p-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-lg">{card.title}</h3>
-                    <p className="text-muted-foreground text-sm mt-1">{card.description}</p>
-                  </div>
-                  <div className={`rounded-full p-3 ${card.color}`}>
-                    <card.icon size={20} />
-                  </div>
-                </div>
-                
-                <div className="mt-6 flex items-end justify-between">
-                  <div>
-                    <p className="text-3xl font-semibold">{card.count}</p>
-                    <p className="text-xs text-muted-foreground mt-1 flex items-center">
-                      <span className="text-green-500 mr-1">{card.percentChange}</span> 
-                      from last month
-                    </p>
-                  </div>
-                  
-                  <div className="rounded-full bg-secondary p-2 hover:bg-primary hover:text-primary-foreground transition-colors">
-                    <ArrowUpRight size={18} />
-                  </div>
-                </div>
-              </div>
-            </Card>
+              title={card.title}
+              description={card.description}
+              count={card.count}
+              icon={card.icon}
+              link={card.link}
+              color={card.color}
+              percentChange={card.percentChange}
+            />
           ))}
         </div>
       </div>
