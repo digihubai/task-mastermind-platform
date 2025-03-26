@@ -1,8 +1,20 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Clock } from "lucide-react";
+import { Play, Pause, Clock, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 interface TaskTimerProps {
   taskId: number;
@@ -14,20 +26,25 @@ const TaskTimer = ({ taskId, taskName, projectName }: TaskTimerProps) => {
   const { toast } = useToast();
   const [isRunning, setIsRunning] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);
-  const [startTime, setStartTime] = useState(null);
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [billable, setBillable] = useState(true);
+  const [hourlyRate, setHourlyRate] = useState(50);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   useEffect(() => {
-    let interval = null;
+    let interval: number | null = null;
     
     if (isRunning) {
-      interval = setInterval(() => {
+      interval = window.setInterval(() => {
         setTimeElapsed(prev => prev + 1);
       }, 1000);
-    } else {
+    } else if (interval) {
       clearInterval(interval);
     }
     
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [isRunning]);
   
   const formatTime = (seconds: number) => {
@@ -36,6 +53,12 @@ const TaskTimer = ({ taskId, taskName, projectName }: TaskTimerProps) => {
     const secs = seconds % 60;
     
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const calculateBillableAmount = () => {
+    if (!billable) return 0;
+    const hours = timeElapsed / 3600;
+    return hours * hourlyRate;
   };
   
   const handleStartTimer = () => {
@@ -50,11 +73,12 @@ const TaskTimer = ({ taskId, taskName, projectName }: TaskTimerProps) => {
   
   const handleStopTimer = () => {
     setIsRunning(false);
-    
-    toast({
-      title: "Timer stopped",
-      description: `Time tracked: ${formatTime(timeElapsed)}`,
-    });
+    setIsDialogOpen(true);
+  };
+
+  const handleTimeSubmit = () => {
+    const endTime = new Date();
+    const billableAmount = calculateBillableAmount();
     
     // Here you would typically save the time entry to your database
     console.log({
@@ -62,38 +86,115 @@ const TaskTimer = ({ taskId, taskName, projectName }: TaskTimerProps) => {
       taskName,
       projectName,
       startTime,
-      endTime: new Date(),
-      duration: timeElapsed
+      endTime,
+      duration: timeElapsed,
+      billable,
+      hourlyRate,
+      billableAmount: billable ? billableAmount : 0
     });
+    
+    toast({
+      title: "Time entry saved",
+      description: `Recorded ${formatTime(timeElapsed)}${billable ? ` ($${billableAmount.toFixed(2)})` : ''}`,
+    });
+    
+    setTimeElapsed(0);
+    setIsDialogOpen(false);
   };
   
   return (
-    <div className="flex items-center gap-2">
-      {isRunning ? (
-        <>
-          <span className="text-sm font-medium">{formatTime(timeElapsed)}</span>
+    <>
+      <div className="flex items-center gap-2">
+        {isRunning ? (
+          <>
+            <span className="text-sm font-medium">{formatTime(timeElapsed)}</span>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="h-8 bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+              onClick={handleStopTimer}
+            >
+              <Pause size={14} className="mr-1" />
+              Stop
+            </Button>
+          </>
+        ) : (
           <Button 
             variant="outline" 
             size="sm"
-            className="h-8 bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
-            onClick={handleStopTimer}
+            className="h-8"
+            onClick={handleStartTimer}
           >
-            <Pause size={14} className="mr-1" />
-            Stop
+            <Play size={14} className="mr-1" />
+            Track Time
           </Button>
-        </>
-      ) : (
-        <Button 
-          variant="outline" 
-          size="sm"
-          className="h-8"
-          onClick={handleStartTimer}
-        >
-          <Play size={14} className="mr-1" />
-          Track Time
-        </Button>
-      )}
-    </div>
+        )}
+      </div>
+      
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Time Entry Details</DialogTitle>
+            <DialogDescription>
+              Add details to your time entry for "{taskName}"
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Clock size={18} />
+                <span className="font-medium">Duration:</span>
+              </div>
+              <span className="text-lg">{formatTime(timeElapsed)}</span>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="billable" className="flex items-center gap-2">
+                  <DollarSign size={18} />
+                  <span>Billable</span>
+                </Label>
+              </div>
+              <Switch
+                id="billable"
+                checked={billable}
+                onCheckedChange={setBillable}
+              />
+            </div>
+            
+            {billable && (
+              <div className="grid grid-cols-2 items-center gap-4">
+                <Label htmlFor="hourlyRate" className="text-right">
+                  Hourly Rate ($):
+                </Label>
+                <Input
+                  id="hourlyRate"
+                  type="number"
+                  value={hourlyRate}
+                  onChange={(e) => setHourlyRate(Number(e.target.value))}
+                  className="col-span-1"
+                />
+              </div>
+            )}
+            
+            {billable && (
+              <div className="flex items-center justify-between">
+                <span className="font-medium">Billable Amount:</span>
+                <span className="text-lg font-medium text-green-600">
+                  ${calculateBillableAmount().toFixed(2)}
+                </span>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleTimeSubmit}>Save Entry</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
