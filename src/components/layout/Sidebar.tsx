@@ -12,6 +12,19 @@ import {
   BarChart3,
   Bot,
   Mail,
+  Headphones,
+  Server,
+  Globe,
+  FileText,
+  Phone,
+  PhoneOutgoing,
+  HelpCircle,
+  Heart,
+  Star,
+  Calendar,
+  AlertCircle,
+  Activity,
+  BookOpen,
   LucideIcon
 } from "lucide-react";
 
@@ -37,25 +50,43 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
   
   const sidebarSections: SidebarSection[] = [
     {
-      title: "Core",
+      title: "Dashboard",
       items: [
-        { path: "/", icon: LayoutDashboard, label: "Dashboard" },
-        { path: "/chat", icon: MessageSquare, label: "Chat" },
-        { path: "/projects", icon: Briefcase, label: "Projects" },
-        { path: "/customers", icon: Users, label: "Customers" },
-      ]
-    },
-    {
-      title: "Features",
-      items: [
-        { path: "/chatbot", icon: Bot, label: "Chatbot" },
-        { path: "/marketing", icon: Mail, label: "Marketing" },
+        { path: "/", icon: LayoutDashboard, label: "Overview" },
         { path: "/analytics", icon: BarChart3, label: "Analytics" },
+        { path: "/calendar", icon: Calendar, label: "Calendar" },
       ]
     },
     {
-      title: "System",
+      title: "Communication",
       items: [
+        { path: "/team-chat", icon: MessageSquare, label: "Team Chat" },
+        { path: "/chat", icon: MessageSquare, label: "Customer Chat" },
+        { path: "/phone", icon: Phone, label: "IVR System" },
+        { path: "/outbound", icon: PhoneOutgoing, label: "Outbound Calls" },
+      ]
+    },
+    {
+      title: "Customer Management",
+      items: [
+        { path: "/customers", icon: Users, label: "Customers" },
+        { path: "/support", icon: HelpCircle, label: "Support Tickets" },
+        { path: "/projects", icon: Briefcase, label: "Projects" },
+      ]
+    },
+    {
+      title: "Marketing & AI",
+      items: [
+        { path: "/marketing", icon: Mail, label: "Email Marketing" },
+        { path: "/social", icon: Globe, label: "Social Media" },
+        { path: "/chatbot", icon: Bot, label: "AI Chatbot" },
+      ]
+    },
+    {
+      title: "Resources",
+      items: [
+        { path: "/knowledge", icon: BookOpen, label: "Knowledge Base" },
+        { path: "/reports", icon: FileText, label: "Reports" },
         { path: "/settings", icon: Settings, label: "Settings" },
       ]
     }
@@ -86,7 +117,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
           transition-all duration-300 ease-in-out overflow-y-auto overflow-x-hidden
         `}
       >
-        <div className="p-4 flex justify-between items-center sticky top-0 bg-white dark:bg-sidebar z-10">
+        <div className="p-4 flex justify-between items-center sticky top-0 bg-white dark:bg-sidebar z-10 border-b border-border">
           <div className={`overflow-hidden transition-opacity ${collapsed && !isMobile ? 'opacity-0 w-0' : 'opacity-100'}`}>
             <h1 className="text-xl font-semibold">DigiHub AI</h1>
           </div>
@@ -102,7 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
           </button>
         </div>
         
-        <nav className="flex-1 px-2 py-4">
+        <nav className="flex-1 px-2 py-4 overflow-y-auto">
           {sidebarSections.map((section, index) => (
             <div key={index} className="mb-6">
               {!collapsed && (

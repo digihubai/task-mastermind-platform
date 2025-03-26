@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
 import { cva } from "class-variance-authority"
@@ -115,6 +116,26 @@ const NavigationMenuIndicator = React.forwardRef<
 NavigationMenuIndicator.displayName =
   NavigationMenuPrimitive.Indicator.displayName
 
+// Export the NavigationMenuGroup component for better organization
+const NavigationMenuGroup = ({ 
+  title, 
+  children, 
+  className 
+}: { 
+  title: string; 
+  children: React.ReactNode; 
+  className?: string;
+}) => {
+  return (
+    <div className={cn("px-2 py-1.5", className)}>
+      <h3 className="text-sm font-medium text-muted-foreground mb-1">{title}</h3>
+      <div className="space-y-1">
+        {children}
+      </div>
+    </div>
+  )
+}
+
 export {
   navigationMenuTriggerStyle,
   NavigationMenu,
@@ -125,4 +146,5 @@ export {
   NavigationMenuLink,
   NavigationMenuIndicator,
   NavigationMenuViewport,
+  NavigationMenuGroup,
 }

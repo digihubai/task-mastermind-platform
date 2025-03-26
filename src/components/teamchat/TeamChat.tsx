@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { TeamChannel, TeamGroup, TeamMessage, SupportUser } from "@/types/support";
+import { TeamChannel, TeamGroup, TeamMessage } from "@/types/support";
 import { 
   Avatar, 
   AvatarFallback, 
@@ -38,7 +38,8 @@ import {
   Heart,
   ThumbsUp,
   Paperclip,
-  Send
+  Send,
+  Gift
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -50,6 +51,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
 
 const mockChannels: TeamChannel[] = [
   {
@@ -193,6 +199,13 @@ const mockMessages: TeamMessage[] = [
   }
 ];
 
+const mockGifs = [
+  { id: "gif1", url: "https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif", title: "Happy" },
+  { id: "gif2", url: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnlya2VpamRjcHUyNDI2c2JzMHRtOTduemRmdWFvYWZ0ZTB6YmtpcSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Ju7l5y9osyymQ/giphy.gif", title: "Thinking" },
+  { id: "gif3", url: "https://media.giphy.com/media/3oKIPf3C7HqqYBVcCk/giphy.gif", title: "Working" },
+  { id: "gif4", url: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnZrYmJ3YTNram43dDZsZXk3MjY3ajg3dW1qZGx6cGxvYWwyb2YwdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ohhwytHcusSCXXp96/giphy.gif", title: "Hello" },
+];
+
 export const TeamChat: React.FC = () => {
   const [activeTab, setActiveTab] = useState("channels");
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>("channel-1");
@@ -200,13 +213,30 @@ export const TeamChat: React.FC = () => {
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [messageText, setMessageText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [channels, setChannels] = useState<TeamChannel[]>(mockChannels);
+  const [groups, setGroups] = useState<TeamGroup[]>(mockGroups);
+  const [showGifPicker, setShowGifPicker] = useState(false);
+  const [gifSearchQuery, setGifSearchQuery] = useState("");
+  
+  const [newChannelName, setNewChannelName] = useState("");
+  const [newChannelDescription, setNewChannelDescription] = useState("");
+  const [newChannelIsPrivate, setNewChannelIsPrivate] = useState(false);
+  const [newChannelDialogOpen, setNewChannelDialogOpen] = useState(false);
+  
+  const [newGroupName, setNewGroupName] = useState("");
+  const [newGroupDialogOpen, setNewGroupDialogOpen] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  
+  const filteredGifs = mockGifs.filter(gif => 
+    gifSearchQuery === "" || gif.title.toLowerCase().includes(gifSearchQuery.toLowerCase())
+  );
   
   const selectedChannel = selectedChannelId 
-    ? mockChannels.find(c => c.id === selectedChannelId) 
+    ? channels.find(c => c.id === selectedChannelId) 
     : null;
     
   const selectedGroup = selectedGroupId 
-    ? mockGroups.find(g => g.id === selectedGroupId) 
+    ? groups.find(g => g.id === selectedGroupId) 
     : null;
   
   const currentMessages = selectedChannelId 
@@ -240,8 +270,90 @@ export const TeamChat: React.FC = () => {
     
     console.log("Sending message:", messageText);
     
+    toast.success("Message sent!");
+    
     setMessageText("");
     setReplyTo(null);
+    setShowGifPicker(false);
+  };
+  
+  const handleCreateChannel = () => {
+    if (newChannelName.trim() === "") {
+      toast.error("Please enter a channel name");
+      return;
+    }
+    
+    const newChannel: TeamChannel = {
+      id: `channel-${Date.now()}`,
+      name: newChannelName.trim().toLowerCase().replace(/\s+/g, '-'),
+      description: newChannelDescription,
+      createdAt: new Date().toISOString(),
+      createdBy: "user-1",
+      isPrivate: newChannelIsPrivate,
+      members: ["user-1"],
+      unreadCount: 0,
+      isPinned: false
+    };
+    
+    setChannels([...channels, newChannel]);
+    setNewChannelName("");
+    setNewChannelDescription("");
+    setNewChannelIsPrivate(false);
+    setNewChannelDialogOpen(false);
+    
+    setSelectedChannelId(newChannel.id);
+    setSelectedGroupId(null);
+    setActiveTab("channels");
+    
+    toast.success(`Channel #${newChannel.name} created!`);
+  };
+  
+  const handleCreateGroup = () => {
+    if (newGroupName.trim() === "") {
+      toast.error("Please enter a group name");
+      return;
+    }
+    
+    if (selectedMembers.length === 0) {
+      toast.error("Please select at least one member");
+      return;
+    }
+    
+    const newGroup: TeamGroup = {
+      id: `group-${Date.now()}`,
+      name: newGroupName.trim(),
+      members: [...selectedMembers, "user-1"],
+      createdAt: new Date().toISOString(),
+      createdBy: "user-1",
+      unreadCount: 0,
+      isPinned: false
+    };
+    
+    setGroups([...groups, newGroup]);
+    setNewGroupName("");
+    setSelectedMembers([]);
+    setNewGroupDialogOpen(false);
+    
+    setSelectedGroupId(newGroup.id);
+    setSelectedChannelId(null);
+    setActiveTab("direct-messages");
+    
+    toast.success(`Group ${newGroup.name} created!`);
+  };
+  
+  const handleToggleMemberSelection = (memberId: string) => {
+    if (selectedMembers.includes(memberId)) {
+      setSelectedMembers(selectedMembers.filter(id => id !== memberId));
+    } else {
+      setSelectedMembers([...selectedMembers, memberId]);
+    }
+  };
+  
+  const handleInsertGif = (gifUrl: string) => {
+    console.log("Inserting GIF:", gifUrl);
+    setMessageText(messageText + " [GIF] ");
+    setShowGifPicker(false);
+    toast.success("GIF selected!");
   };
 
   return (
@@ -268,14 +380,60 @@ export const TeamChat: React.FC = () => {
           <TabsContent value="channels" className="flex-1 flex flex-col space-y-1 p-2 overflow-hidden">
             <div className="flex items-center justify-between px-2 py-1.5">
               <h3 className="text-sm font-semibold">Channels</h3>
-              <Button variant="ghost" size="icon" className="h-7 w-7">
-                <Plus size={16} />
-              </Button>
+              <Dialog open={newChannelDialogOpen} onOpenChange={setNewChannelDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-7 w-7">
+                    <Plus size={16} />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create a New Channel</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="channel-name">Channel Name</Label>
+                      <Input 
+                        id="channel-name" 
+                        placeholder="e.g. marketing" 
+                        value={newChannelName}
+                        onChange={(e) => setNewChannelName(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="channel-description">Description (optional)</Label>
+                      <Textarea 
+                        id="channel-description" 
+                        placeholder="What is this channel about?"
+                        value={newChannelDescription}
+                        onChange={(e) => setNewChannelDescription(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="channel-private">Make Private</Label>
+                        <Switch 
+                          id="channel-private"
+                          checked={newChannelIsPrivate}
+                          onCheckedChange={setNewChannelIsPrivate}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Private channels are only visible to invited members
+                      </p>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setNewChannelDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={handleCreateChannel}>Create Channel</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
             
             <ScrollArea className="flex-1">
               <div className="space-y-1">
-                {mockChannels
+                {channels
                   .filter(channel => 
                     searchQuery === "" || 
                     channel.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -346,9 +504,56 @@ export const TeamChat: React.FC = () => {
           <TabsContent value="direct-messages" className="flex-1 flex flex-col space-y-1 p-2 overflow-hidden">
             <div className="flex items-center justify-between px-2 py-1.5">
               <h3 className="text-sm font-semibold">Direct Messages</h3>
-              <Button variant="ghost" size="icon" className="h-7 w-7">
-                <Plus size={16} />
-              </Button>
+              <Dialog open={newGroupDialogOpen} onOpenChange={setNewGroupDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-7 w-7">
+                    <Plus size={16} />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create a New Group</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="group-name">Group Name</Label>
+                      <Input 
+                        id="group-name" 
+                        placeholder="e.g. Project Team" 
+                        value={newGroupName}
+                        onChange={(e) => setNewGroupName(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Select Members</Label>
+                      <div className="border rounded-md h-40 overflow-y-auto p-2">
+                        {mockTeamMembers.map(member => (
+                          <div key={member.id} className="flex items-center gap-2 p-1">
+                            <input 
+                              type="checkbox" 
+                              id={`member-${member.id}`} 
+                              checked={selectedMembers.includes(member.id)}
+                              onChange={() => handleToggleMemberSelection(member.id)}
+                              className="rounded"
+                            />
+                            <label htmlFor={`member-${member.id}`} className="flex items-center gap-2 flex-1">
+                              <Avatar className="h-6 w-6">
+                                {member.avatar && <AvatarImage src={member.avatar} />}
+                                <AvatarFallback>{member.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                              <span>{member.name}</span>
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setNewGroupDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={handleCreateGroup}>Create Group</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
             
             <ScrollArea className="flex-1">
@@ -357,7 +562,7 @@ export const TeamChat: React.FC = () => {
                   <h4 className="text-xs font-medium text-muted-foreground">Groups</h4>
                 </div>
                 
-                {mockGroups
+                {groups
                   .filter(group => 
                     searchQuery === "" || 
                     group.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -409,7 +614,7 @@ export const TeamChat: React.FC = () => {
                     >
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         <Avatar className="h-6 w-6">
-                          <AvatarImage src={member.avatar || ''} />
+                          {member.avatar && <AvatarImage src={member.avatar} />}
                           <AvatarFallback>{member.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <span className="truncate">{member.name}</span>
@@ -507,7 +712,7 @@ export const TeamChat: React.FC = () => {
                     )}
                     
                     <Avatar className="h-8 w-8 mt-0.5">
-                      <AvatarImage src={sender.avatar || ''} />
+                      {sender.avatar && <AvatarImage src={sender.avatar} />}
                       <AvatarFallback>{sender.name.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
                     </Avatar>
                     
@@ -605,6 +810,14 @@ export const TeamChat: React.FC = () => {
             <Button variant="ghost" size="sm" className="h-7">
               <Plus size={16} />
             </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-7"
+              onClick={() => setShowGifPicker(!showGifPicker)}
+            >
+              <Gift size={16} />
+            </Button>
             <Button variant="ghost" size="sm" className="h-7">
               <Smile size={16} />
             </Button>
@@ -630,6 +843,29 @@ export const TeamChat: React.FC = () => {
               </div>
             )}
           </div>
+          
+          {showGifPicker && (
+            <div className="mb-3 border rounded-md p-2 bg-background">
+              <div className="mb-2">
+                <Input 
+                  placeholder="Search GIFs..." 
+                  value={gifSearchQuery}
+                  onChange={(e) => setGifSearchQuery(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                {filteredGifs.map(gif => (
+                  <img 
+                    key={gif.id}
+                    src={gif.url} 
+                    alt={gif.title}
+                    className="rounded cursor-pointer h-24 w-full object-cover"
+                    onClick={() => handleInsertGif(gif.url)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
           
           <div className="flex gap-2">
             <Input
