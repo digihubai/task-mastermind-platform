@@ -29,7 +29,11 @@ import {
   FileCode,
   Home,
   CreditCard,
-  Tag
+  Tag,
+  ChevronRight,
+  ChevronLeft,
+  Activity,
+  ExternalLink
 } from "lucide-react";
 
 const MainSidebar = ({ collapsed = false, isMobile = false, toggleSidebar }) => {
