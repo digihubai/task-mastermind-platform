@@ -39,7 +39,11 @@ import {
   ThumbsUp,
   Paperclip,
   Send,
-  Gift
+  Gift,
+  Info,
+  Palette,
+  ExternalLink,
+  Flag
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -56,6 +60,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import EnhancedGiphyPicker from "./EnhancedGiphyPicker";
+import PinnedMessages from "./PinnedMessages";
+import ChannelInfoPanel from "./ChannelInfoPanel";
+import ChannelCanvas from "./ChannelCanvas";
 
 const mockChannels: TeamChannel[] = [
   {
@@ -74,7 +82,9 @@ const mockChannels: TeamChannel[] = [
       senderId: "user-2"
     },
     unreadCount: 3,
-    isPinned: true
+    isPinned: true,
+    topic: "Company-wide discussions",
+    purpose: "For general company discussions and announcements"
   },
   {
     id: "channel-2",
@@ -86,6 +96,8 @@ const mockChannels: TeamChannel[] = [
     members: ["user-1", "user-2"],
     unreadCount: 3,
     isPinned: true,
+    topic: "Customer support issues",
+    purpose: "For discussing customer support tickets and issues"
   },
   {
     id: "channel-3",
@@ -97,6 +109,8 @@ const mockChannels: TeamChannel[] = [
     members: ["user-1", "user-2"],
     unreadCount: 0,
     isPinned: false,
+    topic: "Code reviews and technical discussions",
+    purpose: "For development team coordination and code discussions"
   }
 ];
 
@@ -160,7 +174,8 @@ const mockMessages: TeamMessage[] = [
     channelId: "channel-1",
     content: "Has anyone seen the new product demo?",
     createdAt: "2023-04-15T14:30:00Z",
-    senderId: "user-2"
+    senderId: "user-2",
+    isPinned: true
   },
   {
     id: "msg-2",
@@ -178,6 +193,7 @@ const mockMessages: TeamMessage[] = [
     content: "I've shared some documents for the upcoming meeting. Please take a look when you get a chance.",
     createdAt: "2023-05-15T14:10:00Z",
     senderId: "user-3",
+    isPinned: true,
     attachments: [
       {
         id: "attach-1",
@@ -226,6 +242,14 @@ export const TeamChat: React.FC = () => {
   const [newGroupName, setNewGroupName] = useState("");
   const [newGroupDialogOpen, setNewGroupDialogOpen] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  
+  const [showPinnedMessages, setShowPinnedMessages] = useState(false);
+  const [showChannelInfo, setShowChannelInfo] = useState(false);
+  const [showChannelCanvas, setShowChannelCanvas] = useState(false);
+  
+  const [pinnedMessages, setPinnedMessages] = useState<TeamMessage[]>(
+    mockMessages.filter(msg => msg.isPinned)
+  );
   
   const filteredGifs = mockGifs.filter(gif => 
     gifSearchQuery === "" || gif.title.toLowerCase().includes(gifSearchQuery.toLowerCase())
@@ -354,6 +378,43 @@ export const TeamChat: React.FC = () => {
     setMessageText(messageText + " [GIF] ");
     setShowGifPicker(false);
     toast.success("GIF selected!");
+  };
+  
+  const handlePinMessage = (messageId: string) => {
+    const messageToPin = mockMessages.find(msg => msg.id === messageId);
+    if (messageToPin && !messageToPin.isPinned) {
+      messageToPin.isPinned = true;
+      setPinnedMessages([...pinnedMessages, messageToPin]);
+      toast.success("Message pinned to channel!");
+    }
+  };
+  
+  const handleUnpinMessage = (messageId: string) => {
+    const updatedPinned = pinnedMessages.filter(msg => msg.id !== messageId);
+    setPinnedMessages(updatedPinned);
+    
+    const messageToUnpin = mockMessages.find(msg => msg.id === messageId);
+    if (messageToUnpin) {
+      messageToUnpin.isPinned = false;
+    }
+  };
+  
+  const handleUpdateChannelInfo = (updatedInfo: any) => {
+    if (selectedChannelId) {
+      const updatedChannels = channels.map(channel => {
+        if (channel.id === selectedChannelId) {
+          return {
+            ...channel,
+            description: updatedInfo.description,
+            purpose: updatedInfo.purpose,
+            topic: updatedInfo.topic
+          };
+        }
+        return channel;
+      });
+      
+      setChannels(updatedChannels);
+    }
   };
 
   return (
@@ -640,8 +701,8 @@ export const TeamChat: React.FC = () => {
               <Hash size={20} />
               <div>
                 <h3 className="font-medium">{selectedChannel.name}</h3>
-                {selectedChannel.description && (
-                  <p className="text-xs text-muted-foreground">{selectedChannel.description}</p>
+                {selectedChannel.topic && (
+                  <p className="text-xs text-muted-foreground">{selectedChannel.topic}</p>
                 )}
               </div>
             </div>
@@ -660,19 +721,43 @@ export const TeamChat: React.FC = () => {
           )}
           
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <UserPlus size={18} />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8"
+              onClick={() => setShowChannelInfo(!showChannelInfo)}
+              title="Channel Info"
+            >
+              <Info size={18} />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Phone size={18} />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Video size={18} />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8"
+              onClick={() => setShowPinnedMessages(!showPinnedMessages)}
+              title="Pinned Messages"
+            >
               <Pin size={18} />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8"
+              onClick={() => setShowChannelCanvas(true)}
+              title="Channel Canvas"
+            >
+              <Palette size={18} />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8" title="Add People">
+              <UserPlus size={18} />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8" title="Start Call">
+              <Phone size={18} />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8" title="Start Video Call">
+              <Video size={18} />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8" title="Search Messages">
               <Search size={18} />
             </Button>
             <DropdownMenu>
@@ -686,124 +771,186 @@ export const TeamChat: React.FC = () => {
                 <DropdownMenuItem>Notification settings</DropdownMenuItem>
                 <DropdownMenuItem>Create channel</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Leave channel</DropdownMenuItem>
+                <DropdownMenuItem>Copy channel link</DropdownMenuItem>
+                <DropdownMenuItem>Add to favorites</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-destructive">Leave channel</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
         
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4">
-            {currentMessages.length > 0 ? (
-              currentMessages.map((message) => {
-                const sender = getSender(message.senderId);
-                const isReplyHighlighted = replyTo === message.id;
-                
-                return (
-                  <div 
-                    key={message.id} 
-                    className={`flex gap-3 ${isReplyHighlighted ? 'bg-secondary/50 p-2 rounded-md' : ''}`}
-                  >
-                    {message.replyTo && (
-                      <div className="ml-10 text-xs text-muted-foreground mb-1 flex items-center gap-1">
-                        <Reply size={12} />
-                        <span>Replying to a message</span>
-                      </div>
-                    )}
-                    
-                    <Avatar className="h-8 w-8 mt-0.5">
-                      {sender.avatar && <AvatarImage src={sender.avatar} />}
-                      <AvatarFallback>{sender.name.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{sender.name}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(message.createdAt).toLocaleTimeString([], { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                          })}
-                        </span>
-                      </div>
-                      
-                      <p className="text-sm mt-1">{message.content}</p>
-                      
-                      {message.reactions && message.reactions.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {message.reactions.map((reaction, index) => (
-                            <Badge 
-                              key={index} 
-                              variant="secondary" 
-                              className="gap-1 text-xs cursor-pointer hover:bg-secondary/80"
-                            >
-                              {reaction.emoji} <span>{reaction.count}</span>
-                            </Badge>
-                          ))}
+        <div className="flex-1 flex overflow-hidden">
+          <ScrollArea className="flex-1 p-4">
+            <div className="space-y-4">
+              {currentMessages.length > 0 ? (
+                currentMessages.map((message) => {
+                  const sender = getSender(message.senderId);
+                  const isReplyHighlighted = replyTo === message.id;
+                  
+                  return (
+                    <div 
+                      key={message.id} 
+                      className={`flex gap-3 group ${isReplyHighlighted ? 'bg-secondary/50 p-2 rounded-md' : ''} ${message.isPinned ? 'border-l-2 border-yellow-500 pl-2' : ''}`}
+                    >
+                      {message.replyTo && (
+                        <div className="ml-10 text-xs text-muted-foreground mb-1 flex items-center gap-1">
+                          <Reply size={12} />
+                          <span>Replying to a message</span>
                         </div>
                       )}
                       
-                      <div className="flex items-center gap-1 mt-1 opacity-0 hover:opacity-100 transition-opacity">
-                        <Button variant="ghost" size="icon" className="h-6 w-6">
-                          <Smile size={14} />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-6 w-6"
-                          onClick={() => setReplyTo(message.id)}
-                        >
-                          <Reply size={14} />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6">
-                          <Copy size={14} />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-6 w-6">
-                          <BookmarkPlus size={14} />
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-6 w-6">
-                              <MoreVertical size={14} />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="start">
-                            <DropdownMenuItem className="gap-2">
-                              <Edit size={14} /> Edit message
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="gap-2">
-                              <Pin size={14} /> Pin message
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="gap-2">
-                              <Share size={14} /> Share message
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="gap-2 text-destructive">
-                              <Trash2 size={14} /> Delete message
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                      <Avatar className="h-8 w-8 mt-0.5">
+                        {sender.avatar && <AvatarImage src={sender.avatar} />}
+                        <AvatarFallback>{sender.name.split(' ').map(n => n[0]).join('').toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{sender.name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(message.createdAt).toLocaleTimeString([], { 
+                              hour: '2-digit', 
+                              minute: '2-digit' 
+                            })}
+                          </span>
+                          {message.isPinned && (
+                            <Badge variant="outline" className="text-xs flex items-center gap-1 text-yellow-600 border-yellow-300 bg-yellow-50 dark:bg-yellow-950 dark:border-yellow-800">
+                              <Pin size={10} className="text-yellow-500" />
+                              Pinned
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        <p className="text-sm mt-1">{message.content}</p>
+                        
+                        {message.reactions && message.reactions.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {message.reactions.map((reaction, index) => (
+                              <Badge 
+                                key={index} 
+                                variant="secondary" 
+                                className="gap-1 text-xs cursor-pointer hover:bg-secondary/80"
+                              >
+                                {reaction.emoji} <span>{reaction.count}</span>
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button variant="ghost" size="icon" className="h-6 w-6">
+                            <Smile size={14} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6"
+                            onClick={() => setReplyTo(message.id)}
+                          >
+                            <Reply size={14} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6"
+                            onClick={() => {
+                              if (message.isPinned) {
+                                handleUnpinMessage(message.id);
+                              } else {
+                                handlePinMessage(message.id);
+                              }
+                            }}
+                          >
+                            <Pin size={14} className={message.isPinned ? "text-yellow-500" : ""} />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-6 w-6">
+                            <Copy size={14} />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-6 w-6">
+                            <BookmarkPlus size={14} />
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-6 w-6">
+                                <MoreVertical size={14} />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start">
+                              <DropdownMenuItem className="gap-2">
+                                <Edit size={14} /> Edit message
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2" onClick={() => {
+                                if (message.isPinned) {
+                                  handleUnpinMessage(message.id);
+                                } else {
+                                  handlePinMessage(message.id);
+                                }
+                              }}>
+                                <Pin size={14} /> {message.isPinned ? "Unpin message" : "Pin message"}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2">
+                                <Share size={14} /> Share message
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2">
+                                <ExternalLink size={14} /> Open in thread
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2">
+                                <Flag size={14} /> Report message
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem className="gap-2 text-destructive">
+                                <Trash2 size={14} /> Delete message
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full py-12">
-                <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium">No messages yet</h3>
-                <p className="text-muted-foreground text-sm">
-                  {selectedChannel 
-                    ? `Start the conversation in #${selectedChannel.name}`
-                    : selectedGroup
-                      ? `Start the conversation in ${selectedGroup.name}`
-                      : "Select a channel or direct message to start chatting"
-                  }
-                </p>
-              </div>
-            )}
-          </div>
-        </ScrollArea>
+                  );
+                })
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full py-12">
+                  <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium">No messages yet</h3>
+                  <p className="text-muted-foreground text-sm">
+                    {selectedChannel 
+                      ? `Start the conversation in #${selectedChannel.name}`
+                      : selectedGroup
+                        ? `Start the conversation in ${selectedGroup.name}`
+                        : "Select a channel or direct message to start chatting"
+                    }
+                  </p>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+          
+          {showPinnedMessages && (
+            <PinnedMessages 
+              isOpen={showPinnedMessages} 
+              onClose={() => setShowPinnedMessages(false)} 
+              messages={pinnedMessages}
+              onUnpinMessage={handleUnpinMessage}
+            />
+          )}
+          
+          {showChannelInfo && selectedChannel && (
+            <ChannelInfoPanel 
+              isOpen={showChannelInfo} 
+              onClose={() => setShowChannelInfo(false)} 
+              channel={selectedChannel}
+              onUpdateChannel={handleUpdateChannelInfo}
+            />
+          )}
+          
+          {showChannelCanvas && (
+            <ChannelCanvas 
+              isOpen={showChannelCanvas} 
+              onClose={() => setShowChannelCanvas(false)} 
+            />
+          )}
+        </div>
         
         <div className="p-3 border-t">
           <div className="flex items-center gap-2 mb-2">
@@ -845,25 +992,11 @@ export const TeamChat: React.FC = () => {
           </div>
           
           {showGifPicker && (
-            <div className="mb-3 border rounded-md p-2 bg-background">
-              <div className="mb-2">
-                <Input 
-                  placeholder="Search GIFs..." 
-                  value={gifSearchQuery}
-                  onChange={(e) => setGifSearchQuery(e.target.value)}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-                {filteredGifs.map(gif => (
-                  <img 
-                    key={gif.id}
-                    src={gif.url} 
-                    alt={gif.title}
-                    className="rounded cursor-pointer h-24 w-full object-cover"
-                    onClick={() => handleInsertGif(gif.url)}
-                  />
-                ))}
-              </div>
+            <div className="mb-3 absolute bottom-20 left-4 z-10">
+              <EnhancedGiphyPicker
+                onSelect={handleInsertGif}
+                onClose={() => setShowGifPicker(false)}
+              />
             </div>
           )}
           

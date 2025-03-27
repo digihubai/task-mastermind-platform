@@ -39,7 +39,11 @@ import {
   Receipt,
   Building,
   Sparkles,
-  LayoutTemplate
+  LayoutTemplate,
+  Pin,
+  Gift,
+  Hash,
+  Palette
 } from "lucide-react";
 
 export interface SidebarItem {
@@ -76,6 +80,10 @@ export const sidebarSections: SidebarSection[] = [
     title: "Team Collaboration",
     items: [
       { path: "/team-chat", icon: MessageSquare, label: "Team Chat" },
+      { path: "/team-chat/channels", icon: Hash, label: "Channels" },
+      { path: "/team-chat/canvas", icon: Palette, label: "Canvas" },
+      { path: "/team-chat/pinned", icon: Pin, label: "Pinned Items" },
+      { path: "/team-chat/gifs", icon: Gift, label: "GIF Library" },
       { path: "/project-management", icon: Briefcase, label: "Project Management" },
       { path: "/crm", icon: Users, label: "CRM" },
     ]
