@@ -1,10 +1,8 @@
 
-import React from "react";
-
 export interface SidebarItemType {
   title: string;
   href: string;
-  icon: React.ReactNode;
+  icon: string;
   badge?: string;
   subItems?: SidebarItemType[];
 }

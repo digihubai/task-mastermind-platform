@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Package, Bot, Target, Settings, ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 import SidebarSection from "./sidebar/SidebarSection";
 import SidebarUserProfile from "./sidebar/SidebarUserProfile";
 import { 
@@ -106,7 +106,7 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
                           : "hover:bg-secondary"
                       }`}
                     >
-                      {item.icon}
+                      <span className="material-icons">{item.icon}</span>
                       {!collapsed && <span>{item.name}</span>}
                     </a>
                   </li>
@@ -125,7 +125,7 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
                   title="Modules"
                   items={moduleItems}
                   sectionKey="modules"
-                  icon={<Package size={20} />}
+                  icon="package"
                   collapsed={collapsed}
                   expandedSections={expandedSections}
                   toggleSection={toggleSection}
@@ -138,7 +138,7 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
                   title="Marketing"
                   items={marketingItems}
                   sectionKey="marketing"
-                  icon={<Target size={20} />}
+                  icon="target"
                   collapsed={collapsed}
                   expandedSections={expandedSections}
                   toggleSection={toggleSection}
@@ -158,7 +158,7 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
                   title="AI Tools"
                   items={aiToolsItems}
                   sectionKey="ai"
-                  icon={<Bot size={20} />}
+                  icon="bot"
                   collapsed={collapsed}
                   expandedSections={expandedSections}
                   toggleSection={toggleSection}
@@ -178,7 +178,7 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
                   title="Settings"
                   items={settingsItems}
                   sectionKey="settings"
-                  icon={<Settings size={20} />}
+                  icon="settings"
                   collapsed={collapsed}
                   expandedSections={expandedSections}
                   toggleSection={toggleSection}

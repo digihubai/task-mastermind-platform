@@ -1,4 +1,4 @@
-import React from "react";
+
 import { SidebarSectionType } from "@/types/sidebar";
 
 export const dashboardSection: SidebarSectionType = {
@@ -7,12 +7,12 @@ export const dashboardSection: SidebarSectionType = {
     {
       title: "Overview",
       href: "/dashboard",
-      icon: <span className="material-icons">dashboard</span>,
+      icon: "dashboard",
     },
     {
       title: "Reports",
       href: "/dashboard/reports",
-      icon: <span className="material-icons">assessment</span>,
+      icon: "assessment",
     },
   ],
 };
@@ -23,12 +23,12 @@ export const automationSection: SidebarSectionType = {
     {
       title: "Workflows",
       href: "/automation/workflows",
-      icon: <span className="material-icons">settings_input_composite</span>,
+      icon: "settings_input_composite",
     },
     {
       title: "Sequences",
       href: "/automation/sequences",
-      icon: <span className="material-icons">format_list_numbered</span>,
+      icon: "format_list_numbered",
     },
   ],
 };
@@ -39,12 +39,12 @@ export const analyticsSection: SidebarSectionType = {
     {
       title: "Dashboard",
       href: "/analytics",
-      icon: <span className="material-icons">bar_chart</span>,
+      icon: "bar_chart",
     },
     {
       title: "Reports",
       href: "/analytics/reports",
-      icon: <span className="material-icons">analytics</span>,
+      icon: "analytics",
     },
   ],
 };
@@ -55,17 +55,17 @@ export const marketingSection: SidebarSectionType = {
     {
       title: "Campaigns",
       href: "/marketing/campaigns",
-      icon: <span className="material-icons">campaign</span>,
+      icon: "campaign",
     },
     {
       title: "SEO",
       href: "/marketing/seo",
-      icon: <span className="material-icons">search</span>,
+      icon: "search",
     },
     {
       title: "Social Media",
       href: "/marketing/social",
-      icon: <span className="material-icons">share</span>,
+      icon: "share",
     },
   ],
 };
@@ -76,17 +76,17 @@ export const aiToolsSection: SidebarSectionType = {
     {
       title: "AI Chat",
       href: "/ai/chat",
-      icon: <span className="material-icons">chat</span>,
+      icon: "chat",
     },
     {
       title: "AI Vision",
       href: "/ai/vision",
-      icon: <span className="material-icons">visibility</span>,
+      icon: "visibility",
     },
     {
       title: "AI Assistant",
       href: "/ai/assistant",
-      icon: <span className="material-icons">assistant</span>,
+      icon: "assistant",
     },
   ],
 };
@@ -97,39 +97,39 @@ export const coreModulesSection: SidebarSectionType = {
     {
       title: "CRM",
       href: "/crm",
-      icon: <span className="material-icons">people</span>,
+      icon: "people",
       subItems: [
         {
           title: "Customers",
           href: "/crm/customers",
-          icon: <span className="material-icons">group</span>,
+          icon: "group",
         },
         {
           title: "Sales Pipeline",
           href: "/crm/sales",
-          icon: <span className="material-icons">analytics</span>,
+          icon: "analytics",
         },
       ],
     },
     {
       title: "Support",
       href: "/support",
-      icon: <span className="material-icons">support_agent</span>,
+      icon: "support_agent",
       subItems: [
         {
           title: "Call Center",
           href: "/support/call-center",
-          icon: <span className="material-icons">call</span>,
+          icon: "call",
         },
         {
           title: "Omnichannel Inbox",
           href: "/support/omnichannel",
-          icon: <span className="material-icons">inbox</span>,
+          icon: "inbox",
         },
         {
           title: "Support Tickets",
           href: "/support/tickets",
-          icon: <span className="material-icons">confirmation_number</span>,
+          icon: "confirmation_number",
         },
       ],
     },
@@ -142,17 +142,17 @@ export const settingsSection: SidebarSectionType = {
     {
       title: "Profile",
       href: "/settings/profile",
-      icon: <span className="material-icons">person</span>,
+      icon: "person",
     },
     {
       title: "Security",
       href: "/settings/security",
-      icon: <span className="material-icons">security</span>,
+      icon: "security",
     },
     {
       title: "Notifications",
       href: "/settings/notifications",
-      icon: <span className="material-icons">notifications</span>,
+      icon: "notifications",
     },
   ],
 };

@@ -8,7 +8,8 @@ import {
   Clock, 
   AlertCircle, 
   CheckCircle, 
-  Clock8 
+  Clock8,
+  ArrowUpRight
 } from "lucide-react";
 
 const SupportStats: React.FC = () => {
