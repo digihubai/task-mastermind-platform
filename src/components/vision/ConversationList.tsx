@@ -1,8 +1,7 @@
 
 import React from "react";
-import { Search, MessageSquare, Plus } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { MessageSquare, Plus } from "lucide-react";
 
 interface Conversation {
   id: string;
@@ -17,46 +16,47 @@ interface ConversationListProps {
   onNewConversation: () => void;
 }
 
-const ConversationList = ({
-  conversations,
-  activeConversation,
+const ConversationList = ({ 
+  conversations, 
+  activeConversation, 
   onSelectConversation,
-  onNewConversation,
+  onNewConversation
 }: ConversationListProps) => {
   return (
-    <div className="space-y-4">
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-        <Input placeholder="Search" className="pl-10" />
+    <>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-medium">Conversations</h3>
+        <Button 
+          size="sm" 
+          variant="ghost" 
+          className="h-8 w-8 p-0"
+          onClick={onNewConversation}
+        >
+          <Plus size={16} />
+        </Button>
       </div>
-
-      <div className="space-y-2">
+      
+      <div className="space-y-1">
         {conversations.map((conversation) => (
-          <div 
+          <Button
             key={conversation.id}
-            className={`flex items-start gap-3 p-2 rounded cursor-pointer hover:bg-muted/60 ${
-              activeConversation === conversation.id ? "bg-muted" : ""
+            variant="ghost"
+            className={`w-full justify-start ${
+              activeConversation === conversation.id 
+                ? "bg-accent text-accent-foreground" 
+                : ""
             }`}
             onClick={() => onSelectConversation(conversation.id)}
           >
-            <MessageSquare size={18} className="mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm truncate">{conversation.name}</p>
-              <p className="text-xs text-muted-foreground">{conversation.timestamp}</p>
+            <MessageSquare size={16} className="mr-2" />
+            <div className="flex flex-col items-start">
+              <span className="text-sm">{conversation.name}</span>
+              <span className="text-xs text-muted-foreground">{conversation.timestamp}</span>
             </div>
-          </div>
+          </Button>
         ))}
       </div>
-
-      <Button 
-        variant="default" 
-        className="w-full mt-4 gap-2"
-        onClick={onNewConversation}
-      >
-        <Plus size={16} />
-        New Conversation
-      </Button>
-    </div>
+    </>
   );
 };
 

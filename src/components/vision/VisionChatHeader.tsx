@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Share2, Settings, ChevronDown, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Share2, Settings } from "lucide-react";
 
 interface VisionChatHeaderProps {
   onShare: () => void;
@@ -10,36 +10,24 @@ interface VisionChatHeaderProps {
 
 const VisionChatHeader = ({ onShare, onSettings }: VisionChatHeaderProps) => {
   return (
-    <div className="flex justify-between items-center mb-4">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-white">
-          <Image size={20} />
-        </div>
-        <div>
-          <div className="flex items-center gap-1">
-            <span className="font-medium">VisionAI</span>
-            <ChevronDown size={16} className="text-muted-foreground" />
-          </div>
-          <p className="text-xs text-muted-foreground">Image Expert</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-2">
+    <div className="flex justify-between items-center mb-4 pb-2 border-b">
+      <h3 className="text-lg font-medium">Vision Chat</h3>
+      <div className="flex gap-2">
         <Button 
-          variant="outline" 
+          variant="ghost" 
           size="sm" 
-          className="rounded-full" 
+          className="h-8 w-8 p-0" 
           onClick={onShare}
         >
-          <Share2 className="mr-2 h-4 w-4" />
-          Share
+          <Share2 size={16} />
         </Button>
         <Button 
           variant="ghost" 
-          size="icon" 
-          className="rounded-full"
+          size="sm" 
+          className="h-8 w-8 p-0" 
           onClick={onSettings}
         >
-          <Settings size={18} />
+          <Settings size={16} />
         </Button>
       </div>
     </div>

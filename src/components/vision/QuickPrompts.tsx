@@ -8,20 +8,21 @@ interface QuickPromptsProps {
 
 const QuickPrompts = ({ onSelectPrompt }: QuickPromptsProps) => {
   const prompts = [
-    "Explain an Image",
-    "Summarize a book for research",
-    "Translate a book"
+    "What's in this image?",
+    "Describe this for social media",
+    "Identify key objects",
+    "Extract colors from this image"
   ];
 
   return (
-    <div className="flex flex-wrap gap-2 justify-center mb-8">
-      {prompts.map((prompt) => (
-        <Button 
-          key={prompt}
-          variant="secondary" 
-          size="sm" 
-          className="rounded-full"
+    <div className="mb-4 flex flex-wrap gap-2 justify-center max-w-xl mx-auto">
+      {prompts.map((prompt, index) => (
+        <Button
+          key={index}
+          variant="outline"
+          size="sm"
           onClick={() => onSelectPrompt(prompt)}
+          className="bg-background/80 backdrop-blur-sm"
         >
           {prompt}
         </Button>
