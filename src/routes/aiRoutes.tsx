@@ -9,7 +9,6 @@ import AISEOWriterPage from '@/pages/ai/AISEOWriterPage';
 import AIVisionPage from '@/pages/ai/AIVisionPage';
 import PDFInsightPage from '@/pages/ai/PDFInsightPage';
 import ChatbotsPage from '@/pages/ai/ChatbotsPage';
-import ChatbotPage from '@/pages/ChatbotPage';
 
 const aiRoutes: RouteObject[] = [
   {
@@ -71,14 +70,6 @@ const aiRoutes: RouteObject[] = [
   {
     path: '/chatbots',
     element: <ChatbotsPage />,
-  },
-  {
-    path: '/chatbot',
-    element: <ChatbotPage />,
-  },
-  {
-    path: '/ai/chatbot',
-    element: <ChatbotPage />,
   }
 ];
 
