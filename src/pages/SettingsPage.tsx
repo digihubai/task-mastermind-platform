@@ -1,116 +1,123 @@
 
-import React, { useState } from "react";
-import AppLayout from "@/components/layout/AppLayout";
-import { Button } from "@/components/ui/button";
-import { Save } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSettings } from "@/hooks/use-settings";
-import PricingTab from "@/components/settings/PricingTab";
-import FeaturesTab from "@/components/settings/FeaturesTab";
-import GeneralTab from "@/components/settings/GeneralTab";
-import IntegrationsTab from "@/components/settings/IntegrationsTab";
-import AIModelsTab from "@/components/settings/AIModelsTab";
-import LocalizationTab from "@/components/settings/LocalizationTab";
-import TwilioPhoneNumbers from "@/components/phone/TwilioPhoneNumbers";
-import { useToast } from "@/hooks/use-toast";
+import React, { useState } from 'react';
+import AppLayout from '@/components/layout/AppLayout';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card } from '@/components/ui/card';
+import { GeneralTab } from '@/components/settings/GeneralTab';
+import { IntegrationsTab } from '@/components/settings/IntegrationsTab';
+import { FeaturesTab } from '@/components/settings/FeaturesTab';
+import { LocalizationTab } from '@/components/settings/LocalizationTab';
+import { PricingTab } from '@/components/settings/PricingTab';
+// Import as a named import, not a default import
+import { AIModelsTab } from '@/components/settings/AIModelsTab';
+import { 
+  Settings,
+  Puzzle,
+  Globe,
+  CreditCard,
+  Bot,
+  ChevronRight
+} from 'lucide-react';
 
 const SettingsPage = () => {
-  const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("pricing");
-  const {
-    featureCategories,
-    pricingPlans,
-    handleToggleFeature,
-    handleDeleteFeature,
-    handleAddFeature,
-    handlePlanChange,
-    handlePlanFeatureToggle,
-    handleAddPlan,
-    handleDeletePlan,
-    handleSaveChanges
-  } = useSettings();
-  
-  const handleSave = () => {
-    handleSaveChanges();
-    toast({
-      title: "Settings Saved",
-      description: "Your settings have been successfully saved.",
-    });
-  };
-  
+  const [activeTab, setActiveTab] = useState('general');
+
   return (
     <AppLayout>
-      <div className="space-y-6 animate-fade-in">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="container py-8 max-w-7xl">
+        <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
             <p className="text-muted-foreground mt-1">
-              Manage your platform settings and configurations
+              Manage your account settings and preferences
             </p>
           </div>
-          
-          <Button
-            onClick={handleSave}
-            className="flex items-center gap-2"
-          >
-            <Save size={18} />
-            <span>Save Changes</span>
-          </Button>
         </div>
-        
-        <Tabs defaultValue="pricing" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3 md:grid-cols-7 w-full md:w-auto">
-            <TabsTrigger value="pricing">Pricing</TabsTrigger>
-            <TabsTrigger value="features">Features</TabsTrigger>
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="integrations">Integrations</TabsTrigger>
-            <TabsTrigger value="aimodels">AI Models</TabsTrigger>
-            <TabsTrigger value="phone">Phone</TabsTrigger>
-            <TabsTrigger value="localization">Localization</TabsTrigger>
-          </TabsList>
-          
-          <div className="mt-6">
-            <TabsContent value="pricing" className="space-y-6">
-              <PricingTab 
-                pricingPlans={pricingPlans}
-                featureCategories={featureCategories}
-                onPlanChange={handlePlanChange}
-                onPlanFeatureToggle={handlePlanFeatureToggle}
-                onAddPlan={handleAddPlan}
-                onDeletePlan={handleDeletePlan}
-              />
-            </TabsContent>
-            
-            <TabsContent value="features" className="space-y-6">
-              <FeaturesTab 
-                featureCategories={featureCategories}
-                onToggleFeature={handleToggleFeature}
-                onDeleteFeature={handleDeleteFeature}
-                onAddFeature={handleAddFeature}
-              />
-            </TabsContent>
-            
-            <TabsContent value="general" className="space-y-6">
+
+        <div className="flex flex-col md:flex-row gap-8">
+          <div className="w-full md:w-1/4">
+            <Card className="p-4">
+              <Tabs
+                orientation="vertical"
+                value={activeTab}
+                onValueChange={setActiveTab}
+                className="w-full"
+              >
+                <TabsList className="flex flex-col h-auto w-full bg-transparent p-0 space-y-1">
+                  <TabsTrigger
+                    value="general"
+                    className="w-full justify-start px-3 py-3"
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>General</span>
+                    <ChevronRight className="ml-auto h-4 w-4" />
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="integrations"
+                    className="w-full justify-start px-3 py-3"
+                  >
+                    <Puzzle className="mr-2 h-4 w-4" />
+                    <span>Integrations</span>
+                    <ChevronRight className="ml-auto h-4 w-4" />
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="features"
+                    className="w-full justify-start px-3 py-3"
+                  >
+                    <Bot className="mr-2 h-4 w-4" />
+                    <span>Features</span>
+                    <ChevronRight className="ml-auto h-4 w-4" />
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="localization"
+                    className="w-full justify-start px-3 py-3"
+                  >
+                    <Globe className="mr-2 h-4 w-4" />
+                    <span>Localization</span>
+                    <ChevronRight className="ml-auto h-4 w-4" />
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="ai-models"
+                    className="w-full justify-start px-3 py-3"
+                  >
+                    <Bot className="mr-2 h-4 w-4" />
+                    <span>AI Models</span>
+                    <ChevronRight className="ml-auto h-4 w-4" />
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="billing"
+                    className="w-full justify-start px-3 py-3"
+                  >
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    <span>Billing & Plans</span>
+                    <ChevronRight className="ml-auto h-4 w-4" />
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </Card>
+          </div>
+
+          <div className="w-full md:w-3/4">
+            <TabsContent value="general" className="m-0">
               <GeneralTab />
             </TabsContent>
-            
-            <TabsContent value="integrations" className="space-y-6">
+            <TabsContent value="integrations" className="m-0">
               <IntegrationsTab />
             </TabsContent>
-            
-            <TabsContent value="aimodels" className="space-y-6">
-              <AIModelsTab />
+            <TabsContent value="features" className="m-0">
+              <FeaturesTab />
             </TabsContent>
-            
-            <TabsContent value="phone" className="space-y-6">
-              <TwilioPhoneNumbers />
-            </TabsContent>
-            
-            <TabsContent value="localization" className="space-y-6">
+            <TabsContent value="localization" className="m-0">
               <LocalizationTab />
             </TabsContent>
+            <TabsContent value="ai-models" className="m-0">
+              <AIModelsTab />
+            </TabsContent>
+            <TabsContent value="billing" className="m-0">
+              <PricingTab />
+            </TabsContent>
           </div>
-        </Tabs>
+        </div>
       </div>
     </AppLayout>
   );

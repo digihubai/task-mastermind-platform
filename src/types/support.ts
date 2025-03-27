@@ -63,6 +63,15 @@ export interface SupportTicket {
   userId: string;
   assigneeId?: string;
   messages: SupportMessage[];
+  // Additional fields used in the app
+  description?: string;
+  department?: string;
+  assignedTo?: string;
+  tags?: string[];
+  source?: string;
+  rating?: number;
+  followUp?: string;
+  attachments?: any[];
 }
 
 export interface SupportMessage {
@@ -79,6 +88,10 @@ export interface SupportMessage {
     type: string;
     size: number;
   }[];
+  // Additional fields used in the app
+  senderId?: string;
+  senderType?: string;
+  isRead?: boolean;
 }
 
 export interface SupportUser {
@@ -92,6 +105,17 @@ export interface SupportUser {
   createdAt: string;
   lastLogin?: string;
   tickets?: SupportTicket[];
+  // Additional fields used in the app
+  type?: string;
+  lastActivity?: string;
+  phone?: string;
+  browser?: string;
+  os?: string;
+  location?: string;
+  ip?: string;
+  timezone?: string;
+  language?: string;
+  currentUrl?: string;
 }
 
 export interface ChatBotFlow {
@@ -107,6 +131,8 @@ export interface ChatBotFlow {
     target: string;
     condition?: string;
   }[];
+  isActive?: boolean;
+  language?: string;
 }
 
 export interface ChatBotNode {
@@ -132,4 +158,7 @@ export interface ChatBotNode {
       value: any;
     };
   };
+  // Additional fields used in the app
+  content?: string;
+  next?: string[];
 }

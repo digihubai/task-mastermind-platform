@@ -93,6 +93,7 @@ const ChannelInfoPanel: React.FC<ChannelInfoPanelProps> = ({
             )}
           </div>
 
+          {/* Fix: Changed "primary" variant to "default" */}
           {isEditing ? (
             <div className="space-y-4">
               <div>
