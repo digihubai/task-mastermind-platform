@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { SupportTicket, SupportMessage } from "@/types/support";
+import { SupportTicket, SupportMessage, ChatBotFlow, ChatBotNode } from "@/types/support";
 import { ChatFlowDesigner } from "@/components/support/ChatFlowDesigner";
 import { SupportBoard } from "@/components/support/SupportBoard";
 import { TicketList } from "@/components/support/TicketList";
@@ -12,12 +12,14 @@ import { UserDetails } from "@/components/support/UserDetails";
 import { NewTicketForm } from "@/components/support/NewTicketForm";
 import { PlusCircle, RefreshCw, Filter, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 const Support = () => {
   const [activeTab, setActiveTab] = useState("tickets");
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [showNewTicketForm, setShowNewTicketForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
   
   // Mock data
   const [tickets, setTickets] = useState<SupportTicket[]>([
@@ -86,6 +88,34 @@ const Support = () => {
       tags: ["feature-request", "ui"],
     },
   ]);
+  
+  // Default chat flow
+  const [chatFlow, setChatFlow] = useState<ChatBotFlow>({
+    id: "flow-default",
+    name: "Default Support Flow",
+    description: "A default flow for customer support",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    nodes: [
+      {
+        id: "node-start",
+        type: "start",
+        position: { x: 100, y: 100 },
+        data: { name: "Start" }
+      },
+      {
+        id: "node-greeting",
+        type: "message",
+        position: { x: 100, y: 200 },
+        data: { message: "Hello! How can I help you today?" }
+      }
+    ],
+    edges: [
+      { id: "edge-1", source: "node-start", target: "node-greeting" }
+    ],
+    isActive: true,
+    language: "en"
+  });
   
   const selectedTicket = selectedTicketId 
     ? tickets.find(ticket => ticket.id === selectedTicketId) 
@@ -159,6 +189,14 @@ const Support = () => {
       }
       return ticket;
     }));
+  };
+
+  const handleSaveChatFlow = (flow: ChatBotFlow) => {
+    setChatFlow(flow);
+    toast({
+      title: "Flow saved",
+      description: "Your chatbot flow has been saved successfully."
+    });
   };
   
   return (
@@ -241,7 +279,10 @@ const Support = () => {
           </TabsContent>
           
           <TabsContent value="chatbots" className="flex-1">
-            <ChatFlowDesigner />
+            <ChatFlowDesigner 
+              flow={chatFlow}
+              onSave={handleSaveChatFlow}
+            />
           </TabsContent>
         </Tabs>
       </div>

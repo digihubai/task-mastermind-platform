@@ -9,16 +9,36 @@ import { NodeEditor } from "./chatflow/NodeEditor";
 import { FlowPreview } from "./chatflow/FlowPreview";
 import { createNewNode } from "./chatflow/utils";
 
-interface ChatFlowDesignerProps {
-  flow: ChatBotFlow;
-  onSave: (flow: ChatBotFlow) => void;
+export interface ChatFlowDesignerProps {
+  flow?: ChatBotFlow;
+  onSave?: (flow: ChatBotFlow) => void;
 }
 
 export const ChatFlowDesigner: React.FC<ChatFlowDesignerProps> = ({
-  flow,
+  flow: initialFlow,
   onSave,
 }) => {
-  const [currentFlow, setCurrentFlow] = useState<ChatBotFlow>(flow);
+  // Default flow if none is provided
+  const defaultFlow: ChatBotFlow = {
+    id: `flow-${Date.now()}`,
+    name: "New Chatbot Flow",
+    description: "A new chatbot flow",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    nodes: [
+      {
+        id: "start-node",
+        type: "start",
+        position: { x: 100, y: 100 },
+        data: { name: "Start" }
+      }
+    ],
+    edges: [],
+    isActive: false,
+    language: "en"
+  };
+
+  const [currentFlow, setCurrentFlow] = useState<ChatBotFlow>(initialFlow || defaultFlow);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -66,7 +86,9 @@ export const ChatFlowDesigner: React.FC<ChatFlowDesignerProps> = ({
   };
 
   const handleSaveFlow = () => {
-    onSave(currentFlow);
+    if (onSave) {
+      onSave(currentFlow);
+    }
     toast({
       title: "Flow saved",
       description: "Your chatbot flow has been saved successfully.",

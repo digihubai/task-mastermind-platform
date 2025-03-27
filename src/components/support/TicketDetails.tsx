@@ -13,7 +13,8 @@ import {
   Lock, 
   User, 
   Tag,
-  Paperclip
+  Paperclip,
+  ArrowLeft
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -30,14 +31,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export interface TicketDetailsProps {
   ticket: SupportTicket;
-  onSendMessage: (ticketId: string, message: string, isInternal: boolean) => void;
-  onUpdateTicket: (ticketId: string, updateData: Partial<SupportTicket>) => void;
+  messages?: SupportMessage[];
+  onSendMessage?: (ticketId: string, message: string, isInternal: boolean) => void;
+  onUpdateTicket?: (ticketId: string, updateData: Partial<SupportTicket>) => void;
+  onBack?: () => void;
+  onReply?: (message: string) => void;
 }
 
 export const TicketDetails: React.FC<TicketDetailsProps> = ({ 
   ticket, 
+  messages = [],
   onSendMessage,
-  onUpdateTicket
+  onUpdateTicket,
+  onBack,
+  onReply
 }) => {
   const [newMessage, setNewMessage] = useState("");
   const [isInternal, setIsInternal] = useState(false);
@@ -47,8 +54,10 @@ export const TicketDetails: React.FC<TicketDetailsProps> = ({
       case "open":
         return "bg-red-100 text-red-800 border-red-200";
       case "pending":
+      case "in_progress":
         return "bg-amber-100 text-amber-800 border-amber-200";
       case "closed":
+      case "resolved":
         return "bg-green-100 text-green-800 border-green-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
@@ -58,6 +67,7 @@ export const TicketDetails: React.FC<TicketDetailsProps> = ({
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "high":
+      case "urgent":
         return "bg-red-100 text-red-800 border-red-200";
       case "medium":
         return "bg-amber-100 text-amber-800 border-amber-200";
@@ -80,18 +90,30 @@ export const TicketDetails: React.FC<TicketDetailsProps> = ({
   };
   
   const handleSendMessage = () => {
-    if (newMessage.trim()) {
+    if (!newMessage.trim()) return;
+    
+    if (onReply) {
+      onReply(newMessage);
+      setNewMessage("");
+      return;
+    }
+    
+    if (onSendMessage) {
       onSendMessage(ticket.id, newMessage, isInternal);
       setNewMessage("");
     }
   };
   
   const handleUpdateStatus = (status: string) => {
-    onUpdateTicket(ticket.id, { status });
+    if (onUpdateTicket) {
+      onUpdateTicket(ticket.id, { status });
+    }
   };
   
   const handleUpdatePriority = (priority: string) => {
-    onUpdateTicket(ticket.id, { priority });
+    if (onUpdateTicket) {
+      onUpdateTicket(ticket.id, { priority });
+    }
   };
   
   const getMessageSenderInitials = (senderId: string) => {
@@ -99,11 +121,23 @@ export const TicketDetails: React.FC<TicketDetailsProps> = ({
   };
   
   const getMessageSenderName = (message: SupportMessage) => {
-    return message.userId.startsWith("user") ? "Customer" : "Support Agent";
+    return message.userId?.startsWith("user") || message.senderId?.startsWith("user") 
+      ? "Customer" 
+      : "Support Agent";
   };
+
+  // Use ticket.messages if available, otherwise use the provided messages
+  const ticketMessages = ticket.messages || messages;
   
   return (
     <div className="h-full flex flex-col">
+      {onBack && (
+        <Button variant="ghost" onClick={onBack} className="mb-4 self-start">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Tickets
+        </Button>
+      )}
+      
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">{ticket.subject}</h2>
@@ -120,9 +154,13 @@ export const TicketDetails: React.FC<TicketDetailsProps> = ({
                   <AlertCircle className="h-4 w-4 mr-2 text-red-500" />
                   Open
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleUpdateStatus("pending")}>
+                <DropdownMenuItem onClick={() => handleUpdateStatus("in_progress")}>
                   <Clock className="h-4 w-4 mr-2 text-amber-500" />
-                  Pending
+                  In Progress
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleUpdateStatus("resolved")}>
+                  <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                  Resolved
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleUpdateStatus("closed")}>
                   <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
@@ -138,6 +176,9 @@ export const TicketDetails: React.FC<TicketDetailsProps> = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleUpdatePriority("urgent")}>
+                  Urgent
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleUpdatePriority("high")}>
                   High
                 </DropdownMenuItem>
@@ -188,13 +229,13 @@ export const TicketDetails: React.FC<TicketDetailsProps> = ({
         <TabsContent value="conversation" className="flex-1 flex flex-col space-y-4">
           <ScrollArea className="flex-1">
             <div className="space-y-4">
-              {ticket.messages
+              {ticketMessages
                 .filter(message => !message.isInternal)
                 .map((message) => (
                   <Card key={message.id} className="p-4">
                     <div className="flex items-start gap-3">
                       <Avatar>
-                        <AvatarFallback>{getMessageSenderInitials(message.userId)}</AvatarFallback>
+                        <AvatarFallback>{getMessageSenderInitials(message.userId || message.senderId || "")}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
@@ -257,13 +298,13 @@ export const TicketDetails: React.FC<TicketDetailsProps> = ({
         <TabsContent value="notes" className="flex-1">
           <ScrollArea className="flex-1">
             <div className="space-y-4">
-              {ticket.messages
+              {ticketMessages
                 .filter(message => message.isInternal)
                 .map((message) => (
                   <Card key={message.id} className="p-4 bg-gray-50">
                     <div className="flex items-start gap-3">
                       <Avatar>
-                        <AvatarFallback>{getMessageSenderInitials(message.userId)}</AvatarFallback>
+                        <AvatarFallback>{getMessageSenderInitials(message.userId || message.senderId || "")}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center justify-between">

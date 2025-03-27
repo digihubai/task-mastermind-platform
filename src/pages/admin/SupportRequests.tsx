@@ -24,7 +24,7 @@ import { TicketList } from "@/components/support/TicketList";
 import { TicketDetails } from "@/components/support/TicketDetails";
 import { UserDetails } from "@/components/support/UserDetails";
 import { ChatFlowDesigner } from "@/components/support/ChatFlowDesigner";
-import { SupportTicket, SupportMessage, SupportUser, ChatBotFlow } from "@/types/support";
+import { SupportTicket, SupportMessage, SupportUser, ChatBotFlow, ChatBotNode } from "@/types/support";
 import { useToast } from "@/hooks/use-toast";
 import {
   Select,
@@ -50,12 +50,14 @@ const mockTickets: SupportTicket[] = [
     description: "I'm having trouble setting up the chatbot for my website. I've followed the documentation but the widget isn't appearing correctly.",
     status: "in_progress",
     priority: "medium",
+    category: "technical",
     createdAt: "2023-04-10T14:30:00Z",
     updatedAt: "2023-04-11T09:15:00Z",
     userId: "user-123",
     assignedTo: "agent-456",
     department: "technical",
-    tags: ["chatbot", "setup"]
+    tags: ["chatbot", "setup"],
+    messages: []
   },
   {
     id: "ticket-002",
@@ -63,11 +65,13 @@ const mockTickets: SupportTicket[] = [
     description: "I need help understanding how to integrate your API with our custom CRM system. Are there any specific requirements or limitations?",
     status: "open",
     priority: "low",
+    category: "integration",
     createdAt: "2023-04-12T10:45:00Z", 
     updatedAt: "2023-04-12T10:45:00Z",
     userId: "user-456",
     department: "technical",
-    tags: ["api", "integration"]
+    tags: ["api", "integration"],
+    messages: []
   },
   {
     id: "ticket-003",
@@ -75,11 +79,13 @@ const mockTickets: SupportTicket[] = [
     description: "I was charged twice for my subscription this month. Can you please check and refund the extra payment?",
     status: "open",
     priority: "high",
+    category: "billing",
     createdAt: "2023-04-11T08:20:00Z",
     updatedAt: "2023-04-11T08:20:00Z",
     userId: "user-789",
     department: "billing",
-    tags: ["billing", "payment"]
+    tags: ["billing", "payment"],
+    messages: []
   },
   {
     id: "ticket-004",
@@ -87,11 +93,13 @@ const mockTickets: SupportTicket[] = [
     description: "I'd like to request support for multiple languages in the chatbot. Our customers are international and we need to serve them in their native languages.",
     status: "open",
     priority: "medium",
+    category: "feature",
     createdAt: "2023-04-10T15:10:00Z",
     updatedAt: "2023-04-10T15:10:00Z",
     userId: "user-101",
     department: "general",
-    tags: ["feature-request", "languages"]
+    tags: ["feature-request", "languages"],
+    messages: []
   },
   {
     id: "ticket-005",
@@ -99,12 +107,14 @@ const mockTickets: SupportTicket[] = [
     description: "I want to upgrade from the Basic plan to the Pro plan, but I have some questions about the transition process and what happens to my existing data.",
     status: "resolved",
     priority: "medium",
+    category: "account",
     createdAt: "2023-04-09T11:25:00Z",
     updatedAt: "2023-04-10T13:40:00Z",
     userId: "user-202",
     assignedTo: "agent-789",
     department: "sales",
-    tags: ["account", "upgrade"]
+    tags: ["account", "upgrade"],
+    messages: []
   },
   {
     id: "ticket-006",
@@ -112,12 +122,14 @@ const mockTickets: SupportTicket[] = [
     description: "After updating my website theme, the chatbot is no longer visible. I'm getting a JavaScript error in the console related to your widget.",
     status: "closed",
     priority: "urgent",
+    category: "technical",
     createdAt: "2023-04-08T09:15:00Z",
     updatedAt: "2023-04-09T16:30:00Z",
     userId: "user-303",
     assignedTo: "agent-456",
     department: "technical",
-    tags: ["website", "javascript", "error"]
+    tags: ["website", "javascript", "error"],
+    messages: []
   },
   {
     id: "ticket-007",
@@ -125,12 +137,14 @@ const mockTickets: SupportTicket[] = [
     description: "I need to export all my customer conversation data for compliance purposes. Is there a way to download this in a structured format?",
     status: "in_progress",
     priority: "high",
+    category: "data",
     createdAt: "2023-04-07T14:50:00Z",
     updatedAt: "2023-04-08T10:20:00Z",
     userId: "user-404",
     assignedTo: "agent-123",
     department: "technical",
-    tags: ["data", "export", "compliance"]
+    tags: ["data", "export", "compliance"],
+    messages: []
   },
 ];
 
@@ -141,36 +155,44 @@ const mockMessages: Record<string, SupportMessage[]> = {
       ticketId: "ticket-001",
       content: "I'm having trouble setting up the chatbot for my website. I've followed the documentation but the widget isn't appearing correctly.",
       createdAt: "2023-04-10T14:30:00Z",
+      userId: "user-123",
       senderId: "user-123",
       senderType: "user",
-      isRead: true
+      isRead: true,
+      isInternal: false
     },
     {
       id: "msg-002",
       ticketId: "ticket-001",
       content: "Thank you for reaching out. Could you please share which integration method you're using (JavaScript snippet, WordPress plugin, etc.) and which browser you're testing with?",
       createdAt: "2023-04-10T15:45:00Z",
+      userId: "agent-456",
       senderId: "agent-456",
       senderType: "agent",
-      isRead: true
+      isRead: true,
+      isInternal: false
     },
     {
       id: "msg-003",
       ticketId: "ticket-001",
       content: "I'm using the JavaScript snippet method and testing with Chrome. I've put the code in the <head> section as instructed, but nothing shows up.",
       createdAt: "2023-04-10T16:20:00Z",
+      userId: "user-123",
       senderId: "user-123",
       senderType: "user",
-      isRead: true
+      isRead: true,
+      isInternal: false
     },
     {
       id: "msg-004",
       ticketId: "ticket-001",
       content: "I've checked your account and noticed that the chatbot hasn't been fully configured yet. You'll need to complete the setup in the dashboard by setting up at least one initial message. I'll guide you through this process.",
       createdAt: "2023-04-11T09:15:00Z",
+      userId: "agent-456",
       senderId: "agent-456",
       senderType: "agent",
-      isRead: true
+      isRead: true,
+      isInternal: false
     }
   ],
   "ticket-002": [
@@ -179,9 +201,11 @@ const mockMessages: Record<string, SupportMessage[]> = {
       ticketId: "ticket-002",
       content: "I need help understanding how to integrate your API with our custom CRM system. Are there any specific requirements or limitations?",
       createdAt: "2023-04-12T10:45:00Z",
+      userId: "user-456",
       senderId: "user-456",
       senderType: "user",
-      isRead: false
+      isRead: false,
+      isInternal: false
     }
   ],
   "ticket-003": [
@@ -190,9 +214,11 @@ const mockMessages: Record<string, SupportMessage[]> = {
       ticketId: "ticket-003",
       content: "I was charged twice for my subscription this month. Can you please check and refund the extra payment?",
       createdAt: "2023-04-11T08:20:00Z",
+      userId: "user-789",
       senderId: "user-789",
       senderType: "user",
-      isRead: false
+      isRead: false,
+      isInternal: false
     }
   ]
 };
@@ -203,6 +229,7 @@ const mockUsers: SupportUser[] = [
     name: "John Smith",
     email: "john.smith@example.com",
     type: "user",
+    role: "customer",
     createdAt: "2023-01-15T10:30:00Z",
     lastActivity: "2023-04-10T16:20:00Z",
     browser: "Chrome",
@@ -219,6 +246,7 @@ const mockUsers: SupportUser[] = [
     name: "Sarah Johnson",
     email: "sarah.johnson@example.com",
     type: "user",
+    role: "customer",
     createdAt: "2023-02-20T14:45:00Z",
     lastActivity: "2023-04-12T10:45:00Z",
     browser: "Firefox",
@@ -235,6 +263,7 @@ const mockUsers: SupportUser[] = [
     name: "Carlos Mendoza",
     email: "carlos.mendoza@example.com",
     type: "user",
+    role: "customer",
     createdAt: "2023-03-05T09:15:00Z",
     lastActivity: "2023-04-11T08:20:00Z",
     browser: "Safari",
@@ -256,36 +285,57 @@ const initialChatFlow: ChatBotFlow = {
     {
       id: "node-001",
       type: "start",
+      position: { x: 100, y: 100 },
+      data: { name: "Start" },
       content: "Start",
       next: ["node-002"]
     },
     {
       id: "node-002",
       type: "message",
+      position: { x: 100, y: 200 },
+      data: { message: "Hello! How can I help you today?" },
       content: "Hello! How can I help you today?",
       next: ["node-003"]
     },
     {
       id: "node-003",
       type: "input",
+      position: { x: 100, y: 300 },
+      data: { 
+        message: "What type of issue are you experiencing?",
+        options: [
+          { id: "opt-1", text: "Technical Issue", nextNodeId: "node-004" },
+          { id: "opt-2", text: "Billing Issue", nextNodeId: "node-005" }
+        ]
+      },
       content: "What type of issue are you experiencing?",
       next: ["node-004", "node-005"]
     },
     {
       id: "node-004",
       type: "message",
+      position: { x: 200, y: 400 },
+      data: { message: "I understand you're having a technical issue. Let me gather some more information to help you." },
       content: "I understand you're having a technical issue. Let me gather some more information to help you.",
       next: []
     },
     {
       id: "node-005",
       type: "message",
+      position: { x: 0, y: 400 },
+      data: { message: "I'll connect you with our billing department to resolve your payment issue." },
       content: "I'll connect you with our billing department to resolve your payment issue.",
       next: []
     }
   ],
+  edges: [
+    { id: "edge-1", source: "node-001", target: "node-002" },
+    { id: "edge-2", source: "node-002", target: "node-003" },
+    { id: "edge-3", source: "node-003", target: "node-004", condition: "Technical Issue" },
+    { id: "edge-4", source: "node-003", target: "node-005", condition: "Billing Issue" }
+  ],
   isActive: true,
-  // Added the missing required properties:
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   language: "en"
@@ -384,9 +434,11 @@ const SupportRequests = () => {
       ticketId: selectedTicketId,
       content: message,
       createdAt: new Date().toISOString(),
+      userId: "agent-456",
       senderId: "agent-456",
       senderType: "agent",
-      isRead: true
+      isRead: true,
+      isInternal: false
     };
 
     // Update the ticket status if it was open

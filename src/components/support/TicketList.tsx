@@ -16,23 +16,27 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 export interface TicketListProps {
   tickets: SupportTicket[];
   selectedTicketId?: string | null;
-  onSelectTicket: (ticketId: string) => void;
-  onNewTicket: () => void;
+  onSelectTicket?: (ticketId: string) => void;
+  onNewTicket?: () => void;
+  onViewTicket?: (ticket: SupportTicket) => void;
 }
 
 export const TicketList: React.FC<TicketListProps> = ({ 
   tickets, 
   selectedTicketId,
   onSelectTicket,
-  onNewTicket
+  onNewTicket,
+  onViewTicket
 }) => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "open":
         return <AlertCircle className="h-4 w-4 text-red-500" />;
       case "pending":
+      case "in_progress":
         return <Clock className="h-4 w-4 text-amber-500" />;
       case "closed":
+      case "resolved":
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       default:
         return <AlertCircle className="h-4 w-4 text-gray-500" />;
@@ -42,6 +46,7 @@ export const TicketList: React.FC<TicketListProps> = ({
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "high":
+      case "urgent":
         return "bg-red-100 text-red-800 border-red-200";
       case "medium":
         return "bg-amber-100 text-amber-800 border-amber-200";
@@ -61,16 +66,26 @@ export const TicketList: React.FC<TicketListProps> = ({
       minute: '2-digit'
     }).format(date);
   };
+
+  const handleTicketClick = (ticket: SupportTicket) => {
+    if (onViewTicket) {
+      onViewTicket(ticket);
+    } else if (onSelectTicket) {
+      onSelectTicket(ticket.id);
+    }
+  };
   
   return (
     <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Tickets ({tickets.length})</h2>
-        <Button onClick={onNewTicket} size="sm">
-          <PlusCircle className="h-4 w-4 mr-1" />
-          New
-        </Button>
-      </div>
+      {onNewTicket && (
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Tickets ({tickets.length})</h2>
+          <Button onClick={onNewTicket} size="sm">
+            <PlusCircle className="h-4 w-4 mr-1" />
+            New
+          </Button>
+        </div>
+      )}
       
       <ScrollArea className="flex-1">
         <div className="space-y-2">
@@ -80,7 +95,7 @@ export const TicketList: React.FC<TicketListProps> = ({
               className={`p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
                 selectedTicketId === ticket.id ? 'border-primary' : ''
               }`}
-              onClick={() => onSelectTicket(ticket.id)}
+              onClick={() => handleTicketClick(ticket)}
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-2">
