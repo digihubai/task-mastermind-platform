@@ -60,7 +60,7 @@ export const TicketDetails: React.FC<TicketDetailsProps> = ({
     switch (status) {
       case 'open':
         return <AlertCircle className="text-blue-500" size={16} />;
-      case 'in_progress':
+      case 'in-progress':
         return <Clock8 className="text-yellow-500" size={16} />;
       case 'resolved':
         return <CheckCircle2 className="text-green-500" size={16} />;

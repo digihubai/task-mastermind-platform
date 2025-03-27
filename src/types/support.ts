@@ -67,29 +67,41 @@ interface MessageAttachment {
 export interface ChatBotFlow {
   id: string;
   name: string;
+  description?: string; // Added this property
   nodes: ChatBotNode[];
   createdAt: string;
   updatedAt: string;
+  isActive?: boolean;
+  language?: string;
 }
 
 export interface ChatBotNode {
   id: string;
   type: string;
   content: string;
-  position: { x: number; y: number };
-  nextNodes: string[];
+  position?: { x: number; y: number };
+  nextNodes?: string[]; // Changed from 'next' to 'nextNodes' for clarity
+  next?: string[]; // Keep for backward compatibility
 }
 
 export interface SupportTicket {
   id: string;
   subject: string;
-  status: 'open' | 'in-progress' | 'resolved' | 'closed';
+  description?: string; // Added description property
+  status: 'open' | 'in-progress' | 'resolved' | 'closed'; // Fixed hyphen in 'in-progress'
   priority: 'low' | 'medium' | 'high' | 'urgent';
   createdAt: string;
   updatedAt: string;
   userId: string;
   assigneeId?: string;
-  messages: SupportMessage[];
+  assignedTo?: string; // Added for backward compatibility
+  messages?: SupportMessage[];
+  department?: string; // Added department field
+  tags?: string[];
+  source?: 'email' | 'chat' | 'whatsapp' | 'facebook' | 'telegram' | 'sms' | 'web'; // Added source field
+  rating?: number; // Added rating field
+  attachments?: any[]; // Added attachments field
+  followUp?: boolean; // Added followUp field
 }
 
 export interface SupportMessage {
@@ -98,7 +110,9 @@ export interface SupportMessage {
   content: string;
   createdAt: string;
   senderId: string;
-  isInternal: boolean;
+  senderType?: 'user' | 'agent' | 'system'; // Added senderType field
+  isInternal?: boolean;
+  isRead?: boolean;
   attachments?: {
     id: string;
     url: string;
@@ -113,7 +127,17 @@ export interface SupportUser {
   email: string;
   avatar?: string;
   company?: string;
-  role: 'customer' | 'agent' | 'admin';
+  role?: 'customer' | 'agent' | 'admin';
+  type?: string; // Added type field
   createdAt: string;
   lastActive?: string;
+  lastActivity?: string; // Added for backward compatibility
+  phone?: string; // Added phone field
+  browser?: string; // Added browser field
+  os?: string; // Added os field
+  location?: string; // Added location field
+  ip?: string; // Added ip field
+  timezone?: string; // Added timezone field
+  language?: string; // Added language field
+  currentUrl?: string; // Added currentUrl field
 }

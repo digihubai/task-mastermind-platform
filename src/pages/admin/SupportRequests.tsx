@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
@@ -48,12 +47,12 @@ const mockTickets: SupportTicket[] = [
     id: "ticket-001",
     subject: "Setup assistance for chatbot",
     description: "I'm having trouble setting up the chatbot for my website. I've followed the documentation but the widget isn't appearing correctly.",
-    status: "in_progress",
+    status: "in-progress",
     priority: "medium",
     createdAt: "2023-04-10T14:30:00Z",
     updatedAt: "2023-04-11T09:15:00Z",
     userId: "user-123",
-    assignedTo: "agent-456",
+    assigneeId: "agent-456",
     department: "technical",
     tags: ["chatbot", "setup"]
   },
@@ -102,7 +101,7 @@ const mockTickets: SupportTicket[] = [
     createdAt: "2023-04-09T11:25:00Z",
     updatedAt: "2023-04-10T13:40:00Z",
     userId: "user-202",
-    assignedTo: "agent-789",
+    assigneeId: "agent-789",
     department: "sales",
     tags: ["account", "upgrade"]
   },
@@ -115,7 +114,7 @@ const mockTickets: SupportTicket[] = [
     createdAt: "2023-04-08T09:15:00Z",
     updatedAt: "2023-04-09T16:30:00Z",
     userId: "user-303",
-    assignedTo: "agent-456",
+    assigneeId: "agent-456",
     department: "technical",
     tags: ["website", "javascript", "error"]
   },
@@ -123,12 +122,12 @@ const mockTickets: SupportTicket[] = [
     id: "ticket-007",
     subject: "Data export request",
     description: "I need to export all my customer conversation data for compliance purposes. Is there a way to download this in a structured format?",
-    status: "in_progress",
+    status: "in-progress",
     priority: "high",
     createdAt: "2023-04-07T14:50:00Z",
     updatedAt: "2023-04-08T10:20:00Z",
     userId: "user-404",
-    assignedTo: "agent-123",
+    assigneeId: "agent-123",
     department: "technical",
     tags: ["data", "export", "compliance"]
   },
@@ -204,7 +203,7 @@ const mockUsers: SupportUser[] = [
     email: "john.smith@example.com",
     type: "user",
     createdAt: "2023-01-15T10:30:00Z",
-    lastActivity: "2023-04-10T16:20:00Z",
+    lastActive: "2023-04-10T16:20:00Z",
     browser: "Chrome",
     os: "Windows 10",
     location: "New York, United States",
@@ -220,7 +219,7 @@ const mockUsers: SupportUser[] = [
     email: "sarah.johnson@example.com",
     type: "user",
     createdAt: "2023-02-20T14:45:00Z",
-    lastActivity: "2023-04-12T10:45:00Z",
+    lastActive: "2023-04-12T10:45:00Z",
     browser: "Firefox",
     os: "macOS",
     location: "London, United Kingdom",
@@ -236,7 +235,7 @@ const mockUsers: SupportUser[] = [
     email: "carlos.mendoza@example.com",
     type: "user",
     createdAt: "2023-03-05T09:15:00Z",
-    lastActivity: "2023-04-11T08:20:00Z",
+    lastActive: "2023-04-11T08:20:00Z",
     browser: "Safari",
     os: "iOS",
     location: "Madrid, Spain",
@@ -257,35 +256,34 @@ const initialChatFlow: ChatBotFlow = {
       id: "node-001",
       type: "start",
       content: "Start",
-      next: ["node-002"]
+      nextNodes: ["node-002"]
     },
     {
       id: "node-002",
       type: "message",
       content: "Hello! How can I help you today?",
-      next: ["node-003"]
+      nextNodes: ["node-003"]
     },
     {
       id: "node-003",
       type: "input",
       content: "What type of issue are you experiencing?",
-      next: ["node-004", "node-005"]
+      nextNodes: ["node-004", "node-005"]
     },
     {
       id: "node-004",
       type: "message",
       content: "I understand you're having a technical issue. Let me gather some more information to help you.",
-      next: []
+      nextNodes: []
     },
     {
       id: "node-005",
       type: "message",
       content: "I'll connect you with our billing department to resolve your payment issue.",
-      next: []
+      nextNodes: []
     }
   ],
   isActive: true,
-  // Added the missing required properties:
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   language: "en"
@@ -395,8 +393,8 @@ const SupportRequests = () => {
         ? { 
             ...ticket, 
             updatedAt: new Date().toISOString(), 
-            status: ticket.status === 'open' ? 'in_progress' : ticket.status,
-            assignedTo: ticket.assignedTo || "agent-456"
+            status: ticket.status === 'open' ? 'in-progress' : ticket.status,
+            assigneeId: ticket.assigneeId || "agent-456"
           }
         : ticket
     );
@@ -444,7 +442,7 @@ const SupportRequests = () => {
             <TabsTrigger value="tickets" className="flex items-center gap-2">
               <MessageSquare size={16} />
               <span>Tickets</span>
-              <Badge variant="secondary" className="ml-1">{tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length}</Badge>
+              <Badge variant="secondary" className="ml-1">{tickets.filter(t => t.status === 'open' || t.status === 'in-progress').length}</Badge>
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users size={16} />
@@ -490,7 +488,7 @@ const SupportRequests = () => {
                       <DropdownMenuItem onClick={() => setStatusFilter("open")}>
                         Open
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setStatusFilter("in_progress")}>
+                      <DropdownMenuItem onClick={() => setStatusFilter("in-progress")}>
                         In Progress
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setStatusFilter("resolved")}>
@@ -607,7 +605,7 @@ const SupportRequests = () => {
                           {new Date(user.createdAt).toLocaleDateString()}
                         </td>
                         <td className="py-3 px-4">
-                          {user.lastActivity ? new Date(user.lastActivity).toLocaleDateString() : "Never"}
+                          {user.lastActive ? new Date(user.lastActive).toLocaleDateString() : "Never"}
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
@@ -708,7 +706,7 @@ const SupportRequests = () => {
                     <div>
                       <p className="text-sm text-muted-foreground">In Progress</p>
                       <p className="text-3xl font-semibold mt-1">
-                        {tickets.filter(t => t.status === 'in_progress').length}
+                        {tickets.filter(t => t.status === 'in-progress').length}
                       </p>
                     </div>
                     <div className="bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400 p-2 rounded-full">
@@ -832,59 +830,4 @@ const SupportRequests = () => {
                       <div className="flex justify-between mb-1">
                         <span className="text-sm">High</span>
                         <span className="text-sm">
-                          {tickets.filter(t => t.priority === 'high').length}
-                        </span>
-                      </div>
-                      <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                        <div 
-                          className="bg-orange-500 h-full rounded-full" 
-                          style={{ 
-                            width: `${(tickets.filter(t => t.priority === 'high').length / tickets.length) * 100}%` 
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm">Medium</span>
-                        <span className="text-sm">
-                          {tickets.filter(t => t.priority === 'medium').length}
-                        </span>
-                      </div>
-                      <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                        <div 
-                          className="bg-yellow-500 h-full rounded-full" 
-                          style={{ 
-                            width: `${(tickets.filter(t => t.priority === 'medium').length / tickets.length) * 100}%` 
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm">Low</span>
-                        <span className="text-sm">
-                          {tickets.filter(t => t.priority === 'low').length}
-                        </span>
-                      </div>
-                      <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                        <div 
-                          className="bg-green-500 h-full rounded-full" 
-                          style={{ 
-                            width: `${(tickets.filter(t => t.priority === 'low').length / tickets.length) * 100}%` 
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </AppLayout>
-  );
-};
-
-export default SupportRequests;
+                          {tickets.filter(t =>

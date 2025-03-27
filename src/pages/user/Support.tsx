@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
@@ -17,7 +16,7 @@ const mockTickets: SupportTicket[] = [
     id: "ticket-001",
     subject: "Setup assistance for chatbot",
     description: "I'm having trouble setting up the chatbot for my website. I've followed the documentation but the widget isn't appearing correctly.",
-    status: "in_progress",
+    status: "in-progress",
     priority: "medium",
     createdAt: "2023-04-10T14:30:00Z",
     updatedAt: "2023-04-11T09:15:00Z",
@@ -383,7 +382,7 @@ const Support = () => {
                 {tickets.slice(0, 3).map((ticket) => (
                   <div key={ticket.id} className="flex items-start gap-3 py-3 border-b border-border/40 last:border-0">
                     <div className="bg-secondary rounded-full p-2">
-                      {ticket.status === 'open' || ticket.status === 'in_progress' ? (
+                      {ticket.status === 'open' || ticket.status === 'in-progress' ? (
                         <Clock size={18} className="text-blue-500" />
                       ) : (
                         <History size={18} className="text-green-500" />
@@ -401,11 +400,11 @@ const Support = () => {
                         
                         <Badge variant="outline" className={
                           ticket.status === 'open' ? 'bg-blue-50 text-blue-800 border-blue-200' :
-                          ticket.status === 'in_progress' ? 'bg-yellow-50 text-yellow-800 border-yellow-200' :
+                          ticket.status === 'in-progress' ? 'bg-yellow-50 text-yellow-800 border-yellow-200' :
                           ticket.status === 'resolved' ? 'bg-green-50 text-green-800 border-green-200' :
                           'bg-gray-50 text-gray-800 border-gray-200'
                         }>
-                          {ticket.status === 'in_progress' ? 'In Progress' : 
+                          {ticket.status === 'in-progress' ? 'In Progress' : 
                            ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
                         </Badge>
                       </div>

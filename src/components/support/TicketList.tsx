@@ -31,7 +31,7 @@ export const TicketList: React.FC<TicketListProps> = ({ tickets, onViewTicket })
     switch (status) {
       case 'open':
         return "bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400";
-      case 'in_progress':
+      case 'in-progress':
         return "bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400";
       case 'resolved':
         return "bg-green-50 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400";
@@ -153,13 +153,13 @@ export const TicketList: React.FC<TicketListProps> = ({ tickets, onViewTicket })
                   </>
                 )}
                 
-                {ticket.assignedTo && (
+                {ticket.assigneeId && (
                   <>
                     <span>•</span>
                     <div className="flex items-center gap-1">
                       <Avatar className="h-4 w-4">
                         <AvatarFallback className="text-[8px]">
-                          {ticket.assignedTo.slice(0, 2).toUpperCase()}
+                          {ticket.assigneeId.slice(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <span>Assigned</span>

@@ -40,7 +40,7 @@ export const ChatFlowDesigner: React.FC<ChatFlowDesignerProps> = ({
       id: `node-${Date.now()}`,
       type,
       content: type === 'start' ? 'Start' : '',
-      next: [],
+      nextNodes: [],
     };
 
     setCurrentFlow({
@@ -68,12 +68,12 @@ export const ChatFlowDesigner: React.FC<ChatFlowDesignerProps> = ({
       nodes: currentFlow.nodes.filter((node) => node.id !== nodeId),
     });
     
-    // Remove references to this node from other nodes' next arrays
+    // Remove references to this node from other nodes' nextNodes arrays
     setCurrentFlow((prev) => ({
       ...prev,
       nodes: prev.nodes.map((node) => ({
         ...node,
-        next: node.next?.filter((nextId) => nextId !== nodeId) || [],
+        nextNodes: node.nextNodes?.filter((nextId) => nextId !== nodeId) || [],
       })),
     }));
     
@@ -286,13 +286,13 @@ export const ChatFlowDesigner: React.FC<ChatFlowDesignerProps> = ({
                         <input
                           type="checkbox"
                           id={`next-${node.id}`}
-                          checked={selectedNode.next?.includes(node.id) || false}
+                          checked={selectedNode.nextNodes?.includes(node.id) || false}
                           onChange={(e) => {
                             const isChecked = e.target.checked;
                             handleUpdateNode({
-                              next: isChecked
-                                ? [...(selectedNode.next || []), node.id]
-                                : selectedNode.next?.filter((id) => id !== node.id) || [],
+                              nextNodes: isChecked
+                                ? [...(selectedNode.nextNodes || []), node.id]
+                                : selectedNode.nextNodes?.filter((id) => id !== node.id) || [],
                             });
                           }}
                         />
@@ -346,9 +346,9 @@ export const ChatFlowDesigner: React.FC<ChatFlowDesignerProps> = ({
                     <span className="font-medium">{getNodeTypeLabel(node.type)}: {node.content.substring(0, 30)}{node.content.length > 30 ? '...' : ''}</span>
                   </div>
                   
-                  {node.next && node.next.length > 0 && (
+                  {node.nextNodes && node.nextNodes.length > 0 && (
                     <div className="pl-8 space-y-1">
-                      {node.next.map((nextId) => {
+                      {node.nextNodes.map((nextId) => {
                         const nextNode = currentFlow.nodes.find((n) => n.id === nextId);
                         return nextNode ? (
                           <div key={nextId} className="flex items-center gap-1 text-sm text-muted-foreground">
