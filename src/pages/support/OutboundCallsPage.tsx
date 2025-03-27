@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { 
   PhoneOutgoing, Phone, Clock, CheckCircle, User, Plus, 
-  Search, BarChart2, PhoneX, PhoneCheck
+  Search, BarChart2, X, Check
 } from "lucide-react";
 
 const OutboundCallsPage = () => {
@@ -107,7 +107,7 @@ const OutboundCallsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
-                <PhoneCheck className="h-5 w-5 text-green-500 mr-2" />
+                <Check className="h-5 w-5 text-green-500 mr-2" />
                 <span className="text-2xl font-bold">28</span>
               </div>
               <p className="text-xs text-muted-foreground mt-1">80% success rate</p>
@@ -120,7 +120,7 @@ const OutboundCallsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
-                <PhoneX className="h-5 w-5 text-red-500 mr-2" />
+                <X className="h-5 w-5 text-red-500 mr-2" />
                 <span className="text-2xl font-bold">7</span>
               </div>
               <p className="text-xs text-muted-foreground mt-1">20% missed rate</p>

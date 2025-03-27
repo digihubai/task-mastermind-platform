@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { OmnichannelInbox } from "@/components/communication/OmnichannelInbox";
+import OmnichannelInbox from "@/components/communication/OmnichannelInbox";
 import SupportStats from "@/components/support/SupportStats";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, TicketIcon, MessageSquare, Phone, Users } from "lucide-react";
