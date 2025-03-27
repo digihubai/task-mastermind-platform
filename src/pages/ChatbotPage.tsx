@@ -95,6 +95,8 @@ const ChatbotPage = () => {
     }
   };
   
+  console.log("Rendering ChatbotPage, view:", chatbotView);
+  
   return (
     <div className="p-6 animate-fade-in">
       {chatbotView === "list" && (

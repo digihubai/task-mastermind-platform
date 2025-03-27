@@ -5,6 +5,7 @@ import TopBar from "./TopBar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useSidebarControl } from "@/hooks/use-sidebar-control";
+import logger from "@/utils/logger";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -20,6 +21,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   moduleName
 }) => {
   const isMobile = useIsMobile();
+  
+  logger.debug("AppLayout rendering with props", { defaultSidebarTheme, showModuleName, moduleName });
 
   return (
     <SidebarProvider defaultTheme={defaultSidebarTheme}>
@@ -53,6 +56,8 @@ const AppLayoutContent: React.FC<{
     const cleanup = registerSidebarKeyboardShortcut("b");
     return cleanup;
   }, [registerSidebarKeyboardShortcut]);
+
+  logger.debug("AppLayoutContent rendering", { isMobile, state, openMobile });
 
   return (
     <div className="h-screen w-full overflow-hidden flex flex-col bg-background">

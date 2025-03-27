@@ -1,165 +1,68 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Card } from '@/components/ui/card';
-import { useChatbot } from '@/hooks/use-chatbot';
-import { Bot, Send, RefreshCw, X, ChevronUp, ChevronDown } from 'lucide-react';
-import { ChatConfig } from '@/types/support';
-import { Avatar } from '@/components/ui/avatar';
+import React from "react";
 
 interface ChatInterfaceProps {
-  config?: Partial<ChatConfig>;
-  className?: string;
-  title?: string;
-  showHeader?: boolean;
+  title: string;
+  config: {
+    initialMessage: string;
+    modelName: string;
+    maxTokens: number;
+    temperature: number;
+  };
+  variant: "embedded" | "fullscreen";
   showBranding?: boolean;
-  avatarUrl?: string;
-  variant?: 'default' | 'embedded' | 'minimalist';
-  onClose?: () => void;
 }
 
-export const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
-  config, 
-  className = '',
-  title = 'AI Assistant',
-  showHeader = true,
-  showBranding = false,
-  avatarUrl,
-  variant = 'default',
-  onClose
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({
+  title,
+  config,
+  variant,
+  showBranding = true,
 }) => {
-  const { messages, sendMessage, clearChat, isLoading } = useChatbot(config);
-  const [inputValue, setInputValue] = useState('');
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  const handleSendMessage = () => {
-    if (inputValue.trim() && !isLoading) {
-      sendMessage(inputValue);
-      setInputValue('');
-    }
-  };
-  
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSendMessage();
-    }
-  };
-  
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-  
   return (
-    <Card className={`flex flex-col ${variant === 'embedded' ? 'h-full' : 'h-[500px]'} border border-border/40 rounded-lg overflow-hidden ${className}`}>
-      {showHeader && (
-        <div className="flex items-center justify-between p-3 bg-primary text-primary-foreground">
-          <div className="flex items-center gap-2">
-            <div className="bg-white/20 p-2 rounded-full">
-              <Bot size={18} className="text-white" />
-            </div>
-            <span className="font-medium">{title}</span>
+    <div className={`chat-interface ${variant === "embedded" ? "h-[500px] w-full" : "h-full w-full"} border rounded-lg bg-background`}>
+      <div className="chat-header p-3 border-b flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
+            {title.substring(0, 1).toUpperCase()}
           </div>
-          <div className="flex gap-1">
-            {variant !== 'embedded' && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="text-primary-foreground hover:bg-primary-foreground/10"
-                onClick={() => setIsCollapsed(!isCollapsed)}
-              >
-                {isCollapsed ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-              </Button>
-            )}
-            {onClose && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="text-primary-foreground hover:bg-primary-foreground/10"
-                onClick={onClose}
-              >
-                <X size={16} />
-              </Button>
-            )}
+          <h3 className="font-medium">{title}</h3>
+        </div>
+      </div>
+      
+      <div className="chat-messages p-4 h-[calc(100%-110px)] overflow-y-auto">
+        <div className="message bot">
+          <div className="message-bubble bg-muted p-3 rounded-lg inline-block max-w-[80%]">
+            {config.initialMessage || "Hello! How can I help you today?"}
           </div>
         </div>
-      )}
+      </div>
       
-      {!isCollapsed && (
-        <>
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  {message.sender === 'bot' && (
-                    <div className="mr-2 flex-shrink-0">
-                      <Avatar className="h-8 w-8 border">
-                        {avatarUrl ? (
-                          <img src={avatarUrl} alt="Bot" />
-                        ) : (
-                          <Bot size={16} />
-                        )}
-                      </Avatar>
-                    </div>
-                  )}
-                  <div
-                    className={`max-w-[75%] rounded-lg p-3 ${
-                      message.sender === 'user'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
-                    }`}
-                  >
-                    <p className="whitespace-pre-wrap break-words text-sm">{message.content}</p>
-                    <span className="text-xs opacity-70 mt-1 block">
-                      {new Date(message.timestamp).toLocaleTimeString([], { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
-                    </span>
-                  </div>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-          </ScrollArea>
-          
-          <div className="p-3 border-t border-border/60 bg-card">
-            <div className="flex gap-2">
-              <Input
-                placeholder="Type a message..."
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                disabled={isLoading}
-                className="flex-1"
-              />
-              <Button 
-                onClick={handleSendMessage} 
-                disabled={!inputValue.trim() || isLoading}
-                size="icon"
-                className="bg-primary text-primary-foreground rounded-full h-9 w-9 p-2"
-              >
-                <Send size={16} />
-                <span className="sr-only">Send</span>
-              </Button>
-            </div>
-            
-            {showBranding && (
-              <div className="mt-2 text-center">
-                <span className="text-xs text-muted-foreground">
-                  Powered by <span className="font-semibold">Digihub</span>
-                </span>
-              </div>
-            )}
+      <div className="chat-input border-t p-3">
+        <div className="relative">
+          <input 
+            type="text" 
+            className="w-full border rounded-full py-2 px-4 pr-10" 
+            placeholder="Type a message..."
+            disabled
+          />
+          <button 
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-primary"
+            disabled
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m22 2-7 20-4-9-9-4Z"/>
+              <path d="M22 2 11 13"/>
+            </svg>
+          </button>
+        </div>
+        
+        {showBranding && (
+          <div className="text-center text-xs text-muted-foreground mt-2">
+            Powered by DigiHub AI
           </div>
-        </>
-      )}
-    </Card>
+        )}
+      </div>
+    </div>
   );
 };
