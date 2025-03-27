@@ -81,3 +81,50 @@ export interface ChatConfig {
   maxTokens: number;
   temperature: number;
 }
+
+// Team Chat Types
+export interface TeamChannel {
+  id: string;
+  name: string;
+  description?: string;
+  isPrivate: boolean;
+  createdAt: string;
+  updatedBy: string;
+  members: string[];
+  messageCount: number;
+  unreadCount?: number;
+}
+
+export interface TeamGroup {
+  id: string;
+  name: string;
+  description?: string;
+  channels: TeamChannel[];
+  members: string[];
+}
+
+export interface TeamMessage {
+  id: string;
+  channelId: string;
+  content: string;
+  contentType: 'text' | 'image' | 'file' | 'code' | 'gif';
+  senderId: string;
+  senderName: string;
+  senderAvatar?: string;
+  timestamp: string;
+  edited?: boolean;
+  reactions?: Array<{
+    emoji: string;
+    count: number;
+    users: string[];
+  }>;
+  isPinned?: boolean;
+  parentId?: string;
+  threadReplies?: number;
+  attachments?: Array<{
+    url: string;
+    type: string;
+    name: string;
+    size?: number;
+  }>;
+}
