@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
-import { GeneralTab } from '@/components/settings/GeneralTab';
-import { IntegrationsTab } from '@/components/settings/IntegrationsTab';
-import { FeaturesTab } from '@/components/settings/FeaturesTab';
-import { LocalizationTab } from '@/components/settings/LocalizationTab';
-import { PricingTab } from '@/components/settings/PricingTab';
+import GeneralTab from '@/components/settings/GeneralTab';
+import IntegrationsTab from '@/components/settings/IntegrationsTab';
+import FeaturesTab from '@/components/settings/FeaturesTab';
+import LocalizationTab from '@/components/settings/LocalizationTab';
+import PricingTab from '@/components/settings/PricingTab';
 // Import as a named import, not a default import
 import { AIModelsTab } from '@/components/settings/AIModelsTab';
 import { 

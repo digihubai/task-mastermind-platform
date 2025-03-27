@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,7 +92,6 @@ const ChannelInfoPanel: React.FC<ChannelInfoPanelProps> = ({
             )}
           </div>
 
-          {/* Fix: Changed "primary" variant to "default" */}
           {isEditing ? (
             <div className="space-y-4">
               <div>

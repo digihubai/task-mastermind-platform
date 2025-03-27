@@ -38,6 +38,7 @@ export interface TeamChannel {
   lastMessage?: TeamMessage;
   unreadCount: number;
   isPinned?: boolean;
+  icon?: string;
 }
 
 export interface TeamGroup {

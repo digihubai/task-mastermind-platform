@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,6 +38,11 @@ export const ChatFlowDesigner: React.FC<ChatFlowDesignerProps> = ({
     const newNode: ChatBotNode = {
       id: `node-${Date.now()}`,
       type,
+      position: { x: 0, y: 0 },
+      data: {
+        name: type === 'start' ? 'Start' : '',
+        message: '',
+      },
       content: type === 'start' ? 'Start' : '',
       next: [],
     };
@@ -68,7 +72,6 @@ export const ChatFlowDesigner: React.FC<ChatFlowDesignerProps> = ({
       nodes: currentFlow.nodes.filter((node) => node.id !== nodeId),
     });
     
-    // Remove references to this node from other nodes' next arrays
     setCurrentFlow((prev) => ({
       ...prev,
       nodes: prev.nodes.map((node) => ({
