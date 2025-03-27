@@ -13,11 +13,29 @@ interface KpiCardProps {
   title: string;
   data: KpiData;
   icon: React.ReactNode;
+  metricType?: "value" | "percentage" | "currency";
 }
 
-const KpiCard: React.FC<KpiCardProps> = ({ title, data, icon }) => {
+const KpiCard: React.FC<KpiCardProps> = ({ title, data, icon, metricType = "value" }) => {
+  // Handle the display of values based on metric type
+  const formatValue = (value: string) => {
+    // If the value already includes a currency symbol or % sign, don't format it
+    if (value.includes('$') || value.includes('%')) {
+      return value;
+    }
+    
+    switch (metricType) {
+      case "percentage":
+        return `${value}%`;
+      case "currency":
+        return `$${value}`;
+      default:
+        return value;
+    }
+  };
+
   return (
-    <Card className="stat-card">
+    <Card className="stat-card hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
         <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-800">
