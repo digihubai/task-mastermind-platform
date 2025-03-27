@@ -66,10 +66,10 @@ const OutboundCallCampaigns: React.FC<OutboundCallCampaignsProps> = ({ campaigns
               <div>
                 <h3 className="font-medium">{campaign.name}</h3>
                 <Badge 
-                  variant={campaign.status === "active" ? "default" : campaign.status === "paused" ? "outline" : "secondary"}
+                  variant={campaign.status === "Active" ? "default" : campaign.status === "Paused" ? "outline" : "secondary"}
                   className="mt-1"
                 >
-                  {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
+                  {campaign.status}
                 </Badge>
               </div>
               <Button variant="ghost" size="icon">
@@ -81,39 +81,39 @@ const OutboundCallCampaigns: React.FC<OutboundCallCampaignsProps> = ({ campaigns
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div>
-                  <p className="text-2xl font-semibold">{campaign.calls}</p>
-                  <p className="text-xs text-muted-foreground">Total Calls</p>
+                  <p className="text-2xl font-semibold">{campaign.contacts}</p>
+                  <p className="text-xs text-muted-foreground">Total Contacts</p>
                 </div>
                 <div>
                   <p className="text-2xl font-semibold">{campaign.completed}</p>
                   <p className="text-xs text-muted-foreground">Completed</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-semibold">{campaign.answered}</p>
-                  <p className="text-xs text-muted-foreground">Answered</p>
+                  <p className="text-2xl font-semibold">{Math.round(campaign.contacts * campaign.conversion / 100)}</p>
+                  <p className="text-xs text-muted-foreground">Converted</p>
                 </div>
               </div>
               
               <div className="space-y-1">
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-muted-foreground">Progress</span>
-                  <span>{campaign.progress}%</span>
+                  <span>{Math.round((campaign.completed / campaign.contacts) * 100)}%</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
                   <div
                     className="bg-primary rounded-full h-2"
-                    style={{ width: `${campaign.progress}%` }}
+                    style={{ width: `${Math.round((campaign.completed / campaign.contacts) * 100)}%` }}
                   />
                 </div>
               </div>
               
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Clock size={14} />
-                <span>{campaign.scheduled}</span>
+                <span>Started: {new Date(campaign.startDate).toLocaleDateString()}</span>
               </div>
               
               <div className="flex gap-2">
-                {campaign.status === "active" ? (
+                {campaign.status === "Active" ? (
                   <Button variant="outline" size="sm" className="flex-1">
                     <PauseCircle size={14} className="mr-1.5" /> Pause
                   </Button>
