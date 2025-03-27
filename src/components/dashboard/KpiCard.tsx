@@ -43,7 +43,7 @@ const KpiCard: React.FC<KpiCardProps> = ({ title, data, icon, metricType = "valu
         </div>
       </div>
       <div className="mt-2">
-        <p className="stat-value">{data.value}</p>
+        <p className="stat-value">{formatValue(data.value)}</p>
         <div className={data.trend === "up" ? "stat-indicator-up" : "stat-indicator-down"}>
           {data.trend === "up" ? <ArrowUp size={14} className="mr-1" /> : <ArrowDown size={14} className="mr-1" />}
           {data.change}

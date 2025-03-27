@@ -41,32 +41,32 @@ const Index = () => {
     customerSatisfaction: {
       value: "92%",
       change: "+3%",
-      trend: "up" as "up" | "down"  // Added explicit type assertion here
+      trend: "up" as const
     },
     salesPipeline: {
       value: "$243,578",
       change: "+12%",
-      trend: "up" as "up" | "down"  // Added explicit type assertion here
+      trend: "up" as const
     },
     activeProjects: {
       value: "24",
       change: "+5",
-      trend: "up" as "up" | "down"  // Added explicit type assertion here
+      trend: "up" as const
     },
     taskCompletion: {
       value: "87%",
       change: "-2%",
-      trend: "down" as "up" | "down"  // Added explicit type assertion here
+      trend: "down" as const
     },
     leadConversion: {
       value: "32%",
       change: "+5%",
-      trend: "up" as "up" | "down"  // Added explicit type assertion here
+      trend: "up" as const
     },
     averageResolutionTime: {
       value: "2.4h",
       change: "-15%",
-      trend: "up" as "up" | "down"  // Added explicit type assertion here
+      trend: "up" as const
     }
   };
   
@@ -122,7 +122,7 @@ const Index = () => {
           data: { 
             value: "0", 
             change: "0%", 
-            trend: "up" as "up" | "down" // Added explicit type assertion here
+            trend: "up" as const
           }, 
           icon: <AlertCircle size={18} /> 
         };
