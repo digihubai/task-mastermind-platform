@@ -28,11 +28,6 @@ export const aiToolsSection = {
   title: "AI Tools",
   items: [
     {
-      title: "AI Chatbot",
-      href: "/chatbot",
-      icon: <MessageSquare size={20} />,
-    },
-    {
       title: "AI Chatbots",
       href: "/chatbots",
       icon: <MessageSquare size={20} />,

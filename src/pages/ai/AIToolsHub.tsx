@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -72,11 +73,11 @@ const AIToolsHub = () => {
       color: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400"
     },
     {
-      id: "chatbot",
-      name: "AI Chatbot",
+      id: "chatbots",
+      name: "AI Chatbots",
       description: "Create custom chatbots for your website or application",
-      icon: <Bot className="h-6 w-6" />,
-      path: "/chatbot",
+      icon: <MessageSquare className="h-6 w-6" />,
+      path: "/chatbots",
       category: "Automation",
       badge: "Popular",
       color: "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400"
