@@ -1,12 +1,14 @@
 
-import React from "react";
-import { ChevronLeft, ChevronRight, Users, ChevronDown, User } from "lucide-react";
-import SidebarSection from "./SidebarSection";
-import { sidebarSections } from "./SidebarData";
-import { SidebarThemeSwitcher } from "@/components/ui/sidebar";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { Users } from "lucide-react";
 import { useSidebarControl } from "@/hooks/use-sidebar-control";
-import { Link, useLocation } from "react-router-dom";
+import SidebarLogo from "./sidebar/SidebarLogo";
+import SidebarItem from "./sidebar/SidebarItem";
+import SidebarMenuSection from "./sidebar/SidebarMenuSection";
+import SidebarMobileOverlay from "./sidebar/SidebarMobileOverlay";
+import SidebarUserProfile from "./sidebar/SidebarUserProfile";
+import { sidebarSections } from "./sidebar/SidebarNavData";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -73,7 +75,6 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
   // Render nested menu items
   const renderMenuItem = (item: any, level = 0, parentExpanded = true) => {
     const isActive = location.pathname === item.href;
-    const hasSubItems = item.subItems && item.subItems.length > 0;
     const isExpanded = expandedSections[item.title];
     const showItem = level === 0 || parentExpanded;
     
@@ -83,64 +84,27 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
     if (collapsed && !isMobile && level > 0) return null;
     
     return (
-      <div key={item.href} className={`my-1 ${level > 0 ? `ml-${level * 3}` : ''}`}>
-        <div className="relative">
-          <Link
-            to={item.href}
-            className={`
-              flex items-center ${hasSubItems ? 'justify-between' : ''} 
-              rounded-md px-3 py-2 text-sm transition-colors
-              ${isActive 
-                ? 'bg-sidebar-primary text-sidebar-primary-foreground font-medium' 
-                : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-              }
-              ${level > 0 ? 'text-sm' : ''}
-              ${level > 1 ? 'text-xs' : ''}
-            `}
-            onClick={(e) => {
-              if (hasSubItems) {
-                e.preventDefault();
-                toggleSection(item.title);
-              }
-            }}
-          >
-            <div className="flex items-center">
-              {item.icon}
-              {(!collapsed || isMobile) && <span className="ml-3">{item.title}</span>}
-              {item.badge && (!collapsed || isMobile) && (
-                <span className="ml-2 text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">
-                  {item.badge}
-                </span>
-              )}
-            </div>
-            
-            {hasSubItems && (!collapsed || isMobile) && (
-              <ChevronDown 
-                size={16} 
-                className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-              />
-            )}
-          </Link>
-        </div>
-        
-        {hasSubItems && isExpanded && (!collapsed || isMobile) && (
-          <div className="pl-2 mt-1 space-y-1 border-l border-sidebar-border ml-4">
-            {item.subItems.map((subItem: any) => renderMenuItem(subItem, level + 1, true))}
-          </div>
-        )}
-      </div>
+      <SidebarItem 
+        key={item.href}
+        item={item}
+        level={level}
+        collapsed={collapsed}
+        isMobile={isMobile}
+        isActive={isActive}
+        isExpanded={isExpanded}
+        toggleSection={toggleSection}
+        renderMenuItem={renderMenuItem}
+      />
     );
   };
 
   return (
     <>
-      {/* Mobile Overlay */}
-      {isMobile && !collapsed && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-20"
-          onClick={toggleSidebar}
-        />
-      )}
+      {/* Mobile Overlay - Extracted to its own component */}
+      <SidebarMobileOverlay 
+        show={isMobile && !collapsed}
+        onClick={toggleSidebar}
+      />
     
       <aside 
         className={`
@@ -150,55 +114,26 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
           transition-all duration-300 ease-in-out overflow-y-auto overflow-x-hidden
         `}
       >
-        <div className="p-4 flex justify-between items-center sticky top-0 bg-sidebar z-10 border-b border-sidebar-border">
-          <div className={`overflow-hidden transition-opacity ${collapsed && !isMobile ? 'opacity-0 w-0' : 'opacity-100'}`}>
-            <h1 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-foreground">DigiHub AI</h1>
-          </div>
-          
-          <div className="flex items-center gap-1">
-            {!collapsed && <SidebarThemeSwitcher />}
-            
-            <button 
-              onClick={toggleSidebar}
-              className={`
-                rounded-full p-1.5 bg-sidebar-accent text-sidebar-accent-foreground hover:bg-sidebar-accent/80
-                transition-colors duration-200 ${isMobile && collapsed ? 'hidden' : ''}
-              `}
-            >
-              {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-            </button>
-          </div>
-        </div>
+        {/* Logo and sidebar toggle - Extracted to its own component */}
+        <SidebarLogo 
+          collapsed={collapsed}
+          isMobile={isMobile}
+          toggleSidebar={toggleSidebar}
+        />
         
         <nav className="flex-1 px-2 py-4 overflow-y-auto">
           {sidebarSections.map((section) => (
-            <div key={section.title} className="mb-6">
-              {!collapsed && (
-                <h2 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                  {section.title}
-                </h2>
-              )}
-              
-              <div className="space-y-1">
-                {section.items.map((item) => renderMenuItem(item))}
-              </div>
-            </div>
+            <SidebarMenuSection 
+              key={section.title} 
+              title={section.title}
+              collapsed={collapsed}
+            >
+              {section.items.map((item) => renderMenuItem(item))}
+            </SidebarMenuSection>
           ))}
         </nav>
         
-        <div className="p-4 border-t border-sidebar-border">
-          <div className={`flex items-center ${collapsed && !isMobile ? 'justify-center' : 'space-x-3'}`}>
-            <div className="w-8 h-8 rounded-full bg-sidebar-primary/10 flex items-center justify-center text-sidebar-primary">
-              <Users size={18} />
-            </div>
-            {(!collapsed || isMobile) && (
-              <div className="truncate">
-                <p className="text-sm font-medium">Admin User</p>
-                <p className="text-xs text-muted-foreground">admin@digihubai.com</p>
-              </div>
-            )}
-          </div>
-        </div>
+        <SidebarUserProfile collapsed={collapsed} />
       </aside>
     </>
   );
