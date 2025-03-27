@@ -1,11 +1,12 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Copy, Globe, Calendar, Sparkles, RotateCw } from "lucide-react";
+import { ChevronLeft, Copy, Globe, Calendar, Sparkles, RotateCw, Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 interface ContentGenerationStepProps {
   seoData: any;
@@ -16,12 +17,19 @@ interface ContentGenerationStepProps {
 const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({ seoData, onDataChange, onPrev }) => {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [showWordPressOptions, setShowWordPressOptions] = useState(false);
   const [publishType, setPublishType] = useState("immediate");
   const [scheduleDate, setScheduleDate] = useState("");
   const [scheduleTime, setScheduleTime] = useState("");
-  
-  const handleGenerateContent = () => {
+  const [showPublishOptions, setShowPublishOptions] = useState(false);
+  const [showConnectCMSDialog, setShowConnectCMSDialog] = useState(false);
+  const [hasCMS, setHasCMS] = useState(true); // Mock state to simulate CMS connection
+
+  // Auto-generate content when component mounts
+  useEffect(() => {
+    generateContent();
+  }, []);
+
+  const generateContent = () => {
     if (!seoData.selectedOutline) {
       toast({
         title: "No outline selected",
@@ -106,7 +114,7 @@ As AI technology continues to advance, ${mainKeyword}s will play an increasingly
 
       onDataChange("generatedContent", generatedArticle);
       setIsGenerating(false);
-      setShowWordPressOptions(true);
+      setShowPublishOptions(true);
       
       toast({
         title: "Content generated",
@@ -123,7 +131,12 @@ As AI technology continues to advance, ${mainKeyword}s will play an increasingly
     });
   };
   
-  const handlePublishToWordPress = () => {
+  const handlePublish = () => {
+    if (!hasCMS) {
+      setShowConnectCMSDialog(true);
+      return;
+    }
+
     if (publishType === "scheduled" && (!scheduleDate || !scheduleTime)) {
       toast({
         title: "Missing schedule information",
@@ -137,47 +150,50 @@ As AI technology continues to advance, ${mainKeyword}s will play an increasingly
     const scheduledInfo = publishType === "scheduled" ? ` for ${scheduleDate} at ${scheduleTime}` : "";
     
     toast({
-      title: `${publishAction} to WordPress`,
-      description: `${publishAction} to WordPress${scheduledInfo}...`,
+      title: `${publishAction} to site`,
+      description: `${publishAction} to your website${scheduledInfo}...`,
     });
     
     // Simulate publishing process
     setTimeout(() => {
       toast({
         title: "Success!",
-        description: `Successfully ${publishType === "immediate" ? "published" : "scheduled"} to WordPress${scheduledInfo}`,
+        description: `Successfully ${publishType === "immediate" ? "published" : "scheduled"} to your site${scheduledInfo}`,
+      });
+    }, 1500);
+  };
+
+  const handleConnectCMS = () => {
+    // Simulate connection to CMS
+    toast({
+      title: "CMS connection",
+      description: "Connecting to your content management system...",
+    });
+    
+    setTimeout(() => {
+      setHasCMS(true);
+      setShowConnectCMSDialog(false);
+      toast({
+        title: "Connected!",
+        description: "Your CMS has been successfully connected",
       });
     }, 1500);
   };
 
   return (
     <div className="space-y-6">
-      {!seoData.generatedContent ? (
+      {isGenerating ? (
         <Card className="p-6 flex flex-col items-center justify-center text-center">
           <Sparkles className="h-12 w-12 text-primary/60 mb-4" />
-          <h2 className="text-2xl font-semibold mb-2">Generating the article...</h2>
+          <h2 className="text-2xl font-semibold mb-2">Generating your article...</h2>
           <p className="text-muted-foreground mb-6">
-            You can edit your article in documents once it is generated.
+            Creating SEO-optimized content based on your selections.
           </p>
           
-          <Button 
-            onClick={handleGenerateContent}
-            disabled={isGenerating}
-            size="lg"
-            className="px-8"
-          >
-            {isGenerating ? (
-              <>
-                <RotateCw className="mr-2 h-4 w-4 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 h-4 w-4" />
-                Generate Content
-              </>
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <RotateCw className="h-5 w-5 animate-spin text-primary" />
+            <span>Please wait, this may take a moment</span>
+          </div>
           
           <Button 
             variant="outline" 
@@ -192,10 +208,18 @@ As AI technology continues to advance, ${mainKeyword}s will play an increasingly
         <>
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-semibold">Result</h2>
-              <Button variant="destructive" size="sm">
-                Stop
-              </Button>
+              <h2 className="text-2xl font-semibold">Generated Content</h2>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={generateContent}
+                  className="flex items-center gap-1"
+                >
+                  <RotateCw className="h-4 w-4" />
+                  Regenerate
+                </Button>
+              </div>
             </div>
             
             <div className="prose prose-sm max-w-none dark:prose-invert">
@@ -221,11 +245,11 @@ As AI technology continues to advance, ${mainKeyword}s will play an increasingly
             </div>
           </Card>
           
-          {showWordPressOptions && (
+          {showPublishOptions && (
             <Card className="p-6 border border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-900/20">
               <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
                 <Globe className="text-green-600" />
-                WordPress Publishing Options
+                Publishing Options
               </h3>
               
               <div className="space-y-4">
@@ -267,25 +291,62 @@ As AI technology continues to advance, ${mainKeyword}s will play an increasingly
                 )}
                 
                 <Button 
-                  onClick={handlePublishToWordPress}
+                  onClick={handlePublish}
                   className="w-full gap-2"
                   variant="default"
                 >
                   {publishType === "immediate" ? (
                     <>
                       <Globe className="h-4 w-4" />
-                      Publish to WordPress
+                      Publish to Site
                     </>
                   ) : (
                     <>
                       <Calendar className="h-4 w-4" />
-                      Schedule for WordPress
+                      Schedule Publication
                     </>
                   )}
                 </Button>
               </div>
             </Card>
           )}
+          
+          <Dialog open={showConnectCMSDialog} onOpenChange={setShowConnectCMSDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Connect a CMS</DialogTitle>
+                <DialogDescription>
+                  Connect your content management system to publish content directly from DigiHub.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="grid grid-cols-2 gap-4 py-4">
+                <Button variant="outline" className="flex flex-col h-24 items-center justify-center gap-2" onClick={handleConnectCMS}>
+                  <Globe className="h-8 w-8 text-blue-500" />
+                  <span>WordPress</span>
+                </Button>
+                
+                <Button variant="outline" className="flex flex-col h-24 items-center justify-center gap-2" onClick={handleConnectCMS}>
+                  <Globe className="h-8 w-8 text-purple-500" />
+                  <span>Webflow</span>
+                </Button>
+                
+                <Button variant="outline" className="flex flex-col h-24 items-center justify-center gap-2" onClick={handleConnectCMS}>
+                  <Globe className="h-8 w-8 text-yellow-500" />
+                  <span>Contentful</span>
+                </Button>
+                
+                <Button variant="outline" className="flex flex-col h-24 items-center justify-center gap-2" onClick={handleConnectCMS}>
+                  <Plus className="h-8 w-8 text-gray-500" />
+                  <span>Custom CMS</span>
+                </Button>
+              </div>
+              
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowConnectCMSDialog(false)}>Cancel</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </>
       )}
     </div>

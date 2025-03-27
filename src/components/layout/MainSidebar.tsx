@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Bot, 
@@ -33,11 +33,26 @@ import {
   ChevronRight,
   ChevronLeft,
   Activity,
-  ExternalLink
+  ExternalLink,
+  Target,
+  Zap,
+  Calendar
 } from "lucide-react";
 
 const MainSidebar = ({ collapsed = false, isMobile = false, toggleSidebar }) => {
   const location = useLocation();
+  const [expandedSections, setExpandedSections] = useState({
+    marketing: true,
+    crm: false,
+    projects: false
+  });
+  
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
   
   const userMenuItems = [
     { name: "Dashboard", path: "/dashboard", icon: <Home size={20} /> },
@@ -86,14 +101,24 @@ const MainSidebar = ({ collapsed = false, isMobile = false, toggleSidebar }) => 
     { name: "Credits", path: "/admin/credits", icon: <DollarSign size={20} /> }
   ];
   
+  // Marketing submenu items
+  const marketingItems = [
+    { name: "Marketing Hub", path: "/marketing", icon: <Globe size={20} /> },
+    { name: "Campaigns", path: "/marketing/campaigns", icon: <Target size={20} /> },
+    { name: "Automation", path: "/marketing/automation", icon: <Zap size={20} /> },
+    { name: "SEO", path: "/marketing/seo", icon: <Search size={20} /> },
+    { name: "SEO Tools", path: "/marketing/seo/tools", icon: <Globe size={20} /> },
+    { name: "AI SEO Writer", path: "/marketing/seo/ai-writer", icon: <Edit size={20} /> },
+    { name: "Email Marketing", path: "/marketing/email", icon: <Mail size={20} /> },
+    { name: "Social Media", path: "/marketing/social", icon: <Bell size={20} /> },
+    { name: "Analytics", path: "/marketing/analytics", icon: <BarChart2 size={20} /> },
+  ];
+  
   // Additional new modules from requirements
   const newModulesItems = [
     { name: "Project Management", path: "/project-management", icon: <FolderOpen size={20} /> },
     { name: "CRM", path: "/crm", icon: <Users size={20} /> },
     { name: "Chatbot", path: "/chatbot", icon: <MessageSquare size={20} /> },
-    { name: "Marketing", path: "/marketing", icon: <Bell size={20} /> },
-    { name: "Marketing SEO", path: "/marketing/seo", icon: <Search size={20} /> },
-    { name: "SEO Tools", path: "/marketing/seo/tools", icon: <Globe size={20} /> },
     { name: "Workflow", path: "/workflow", icon: <RefreshCw size={20} /> },
     { name: "Funnel Creator", path: "/funnel-creator", icon: <PenTool size={20} /> }
   ];
@@ -116,6 +141,150 @@ const MainSidebar = ({ collapsed = false, isMobile = false, toggleSidebar }) => 
     ));
   };
   
+  const renderMarketingSection = () => {
+    if (collapsed) {
+      return (
+        <li className="px-2">
+          <Link
+            to="/marketing"
+            className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+              location.pathname.includes('/marketing')
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-secondary"
+            }`}
+          >
+            <Globe size={20} />
+          </Link>
+        </li>
+      );
+    }
+    
+    return (
+      <div className="space-y-1">
+        <div 
+          className="flex items-center justify-between px-3 py-2 text-sm font-medium cursor-pointer hover:bg-secondary/50 rounded-md"
+          onClick={() => toggleSection('marketing')}
+        >
+          <div className="flex items-center gap-3">
+            <Globe size={20} />
+            <span>Marketing</span>
+          </div>
+          {expandedSections.marketing ? (
+            <ChevronRight size={16} className="transform rotate-90" />
+          ) : (
+            <ChevronRight size={16} />
+          )}
+        </div>
+        
+        {expandedSections.marketing && (
+          <div className="pl-4 space-y-1">
+            <Link
+              to="/marketing/campaigns"
+              className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                location.pathname === '/marketing/campaigns'
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-secondary"
+              }`}
+            >
+              <Target size={18} />
+              <span>Campaigns</span>
+            </Link>
+            
+            <Link
+              to="/marketing/automation"
+              className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                location.pathname === '/marketing/automation'
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-secondary"
+              }`}
+            >
+              <Zap size={18} />
+              <span>Automation</span>
+            </Link>
+            
+            <div>
+              <Link
+                to="/marketing/seo"
+                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                  location.pathname === '/marketing/seo'
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-secondary"
+                }`}
+              >
+                <Search size={18} />
+                <span>SEO</span>
+              </Link>
+              
+              {(location.pathname.includes('/marketing/seo') || location.pathname.includes('/seo-writer')) && (
+                <div className="pl-4 space-y-1 mt-1">
+                  <Link
+                    to="/marketing/seo/tools"
+                    className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                      location.pathname === '/marketing/seo/tools'
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-secondary"
+                    }`}
+                  >
+                    <Globe size={16} />
+                    <span>SEO Tools</span>
+                  </Link>
+                  
+                  <Link
+                    to="/marketing/seo/ai-writer"
+                    className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                      location.pathname === '/marketing/seo/ai-writer'
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-secondary"
+                    }`}
+                  >
+                    <Edit size={16} />
+                    <span>AI SEO Writer</span>
+                  </Link>
+                </div>
+              )}
+            </div>
+            
+            <Link
+              to="/marketing/email"
+              className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                location.pathname === '/marketing/email'
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-secondary"
+              }`}
+            >
+              <Mail size={18} />
+              <span>Email</span>
+            </Link>
+            
+            <Link
+              to="/marketing/social"
+              className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                location.pathname === '/marketing/social'
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-secondary"
+              }`}
+            >
+              <Bell size={18} />
+              <span>Social Media</span>
+            </Link>
+            
+            <Link
+              to="/marketing/analytics"
+              className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                location.pathname === '/marketing/analytics'
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-secondary"
+              }`}
+            >
+              <BarChart2 size={18} />
+              <span>Analytics</span>
+            </Link>
+          </div>
+        )}
+      </div>
+    );
+  };
+  
   return (
     <aside
       className={`${
@@ -136,16 +305,20 @@ const MainSidebar = ({ collapsed = false, isMobile = false, toggleSidebar }) => 
           <nav className="space-y-4">
             <div>
               <h3 className={`px-4 text-xs font-semibold text-muted-foreground mb-2 ${collapsed ? "sr-only" : ""}`}>
-                NEW MODULES
+                MAIN MODULES
               </h3>
               <ul className="space-y-1">
-                {renderMenuItems(newModulesItems)}
+                {renderMenuItems(newModulesItems.filter(item => 
+                  item.name !== "Marketing" && 
+                  !item.path.includes('/marketing')
+                ))}
+                {renderMarketingSection()}
               </ul>
             </div>
             
             <div>
               <h3 className={`px-4 text-xs font-semibold text-muted-foreground mb-2 ${collapsed ? "sr-only" : ""}`}>
-                USER
+                AI TOOLS
               </h3>
               <ul className="space-y-1">
                 {renderMenuItems(userMenuItems)}

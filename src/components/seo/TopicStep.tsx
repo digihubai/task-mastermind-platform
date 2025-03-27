@@ -33,39 +33,227 @@ const TopicStep: React.FC<TopicStepProps> = ({ seoData, onDataChange, onNext }) 
     // Simulate API call to generate better, more relevant keywords
     setTimeout(() => {
       // Generate more relevant and focused keywords based on topic
-      const words = seoData.topic.toLowerCase().split(/\s+/);
-      const mainTerm = words[words.length - 1] || words[0] || "chatbot";
+      const topic = seoData.topic.toLowerCase();
+      const words = topic.split(/\s+/);
+      const mainTerm = words[words.length - 1] || words[0] || "product";
       
-      const relatedKeywords = [
-        mainTerm,
-        `ai ${mainTerm}`,
-        `${mainTerm} technology`,
-        `conversational ${mainTerm}`,
-        `automated ${mainTerm}`,
-        `${mainTerm} support`,
-        `dialogue ${mainTerm}`,
-        `${mainTerm} intelligence`,
-        `virtual ${mainTerm}`,
-        `customer ${mainTerm}`,
-        `${mainTerm} integration`,
-        `${mainTerm} platform`,
-        `${mainTerm} solution`,
-        `business ${mainTerm}`,
-        `enterprise ${mainTerm}`,
-        `${mainTerm} benefits`,
-        `${mainTerm} application`,
-        `${mainTerm} implementation`,
-        `${mainTerm} system`,
-        `${mainTerm} interface`
-      ];
+      // More sophisticated keyword generation based on topic context
+      let relatedKeywords = [];
       
-      // Take only the number of keywords specified by the user
-      onDataChange("keywords", relatedKeywords.slice(0, seoData.keywordCount));
+      // Extract key themes from the topic
+      const topicThemes = {
+        marketing: ['marketing', 'advertise', 'promote', 'brand', 'campaign'],
+        technology: ['tech', 'software', 'app', 'digital', 'computer', 'online', 'platform'],
+        business: ['business', 'company', 'startup', 'enterprise', 'organization', 'corporate'],
+        ecommerce: ['shop', 'store', 'ecommerce', 'retail', 'product', 'sell'],
+        content: ['content', 'blog', 'article', 'post', 'write'],
+        ai: ['ai', 'artificial', 'intelligence', 'machine', 'learning', 'automation']
+      };
+      
+      // Determine primary theme of the topic
+      let primaryTheme = '';
+      let maxMatches = 0;
+      
+      for (const [theme, keywords] of Object.entries(topicThemes)) {
+        const matches = keywords.filter(keyword => topic.includes(keyword)).length;
+        if (matches > maxMatches) {
+          maxMatches = matches;
+          primaryTheme = theme;
+        }
+      }
+      
+      // If no clear theme is detected, default to business
+      if (!primaryTheme) primaryTheme = 'business';
+      
+      // Generate keywords based on detected theme
+      switch (primaryTheme) {
+        case 'marketing':
+          relatedKeywords = [
+            `${mainTerm} strategy`,
+            `${mainTerm} campaign`,
+            `digital ${mainTerm}`,
+            `${mainTerm} analytics`,
+            `${mainTerm} roi`,
+            `${mainTerm} optimization`,
+            `${mainTerm} funnel`,
+            `${mainTerm} automation`,
+            `${mainTerm} targeting`,
+            `${mainTerm} metrics`,
+            `${mainTerm} performance`,
+            `effective ${mainTerm}`,
+            `${mainTerm} software`,
+            `${mainTerm} agency`,
+            `${mainTerm} services`,
+            `best ${mainTerm} practices`,
+            `${mainTerm} trends`,
+            `${mainTerm} tools`,
+            `${mainTerm} platforms`,
+            `${mainTerm} technology`
+          ];
+          break;
+          
+        case 'technology':
+          relatedKeywords = [
+            `${mainTerm} software`,
+            `${mainTerm} platform`,
+            `${mainTerm} solution`,
+            `${mainTerm} system`,
+            `${mainTerm} api`,
+            `${mainTerm} integration`,
+            `${mainTerm} architecture`,
+            `${mainTerm} infrastructure`,
+            `${mainTerm} scalability`,
+            `${mainTerm} security`,
+            `${mainTerm} development`,
+            `${mainTerm} implementation`,
+            `enterprise ${mainTerm}`,
+            `${mainTerm} features`,
+            `${mainTerm} benefits`,
+            `${mainTerm} comparison`,
+            `${mainTerm} pricing`,
+            `${mainTerm} review`,
+            `top ${mainTerm} providers`,
+            `best ${mainTerm} tools`
+          ];
+          break;
+          
+        case 'business':
+          relatedKeywords = [
+            `${mainTerm} strategy`,
+            `${mainTerm} growth`,
+            `${mainTerm} optimization`,
+            `${mainTerm} transformation`,
+            `${mainTerm} innovation`,
+            `${mainTerm} management`,
+            `${mainTerm} solutions`,
+            `${mainTerm} consulting`,
+            `${mainTerm} services`,
+            `${mainTerm} case study`,
+            `${mainTerm} best practices`,
+            `${mainTerm} implementation`,
+            `${mainTerm} framework`,
+            `${mainTerm} metrics`,
+            `${mainTerm} success factors`,
+            `${mainTerm} challenges`,
+            `${mainTerm} trends`,
+            `${mainTerm} leadership`,
+            `${mainTerm} efficiency`,
+            `${mainTerm} sustainability`
+          ];
+          break;
+          
+        case 'ecommerce':
+          relatedKeywords = [
+            `${mainTerm} store`,
+            `${mainTerm} shop`,
+            `${mainTerm} marketplace`,
+            `${mainTerm} platform`,
+            `${mainTerm} shopping`,
+            `${mainTerm} product`,
+            `${mainTerm} checkout`,
+            `${mainTerm} cart`,
+            `${mainTerm} payment`,
+            `${mainTerm} shipping`,
+            `${mainTerm} returns`,
+            `${mainTerm} customer experience`,
+            `${mainTerm} conversion rate`,
+            `${mainTerm} analytics`,
+            `${mainTerm} optimization`,
+            `best ${mainTerm} sites`,
+            `${mainTerm} hosting`,
+            `${mainTerm} website`,
+            `${mainTerm} security`,
+            `${mainTerm} mobile`
+          ];
+          break;
+          
+        case 'content':
+          relatedKeywords = [
+            `${mainTerm} creation`,
+            `${mainTerm} strategy`,
+            `${mainTerm} marketing`,
+            `${mainTerm} writing`,
+            `${mainTerm} distribution`,
+            `${mainTerm} management`,
+            `${mainTerm} optimization`,
+            `${mainTerm} planning`,
+            `${mainTerm} calendar`,
+            `${mainTerm} promotion`,
+            `${mainTerm} engagement`,
+            `${mainTerm} analytics`,
+            `${mainTerm} tools`,
+            `${mainTerm} trends`,
+            `${mainTerm} best practices`,
+            `${mainTerm} examples`,
+            `${mainTerm} roi`,
+            `${mainTerm} metrics`,
+            `${mainTerm} workflow`,
+            `${mainTerm} production`
+          ];
+          break;
+          
+        case 'ai':
+          relatedKeywords = [
+            `${mainTerm} intelligence`,
+            `${mainTerm} learning`,
+            `${mainTerm} automation`,
+            `${mainTerm} algorithms`,
+            `${mainTerm} neural networks`,
+            `${mainTerm} machine learning`,
+            `${mainTerm} deep learning`,
+            `${mainTerm} natural language processing`,
+            `${mainTerm} computer vision`,
+            `${mainTerm} robotics`,
+            `${mainTerm} prediction`,
+            `${mainTerm} analytics`,
+            `${mainTerm} data science`,
+            `${mainTerm} applications`,
+            `${mainTerm} implementation`,
+            `${mainTerm} tools`,
+            `${mainTerm} platforms`,
+            `${mainTerm} solutions`,
+            `${mainTerm} benefits`,
+            `${mainTerm} ethics`
+          ];
+          break;
+          
+        default:
+          // Generic business keywords as fallback
+          relatedKeywords = [
+            `${mainTerm}`,
+            `best ${mainTerm}`,
+            `${mainTerm} benefits`,
+            `${mainTerm} examples`,
+            `${mainTerm} tips`,
+            `${mainTerm} guide`,
+            `${mainTerm} tutorial`,
+            `${mainTerm} strategy`,
+            `${mainTerm} management`,
+            `${mainTerm} tools`,
+            `${mainTerm} software`,
+            `${mainTerm} platform`,
+            `${mainTerm} solutions`,
+            `${mainTerm} services`,
+            `${mainTerm} trends`,
+            `${mainTerm} best practices`,
+            `${mainTerm} techniques`,
+            `${mainTerm} implementation`,
+            `${mainTerm} optimization`,
+            `${mainTerm} experts`
+          ];
+      }
+      
+      // Remove duplicates and filter valid keywords
+      const uniqueKeywords = [...new Set(relatedKeywords)]
+        .filter(keyword => keyword.length > 2)
+        .slice(0, seoData.keywordCount);
+      
+      onDataChange("keywords", uniqueKeywords);
       setIsGeneratingKeywords(false);
       
       toast({
         title: "Keywords generated",
-        description: `Generated ${seoData.keywordCount} keywords based on your topic`,
+        description: `Generated ${uniqueKeywords.length} keywords based on your topic`,
       });
     }, 1500);
   };
