@@ -13,11 +13,7 @@ const VisionTabs = ({ selectedTab, onTabChange, children }: VisionTabsProps) => 
   const navigate = useNavigate();
 
   const handleTabChange = (value: string) => {
-    if (value === "seo") {
-      // Redirect to AI SEO Writer page when SEO Tools tab is clicked
-      navigate("/ai-seo");
-      return;
-    } else if (value === "integrations") {
+    if (value === "integrations") {
       // Redirect to the integrations tab
       navigate("/settings/integrations");
       return;
@@ -28,9 +24,8 @@ const VisionTabs = ({ selectedTab, onTabChange, children }: VisionTabsProps) => 
 
   return (
     <Tabs value={selectedTab} onValueChange={handleTabChange} className="w-full">
-      <TabsList className="grid grid-cols-3 mb-4">
+      <TabsList className="grid grid-cols-2 mb-4">
         <TabsTrigger value="vision">Vision Analysis</TabsTrigger>
-        <TabsTrigger value="seo">SEO Tools</TabsTrigger>
         <TabsTrigger value="integrations">Integrations</TabsTrigger>
       </TabsList>
       {children}

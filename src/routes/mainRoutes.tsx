@@ -10,6 +10,7 @@ import FunnelCreator from '@/pages/modules/FunnelCreator';
 import AISEOPage from '@/pages/ai/AISEOPage';
 import AIVisionPage from '@/pages/ai/AIVisionPage';
 import ChatbotPage from '@/pages/ChatbotPage';
+import SettingsIntegrationsPage from '@/pages/settings/SettingsIntegrationsPage';
 
 const mainRoutes: RouteObject[] = [
   {
@@ -51,6 +52,10 @@ const mainRoutes: RouteObject[] = [
   {
     path: '/chatbot',
     element: <ChatbotPage />,
+  },
+  {
+    path: '/settings/integrations',
+    element: <SettingsIntegrationsPage />,
   },
 ];
 

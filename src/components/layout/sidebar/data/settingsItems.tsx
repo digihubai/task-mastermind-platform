@@ -1,20 +1,30 @@
 
 import React from "react";
 import {
-  User,
   Settings,
-  FileCode,
+  Users,
+  CreditCard,
   Bell,
-  Headphones,
+  Globe,
+  Lock,
+  Palette,
+  UserCog,
+  Bot,
+  PlugZap,
 } from "lucide-react";
 import { SidebarItemType } from "@/types/sidebar";
 
 // Settings menu items
 export const settingsItems = [
-  { name: "Account Settings", path: "/settings/account", icon: <User size={20} /> },
-  { name: "Tools Settings", path: "/settings/tools", icon: <Settings size={20} /> },
-  { name: "Integrations", path: "/settings/integrations", icon: <FileCode size={20} /> },
+  { name: "General Settings", path: "/settings", icon: <Settings size={20} /> },
+  { name: "Teams", path: "/settings/teams", icon: <Users size={20} /> },
+  { name: "Billing", path: "/settings/billing", icon: <CreditCard size={20} /> },
   { name: "Notifications", path: "/settings/notifications", icon: <Bell size={20} /> },
+  { name: "Integrations", path: "/settings/integrations", icon: <PlugZap size={20} /> },
+  { name: "Language", path: "/settings/language", icon: <Globe size={20} /> },
+  { name: "Security", path: "/settings/security", icon: <Lock size={20} /> },
+  { name: "Appearance", path: "/settings/appearance", icon: <Palette size={20} /> },
+  { name: "API Settings", path: "/settings/api", icon: <Bot size={20} /> },
 ];
 
 // Settings section for sidebar
@@ -22,29 +32,56 @@ export const settingsSection = {
   title: "Settings",
   items: [
     {
-      title: "Account & Profile",
-      href: "/settings/profile",
-      icon: <User size={20} />,
-    },
-    {
-      title: "Tool Settings",
-      href: "/settings/tools",
+      title: "Settings",
+      href: "/settings",
       icon: <Settings size={20} />,
-    },
-    {
-      title: "Integrations",
-      href: "/settings/integrations",
-      icon: <FileCode size={20} />,
-    },
-    {
-      title: "Notifications",
-      href: "/settings/notifications",
-      icon: <Bell size={20} />,
-    },
-    {
-      title: "Support & Help",
-      href: "/support/help",
-      icon: <Headphones size={20} />,
+      subItems: [
+        {
+          title: "General",
+          href: "/settings/general",
+          icon: <Settings size={18} />,
+        },
+        {
+          title: "Profile",
+          href: "/settings/profile",
+          icon: <UserCog size={18} />,
+        },
+        {
+          title: "Teams",
+          href: "/settings/teams",
+          icon: <Users size={18} />,
+        },
+        {
+          title: "Billing",
+          href: "/settings/billing",
+          icon: <CreditCard size={18} />,
+        },
+        {
+          title: "Notifications",
+          href: "/settings/notifications",
+          icon: <Bell size={18} />,
+        },
+        {
+          title: "Integrations",
+          href: "/settings/integrations",
+          icon: <PlugZap size={18} />,
+        },
+        {
+          title: "Language",
+          href: "/settings/language",
+          icon: <Globe size={18} />,
+        },
+        {
+          title: "Security",
+          href: "/settings/security",
+          icon: <Lock size={18} />,
+        },
+        {
+          title: "Appearance",
+          href: "/settings/appearance",
+          icon: <Palette size={18} />,
+        },
+      ],
     },
   ] as SidebarItemType[],
 };
