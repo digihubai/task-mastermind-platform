@@ -1,70 +1,100 @@
 
 import React from "react";
-import { Star, PenTool, Image, Bot } from "lucide-react";
+import { Star, PenTool, Image, Bot, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
-interface RecentUsageItem {
-  id: number;
-  icon: React.ReactNode;
-  action: string;
-  tool: string;
-  timeAgo: string;
-  iconBgClass: string;
-}
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAIToolUsage, AIToolUsageItem } from "@/hooks/useAIToolUsage";
 
 const AIToolRecentUsage = () => {
-  const recentUsageItems: RecentUsageItem[] = [
-    {
-      id: 1,
-      icon: <PenTool size={16} />,
-      action: "Created marketing copy",
-      tool: "AI Copywriter",
-      timeAgo: "2 hours ago",
-      iconBgClass: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-    },
-    {
-      id: 2,
-      icon: <Image size={16} />,
-      action: "Generated product images",
-      tool: "AI Vision",
-      timeAgo: "Yesterday",
-      iconBgClass: "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400"
-    },
-    {
-      id: 3,
-      icon: <Bot size={16} />,
-      action: "Trained customer service chatbot",
-      tool: "AI Chatbot",
-      timeAgo: "3 days ago",
-      iconBgClass: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400"
+  const { recentUsage, isLoading, error, refreshUsage } = useAIToolUsage();
+
+  // Function to render the appropriate icon based on the tool type
+  const renderIcon = (iconType: string) => {
+    switch (iconType) {
+      case "pen-tool":
+        return <PenTool size={16} />;
+      case "image":
+        return <Image size={16} />;
+      case "bot":
+        return <Bot size={16} />;
+      default:
+        return <PenTool size={16} />;
     }
-  ];
+  };
+
+  if (error) {
+    return (
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-4">Recent Usage</h2>
+        <Card className="border border-border/40 p-6">
+          <div className="text-center text-muted-foreground py-4">
+            Unable to load recent activity.
+            <Button variant="link" onClick={refreshUsage} className="ml-2">
+              Try again
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-8">
       <h2 className="text-xl font-semibold mb-4">Recent Usage</h2>
       <Card className="border border-border/40 p-6">
         <div className="space-y-4">
-          {recentUsageItems.map((item) => (
-            <div key={item.id} className="flex items-center justify-between pb-4 last:pb-0 last:border-0 border-b border-border/40">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-full ${item.iconBgClass}`}>
-                  {item.icon}
+          {isLoading ? (
+            // Skeleton loading state
+            <>
+              {[1, 2, 3].map((item) => (
+                <div key={item} className="flex items-center justify-between pb-4 last:pb-0 last:border-0 border-b border-border/40">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div>
+                      <Skeleton className="h-4 w-32 mb-2" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-sm">{item.action}</p>
-                  <p className="text-xs text-muted-foreground">{item.tool}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <p className="text-xs text-muted-foreground">{item.timeAgo}</p>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Star size={16} />
-                </Button>
-              </div>
+              ))}
+            </>
+          ) : recentUsage.length === 0 ? (
+            <div className="text-center text-muted-foreground py-4">
+              No recent activity found.
             </div>
-          ))}
+          ) : (
+            recentUsage.map((item: AIToolUsageItem) => (
+              <div key={item.id} className="flex items-center justify-between pb-4 last:pb-0 last:border-0 border-b border-border/40">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-full ${item.iconBgClass}`}>
+                    {renderIcon(item.iconType)}
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm">{item.action}</p>
+                    <p className="text-xs text-muted-foreground">{item.tool}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <p className="text-xs text-muted-foreground">{item.timeAgo}</p>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Star size={16} />
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+          
+          {isLoading && (
+            <div className="flex items-center justify-center text-xs text-muted-foreground">
+              <Loader2 size={16} className="animate-spin mr-2" />
+              Loading recent activity...
+            </div>
+          )}
         </div>
       </Card>
     </div>
