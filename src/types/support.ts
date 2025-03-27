@@ -1,3 +1,4 @@
+
 export interface SupportTicket {
   id: string;
   subject: string;

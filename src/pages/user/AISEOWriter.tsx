@@ -3,233 +3,308 @@ import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, PlusCircle, Eye, Search, ArrowRight, File, Layers, BarChart2, Image, RefreshCw, Cloud, ExternalLink } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Search, 
+  Globe, 
+  BarChart, 
+  ListChecks, 
+  Edit, 
+  Copy, 
+  Download,
+  Sparkles
+} from "lucide-react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { useToast } from "@/hooks/use-toast";
-
-// Step components import
-import SEOKeywordStep from "@/components/seo/SEOKeywordStep";
-import SEOTitleStep from "@/components/seo/SEOTitleStep";
-import SEOOutlineStep from "@/components/seo/SEOOutlineStep";
-import SEOImageStep from "@/components/seo/SEOImageStep";
-import SEOContentPreview from "@/components/seo/SEOContentPreview";
-import SEOIntegrations from "@/components/seo/SEOIntegrations";
-import SEOContentHistory from "@/components/seo/SEOContentHistory";
-import SEOAnalytics from "@/components/seo/SEOAnalytics";
-
-const STEPS = [
-  { id: 1, name: "Topic & Keywords", component: SEOKeywordStep },
-  { id: 2, name: "Title", component: SEOTitleStep },
-  { id: 3, name: "Outline", component: SEOOutlineStep },
-  { id: 4, name: "Image", component: SEOImageStep },
-  { id: 5, name: "Content", component: SEOContentPreview },
-];
 
 const AISEOWriter = () => {
-  const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("create");
-  const [currentStep, setCurrentStep] = useState(1);
-  const [seoData, setSeoData] = useState({
-    topic: "",
-    keywords: [],
-    keywordCount: 10,
-    title: "",
-    titleCount: 3,
-    maxTitleLength: 30,
-    outline: "",
-    subtitleCount: 10,
-    outlineCount: 3,
-    imagePrompt: "",
-    imageSize: "square",
-    imageCount: 4,
-    content: "",
-    wordCount: 0,
-    seoScore: 0,
-    readabilityScore: 0,
-    keywords_density: {},
-    integrations: [],
-    selectedKeywords: [],
-  });
-
-  const handleInputChange = (field: string, value: any) => {
-    setSeoData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleNextStep = () => {
-    if (currentStep < STEPS.length) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      // Final step completed
-      toast({
-        title: "Content created successfully",
-        description: "Your SEO content is ready to be published.",
-      });
+  const [keyword, setKeyword] = useState("");
+  const [contentType, setContentType] = useState("blog-post");
+  const [generatedContent, setGeneratedContent] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [seoScore, setSeoScore] = useState(0);
+  const [keywordDensity, setKeywordDensity] = useState(0);
+  const [readabilityScore, setReadabilityScore] = useState(0);
+  
+  const handleGenerateContent = () => {
+    if (!keyword.trim()) {
+      toast.error("Please enter a keyword to generate content");
+      return;
     }
-  };
-
-  const handlePrevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleGenerateKeywords = () => {
-    // Simulate API call for keyword generation
-    toast({
-      title: "Generating keywords",
-      description: "Keywords are being generated based on your topic.",
-    });
     
-    // Mock data
+    setIsGenerating(true);
+    
+    // Simulate AI generation process
     setTimeout(() => {
-      const mockKeywords = ["assistant", "dialogue", "interface", "response", "automation", 
-                          "conversation", "intelligence", "technology", "support", "queries", 
-                          "chatbot", "ai", "language"];
-      handleInputChange("keywords", mockKeywords);
-      toast({
-        title: "Keywords generated",
-        description: "Choose the most relevant keywords for your content.",
-      });
-    }, 1500);
-  };
+      const sampleContent = `# ${keyword}: The Ultimate Guide
 
-  const handleSelectKeyword = (keyword: string) => {
-    const selectedKeywords = [...seoData.selectedKeywords];
-    if (selectedKeywords.includes(keyword)) {
-      handleInputChange("selectedKeywords", selectedKeywords.filter(k => k !== keyword));
-    } else {
-      handleInputChange("selectedKeywords", [...selectedKeywords, keyword]);
-    }
-  };
+## Introduction
+When it comes to ${keyword}, there's a lot to understand and explore. This comprehensive guide will walk you through everything you need to know about ${keyword} in 2023.
 
-  const handleNewContent = () => {
-    setSeoData({
-      topic: "",
-      keywords: [],
-      keywordCount: 10,
-      title: "",
-      titleCount: 3,
-      maxTitleLength: 30,
-      outline: "",
-      subtitleCount: 10,
-      outlineCount: 3,
-      imagePrompt: "",
-      imageSize: "square", 
-      imageCount: 4,
-      content: "",
-      wordCount: 0,
-      seoScore: 0,
-      readabilityScore: 0,
-      keywords_density: {},
-      integrations: [],
-      selectedKeywords: [],
-    });
-    setCurrentStep(1);
-    setActiveTab("create");
-  };
+## What is ${keyword}?
+${keyword} refers to a specialized approach in the industry that has gained significant attention in recent years. Experts in ${keyword} have noted its importance for businesses looking to gain a competitive edge.
 
-  const handleExportToWordPress = () => {
-    toast({
-      title: "Content exported to WordPress",
-      description: "Your content has been successfully exported to your WordPress site.",
-    });
-  };
+## Why ${keyword} Matters
+Understanding ${keyword} is crucial for several reasons:
+- It helps improve your overall digital strategy
+- It provides insights into customer behavior
+- It can significantly boost your conversion rates
 
-  const renderCurrentStep = () => {
-    const StepComponent = STEPS[currentStep - 1].component;
-    return <StepComponent seoData={seoData} onDataChange={handleInputChange} onNext={handleNextStep} onPrev={handlePrevStep} />;
-  };
+## How to Implement ${keyword} Strategies
+1. Start with a comprehensive audit
+2. Develop a tailored approach for your specific needs
+3. Monitor results and adjust accordingly
+4. Stay updated with the latest ${keyword} trends
 
-  const renderStepIndicator = () => {
-    const progress = ((currentStep - 1) / (STEPS.length - 1)) * 100;
+## Conclusion
+By leveraging ${keyword} effectively, organizations can see substantial improvements in their performance metrics and stay ahead of the competition.`;
+      
+      setGeneratedContent(sampleContent);
+      setSeoScore(Math.floor(Math.random() * 20) + 80); // 80-100
+      setKeywordDensity(Math.floor(Math.random() * 3) + 1); // 1-4%
+      setReadabilityScore(Math.floor(Math.random() * 15) + 70); // 70-85
+      
+      setIsGenerating(false);
+      toast.success("SEO content generated successfully!");
+    }, 3000);
+  };
+  
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(generatedContent);
+    toast.success("Content copied to clipboard!");
+  };
+  
+  const handleDownload = () => {
+    const element = document.createElement("a");
+    const file = new Blob([generatedContent], {type: 'text/markdown'});
+    element.href = URL.createObjectURL(file);
+    element.download = `${keyword.replace(/\s+/g, '-').toLowerCase()}-seo-content.md`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
     
-    return (
-      <div className="mb-6">
-        <div className="flex justify-between mb-2">
-          {STEPS.map((step) => (
-            <div 
-              key={step.id} 
-              className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-medium
-                ${currentStep === step.id ? 'bg-primary text-primary-foreground' : 
-                 currentStep > step.id ? 'bg-primary/80 text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}
-            >
-              {step.id}
-            </div>
-          ))}
-        </div>
-        <Progress value={progress} className="h-2" />
-        <div className="flex justify-between mt-2">
-          {STEPS.map((step) => (
-            <span key={step.id} className="text-xs text-muted-foreground max-w-[80px] text-center">{step.name}</span>
-          ))}
-        </div>
-      </div>
-    );
+    toast.success("Content downloaded as Markdown!");
   };
-
+  
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight">AI SEO Writer</h1>
-            <p className="text-muted-foreground mt-1">
-              Just choose your topic, and watch AI whip up SEO-optimized blog content in a matter of seconds!
-            </p>
-          </div>
-          
-          <div className="flex space-x-2">
-            <Button variant="outline" onClick={() => setActiveTab("create")}>
-              <Eye className="mr-2 h-4 w-4" /> Preview
-            </Button>
-            <Button onClick={handleNewContent} className="flex items-center gap-2">
-              <PlusCircle size={18} />
-              <span>Start Over</span>
-            </Button>
-          </div>
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight">AI SEO Writer</h1>
+          <p className="text-muted-foreground mt-1">
+            Create SEO-optimized content that ranks well on search engines
+          </p>
         </div>
         
-        <div className="flex justify-between items-center">
-          <div className="flex space-x-2">
-            <Badge variant="outline" className="px-3 py-1">
-              <span className="font-semibold mr-1">Words:</span> Unlimited
-            </Badge>
-            <Badge variant="outline" className="px-3 py-1">
-              <span className="font-semibold mr-1">Images:</span> Unlimited
-            </Badge>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="p-6 border border-border/40">
+              <Tabs defaultValue="editor" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="editor">Content Editor</TabsTrigger>
+                  <TabsTrigger value="analysis">SEO Analysis</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="editor">
+                  <Textarea
+                    placeholder="Generated SEO content will appear here..."
+                    className="min-h-[400px] font-mono text-sm resize-none"
+                    value={generatedContent}
+                    onChange={(e) => setGeneratedContent(e.target.value)}
+                  />
+                  
+                  {generatedContent && (
+                    <div className="flex gap-2 mt-4">
+                      <Button 
+                        variant="outline" 
+                        onClick={handleCopyToClipboard}
+                        className="gap-2"
+                      >
+                        <Copy size={16} />
+                        Copy
+                      </Button>
+                      
+                      <Button 
+                        variant="outline" 
+                        onClick={handleDownload}
+                        className="gap-2"
+                      >
+                        <Download size={16} />
+                        Download
+                      </Button>
+                    </div>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="analysis">
+                  {generatedContent ? (
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Card className="p-4 border border-border/40 bg-green-50 dark:bg-green-900/20">
+                          <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                            <BarChart size={18} />
+                            <h3 className="font-medium">SEO Score</h3>
+                          </div>
+                          <p className="text-3xl font-bold mt-2 text-green-700 dark:text-green-400">{seoScore}/100</p>
+                          <p className="text-xs text-green-700/70 dark:text-green-400/70 mt-1">
+                            {seoScore >= 90 ? 'Excellent' : seoScore >= 80 ? 'Good' : 'Needs Improvement'}
+                          </p>
+                        </Card>
+                        
+                        <Card className="p-4 border border-border/40 bg-blue-50 dark:bg-blue-900/20">
+                          <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
+                            <Globe size={18} />
+                            <h3 className="font-medium">Keyword Density</h3>
+                          </div>
+                          <p className="text-3xl font-bold mt-2 text-blue-700 dark:text-blue-400">{keywordDensity}%</p>
+                          <p className="text-xs text-blue-700/70 dark:text-blue-400/70 mt-1">
+                            {keywordDensity >= 3 ? 'High' : keywordDensity >= 2 ? 'Optimal' : 'Low'}
+                          </p>
+                        </Card>
+                        
+                        <Card className="p-4 border border-border/40 bg-purple-50 dark:bg-purple-900/20">
+                          <div className="flex items-center gap-2 text-purple-700 dark:text-purple-400">
+                            <Edit size={18} />
+                            <h3 className="font-medium">Readability</h3>
+                          </div>
+                          <p className="text-3xl font-bold mt-2 text-purple-700 dark:text-purple-400">{readabilityScore}/100</p>
+                          <p className="text-xs text-purple-700/70 dark:text-purple-400/70 mt-1">
+                            {readabilityScore >= 80 ? 'Easy to Read' : readabilityScore >= 70 ? 'Moderate' : 'Complex'}
+                          </p>
+                        </Card>
+                      </div>
+                      
+                      <Card className="p-4 border border-border/40">
+                        <h3 className="font-medium mb-3">SEO Recommendations</h3>
+                        <ul className="space-y-2">
+                          <li className="flex items-start gap-2">
+                            <ListChecks className="h-4 w-4 text-green-600 mt-0.5" />
+                            <span className="text-sm">Add more relevant heading tags (H2, H3)</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <ListChecks className="h-4 w-4 text-green-600 mt-0.5" />
+                            <span className="text-sm">Include the keyword in the first 100 words</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <ListChecks className="h-4 w-4 text-green-600 mt-0.5" />
+                            <span className="text-sm">Add more internal and external links</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <ListChecks className="h-4 w-4 text-green-600 mt-0.5" />
+                            <span className="text-sm">Consider adding image alt text with keywords</span>
+                          </li>
+                        </ul>
+                      </Card>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <Search className="h-12 w-12 text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">Generate content to see SEO analysis</p>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </Card>
+          </div>
+          
+          <div className="space-y-6">
+            <Card className="p-6 border border-border/40">
+              <h3 className="text-lg font-medium mb-4">Content Generator</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">Target Keyword</label>
+                  <Input
+                    placeholder="e.g., digital marketing strategies"
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">Content Type</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      variant={contentType === "blog-post" ? "default" : "outline"}
+                      className="w-full justify-start"
+                      onClick={() => setContentType("blog-post")}
+                    >
+                      <Badge variant="outline" className="mr-2">Blog</Badge>
+                      Blog Post
+                    </Button>
+                    
+                    <Button
+                      variant={contentType === "landing-page" ? "default" : "outline"}
+                      className="w-full justify-start"
+                      onClick={() => setContentType("landing-page")}
+                    >
+                      <Badge variant="outline" className="mr-2">Page</Badge>
+                      Landing Page
+                    </Button>
+                    
+                    <Button
+                      variant={contentType === "product-desc" ? "default" : "outline"}
+                      className="w-full justify-start"
+                      onClick={() => setContentType("product-desc")}
+                    >
+                      <Badge variant="outline" className="mr-2">Prod</Badge>
+                      Product Desc
+                    </Button>
+                    
+                    <Button
+                      variant={contentType === "meta-tags" ? "default" : "outline"}
+                      className="w-full justify-start"
+                      onClick={() => setContentType("meta-tags")}
+                    >
+                      <Badge variant="outline" className="mr-2">Meta</Badge>
+                      Meta Tags
+                    </Button>
+                  </div>
+                </div>
+                
+                <Button 
+                  className="w-full mt-4 gap-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
+                  onClick={handleGenerateContent}
+                  disabled={isGenerating || !keyword.trim()}
+                >
+                  {isGenerating ? (
+                    <>Generating content...</>
+                  ) : (
+                    <>
+                      <Sparkles size={16} />
+                      Generate SEO Content
+                    </>
+                  )}
+                </Button>
+              </div>
+            </Card>
+            
+            <Card className="p-6 border border-border/40">
+              <h3 className="text-lg font-medium mb-4">SEO Writing Tips</h3>
+              
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex gap-2">
+                  <Globe className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Use your target keyword in headings, intro and conclusion</span>
+                </li>
+                <li className="flex gap-2">
+                  <Globe className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Create content that answers user's search intent</span>
+                </li>
+                <li className="flex gap-2">
+                  <Globe className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Use related keywords and LSI terms throughout</span>
+                </li>
+                <li className="flex gap-2">
+                  <Globe className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Maintain readability with short sentences and paragraphs</span>
+                </li>
+              </ul>
+            </Card>
           </div>
         </div>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-4">
-            <TabsTrigger value="create">Create Content</TabsTrigger>
-            <TabsTrigger value="history">Content History</TabsTrigger>
-            <TabsTrigger value="integrations">Integrations</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="create">
-            {renderStepIndicator()}
-            {renderCurrentStep()}
-          </TabsContent>
-          
-          <TabsContent value="history">
-            <SEOContentHistory />
-          </TabsContent>
-          
-          <TabsContent value="integrations">
-            <SEOIntegrations />
-          </TabsContent>
-          
-          <TabsContent value="analytics">
-            <SEOAnalytics />
-          </TabsContent>
-        </Tabs>
       </div>
     </AppLayout>
   );
