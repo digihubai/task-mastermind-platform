@@ -210,6 +210,8 @@ const AIModelsTab: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
+        // Comment out the Supabase query for now since the table doesn't exist
+        /* 
         const { data, error } = await supabase
           .from('ai_providers')
           .select('*');
@@ -221,6 +223,7 @@ const AIModelsTab: React.FC = () => {
           // This is a placeholder - actual implementation would depend on DB structure
           setProviders(data as any);
         }
+        */
       } catch (err: any) {
         console.error('Error fetching AI models:', err);
         setError(err.message);

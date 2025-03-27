@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,7 +85,7 @@ const ChannelInfoPanel: React.FC<ChannelInfoPanelProps> = ({
                 Edit
               </Button>
             ) : (
-              <Button variant="primary" size="sm" onClick={handleSaveInfo}>
+              <Button variant="default" size="sm" onClick={handleSaveInfo}>
                 <Save size={14} className="mr-1" />
                 Save
               </Button>
@@ -160,7 +159,6 @@ const ChannelInfoPanel: React.FC<ChannelInfoPanelProps> = ({
           
           <ScrollArea className="h-[350px]">
             <div className="space-y-2">
-              {/* Mock data for members */}
               {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="flex items-center justify-between p-2 hover:bg-secondary rounded-md">
                   <div className="flex items-center">
