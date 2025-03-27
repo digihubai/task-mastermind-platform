@@ -100,7 +100,7 @@ export const modulesStarter = {
 
 // Add the moduleSection export
 export const moduleSection = {
-  title: "Modules",
+  title: "Departments", // Renamed to maintain consistency with the coreModulesSection
   items: [
     {
       title: "CRM",

@@ -7,7 +7,7 @@ import {
   analyticsSection,
   marketingSection,
   aiToolsSection,
-  moduleSection,
+  coreModulesSection,
   settingsSection
 } from "./data";
 import { useLocation } from "react-router-dom";
@@ -47,7 +47,7 @@ export const sidebarSections: SidebarSectionType[] = [
   analyticsSection,
   marketingSection,
   aiToolsSection,
-  moduleSection,
+  coreModulesSection, // Use coreModulesSection instead of moduleSection
   settingsSection
 ];
 
@@ -114,8 +114,8 @@ export const SidebarNavData = () => {
       />
       
       <SidebarMenuItem
-        key="modules"
-        section={moduleSection}
+        key="departments"
+        section={coreModulesSection} // Use coreModulesSection instead of moduleSection 
         pathname={pathname}
         expandedSections={expandedSections}
         toggleSection={toggleSection}

@@ -4,7 +4,7 @@ import { automationSection } from "./automationItems";
 import { analyticsSection } from "./analyticsItems";
 import { marketingSection } from "./marketingItems";
 import { aiToolsSection } from "./aiTools";
-import { moduleSection } from "./moduleItems";
+import { moduleSection, coreModulesSection } from "./moduleItems";
 import { settingsSection } from "./settingsItems";
 
 export {
@@ -14,5 +14,6 @@ export {
   marketingSection,
   aiToolsSection,
   moduleSection,
+  coreModulesSection,
   settingsSection,
 };
