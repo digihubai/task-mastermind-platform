@@ -1,4 +1,130 @@
 
+export interface SupportTicket {
+  id: string;
+  subject: string;
+  description: string;
+  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+  assignedTo?: string;
+  department?: 'sales' | 'technical' | 'billing' | 'general';
+  tags?: string[];
+  attachments?: Attachment[];
+  followUp?: boolean;
+  customFields?: Record<string, string>;
+  source?: 'chat' | 'email' | 'web' | 'whatsapp' | 'facebook' | 'telegram' | 'sms';
+  rating?: number;
+  ratingComment?: string;
+}
+
+export interface SupportMessage {
+  id: string;
+  ticketId: string;
+  content: string;
+  createdAt: string;
+  senderId: string;
+  senderType: 'user' | 'agent' | 'system';
+  attachments?: Attachment[];
+  isRead: boolean;
+  isInternal?: boolean; // For internal notes visible only to agents
+  isTranslated?: boolean;
+  originalContent?: string; // Original content before translation
+}
+
+export interface Attachment {
+  id: string;
+  name: string;
+  url: string;
+  type: string;
+  size: number;
+  createdAt: string;
+}
+
+export interface SupportUser {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  createdAt: string;
+  lastActivity?: string;
+  type: 'user' | 'agent' | 'admin';
+  browser?: string;
+  os?: string;
+  location?: string;
+  ip?: string;
+  timezone?: string;
+  language?: string;
+  company?: string;
+  currency?: string;
+  phone?: string;
+  currentUrl?: string;
+  department?: string;
+  notes?: string;
+  customFields?: Record<string, string>;
+  status?: 'online' | 'away' | 'offline';
+}
+
+export interface SupportConversation {
+  id: string;
+  userId: string;
+  userName: string;
+  lastMessage: string;
+  time: string;
+  unread: number;
+  isOnline: boolean;
+  avatar?: string;
+  isPinned?: boolean;
+  tags?: string[];
+  department?: string;
+}
+
+export interface ChatBotFlow {
+  id: string;
+  name: string;
+  description?: string;
+  nodes: ChatBotNode[];
+  isActive: boolean;
+  triggers?: ChatBotTrigger[];
+  language?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChatBotNode {
+  id: string;
+  type: 'start' | 'message' | 'input' | 'condition' | 'action' | 'transfer' | 'end';
+  content: string;
+  next?: string[];
+  conditions?: ChatBotCondition[];
+  actions?: ChatBotAction[];
+  delay?: number;
+  metadata?: Record<string, any>;
+}
+
+export interface ChatBotCondition {
+  id: string;
+  type: 'text' | 'intent' | 'entity' | 'custom';
+  value: string;
+  operator: 'equals' | 'contains' | 'starts_with' | 'ends_with' | 'greater_than' | 'less_than';
+  next: string;
+}
+
+export interface ChatBotAction {
+  id: string;
+  type: 'set_variable' | 'api_call' | 'send_email' | 'create_ticket' | 'custom';
+  parameters: Record<string, any>;
+}
+
+export interface ChatBotTrigger {
+  id: string;
+  type: 'url' | 'time' | 'user_action' | 'custom';
+  conditions: Record<string, any>;
+  isActive: boolean;
+}
+
+// Team chat specific interfaces
 export interface TeamChannel {
   id: string;
   name: string;
@@ -7,15 +133,10 @@ export interface TeamChannel {
   createdBy: string;
   isPrivate: boolean;
   members: string[];
-  lastMessage?: {
-    id: string;
-    channelId: string;
-    content: string;
-    createdAt: string;
-    senderId: string;
-  };
-  unreadCount: number;
+  lastMessage?: TeamMessage;
+  unreadCount?: number;
   isPinned?: boolean;
+  icon?: string;
 }
 
 export interface TeamGroup {
@@ -24,14 +145,9 @@ export interface TeamGroup {
   members: string[];
   createdAt: string;
   createdBy: string;
-  lastMessage?: {
-    id: string;
-    groupId: string;
-    content: string;
-    createdAt: string;
-    senderId: string;
-  };
-  unreadCount: number;
+  avatar?: string;
+  lastMessage?: TeamMessage;
+  unreadCount?: number;
   isPinned?: boolean;
 }
 
@@ -42,102 +158,89 @@ export interface TeamMessage {
   content: string;
   createdAt: string;
   senderId: string;
+  attachments?: Attachment[];
   reactions?: MessageReaction[];
-  attachments?: MessageAttachment[];
-  mentions?: string[];
+  isEdited?: boolean;
+  isPinned?: boolean;
   replyTo?: string;
+  mentions?: string[];
+  isRead?: Record<string, boolean>; // userId: hasRead
 }
 
-interface MessageReaction {
+export interface MessageReaction {
   emoji: string;
   count: number;
-  users?: string[];
+  users: string[];
 }
 
-interface MessageAttachment {
+export interface SavedReply {
   id: string;
-  name: string;
-  url: string;
-  type: string;
-  size: number;
+  title: string;
+  content: string;
+  tags?: string[];
   createdAt: string;
+  updatedBy: string;
+  shortcut?: string;
 }
 
-// Additional types needed for other components
-export interface ChatBotFlow {
+export interface Department {
   id: string;
   name: string;
-  description?: string; // Added this property
-  nodes: ChatBotNode[];
+  description?: string;
+  agents: string[];
+  email?: string;
+  isDefault?: boolean;
+  autoAssign?: boolean;
+}
+
+export interface KnowledgeBaseArticle {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  tags?: string[];
+  author: string;
   createdAt: string;
   updatedAt: string;
-  isActive?: boolean;
+  views: number;
+  likes: number;
+  isPublished: boolean;
   language?: string;
 }
 
-export interface ChatBotNode {
-  id: string;
-  type: string;
-  content: string;
-  position?: { x: number; y: number };
-  nextNodes?: string[]; // Changed from 'next' to 'nextNodes' for clarity
-  next?: string[]; // Keep for backward compatibility
-}
-
-export interface SupportTicket {
-  id: string;
-  subject: string;
-  description?: string; // Added description property
-  status: 'open' | 'in-progress' | 'resolved' | 'closed'; // Fixed hyphen in 'in-progress'
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  createdAt: string;
-  updatedAt: string;
-  userId: string;
-  assigneeId?: string;
-  assignedTo?: string; // Added for backward compatibility
-  messages?: SupportMessage[];
-  department?: string; // Added department field
-  tags?: string[];
-  source?: 'email' | 'chat' | 'whatsapp' | 'facebook' | 'telegram' | 'sms' | 'web'; // Added source field
-  rating?: number; // Added rating field
-  attachments?: any[]; // Added attachments field
-  followUp?: boolean; // Added followUp field
-}
-
-export interface SupportMessage {
-  id: string;
-  ticketId: string;
-  content: string;
-  createdAt: string;
-  senderId: string;
-  senderType?: 'user' | 'agent' | 'system'; // Added senderType field
-  isInternal?: boolean;
-  isRead?: boolean;
-  attachments?: {
-    id: string;
-    url: string;
-    name: string;
-    type: string;
-  }[];
-}
-
-export interface SupportUser {
+export interface KnowledgeBaseCategory {
   id: string;
   name: string;
-  email: string;
-  avatar?: string;
-  company?: string;
-  role?: 'customer' | 'agent' | 'admin';
-  type?: string; // Added type field
+  description?: string;
+  parentId?: string;
+  order: number;
+  articles?: number; // Count of articles
+}
+
+export interface SupportReport {
+  id: string;
+  type: 'daily' | 'weekly' | 'monthly';
+  data: any;
   createdAt: string;
-  lastActive?: string;
-  lastActivity?: string; // Added for backward compatibility
-  phone?: string; // Added phone field
-  browser?: string; // Added browser field
-  os?: string; // Added os field
-  location?: string; // Added location field
-  ip?: string; // Added ip field
-  timezone?: string; // Added timezone field
-  language?: string; // Added language field
-  currentUrl?: string; // Added currentUrl field
+  period: {
+    start: string;
+    end: string;
+  };
+}
+
+export interface AgentSchedule {
+  id: string;
+  agentId: string;
+  weekdays: Record<string, {
+    isWorking: boolean;
+    startTime?: string;
+    endTime?: string;
+  }>;
+  exceptions: {
+    date: string;
+    isWorking: boolean;
+    startTime?: string;
+    endTime?: string;
+    note?: string;
+  }[];
 }

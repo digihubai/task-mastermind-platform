@@ -18,117 +18,46 @@ import DashboardCard from "@/components/dashboard/DashboardCard";
 import ActivityItem from "@/components/dashboard/ActivityItem";
 import TaskItem from "@/components/dashboard/TaskItem";
 import SystemStatus from "@/components/dashboard/SystemStatus";
-import KPIDashboardCustomizer, { KpiItem } from "@/components/dashboard/KPIDashboardCustomizer";
-import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const navigate = useNavigate();
   const [activePeriod, setActivePeriod] = useState("today");
-  const { toast } = useToast();
-  
-  // KPI dashboard configuration
-  const [kpiItems, setKpiItems] = useState<KpiItem[]>([
-    { id: "customer-satisfaction", title: "Customer Satisfaction", visible: true, metricType: "percentage", icon: "users" },
-    { id: "sales-pipeline", title: "Sales Pipeline", visible: true, metricType: "currency", icon: "dollar" },
-    { id: "active-projects", title: "Active Projects", visible: true, metricType: "value", icon: "briefcase" },
-    { id: "task-completion", title: "Task Completion", visible: true, metricType: "percentage", icon: "check" },
-    { id: "lead-conversion", title: "Lead Conversion", visible: true, metricType: "percentage", icon: "target" },
-    { id: "resolution-time", title: "Avg. Resolution Time", visible: true, metricType: "value", icon: "clock" },
-  ]);
   
   // KPI data
   const kpiData = {
     customerSatisfaction: {
       value: "92%",
       change: "+3%",
-      trend: "up" as const
+      trend: "up" as "up" | "down"
     },
     salesPipeline: {
       value: "$243,578",
       change: "+12%",
-      trend: "up" as const
+      trend: "up" as "up" | "down"
     },
     activeProjects: {
       value: "24",
       change: "+5",
-      trend: "up" as const
+      trend: "up" as "up" | "down"
     },
     taskCompletion: {
       value: "87%",
       change: "-2%",
-      trend: "down" as const
+      trend: "down" as "up" | "down"
     },
     leadConversion: {
       value: "32%",
       change: "+5%",
-      trend: "up" as const
+      trend: "up" as "up" | "down"
     },
     averageResolutionTime: {
       value: "2.4h",
       change: "-15%",
-      trend: "up" as const
+      trend: "up" as "up" | "down" // down is good for resolution time
     }
   };
   
-  const handleSaveKpiConfiguration = (updatedKpis: KpiItem[]) => {
-    setKpiItems(updatedKpis);
-    toast({
-      title: "Dashboard updated",
-      description: "Your KPI dashboard has been customized successfully"
-    });
-  };
-  
-  const getKpiDataById = (id: string) => {
-    switch (id) {
-      case "customer-satisfaction":
-        return { 
-          title: "Customer Satisfaction", 
-          data: kpiData.customerSatisfaction, 
-          icon: <Users size={18} className="text-blue-600" /> 
-        };
-      case "sales-pipeline":
-        return { 
-          title: "Sales Pipeline", 
-          data: kpiData.salesPipeline, 
-          icon: <DollarSign size={18} className="text-green-600" /> 
-        };
-      case "active-projects":
-        return { 
-          title: "Active Projects", 
-          data: kpiData.activeProjects, 
-          icon: <Briefcase size={18} className="text-purple-600" /> 
-        };
-      case "task-completion":
-        return { 
-          title: "Task Completion", 
-          data: kpiData.taskCompletion, 
-          icon: <CheckCircle size={18} className="text-emerald-600" /> 
-        };
-      case "lead-conversion":
-        return { 
-          title: "Lead Conversion", 
-          data: kpiData.leadConversion, 
-          icon: <Target size={18} className="text-amber-600" /> 
-        };
-      case "resolution-time":
-        return { 
-          title: "Avg. Resolution Time", 
-          data: kpiData.averageResolutionTime, 
-          icon: <Clock size={18} className="text-rose-600" /> 
-        };
-      default:
-        return { 
-          title: "Unknown KPI", 
-          data: { 
-            value: "0", 
-            change: "0%", 
-            trend: "up" as const
-          }, 
-          icon: <AlertCircle size={18} /> 
-        };
-    }
-  };
-  
+  // Recent activities
   const recentActivities = [
     {
       type: "new_customer",
@@ -167,6 +96,7 @@ const Index = () => {
     }
   ];
   
+  // Active tasks
   const activeTasks = [
     {
       title: "Complete client proposal",
@@ -198,6 +128,7 @@ const Index = () => {
     }
   ];
   
+  // Dashboard card configuration
   const dashboardCards = [
     {
       title: "Projects",
@@ -273,38 +204,24 @@ const Index = () => {
             <div className="p-6 border-b bg-card">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">KPI Dashboard</h3>
-                <div className="flex items-center gap-2">
-                  <KPIDashboardCustomizer 
-                    kpis={kpiItems} 
-                    onSave={handleSaveKpiConfiguration} 
-                  />
-                  <Tabs defaultValue={activePeriod} onValueChange={setActivePeriod} className="w-[300px]">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="today">Today</TabsTrigger>
-                      <TabsTrigger value="week">This Week</TabsTrigger>
-                      <TabsTrigger value="month">This Month</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-                </div>
+                <Tabs defaultValue={activePeriod} onValueChange={setActivePeriod} className="w-[300px]">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="today">Today</TabsTrigger>
+                    <TabsTrigger value="week">This Week</TabsTrigger>
+                    <TabsTrigger value="month">This Month</TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </div>
             </div>
             
             <div className="p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {kpiItems
-                  .filter(kpi => kpi.visible)
-                  .map(kpi => {
-                    const kpiData = getKpiDataById(kpi.id);
-                    return (
-                      <KpiCard 
-                        key={kpi.id}
-                        title={kpiData.title} 
-                        data={kpiData.data} 
-                        icon={kpiData.icon} 
-                      />
-                    );
-                  })
-                }
+                <KpiCard title="Customer Satisfaction" data={kpiData.customerSatisfaction} icon={<Users size={18} className="text-blue-600" />} />
+                <KpiCard title="Sales Pipeline" data={kpiData.salesPipeline} icon={<DollarSign size={18} className="text-green-600" />} />
+                <KpiCard title="Active Projects" data={kpiData.activeProjects} icon={<Briefcase size={18} className="text-purple-600" />} />
+                <KpiCard title="Task Completion" data={kpiData.taskCompletion} icon={<CheckCircle size={18} className="text-emerald-600" />} />
+                <KpiCard title="Lead Conversion" data={kpiData.leadConversion} icon={<Target size={18} className="text-amber-600" />} />
+                <KpiCard title="Avg. Resolution Time" data={kpiData.averageResolutionTime} icon={<Clock size={18} className="text-rose-600" />} />
               </div>
             </div>
           </Card>
