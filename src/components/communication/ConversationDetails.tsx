@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowUpRight, Mail, MessageSquare, Phone, Instagram, Twitter, Facebook, Send, Paperclip, Smile, Clock, CheckCircle, Info } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ChannelInfoSection from './ChannelInfoSection';
 
 // Define proper types to match with OmnichannelInbox
 interface Conversation {
@@ -33,6 +34,29 @@ interface ConversationDetailsProps {
   conversation: Conversation | undefined;
   messages: Message[];
 }
+
+// Sample pinned messages data for demo
+const samplePinnedMessages = [
+  {
+    id: "pin1",
+    content: "Important contact information: support@example.com",
+    sender: {
+      id: "user-1",
+      name: "John Doe",
+      avatar: "/avatar-1.png"
+    },
+    timestamp: "Yesterday at 3:45 PM"
+  },
+  {
+    id: "pin2",
+    content: "Meeting scheduled for next Tuesday at 10 AM",
+    sender: {
+      id: "user-2",
+      name: "Sarah Miller"
+    },
+    timestamp: "Oct 5, 2023"
+  }
+];
 
 const ConversationDetails: React.FC<ConversationDetailsProps> = ({ conversation, messages }) => {
   const [newMessage, setNewMessage] = useState("");
@@ -83,7 +107,7 @@ const ConversationDetails: React.FC<ConversationDetailsProps> = ({ conversation,
   }
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       <div className="pb-3 border-b">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -125,6 +149,14 @@ const ConversationDetails: React.FC<ConversationDetailsProps> = ({ conversation,
           </div>
         </div>
       </div>
+      
+      {/* Add Channel Info Section */}
+      <ChannelInfoSection 
+        channelId={conversation.id}
+        channelName={conversation.name}
+        initialDescription="This channel is for discussing customer support inquiries and tracking resolutions."
+        pinnedMessages={samplePinnedMessages}
+      />
       
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full p-4">
@@ -225,7 +257,7 @@ const ConversationDetails: React.FC<ConversationDetailsProps> = ({ conversation,
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

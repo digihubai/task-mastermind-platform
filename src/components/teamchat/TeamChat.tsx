@@ -39,7 +39,12 @@ import {
   ThumbsUp,
   Paperclip,
   Send,
-  Gift
+  Gift,
+  Info,
+  ChevronDown,
+  ChevronUp,
+  Save,
+  X
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -56,6 +61,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const mockChannels: TeamChannel[] = [
   {
@@ -206,6 +212,31 @@ const mockGifs = [
   { id: "gif4", url: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnZrYmJ3YTNram43dDZsZXk3MjY3ajg3dW1qZGx6cGxvYWwyb2YwdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ohhwytHcusSCXXp96/giphy.gif", title: "Hello" },
 ];
 
+interface PinnedMessage {
+  id: string;
+  channelId: string;
+  content: string;
+  createdAt: string;
+  senderId: string;
+}
+
+const mockPinnedMessages: PinnedMessage[] = [
+  {
+    id: "pin-1",
+    channelId: "channel-1",
+    content: "Important: Team meeting tomorrow at 10 AM",
+    createdAt: "2023-05-15T12:00:00Z",
+    senderId: "user-1"
+  },
+  {
+    id: "pin-2",
+    channelId: "channel-1",
+    content: "Product release scheduled for next Friday",
+    createdAt: "2023-05-16T09:30:00Z",
+    senderId: "user-2"
+  }
+];
+
 export const TeamChat: React.FC = () => {
   const [activeTab, setActiveTab] = useState("channels");
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>("channel-1");
@@ -226,6 +257,17 @@ export const TeamChat: React.FC = () => {
   const [newGroupName, setNewGroupName] = useState("");
   const [newGroupDialogOpen, setNewGroupDialogOpen] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+
+  const [channelDescription, setChannelDescription] = useState<Record<string, string>>({
+    "channel-1": "General discussions for the team",
+    "channel-2": "Customer support related discussions",
+    "channel-3": "Development team discussions and updates"
+  });
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [editedDescription, setEditedDescription] = useState("");
+  const [showChannelInfo, setShowChannelInfo] = useState(true);
+  const [pinnedMessages, setPinnedMessages] = useState<PinnedMessage[]>(mockPinnedMessages);
+  const [showPinnedMessages, setShowPinnedMessages] = useState(true);
   
   const filteredGifs = mockGifs.filter(gif => 
     gifSearchQuery === "" || gif.title.toLowerCase().includes(gifSearchQuery.toLowerCase())
@@ -245,6 +287,10 @@ export const TeamChat: React.FC = () => {
       ? mockMessages.filter(m => m.groupId === selectedGroupId)
       : [];
   
+  const currentPinnedMessages = selectedChannelId
+    ? pinnedMessages.filter(m => m.channelId === selectedChannelId)
+    : [];
+
   const getSender = (senderId: string): TeamMember => {
     return mockTeamMembers.find(m => m.id === senderId) || { 
       id: senderId, 
@@ -354,6 +400,52 @@ export const TeamChat: React.FC = () => {
     setMessageText(messageText + " [GIF] ");
     setShowGifPicker(false);
     toast.success("GIF selected!");
+  };
+
+  const handleSaveDescription = () => {
+    if (selectedChannelId) {
+      setChannelDescription({
+        ...channelDescription,
+        [selectedChannelId]: editedDescription
+      });
+      setIsEditingDescription(false);
+      toast.success("Channel description updated");
+    }
+  };
+
+  const handleCancelEditDescription = () => {
+    if (selectedChannelId) {
+      setEditedDescription(channelDescription[selectedChannelId] || "");
+    }
+    setIsEditingDescription(false);
+  };
+
+  const handleEditDescription = () => {
+    if (selectedChannelId) {
+      setEditedDescription(channelDescription[selectedChannelId] || "");
+      setIsEditingDescription(true);
+    }
+  };
+
+  const handlePinMessage = (messageId: string) => {
+    const message = mockMessages.find(m => m.id === messageId);
+    if (message && !pinnedMessages.some(pm => pm.id === `pin-${messageId}`)) {
+      const newPinnedMessage: PinnedMessage = {
+        id: `pin-${messageId}`,
+        channelId: message.channelId || "",
+        content: message.content,
+        createdAt: new Date().toISOString(),
+        senderId: message.senderId
+      };
+      
+      setPinnedMessages([...pinnedMessages, newPinnedMessage]);
+      toast.success("Message pinned to channel");
+    }
+  };
+
+  const handleUnpinMessage = (pinnedId: string) => {
+    setPinnedMessages(pinnedMessages.filter(pm => pm.id !== pinnedId));
+    toast.success("Message unpinned from channel");
   };
 
   return (
@@ -754,6 +846,14 @@ export const TeamChat: React.FC = () => {
                           onClick={() => setReplyTo(message.id)}
                         >
                           <Reply size={14} />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => handlePinMessage(message.id)}
+                        >
+                          <Pin size={14} />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-6 w-6">
                           <Copy size={14} />
