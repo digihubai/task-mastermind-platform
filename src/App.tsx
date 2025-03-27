@@ -14,6 +14,7 @@ function App() {
           <Route path="/" element={<Index />} />
           <Route path="/team-chat" element={<TeamChatPage />} />
           <Route path="/messaging" element={<MessagingPage />} />
+          <Route path="/chat" element={<MessagingPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
