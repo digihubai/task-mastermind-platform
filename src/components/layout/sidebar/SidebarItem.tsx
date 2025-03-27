@@ -2,6 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface SidebarItemProps {
   item: {
@@ -56,28 +57,52 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
         >
           <div className="flex items-center">
             {item.icon}
-            {(!collapsed || isMobile) && <span className="ml-3">{item.title}</span>}
+            
+            {(!collapsed || isMobile) && (
+              <motion.span 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="ml-3"
+              >
+                {item.title}
+              </motion.span>
+            )}
+            
             {item.badge && (!collapsed || isMobile) && (
-              <span className="ml-2 text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">
+              <motion.span 
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="ml-2 text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">
                 {item.badge}
-              </span>
+              </motion.span>
             )}
           </div>
           
           {hasSubItems && (!collapsed || isMobile) && (
-            <ChevronDown 
-              size={16} 
-              className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-            />
+            <motion.div
+              animate={{ rotate: isExpanded ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronDown size={16} />
+            </motion.div>
           )}
         </Link>
       </div>
       
-      {hasSubItems && isExpanded && (!collapsed || isMobile) && (
-        <div className="pl-2 mt-1 space-y-1 border-l border-sidebar-border ml-4">
-          {item.subItems.map((subItem) => renderMenuItem(subItem, level + 1, true))}
-        </div>
-      )}
+      <AnimatePresence>
+        {hasSubItems && isExpanded && (!collapsed || isMobile) && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden pl-2 mt-1 border-l border-sidebar-border ml-4"
+          >
+            {item.subItems.map((subItem) => renderMenuItem(subItem, level + 1, true))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
