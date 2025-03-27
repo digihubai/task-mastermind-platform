@@ -41,7 +41,9 @@ export const mockChannels: TeamChannel[] = [
     unreadCount: 0,
     createdAt: new Date().toISOString(),
     createdBy: "system",
-    members: ["user-1", "user-2", "user-3"]
+    isPrivate: false,
+    members: ["user-1", "user-2", "user-3"],
+    messageCount: 12
   },
   {
     id: "channel-2",
@@ -55,7 +57,8 @@ export const mockChannels: TeamChannel[] = [
     createdAt: new Date().toISOString(),
     createdBy: "user-1",
     members: ["user-1", "user-2"],
-    isPrivate: false
+    isPrivate: false,
+    messageCount: 25
   },
   {
     id: "channel-3",
@@ -69,7 +72,8 @@ export const mockChannels: TeamChannel[] = [
     createdAt: new Date().toISOString(),
     createdBy: "user-2",
     members: ["user-1", "user-2"],
-    isPrivate: true
+    isPrivate: true,
+    messageCount: 8
   }
 ];
 
@@ -82,7 +86,9 @@ export const mockGroups: TeamGroup[] = [
     createdBy: "user-1",
     unreadCount: 5,
     isPinned: true,
-    isActive: false
+    isActive: false,
+    channels: [],
+    description: "Sales team discussions"
   },
   {
     id: "group-2",
@@ -92,7 +98,9 @@ export const mockGroups: TeamGroup[] = [
     createdBy: "user-3",
     unreadCount: 0,
     isPinned: false,
-    isActive: false
+    isActive: false,
+    channels: [],
+    description: "Dev team chat"
   }
 ];
 
@@ -103,28 +111,41 @@ export const mockMessages: TeamMessage[] = [
     content: "Welcome to the general channel!",
     createdAt: new Date().toISOString(),
     senderId: "user-1",
-    isPinned: true
+    isPinned: true,
+    contentType: "text",
+    senderName: "John Doe",
+    timestamp: new Date().toISOString()
   },
   {
     id: "msg-2",
     channelId: "channel-1",
     content: "Thanks! Happy to be here.",
     createdAt: new Date(Date.now() - 3600000).toISOString(),
-    senderId: "user-2"
+    senderId: "user-2",
+    contentType: "text",
+    senderName: "Jane Smith",
+    timestamp: new Date(Date.now() - 3600000).toISOString()
   },
   {
     id: "msg-3",
     channelId: "channel-2",
     content: "Anyone watching the game tonight?",
     createdAt: new Date(Date.now() - 7200000).toISOString(),
-    senderId: "user-1"
+    senderId: "user-1",
+    contentType: "text",
+    senderName: "John Doe",
+    timestamp: new Date(Date.now() - 7200000).toISOString()
   },
   {
     id: "msg-4",
     groupId: "group-1",
+    channelId: "",
     content: "Let's discuss the Q2 targets",
     createdAt: new Date(Date.now() - 86400000).toISOString(),
-    senderId: "user-1"
+    senderId: "user-1",
+    contentType: "text",
+    senderName: "John Doe",
+    timestamp: new Date(Date.now() - 86400000).toISOString()
   }
 ];
 

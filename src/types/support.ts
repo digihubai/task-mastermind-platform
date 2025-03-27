@@ -88,11 +88,17 @@ export interface TeamChannel {
   name: string;
   description?: string;
   isPrivate: boolean;
-  createdAt: string;
-  updatedBy: string;
   members: string[];
   messageCount: number;
   unreadCount?: number;
+  isPinned?: boolean;
+  topic?: string;
+  icon?: string;
+  createdAt: string;
+  createdBy?: string;
+  updatedBy?: string;
+  purpose?: string;
+  isActive?: boolean;
 }
 
 export interface TeamGroup {
@@ -101,6 +107,11 @@ export interface TeamGroup {
   description?: string;
   channels: TeamChannel[];
   members: string[];
+  unreadCount?: number;
+  isPinned?: boolean;
+  createdAt: string;
+  createdBy?: string;
+  updatedAt?: string;
 }
 
 export interface TeamMessage {
@@ -122,9 +133,13 @@ export interface TeamMessage {
   parentId?: string;
   threadReplies?: number;
   attachments?: Array<{
+    id: string;
     url: string;
     type: string;
     name: string;
     size?: number;
   }>;
+  createdAt: string;
+  replyTo?: string;
+  groupId?: string;
 }

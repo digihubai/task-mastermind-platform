@@ -130,7 +130,8 @@ export const TeamChat: React.FC = () => {
       isPrivate: newChannelIsPrivate,
       members: ["user-1"],
       unreadCount: 0,
-      isPinned: false
+      isPinned: false,
+      messageCount: 0
     };
     
     setChannels([...channels, newChannel]);
@@ -164,7 +165,8 @@ export const TeamChat: React.FC = () => {
       createdAt: new Date().toISOString(),
       createdBy: "user-1",
       unreadCount: 0,
-      isPinned: false
+      isPinned: false,
+      channels: []
     };
     
     setGroups([...groups, newGroup]);
