@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import SidebarMenuItem from "./SidebarMenuItem";
 import {
   dashboardSection,
@@ -12,6 +12,7 @@ import {
 } from "./data";
 import { useLocation } from "react-router-dom";
 import { SidebarSectionType } from "@/types/sidebar";
+import { useSidebarNavigation } from "@/hooks/use-sidebar-navigation";
 
 // Export these items for MainSidebar.tsx
 export const userMenuItems = [
@@ -52,6 +53,13 @@ export const sidebarSections: SidebarSectionType[] = [
 
 export const SidebarNavData = () => {
   const { pathname } = useLocation();
+  // We'll use our navigation hook to get expanded sections and other utilities
+  const {
+    expandedSections,
+    toggleSection,
+    isPathActive,
+    isExactPathActive
+  } = useSidebarNavigation();
 
   return (
     <div className="flex flex-col gap-6 p-0">
@@ -59,42 +67,70 @@ export const SidebarNavData = () => {
         key="dashboard"
         section={dashboardSection} 
         pathname={pathname} 
+        expandedSections={expandedSections}
+        toggleSection={toggleSection}
+        isPathActive={isPathActive}
+        isExactPathActive={isExactPathActive}
       />
 
       <SidebarMenuItem
         key="automation"
         section={automationSection}
         pathname={pathname}
+        expandedSections={expandedSections}
+        toggleSection={toggleSection}
+        isPathActive={isPathActive}
+        isExactPathActive={isExactPathActive}
       />
       
       <SidebarMenuItem
         key="analytics"  
         section={analyticsSection}
         pathname={pathname}
+        expandedSections={expandedSections}
+        toggleSection={toggleSection}
+        isPathActive={isPathActive}
+        isExactPathActive={isExactPathActive}
       />
       
       <SidebarMenuItem 
         key="marketing"
         section={marketingSection} 
         pathname={pathname} 
+        expandedSections={expandedSections}
+        toggleSection={toggleSection}
+        isPathActive={isPathActive}
+        isExactPathActive={isExactPathActive}
       />
       
       <SidebarMenuItem
         key="aitools" 
         section={aiToolsSection} 
         pathname={pathname} 
+        expandedSections={expandedSections}
+        toggleSection={toggleSection}
+        isPathActive={isPathActive}
+        isExactPathActive={isExactPathActive}
       />
       
       <SidebarMenuItem
         key="modules"
         section={moduleSection}
         pathname={pathname}
+        expandedSections={expandedSections}
+        toggleSection={toggleSection}
+        isPathActive={isPathActive}
+        isExactPathActive={isExactPathActive}
       />
       
       <SidebarMenuItem
         key="settings"
         section={settingsSection}
         pathname={pathname}
+        expandedSections={expandedSections}
+        toggleSection={toggleSection}
+        isPathActive={isPathActive}
+        isExactPathActive={isExactPathActive}
       />
     </div>
   );
