@@ -37,8 +37,8 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
           flex items-center px-3 py-2 rounded-md text-sm
           group transition-all duration-200
           ${active 
-            ? 'bg-violet-600 text-white font-medium' 
-            : 'text-foreground hover:bg-secondary'
+            ? 'bg-sidebar-primary text-sidebar-primary-foreground font-medium' 
+            : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
           }
         `}
       >

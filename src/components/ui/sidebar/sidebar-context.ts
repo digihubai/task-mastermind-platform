@@ -1,6 +1,8 @@
 
 import * as React from "react"
 
+export type SidebarTheme = "default" | "violet" | "blue" | "gray" | "dark"
+
 export type SidebarContext = {
   state: "expanded" | "collapsed"
   open: boolean
@@ -9,6 +11,8 @@ export type SidebarContext = {
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
+  theme: SidebarTheme
+  setTheme: (theme: SidebarTheme) => void
 }
 
 export const SidebarContext = React.createContext<SidebarContext | null>(null)
