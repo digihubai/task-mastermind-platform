@@ -68,16 +68,16 @@ export const sidebarSections: SidebarSection[] = [
       { path: "/chat", icon: MessageSquare, label: "Customer Chat" },
       { path: "/support", icon: HelpCircle, label: "Support Tickets" },
       { path: "/chatbot", icon: Bot, label: "AI Chatbot" },
-      { path: "/phone", icon: Phone, label: "IVR System" },
-      { path: "/outbound", icon: PhoneOutgoing, label: "Outbound Calls" },
+      { path: "/phone/ivr-system", icon: Phone, label: "IVR System" }, // Updated path
+      { path: "/outbound", icon: PhoneOutgoing, label: "Outbound Calls" }, // Matches route in App.tsx
     ]
   },
   {
     title: "Team Collaboration",
     items: [
       { path: "/team-chat", icon: MessageSquare, label: "Team Chat" },
-      { path: "/project-management", icon: Briefcase, label: "Project Management" },
-      { path: "/crm", icon: Users, label: "CRM" },
+      { path: "/projects", icon: Briefcase, label: "Project Management" }, // Updated path
+      { path: "/customers", icon: Users, label: "CRM" }, // Updated path
     ]
   },
   {
@@ -94,8 +94,8 @@ export const sidebarSections: SidebarSection[] = [
     title: "Workflow Automation",
     items: [
       { path: "/automation/workflows", icon: LayoutTemplate, label: "Workflows" },
-      { path: "/automation/templates", icon: FileText, label: "Templates" },
-      { path: "/automation/editor", icon: Zap, label: "Create Workflow" },
+      { path: "/automation/workflow-templates", icon: FileText, label: "Templates" }, // Updated path
+      { path: "/automation/workflow-editor", icon: Zap, label: "Create Workflow" }, // Updated path
       { path: "/automation/industry-templates", icon: Building, label: "Industry Solutions" },
       { path: "/automation/api-connector", icon: Database, label: "API Connector" },
     ]
@@ -103,20 +103,20 @@ export const sidebarSections: SidebarSection[] = [
   {
     title: "Marketing",
     items: [
-      { path: "/marketing", icon: Mail, label: "Email Marketing" },
-      { path: "/social", icon: Globe, label: "Social Media" },
-      { path: "/campaigns", icon: Target, label: "Campaigns" },
-      { path: "/brand-voice", icon: Megaphone, label: "Brand Voice" },
+      { path: "/marketing", icon: Mail, label: "Email Marketing" }, 
+      { path: "/marketing/social", icon: Globe, label: "Social Media" }, // Updated path
+      { path: "/marketing/campaigns", icon: Target, label: "Campaigns" }, // Updated path
+      { path: "/marketing/brand-voice", icon: Megaphone, label: "Brand Voice" }, // Updated path
     ]
   },
   {
     title: "AI Tools",
     items: [
-      { path: "/ai-copywriter", icon: PenTool, label: "AI Copywriter" },
-      { path: "/ai-seo", icon: Search, label: "AI SEO Writer" },
-      { path: "/ai-vision", icon: Image, label: "AI Vision" },
-      { path: "/ai-rewriter", icon: Zap, label: "AI Rewriter" },
-      { path: "/pdf-insight", icon: FileSpreadsheet, label: "PDF Insight" },
+      { path: "/ai-tools/copywriter", icon: PenTool, label: "AI Copywriter" }, // Updated path
+      { path: "/ai-tools/seo", icon: Search, label: "AI SEO Writer" }, // Updated path
+      { path: "/ai-tools/vision", icon: Image, label: "AI Vision" }, // Updated path
+      { path: "/ai-tools/rewriter", icon: Zap, label: "AI Rewriter" }, // Updated path
+      { path: "/ai-tools/pdf-insight", icon: FileSpreadsheet, label: "PDF Insight" }, // Updated path
     ]
   },
   {

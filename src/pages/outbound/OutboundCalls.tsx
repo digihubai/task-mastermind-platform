@@ -12,9 +12,9 @@ import { PlusCircle, Phone } from "lucide-react";
 
 const OutboundCalls = () => {
   const { data: campaigns, isLoading: campaignsLoading } = useCallCampaigns();
-  const { data: stats } = useCallStats();
-  const { data: scripts } = useCallScripts();
-  const { data: contactLists } = useContactLists();
+  const { data: stats, isLoading: statsLoading } = useCallStats();
+  const { data: scripts, isLoading: scriptsLoading } = useCallScripts();
+  const { data: contactLists, isLoading: contactsLoading } = useContactLists();
 
   return (
     <AppLayout>
@@ -48,7 +48,7 @@ const OutboundCalls = () => {
           </TabsList>
           
           <TabsContent value="analytics" className="space-y-4">
-            <OutboundCallAnalytics />
+            <OutboundCallAnalytics stats={stats} isLoading={statsLoading} />
           </TabsContent>
           
           <TabsContent value="campaigns">

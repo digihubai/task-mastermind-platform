@@ -2,312 +2,215 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Button } from "@/components/ui/button";
-import { 
-  BarChart3, 
-  Download, 
-  ArrowUpRight, 
-  ArrowDownRight,
-  Phone,
-  UserRound,
-  CheckCircle,
-  Clock,
-  XCircle
-} from "lucide-react";
-import { useCallStats } from '@/services/outboundCallService';
+import { Download, Calendar, ArrowUpRight, ArrowDownRight, Phone, UserCheck, UserX, Clock } from "lucide-react";
+import { CallStats } from '@/services/outboundCallService';
 
-// Line chart component using recharts
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  Legend,
-} from 'recharts';
+interface OutboundCallAnalyticsProps {
+  stats?: CallStats;
+  isLoading?: boolean;
+}
 
-const callVolumeData = [
-  { name: '1 Mar', outbound: 40, answered: 24 },
-  { name: '2 Mar', outbound: 30, answered: 13 },
-  { name: '3 Mar', outbound: 20, answered: 8 },
-  { name: '4 Mar', outbound: 27, answered: 19 },
-  { name: '5 Mar', outbound: 18, answered: 10 },
-  { name: '6 Mar', outbound: 23, answered: 12 },
-  { name: '7 Mar', outbound: 34, answered: 20 },
-];
+const OutboundCallAnalytics: React.FC<OutboundCallAnalyticsProps> = ({ stats, isLoading = false }) => {
+  if (isLoading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Call Analytics</CardTitle>
+          <CardDescription>Loading data...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center">
+            <div className="animate-pulse w-full h-full bg-muted/50 rounded-md"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
-const conversionData = [
-  { name: '1 Mar', rate: 12 },
-  { name: '2 Mar', rate: 9 },
-  { name: '3 Mar', rate: 15 },
-  { name: '4 Mar', rate: 18 },
-  { name: '5 Mar', rate: 12 },
-  { name: '6 Mar', rate: 14 },
-  { name: '7 Mar', rate: 17 },
-];
+  if (!stats) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Call Analytics</CardTitle>
+          <CardDescription>No data available</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+            No call data available for analysis
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
-const timeOfDayData = [
-  { name: '9 AM', calls: 28, rate: 15 },
-  { name: '10 AM', calls: 35, rate: 20 },
-  { name: '11 AM', calls: 42, rate: 18 },
-  { name: '12 PM', calls: 20, rate: 10 },
-  { name: '1 PM', calls: 15, rate: 8 },
-  { name: '2 PM', calls: 38, rate: 16 },
-  { name: '3 PM', calls: 45, rate: 22 },
-  { name: '4 PM', calls: 30, rate: 19 },
-];
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
-const OutboundCallAnalytics = () => {
-  const { data: stats, isLoading } = useCallStats();
+  const pieData = [
+    { name: 'Answered', value: stats.callOutcomes.answered },
+    { name: 'Voicemail', value: stats.callOutcomes.voicemail },
+    { name: 'No Answer', value: stats.callOutcomes.noAnswer },
+    { name: 'Busy', value: stats.callOutcomes.busy },
+    { name: 'Failed', value: stats.callOutcomes.failed }
+  ];
+
+  const metricCards = [
+    {
+      title: "Total Calls",
+      value: stats.totalCalls,
+      change: stats.callsChange,
+      icon: <Phone className="h-4 w-4 text-muted-foreground" />,
+    },
+    {
+      title: "Answered Rate",
+      value: `${stats.answeredRate}%`,
+      change: stats.answeredRateChange,
+      icon: <UserCheck className="h-4 w-4 text-muted-foreground" />,
+    },
+    {
+      title: "Avg. Duration",
+      value: stats.avgCallDuration,
+      change: stats.durationChange,
+      icon: <Clock className="h-4 w-4 text-muted-foreground" />,
+    },
+    {
+      title: "Conversion Rate",
+      value: `${stats.conversionRate}%`,
+      change: stats.conversionChange,
+      icon: <ArrowUpRight className="h-4 w-4 text-muted-foreground" />,
+    },
+  ];
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-medium tracking-tight">Call Performance</h2>
-          <p className="text-muted-foreground">Analyze your outbound call campaigns</p>
+          <h2 className="text-2xl font-semibold">Call Analytics</h2>
+          <p className="text-sm text-muted-foreground">
+            Performance metrics for your outbound call campaigns
+          </p>
         </div>
-        
-        <div className="flex gap-2 self-end sm:self-auto">
-          <Button variant="outline" size="sm" className="flex items-center gap-1">
-            <Download size={14} />
+        <div className="flex items-center gap-2">
+          <Button variant="outline" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Last 30 Days
+          </Button>
+          <Button variant="outline" className="flex items-center gap-2">
+            <Download className="h-4 w-4" />
             Export
           </Button>
-          <Button variant="outline" size="sm" className="flex items-center gap-1">
-            <BarChart3 size={14} />
-            Reports
-          </Button>
         </div>
       </div>
-      
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                <p className="text-muted-foreground text-xs">Total Calls</p>
-                <p className="text-2xl font-semibold">
-                  {isLoading ? "..." : stats?.totalCalls}
-                </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {metricCards.map((card, i) => (
+          <Card key={i}>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between space-y-0 pb-2">
+                <p className="text-sm font-medium leading-none">{card.title}</p>
+                {card.icon}
               </div>
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                <Phone size={16} />
+              <div className="flex items-end justify-between">
+                <div className="text-2xl font-bold">{card.value}</div>
+                <div className={`flex items-center text-xs ${
+                  card.change > 0 ? "text-green-500" : "text-red-500"
+                }`}>
+                  {card.change > 0 ? (
+                    <ArrowUpRight className="h-3 w-3 mr-1" />
+                  ) : (
+                    <ArrowDownRight className="h-3 w-3 mr-1" />
+                  )}
+                  {Math.abs(card.change)}%
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-1 mt-3 text-xs">
-              <span className="text-muted-foreground">vs last week</span>
-              <span className={`font-medium flex items-center ${true ? 'text-green-500' : 'text-red-500'}`}>
-                {true ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                8.2%
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                <p className="text-muted-foreground text-xs">Answer Rate</p>
-                <p className="text-2xl font-semibold">
-                  {isLoading ? "..." : `${stats?.answerRate}%`}
-                </p>
-              </div>
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                <UserRound size={16} />
-              </div>
-            </div>
-            <div className="flex items-center gap-1 mt-3 text-xs">
-              <span className="text-muted-foreground">vs last week</span>
-              <span className={`font-medium flex items-center ${false ? 'text-green-500' : 'text-red-500'}`}>
-                {false ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                2.1%
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                <p className="text-muted-foreground text-xs">Conversion Rate</p>
-                <p className="text-2xl font-semibold">
-                  {isLoading ? "..." : `${stats?.conversionRate}%`}
-                </p>
-              </div>
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                <CheckCircle size={16} />
-              </div>
-            </div>
-            <div className="flex items-center gap-1 mt-3 text-xs">
-              <span className="text-muted-foreground">vs last week</span>
-              <span className={`font-medium flex items-center ${true ? 'text-green-500' : 'text-red-500'}`}>
-                {true ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                5.3%
-              </span>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Call Volume Trend</CardTitle>
+            <CardDescription>Daily outbound call activity</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={stats.dailyStats}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="day" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line 
+                    type="monotone" 
+                    dataKey="total" 
+                    stroke="#8884d8" 
+                    name="Total Calls"
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="answered" 
+                    stroke="#82ca9d" 
+                    name="Answered"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
-          <CardContent className="p-4">
-            <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                <p className="text-muted-foreground text-xs">Avg Duration</p>
-                <p className="text-2xl font-semibold">
-                  {isLoading ? "..." : stats?.avgDuration}
-                </p>
-              </div>
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                <Clock size={16} />
-              </div>
-            </div>
-            <div className="flex items-center gap-1 mt-3 text-xs">
-              <span className="text-muted-foreground">vs last week</span>
-              <span className={`font-medium flex items-center ${true ? 'text-green-500' : 'text-red-500'}`}>
-                {true ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                0.5%
-              </span>
+          <CardHeader>
+            <CardTitle>Call Outcomes</CardTitle>
+            <CardDescription>Distribution of call results</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    paddingAngle={3}
+                    dataKey="value"
+                    label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
       </div>
-      
-      {/* Charts */}
-      <Tabs defaultValue="callVolume" className="space-y-4">
-        <div className="flex justify-between items-center">
-          <TabsList>
-            <TabsTrigger value="callVolume">Call Volume</TabsTrigger>
-            <TabsTrigger value="conversions">Conversions</TabsTrigger>
-            <TabsTrigger value="timeOfDay">Time of Day</TabsTrigger>
-          </TabsList>
-          
-          <div className="text-sm text-muted-foreground">
-            Last 7 days
-          </div>
-        </div>
-        
-        <TabsContent value="callVolume">
-          <Card>
-            <CardHeader className="px-6 py-4">
-              <CardTitle>Call Volume Trend</CardTitle>
-              <CardDescription>Total outbound calls vs answered calls</CardDescription>
-            </CardHeader>
-            <CardContent className="px-6 pb-6">
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={callVolumeData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="outbound" stroke="#8884d8" name="Outbound" />
-                    <Line type="monotone" dataKey="answered" stroke="#82ca9d" name="Answered" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="conversions">
-          <Card>
-            <CardHeader className="px-6 py-4">
-              <CardTitle>Conversion Rate</CardTitle>
-              <CardDescription>Daily conversion rate for outbound calls</CardDescription>
-            </CardHeader>
-            <CardContent className="px-6 pb-6">
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={conversionData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="rate" fill="#8884d8" name="Conversion %" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="timeOfDay">
-          <Card>
-            <CardHeader className="px-6 py-4">
-              <CardTitle>Time of Day Analysis</CardTitle>
-              <CardDescription>Best times for calls and conversion rates</CardDescription>
-            </CardHeader>
-            <CardContent className="px-6 pb-6">
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={timeOfDayData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="name" />
-                    <YAxis yAxisId="left" orientation="left" />
-                    <YAxis yAxisId="right" orientation="right" />
-                    <Tooltip />
-                    <Legend />
-                    <Bar yAxisId="left" dataKey="calls" fill="#8884d8" name="Calls" />
-                    <Bar yAxisId="right" dataKey="rate" fill="#82ca9d" name="Success %" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-      
-      {/* Call Outcomes */}
+
       <Card>
-        <CardHeader className="px-6 py-4">
-          <CardTitle>Call Outcomes</CardTitle>
-          <CardDescription>Distribution of call results</CardDescription>
+        <CardHeader>
+          <CardTitle>Agent Performance</CardTitle>
+          <CardDescription>Call metrics by agent</CardDescription>
         </CardHeader>
-        <CardContent className="px-6 pb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="p-4 border rounded-md flex flex-col items-center justify-center text-center">
-              <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-500 mb-3">
-                <CheckCircle size={24} />
-              </div>
-              <p className="font-medium">Successful</p>
-              <p className="text-2xl font-semibold mt-1">32%</p>
-              <p className="text-xs text-muted-foreground mt-1">398 calls</p>
-            </div>
-            
-            <div className="p-4 border rounded-md flex flex-col items-center justify-center text-center">
-              <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 mb-3">
-                <Phone size={24} />
-              </div>
-              <p className="font-medium">Voicemail</p>
-              <p className="text-2xl font-semibold mt-1">28%</p>
-              <p className="text-xs text-muted-foreground mt-1">352 calls</p>
-            </div>
-            
-            <div className="p-4 border rounded-md flex flex-col items-center justify-center text-center">
-              <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center text-red-500 mb-3">
-                <XCircle size={24} />
-              </div>
-              <p className="font-medium">No Answer</p>
-              <p className="text-2xl font-semibold mt-1">36%</p>
-              <p className="text-xs text-muted-foreground mt-1">450 calls</p>
-            </div>
-            
-            <div className="p-4 border rounded-md flex flex-col items-center justify-center text-center">
-              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 mb-3">
-                <Clock size={24} />
-              </div>
-              <p className="font-medium">Scheduled</p>
-              <p className="text-2xl font-semibold mt-1">4%</p>
-              <p className="text-xs text-muted-foreground mt-1">48 calls</p>
-            </div>
+        <CardContent>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={stats.agentPerformance}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="agent" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="calls" fill="#8884d8" name="Total Calls" />
+                <Bar dataKey="converted" fill="#82ca9d" name="Conversions" />
+                <Bar dataKey="avgDuration" fill="#ffc658" name="Avg Duration (min)" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>

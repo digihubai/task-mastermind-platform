@@ -1,197 +1,144 @@
+
 import { useQuery } from "@tanstack/react-query";
 
-// Types
 export interface CallCampaign {
   id: string;
   name: string;
-  status: 'active' | 'scheduled' | 'completed' | 'paused';
-  calls: number;
-  answered: number;
-  completedCalls: number;
-  totalCalls: number;
-  answerRate: number;
-  conversions: number;
-  conversionRate: number;
-  trend: 'up' | 'down';
-  createdAt: string;
+  status: 'Active' | 'Paused' | 'Completed' | 'Draft';
+  contacts: number;
   completed: number;
-  progress: number;
-  scheduled: string;
+  conversion: number;
+  startDate: string;
+  endDate?: string;
+  assignedTo: string[];
 }
 
 export interface CallScript {
   id: string;
   name: string;
   description: string;
-  lastEdited: string;
   type: string;
+  lastEdited: string;
+  content?: string;
 }
 
 export interface ContactList {
   id: string;
   name: string;
   count: number;
+  status: 'Active' | 'Inactive';
   lastUpdated: string;
-  status: string;
-}
-
-export interface CallRecord {
-  id: string;
-  contactName: string;
-  phoneNumber: string;
-  campaignId: string;
-  campaignName: string;
-  status: 'completed' | 'not-answered' | 'voicemail' | 'scheduled';
-  duration: number;
-  notes: string;
-  outcome: string;
-  timestamp: string;
+  source: string;
 }
 
 export interface CallStats {
   totalCalls: number;
-  answeredCalls: number;
-  answerRate: number;
-  avgDuration: string;
+  callsChange: number;
+  answeredRate: number;
+  answeredRateChange: number;
+  avgCallDuration: string;
+  durationChange: number;
   conversionRate: number;
+  conversionChange: number;
+  callOutcomes: {
+    answered: number;
+    voicemail: number;
+    noAnswer: number;
+    busy: number;
+    failed: number;
+  };
+  dailyStats: Array<{
+    day: string;
+    total: number;
+    answered: number;
+    conversion: number;
+  }>;
+  agentPerformance: Array<{
+    agent: string;
+    calls: number;
+    converted: number;
+    avgDuration: number;
+  }>;
 }
 
-// Mock Data
+// Mock data for campaigns
 const mockCampaigns: CallCampaign[] = [
   {
     id: "camp-1",
-    name: "Lead Follow-up",
-    status: 'active',
-    calls: 248,
-    answered: 92,
-    completedCalls: 92,
-    totalCalls: 248,
-    answerRate: 37,
-    conversions: 28,
-    conversionRate: 11,
-    trend: "up",
-    createdAt: new Date().toISOString(),
-    completed: 92,
-    progress: 37,
-    scheduled: "Today, 9:00 AM"
+    name: "Q2 Lead Generation",
+    status: "Active",
+    contacts: 500,
+    completed: 320,
+    conversion: 12.5,
+    startDate: "2025-04-01",
+    assignedTo: ["Jane Cooper", "Robert Fox"]
   },
   {
     id: "camp-2",
-    name: "Customer Feedback",
-    status: 'active',
-    calls: 120,
-    answered: 45,
-    completedCalls: 45,
-    totalCalls: 120,
-    answerRate: 38,
-    conversions: 22,
-    conversionRate: 18,
-    trend: "up",
-    createdAt: new Date().toISOString(),
-    completed: 45,
-    progress: 38,
-    scheduled: "Tomorrow, 10:00 AM"
+    name: "Product Demo Follow-up",
+    status: "Active",
+    contacts: 150,
+    completed: 124,
+    conversion: 28.3,
+    startDate: "2025-03-15",
+    assignedTo: ["Wade Warren"]
   },
   {
     id: "camp-3",
-    name: "Product Announcement",
-    status: 'paused',
-    calls: 215,
-    answered: 58,
-    completedCalls: 58,
-    totalCalls: 215,
-    answerRate: 27,
-    conversions: 12,
-    conversionRate: 6,
-    trend: "down",
-    createdAt: new Date().toISOString(),
-    completed: 58,
-    progress: 27,
-    scheduled: "Monday, 11:00 AM"
-  }
-];
-
-const mockCallStats: CallStats = {
-  totalCalls: 1248,
-  answeredCalls: 398,
-  answerRate: 32,
-  avgDuration: "2m 48s",
-  conversionRate: 14
-};
-
-const mockCallRecords: CallRecord[] = [
-  {
-    id: "call-1",
-    contactName: "John Smith",
-    phoneNumber: "+1 (555) 123-4567",
-    campaignId: "camp-1",
-    campaignName: "Lead Follow-up",
-    status: "completed",
-    duration: 165, // seconds
-    notes: "Customer requested a follow-up email",
-    outcome: "Interested",
-    timestamp: new Date(Date.now() - 3600000).toISOString() // 1 hour ago
+    name: "Event Outreach",
+    status: "Completed",
+    contacts: 300,
+    completed: 300,
+    conversion: 18.7,
+    startDate: "2025-02-10",
+    endDate: "2025-02-28",
+    assignedTo: ["Esther Howard", "Jenny Wilson", "Cameron Williamson"]
   },
   {
-    id: "call-2",
-    contactName: "Jane Doe",
-    phoneNumber: "+1 (555) 234-5678",
-    campaignId: "camp-1",
-    campaignName: "Lead Follow-up",
-    status: "voicemail",
-    duration: 45, // seconds
-    notes: "Left voicemail about new features",
-    outcome: "Voicemail",
-    timestamp: new Date(Date.now() - 7200000).toISOString() // 2 hours ago
-  },
-  {
-    id: "call-3",
-    contactName: "Robert Johnson",
-    phoneNumber: "+1 (555) 345-6789",
-    campaignId: "camp-2",
-    campaignName: "Customer Feedback",
-    status: "completed",
-    duration: 320, // seconds
-    notes: "Very positive feedback, interested in upgrade",
-    outcome: "Success",
-    timestamp: new Date(Date.now() - 10800000).toISOString() // 3 hours ago
-  },
-  {
-    id: "call-4",
-    contactName: "Sarah Williams",
-    phoneNumber: "+1 (555) 456-7890",
-    campaignId: "camp-3",
-    campaignName: "Product Announcement",
-    status: "not-answered",
-    duration: 0, // seconds
-    notes: "No answer, try again tomorrow",
-    outcome: "No Answer",
-    timestamp: new Date(Date.now() - 14400000).toISOString() // 4 hours ago
+    id: "camp-4",
+    name: "Renewal Campaign",
+    status: "Draft",
+    contacts: 420,
+    completed: 0,
+    conversion: 0,
+    startDate: "2025-05-01",
+    assignedTo: []
   }
 ];
 
 // Mock data for scripts
-const mockCallScripts: CallScript[] = [
+const mockScripts: CallScript[] = [
   {
     id: "script-1",
-    name: "Lead Qualification Script",
-    description: "Standard script for qualifying new leads",
+    name: "Product Demo Follow-up",
+    description: "Script for following up after product demos",
+    type: "Follow-up",
     lastEdited: "2 days ago",
-    type: "Qualification"
+    content: "Hello {name}, this is {agent} from DigiHub AI. I'm calling to follow up on the product demo you attended..."
   },
   {
     id: "script-2",
-    name: "Product Demo Follow-up",
-    description: "Script for following up after product demos",
+    name: "New Feature Introduction",
+    description: "Introducing our latest AI-powered features",
+    type: "Outreach",
     lastEdited: "1 week ago",
-    type: "Follow-up"
+    content: "Hi {name}, I'm {agent} calling from DigiHub AI. We've just launched some exciting new features..."
   },
   {
     id: "script-3",
-    name: "Customer Satisfaction Survey",
-    description: "Script for collecting customer feedback",
+    name: "Renewal Script",
+    description: "For contacting customers approaching renewal dates",
+    type: "Renewal",
     lastEdited: "3 days ago",
-    type: "Survey"
+    content: "Hello {name}, this is {agent} from DigiHub AI. I noticed your subscription is coming up for renewal..."
+  },
+  {
+    id: "script-4",
+    name: "Webinar Invitation",
+    description: "Invite prospects to upcoming webinar",
+    type: "Event",
+    lastEdited: "Yesterday",
+    content: "Hi {name}, this is {agent} from DigiHub AI. I'm reaching out to invite you to our upcoming webinar..."
   }
 ];
 
@@ -199,85 +146,138 @@ const mockCallScripts: CallScript[] = [
 const mockContactLists: ContactList[] = [
   {
     id: "list-1",
-    name: "New Leads - March 2025",
-    count: 120,
+    name: "Q2 Prospects",
+    count: 583,
+    status: "Active",
     lastUpdated: "2 days ago",
-    status: "Active"
+    source: "Hubspot CRM"
   },
   {
     id: "list-2",
-    name: "Enterprise Customers",
-    count: 45,
-    lastUpdated: "1 week ago",
-    status: "Active"
+    name: "Product Demo Attendees",
+    count: 147,
+    status: "Active",
+    lastUpdated: "Yesterday",
+    source: "Zoom Webinars"
   },
   {
     id: "list-3",
-    name: "Inactive Customers",
-    count: 87,
-    lastUpdated: "3 days ago",
-    status: "Inactive"
+    name: "Conference Leads",
+    count: 304,
+    status: "Inactive",
+    lastUpdated: "2 weeks ago",
+    source: "Manual Import"
+  },
+  {
+    id: "list-4",
+    name: "Renewal Candidates",
+    count: 421,
+    status: "Active",
+    lastUpdated: "1 week ago",
+    source: "Salesforce"
   }
 ];
 
-// Service functions
+// Mock data for call statistics
+const mockCallStats: CallStats = {
+  totalCalls: 1423,
+  callsChange: 12,
+  answeredRate: 42,
+  answeredRateChange: 5,
+  avgCallDuration: "3m 25s",
+  durationChange: -2,
+  conversionRate: 18,
+  conversionChange: 7,
+  callOutcomes: {
+    answered: 598,
+    voicemail: 412,
+    noAnswer: 287,
+    busy: 54,
+    failed: 72
+  },
+  dailyStats: [
+    { day: "Mar 1", total: 42, answered: 18, conversion: 4 },
+    { day: "Mar 2", total: 53, answered: 24, conversion: 6 },
+    { day: "Mar 3", total: 61, answered: 28, conversion: 7 },
+    { day: "Mar 4", total: 47, answered: 22, conversion: 5 },
+    { day: "Mar 5", total: 52, answered: 25, conversion: 5 },
+    { day: "Mar 6", total: 38, answered: 16, conversion: 3 },
+    { day: "Mar 7", total: 27, answered: 11, conversion: 2 },
+    { day: "Mar 8", total: 45, answered: 19, conversion: 5 },
+    { day: "Mar 9", total: 55, answered: 26, conversion: 7 },
+    { day: "Mar 10", total: 62, answered: 30, conversion: 8 },
+    { day: "Mar 11", total: 58, answered: 27, conversion: 6 },
+    { day: "Mar 12", total: 63, answered: 29, conversion: 8 },
+    { day: "Mar 13", total: 49, answered: 21, conversion: 5 },
+    { day: "Mar 14", total: 44, answered: 20, conversion: 4 }
+  ],
+  agentPerformance: [
+    { agent: "Jane Cooper", calls: 312, converted: 48, avgDuration: 3.7 },
+    { agent: "Robert Fox", calls: 287, converted: 52, avgDuration: 4.2 },
+    { agent: "Wade Warren", calls: 256, converted: 41, avgDuration: 3.1 },
+    { agent: "Esther Howard", calls: 229, converted: 37, avgDuration: 3.8 },
+    { agent: "Jenny Wilson", calls: 204, converted: 35, avgDuration: 2.9 },
+    { agent: "Cameron Williamson", calls: 135, converted: 19, avgDuration: 2.6 }
+  ]
+};
+
+// API function to fetch campaigns
+export const fetchCallCampaigns = async (): Promise<CallCampaign[]> => {
+  // In a real application, this would be an API call
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(mockCampaigns), 500);
+  });
+};
+
+// API function to fetch call scripts
+export const fetchCallScripts = async (): Promise<CallScript[]> => {
+  // In a real application, this would be an API call
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(mockScripts), 500);
+  });
+};
+
+// API function to fetch contact lists
+export const fetchContactLists = async (): Promise<ContactList[]> => {
+  // In a real application, this would be an API call
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(mockContactLists), 500);
+  });
+};
+
+// API function to fetch call statistics
+export const fetchCallStats = async (): Promise<CallStats> => {
+  // In a real application, this would be an API call
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(mockCallStats), 500);
+  });
+};
+
+// React Query hooks
 export const useCallCampaigns = () => {
   return useQuery({
-    queryKey: ['outbound-campaigns'],
-    queryFn: async () => {
-      // Simulate API request
-      return new Promise<CallCampaign[]>((resolve) => {
-        setTimeout(() => resolve(mockCampaigns), 500);
-      });
-    }
+    queryKey: ['callCampaigns'],
+    queryFn: fetchCallCampaigns
   });
 };
 
-export const useCallStats = () => {
-  return useQuery({
-    queryKey: ['outbound-call-stats'],
-    queryFn: async () => {
-      // Simulate API request
-      return new Promise<CallStats>((resolve) => {
-        setTimeout(() => resolve(mockCallStats), 500);
-      });
-    }
-  });
-};
-
-export const useCallRecords = () => {
-  return useQuery({
-    queryKey: ['outbound-call-records'],
-    queryFn: async () => {
-      // Simulate API request
-      return new Promise<CallRecord[]>((resolve) => {
-        setTimeout(() => resolve(mockCallRecords), 500);
-      });
-    }
-  });
-};
-
-// New service functions for scripts and contact lists
 export const useCallScripts = () => {
   return useQuery({
-    queryKey: ['outbound-call-scripts'],
-    queryFn: async () => {
-      // Simulate API request
-      return new Promise<CallScript[]>((resolve) => {
-        setTimeout(() => resolve(mockCallScripts), 500);
-      });
-    }
+    queryKey: ['callScripts'],
+    queryFn: fetchCallScripts
   });
 };
 
 export const useContactLists = () => {
   return useQuery({
-    queryKey: ['outbound-contact-lists'],
-    queryFn: async () => {
-      // Simulate API request
-      return new Promise<ContactList[]>((resolve) => {
-        setTimeout(() => resolve(mockContactLists), 500);
-      });
-    }
+    queryKey: ['contactLists'],
+    queryFn: fetchContactLists
+  });
+};
+
+export const useCallStats = () => {
+  return useQuery({
+    queryKey: ['callStats'],
+    queryFn: fetchCallStats
   });
 };

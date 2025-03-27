@@ -105,6 +105,7 @@ function App() {
       <Route path="/auth" element={<AuthPage />} />
       
       {/* Analytics routes */}
+      <Route path="/analytics" element={<AnalyticsDashboard />} />
       <Route path="/analytics/dashboard" element={<AnalyticsDashboard />} />
       
       {/* Marketing routes */}
@@ -188,9 +189,11 @@ function App() {
 
       {/* Phone system routes */}
       <Route path="/phone/ivr-system" element={<IVRSystem />} />
+      <Route path="/outbound" element={<OutboundCalls />} /> {/* Added the missing route */}
       <Route path="/outbound/calls" element={<OutboundCalls />} />
       
       {/* Finance routes */}
+      <Route path="/finance" element={<FinanceDashboard />} /> {/* Added missing route */}
       <Route path="/finance/dashboard" element={<FinanceDashboard />} />
       <Route path="/finance/tax-calculator" element={<TaxCalculator />} />
 
