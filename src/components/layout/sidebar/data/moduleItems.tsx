@@ -12,6 +12,8 @@ import {
   PhoneOutgoing,
   MessageSquare,
   Ticket,
+  BarChart2,
+  Calculator,
 } from "lucide-react";
 import { SidebarItemType } from "@/types/sidebar";
 
@@ -23,7 +25,7 @@ export const moduleItems = [
   { name: "Customer Support", path: "/support", icon: <Headphones size={20} /> },
 ];
 
-// Core modules section for sidebar (renamed to Department)
+// Core modules section for sidebar (Department)
 export const coreModulesSection = {
   title: "Department",
   items: [
@@ -89,6 +91,16 @@ export const coreModulesSection = {
         }
       ],
     },
+    {
+      title: "Finance",
+      href: "/finance",
+      icon: <Calculator size={20} />,
+    },
+    {
+      title: "Analytics",
+      href: "/analytics",
+      icon: <BarChart2 size={20} />,
+    }
   ] as SidebarItemType[],
 };
 
@@ -98,24 +110,4 @@ export const modulesStarter = {
   icon: <Package size={20} />,
 };
 
-// Add the moduleSection export
-export const moduleSection = {
-  title: "Departments", // Renamed to maintain consistency with the coreModulesSection
-  items: [
-    {
-      title: "CRM",
-      href: "/crm",
-      icon: <Users size={20} />,
-    },
-    {
-      title: "Project Management",
-      href: "/project-management",
-      icon: <FolderOpen size={20} />,
-    },
-    {
-      title: "Support",
-      href: "/support",
-      icon: <Headphones size={20} />,
-    }
-  ] as SidebarItemType[]
-};
+// Removing the redundant moduleSection - we'll use coreModulesSection instead

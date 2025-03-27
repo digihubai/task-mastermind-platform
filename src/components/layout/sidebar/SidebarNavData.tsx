@@ -47,7 +47,7 @@ export const sidebarSections: SidebarSectionType[] = [
   analyticsSection,
   marketingSection,
   aiToolsSection,
-  coreModulesSection, // Use coreModulesSection instead of moduleSection
+  coreModulesSection,
   settingsSection
 ];
 
@@ -114,8 +114,8 @@ export const SidebarNavData = () => {
       />
       
       <SidebarMenuItem
-        key="departments"
-        section={coreModulesSection} // Use coreModulesSection instead of moduleSection 
+        key="department"
+        section={coreModulesSection}
         pathname={pathname}
         expandedSections={expandedSections}
         toggleSection={toggleSection}

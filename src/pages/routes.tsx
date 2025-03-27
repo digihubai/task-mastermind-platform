@@ -27,6 +27,9 @@ import financeRoutes from "@/routes/financeRoutes";
 import crmRoutes from "@/routes/crmRoutes";
 import automationRoutes from "@/routes/automationRoutes";
 import Workflow from "@/pages/modules/Workflow";
+import CampaignsPage from "@/pages/marketing/CampaignsPage";
+import SocialMediaPage from "@/pages/marketing/SocialMediaPage";
+import { FinanceDashboard } from "@/pages/finance/FinanceDashboard";
 
 // Main application routes
 const routes: RouteObject[] = [
@@ -59,6 +62,14 @@ const routes: RouteObject[] = [
     element: <MarketingSEOPage />,
   },
   {
+    path: "/marketing/campaigns",
+    element: <CampaignsPage />,
+  },
+  {
+    path: "/marketing/social-media",
+    element: <SocialMediaPage />,
+  },
+  {
     path: "/projects",
     element: <ProjectsPage />,
   },
@@ -81,6 +92,10 @@ const routes: RouteObject[] = [
   {
     path: "/workflow",
     element: <Workflow />,
+  },
+  {
+    path: "/finance",
+    element: <FinanceDashboard />,
   },
   {
     path: "/ai/rewriter",

@@ -59,7 +59,15 @@ export function useSidebarNavigation() {
     if (path === "/" && location.pathname === "/") {
       return true;
     }
-    return path !== "/" && location.pathname.startsWith(path);
+    
+    // Special case for dashboard path
+    if (path === "/dashboard" && location.pathname === "/dashboard") {
+      return true;
+    }
+    
+    return path !== "/" && 
+           path !== "/dashboard" && 
+           location.pathname.startsWith(path);
   }, [location.pathname]);
   
   // Check if a path is exactly active
