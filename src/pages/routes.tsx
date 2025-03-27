@@ -1,51 +1,58 @@
+
 import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import App from '@/App';
 
-// Import pages
-import DashboardPage from './DashboardPage';
-import AnalyticsPage from './AnalyticsPage';
-import CalendarPage from './CalendarPage';
-import ChatPage from './ChatPage';
-import SupportPage from './SupportPage';
-import ChatbotPage from './ChatbotPage';
-import PhonePage from './PhonePage';
-import OutboundPage from './OutboundPage';
+// Import existing pages
+import Index from './Index';
+import NotFound from './NotFound';
+import ProjectsPage from './ProjectsPage';
+import SettingsPage from './SettingsPage';
 import TeamChatPage from './TeamChatPage';
-import TeamChatChannelsPage from './TeamChatChannelsPage';
-import TeamChatCanvasPage from './TeamChatCanvasPage';
-import TeamChatPinnedPage from './TeamChatPinnedPage';
-import TeamChatGifsPage from './TeamChatGifsPage';
-import ProjectManagementPage from './ProjectManagementPage';
-import CRMPage from './CRMPage';
-import FinancePage from './FinancePage';
-import TaxCalculatorPage from './TaxCalculatorPage';
-import InvoicesPage from './InvoicesPage';
-import ExpensesPage from './ExpensesPage';
-import ReportsPage from './ReportsPage';
-import WorkflowsPage from './WorkflowsPage';
-import TemplatesPage from './TemplatesPage';
-import EditorPage from './EditorPage';
-import IndustryTemplatesPage from './IndustryTemplatesPage';
-import APIConnectorPage from './APIConnectorPage';
-import MarketingPage from './MarketingPage';
-import SocialPage from './SocialPage';
-import CampaignsPage from './CampaignsPage';
-import BrandVoicePage from './BrandVoicePage';
-import AICopywriterPage from './AICopywriterPage';
-import AISEOWriterPage from './AISEOWriterPage';
+import AuthPage from './auth/AuthPage';
+
 // AI pages
 import AIVisionPage from './ai/AIVisionPage';
 import PDFInsightPage from './ai/PDFInsightPage';
+import AICopywriterPage from './ai/AICopywriterPage';
+import AISEOWriterPage from './ai/AISEOWriterPage';
 
 // User pages
 import AIVision from './user/AIVision';
 
 // Marketing pages
+import MarketingPage from './MarketingPage';
 import MarketingSEOPage from './MarketingSEOPage';
 
-import KnowledgePage from './KnowledgePage';
-import SettingsPage from './SettingsPage';
+// Create placeholder components for missing pages
+const DashboardPage = () => <Index />;
+const AnalyticsPage = () => <div>Analytics Page</div>;
+const CalendarPage = () => <div>Calendar Page</div>;
+const ChatPage = () => <div>Chat Page</div>;
+const SupportPage = () => <div>Support Page</div>;
+const ChatbotPage = () => <div>Chatbot Page</div>;
+const PhonePage = () => <div>Phone Page</div>;
+const OutboundPage = () => <div>Outbound Page</div>;
+const TeamChatChannelsPage = () => <div>Team Chat Channels Page</div>;
+const TeamChatCanvasPage = () => <div>Team Chat Canvas Page</div>;
+const TeamChatPinnedPage = () => <div>Team Chat Pinned Page</div>;
+const TeamChatGifsPage = () => <div>Team Chat Gifs Page</div>;
+const ProjectManagementPage = () => <div>Project Management Page</div>;
+const CRMPage = () => <div>CRM Page</div>;
+const FinancePage = () => <div>Finance Page</div>;
+const TaxCalculatorPage = () => <div>Tax Calculator Page</div>;
+const InvoicesPage = () => <div>Invoices Page</div>;
+const ExpensesPage = () => <div>Expenses Page</div>;
+const ReportsPage = () => <div>Reports Page</div>;
+const WorkflowsPage = () => <div>Workflows Page</div>;
+const TemplatesPage = () => <div>Templates Page</div>;
+const EditorPage = () => <div>Editor Page</div>;
+const IndustryTemplatesPage = () => <div>Industry Templates Page</div>;
+const APIConnectorPage = () => <div>API Connector Page</div>;
+const SocialPage = () => <div>Social Page</div>;
+const CampaignsPage = () => <div>Campaigns Page</div>;
+const BrandVoicePage = () => <div>Brand Voice Page</div>;
+const KnowledgePage = () => <div>Knowledge Page</div>;
 
 const router = createBrowserRouter([
   {
@@ -203,7 +210,19 @@ const router = createBrowserRouter([
         path: '/settings',
         element: <SettingsPage />,
       },
+      {
+        path: '/projects',
+        element: <ProjectsPage />,
+      },
+      {
+        path: '*',
+        element: <NotFound />,
+      }
     ],
+  },
+  {
+    path: '/auth',
+    element: <AuthPage />,
   },
 ]);
 
