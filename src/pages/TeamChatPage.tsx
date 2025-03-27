@@ -31,7 +31,10 @@ import {
   PhoneCall,
   PhoneIncoming,
   PhoneMissed,
-  PhoneOutgoing
+  PhoneOutgoing,
+  Pin,
+  Info,
+  Palette
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -43,16 +46,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CreateChannelModal from "@/components/teamchat/CreateChannelModal";
-import GiphyPicker from "@/components/teamchat/GiphyPicker";
-import { useToast } from "@/hooks/use-toast";
+import EnhancedGiphyPicker from "@/components/teamchat/EnhancedGiphyPicker";
+import PinnedMessages from "@/components/teamchat/PinnedMessages";
+import ChannelInfoPanel from "@/components/teamchat/ChannelInfoPanel";
+import ChannelCanvas from "@/components/teamchat/ChannelCanvas";
+import { toast } from "sonner";
+import { TeamChannel, TeamMessage } from "@/types/support";
 
 // Mock data
 const mockChannels = [
-  { id: "1", name: "general", icon: "hash", unreadCount: 0, isActive: true },
-  { id: "2", name: "marketing", icon: "hash", unreadCount: 3, isActive: false },
-  { id: "3", name: "design", icon: "hash", unreadCount: 0, isActive: false },
-  { id: "4", name: "development", icon: "hash", unreadCount: 2, isActive: false },
-  { id: "5", name: "sales-team", icon: "users", unreadCount: 0, isActive: false, isPrivate: true },
+  { id: "1", name: "general", icon: "hash", unreadCount: 0, isActive: true, topic: "Company-wide discussions" },
+  { id: "2", name: "marketing", icon: "hash", unreadCount: 3, isActive: false, topic: "Marketing campaigns and ideas" },
+  { id: "3", name: "design", icon: "hash", unreadCount: 0, isActive: false, topic: "Design resources and feedback" },
+  { id: "4", name: "development", icon: "hash", unreadCount: 2, isActive: false, topic: "Code discussions and updates" },
+  { id: "5", name: "sales-team", icon: "users", unreadCount: 0, isActive: false, isPrivate: true, topic: "Sales strategies and leads" },
 ];
 
 const mockDirectMessages = [
@@ -165,13 +172,26 @@ const mockCalls = [
 ];
 
 const TeamChatPage = () => {
-  const { toast } = useToast();
   const [activeChannel, setActiveChannel] = useState(mockChannels[0]);
   const [messageText, setMessageText] = useState("");
   const [showCreateChannel, setShowCreateChannel] = useState(false);
-  const [showGiphyPicker, setShowGiphyPicker] = useState(false);
+  const [showGifPicker, setShowGifPicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTab, setSelectedTab] = useState("chat");
+  const [showPinnedMessages, setShowPinnedMessages] = useState(false);
+  const [showChannelInfo, setShowChannelInfo] = useState(false);
+  const [showChannelCanvas, setShowChannelCanvas] = useState(false);
+  
+  const [pinnedMessages, setPinnedMessages] = useState<TeamMessage[]>([
+    {
+      id: "pinned1",
+      channelId: "1",
+      content: "Important announcement: Team meeting tomorrow at 10AM",
+      createdAt: new Date().toISOString(),
+      senderId: "user1",
+      isPinned: true
+    }
+  ]);
 
   const handleSendMessage = () => {
     if (!messageText.trim()) return;
@@ -182,7 +202,7 @@ const TeamChatPage = () => {
     });
     
     setMessageText("");
-    setShowGiphyPicker(false);
+    setShowGifPicker(false);
   };
 
   const handleCreateChannel = (channelData: any) => {
@@ -193,11 +213,34 @@ const TeamChatPage = () => {
   };
 
   const handleSelectGif = (gifUrl: string) => {
+    setMessageText(messageText + ` [GIF: ${gifUrl}] `);
     toast({
       title: "GIF selected",
       description: "Your GIF will be sent with the message",
     });
-    setShowGiphyPicker(false);
+    setShowGifPicker(false);
+  };
+  
+  const handleUnpinMessage = (messageId: string) => {
+    setPinnedMessages(pinnedMessages.filter(msg => msg.id !== messageId));
+    toast({
+      title: "Message unpinned",
+      description: "The message has been removed from pinned messages",
+    });
+  };
+  
+  const handleUpdateChannel = (updatedInfo: any) => {
+    setActiveChannel({
+      ...activeChannel,
+      description: updatedInfo.description,
+      purpose: updatedInfo.purpose,
+      topic: updatedInfo.topic
+    });
+    
+    toast({
+      title: "Channel updated",
+      description: "Channel information has been updated successfully",
+    });
   };
 
   const filteredChannels = mockChannels.filter(channel => 
@@ -256,10 +299,9 @@ const TeamChatPage = () => {
             </div>
 
             <Tabs defaultValue="chat" className="w-full" onValueChange={setSelectedTab}>
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="chat">Chat</TabsTrigger>
                 <TabsTrigger value="calls">Calls</TabsTrigger>
-                <TabsTrigger value="ivr">IVR</TabsTrigger>
               </TabsList>
               
               <TabsContent value="chat" className="mt-3 space-y-4">
@@ -372,38 +414,6 @@ const TeamChatPage = () => {
                   </div>
                 </ScrollArea>
               </TabsContent>
-              
-              <TabsContent value="ivr" className="mt-3">
-                <div className="p-2 space-y-4">
-                  <div className="text-center py-8">
-                    <h3 className="font-medium mb-2">Interactive Voice Response</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Configure your automatic phone system to handle incoming calls
-                    </p>
-                    <Button>
-                      Configure IVR System
-                    </Button>
-                  </div>
-                  
-                  <div className="border rounded-md p-3">
-                    <h4 className="font-medium text-sm mb-2">Recent IVR Stats</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Total calls today</span>
-                        <span className="font-medium">12</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Avg. handling time</span>
-                        <span className="font-medium">2:45</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Transferred to agent</span>
-                        <span className="font-medium">4</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
             </Tabs>
           </div>
         </div>
@@ -423,6 +433,51 @@ const TeamChatPage = () => {
             </div>
             
             <div className="flex items-center space-x-1">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => setShowChannelInfo(!showChannelInfo)}
+                    >
+                      <Info size={18} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Channel info</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => setShowPinnedMessages(!showPinnedMessages)}
+                    >
+                      <Pin size={18} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Pinned messages</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => setShowChannelCanvas(!showChannelCanvas)}
+                    >
+                      <Palette size={18} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Channel canvas</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -526,6 +581,7 @@ const TeamChatPage = () => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>Reply</DropdownMenuItem>
                         <DropdownMenuItem>Add reaction</DropdownMenuItem>
+                        <DropdownMenuItem>Pin message</DropdownMenuItem>
                         <DropdownMenuItem>Copy text</DropdownMenuItem>
                         <DropdownMenuItem>Forward</DropdownMenuItem>
                       </DropdownMenuContent>
@@ -543,7 +599,7 @@ const TeamChatPage = () => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" onClick={() => setShowGiphyPicker(!showGiphyPicker)}>
+                      <Button variant="ghost" size="icon" onClick={() => setShowGifPicker(!showGifPicker)}>
                         <SmilePlus size={18} />
                       </Button>
                     </TooltipTrigger>
@@ -581,15 +637,40 @@ const TeamChatPage = () => {
               />
             </div>
             
-            {showGiphyPicker && (
+            {showGifPicker && (
               <div className="absolute bottom-[124px] left-4 z-10">
-                <GiphyPicker
+                <EnhancedGiphyPicker
                   onSelect={handleSelectGif}
-                  onClose={() => setShowGiphyPicker(false)}
+                  onClose={() => setShowGifPicker(false)}
                 />
               </div>
             )}
           </div>
+          
+          {showPinnedMessages && (
+            <PinnedMessages 
+              isOpen={showPinnedMessages} 
+              onClose={() => setShowPinnedMessages(false)} 
+              messages={pinnedMessages}
+              onUnpinMessage={handleUnpinMessage}
+            />
+          )}
+          
+          {showChannelInfo && (
+            <ChannelInfoPanel 
+              isOpen={showChannelInfo} 
+              onClose={() => setShowChannelInfo(false)} 
+              channel={activeChannel}
+              onUpdateChannel={handleUpdateChannel}
+            />
+          )}
+          
+          {showChannelCanvas && (
+            <ChannelCanvas 
+              isOpen={showChannelCanvas} 
+              onClose={() => setShowChannelCanvas(false)} 
+            />
+          )}
         </div>
       </div>
       
