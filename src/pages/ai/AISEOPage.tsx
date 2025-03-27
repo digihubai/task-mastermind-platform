@@ -10,10 +10,12 @@ import SEOContentPreview from "@/components/seo/SEOContentPreview";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const steps = ["keywords", "title", "outline", "image", "content"];
 
 const AISEOPage = () => {
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
   const [seoData, setSeoData] = useState({
     topic: "",
@@ -29,7 +31,12 @@ const AISEOPage = () => {
     subtitleCount: 5,
     outlineCount: 2,
     image: null,
+    featuredImage: "",
+    imagePrompt: "",
+    imageSize: "square",
+    imageCount: 4,
     content: "",
+    savedContent: ""
   });
 
   const handleDataChange = (field: string, value: any) => {
@@ -37,6 +44,13 @@ const AISEOPage = () => {
       ...prev,
       [field]: value,
     }));
+
+    if (field === "savedContent") {
+      toast({
+        title: "Content saved",
+        description: "Your SEO content has been saved successfully.",
+      });
+    }
   };
 
   const handleNext = () => {
