@@ -1,4 +1,3 @@
-
 // Team chat related types
 export interface TeamMessage {
   id: string;
