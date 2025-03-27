@@ -41,8 +41,9 @@ import {
   ListChecks,
   User,
 } from "lucide-react";
+import { SidebarItemType, SidebarSectionType } from "@/types/sidebar";
 
-export const sidebarSections = [
+export const sidebarSections: SidebarSectionType[] = [
   {
     title: "Main Navigation",
     items: [
