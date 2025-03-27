@@ -4,6 +4,7 @@ import {
   MessageSquare, Mail, Phone, Users, Database, FileText, 
   BarChart3, RefreshCw, Calendar, Bell, ArrowDownUp, CheckCircle 
 } from "lucide-react";
+import React from "react";
 
 export interface WorkflowTemplate {
   id: number;
@@ -39,7 +40,7 @@ export const useWorkflowTemplates = () => {
       id: 1,
       title: "Customer Support IVR",
       description: "Interactive voice response system for handling customer calls and routing to proper departments.",
-      icon: <Phone size={20} className="text-violet-600" />,
+      icon: React.createElement(Phone, { size: 20, className: "text-violet-600" }),
       categoryLabel: "Phone",
       category: "communication",
       popular: true
@@ -48,7 +49,7 @@ export const useWorkflowTemplates = () => {
       id: 2,
       title: "Multi-Channel Chat Support",
       description: "Connect with customers through multiple chat platforms with a unified inbox.",
-      icon: <MessageSquare size={20} className="text-blue-600" />,
+      icon: React.createElement(MessageSquare, { size: 20, className: "text-blue-600" }),
       categoryLabel: "Messaging",
       category: "communication",
       popular: true
@@ -57,7 +58,7 @@ export const useWorkflowTemplates = () => {
       id: 3,
       title: "Email Response Automation",
       description: "Automatically categorize and respond to common email inquiries.",
-      icon: <Mail size={20} className="text-indigo-600" />,
+      icon: React.createElement(Mail, { size: 20, className: "text-indigo-600" }),
       categoryLabel: "Email",
       category: "communication",
       popular: false
@@ -68,7 +69,7 @@ export const useWorkflowTemplates = () => {
       id: 4,
       title: "CSAT Dashboard",
       description: "Monitor customer satisfaction scores across all touchpoints.",
-      icon: <BarChart3 size={20} className="text-green-600" />,
+      icon: React.createElement(BarChart3, { size: 20, className: "text-green-600" }),
       categoryLabel: "Analytics",
       category: "customer-service",
       popular: true
@@ -77,7 +78,7 @@ export const useWorkflowTemplates = () => {
       id: 5,
       title: "Ticket Resolution Timer",
       description: "Track and improve response and resolution times with automated reports.",
-      icon: <RefreshCw size={20} className="text-blue-600" />,
+      icon: React.createElement(RefreshCw, { size: 20, className: "text-blue-600" }),
       categoryLabel: "Performance",
       category: "customer-service",
       popular: false
@@ -86,7 +87,7 @@ export const useWorkflowTemplates = () => {
       id: 6,
       title: "Refund Processing",
       description: "Streamline refund approval process with proper documentation and authorization.",
-      icon: <Database size={20} className="text-indigo-600" />,
+      icon: React.createElement(Database, { size: 20, className: "text-indigo-600" }),
       categoryLabel: "Operations",
       category: "customer-service",
       popular: false
@@ -97,7 +98,7 @@ export const useWorkflowTemplates = () => {
       id: 7,
       title: "Lead Qualification",
       description: "Score and route leads to the appropriate sales representatives.",
-      icon: <Users size={20} className="text-amber-600" />,
+      icon: React.createElement(Users, { size: 20, className: "text-amber-600" }),
       categoryLabel: "Pipeline",
       category: "sales",
       popular: true
@@ -106,7 +107,7 @@ export const useWorkflowTemplates = () => {
       id: 8,
       title: "Contract Approval Process",
       description: "Manage the review and approval of sales contracts with role-based permissions.",
-      icon: <FileText size={20} className="text-violet-600" />,
+      icon: React.createElement(FileText, { size: 20, className: "text-violet-600" }),
       categoryLabel: "Documents",
       category: "sales",
       popular: false
@@ -117,7 +118,7 @@ export const useWorkflowTemplates = () => {
       id: 9,
       title: "Task Lifecycle Management",
       description: "Track tasks from creation to completion with custom status transitions.",
-      icon: <CheckCircle size={20} className="text-green-600" />,
+      icon: React.createElement(CheckCircle, { size: 20, className: "text-green-600" }),
       categoryLabel: "Tasks",
       category: "project",
       popular: true
@@ -126,7 +127,7 @@ export const useWorkflowTemplates = () => {
       id: 10,
       title: "Deadline Reminders",
       description: "Send automated reminders about upcoming project deadlines.",
-      icon: <Calendar size={20} className="text-blue-600" />,
+      icon: React.createElement(Calendar, { size: 20, className: "text-blue-600" }),
       categoryLabel: "Scheduling",
       category: "project",
       popular: false
@@ -137,7 +138,7 @@ export const useWorkflowTemplates = () => {
       id: 11,
       title: "Expense Approval",
       description: "Multi-level approval workflow for expense reports with budget validation.",
-      icon: <Database size={20} className="text-amber-600" />,
+      icon: React.createElement(Database, { size: 20, className: "text-amber-600" }),
       categoryLabel: "Expenses",
       category: "finance",
       popular: true
@@ -148,7 +149,7 @@ export const useWorkflowTemplates = () => {
       id: 12,
       title: "Onboarding Process",
       description: "Streamline new employee onboarding with automated task assignments.",
-      icon: <Users size={20} className="text-indigo-600" />,
+      icon: React.createElement(Users, { size: 20, className: "text-indigo-600" }),
       categoryLabel: "Employees",
       category: "hr",
       popular: true
