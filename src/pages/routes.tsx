@@ -9,6 +9,11 @@ import AIVisionPage from "./ai/AIVisionPage";
 import PDFInsightPage from "./ai/PDFInsightPage";
 import AIBots from "./user/AIBots";
 import WorkflowEditor from "./automation/WorkflowEditor";
+// User AI tool pages
+import AIRewriter from "./user/AIRewriter";
+import AISEOWriter from "./user/AISEOWriter";
+import AIVision from "./user/AIVision";
+import PDFInsight from "./user/PDFInsight";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +51,23 @@ const router = createBrowserRouter([
   {
     path: "/automation/editor/:id?",
     element: <WorkflowEditor />,
+  },
+  // User AI tool routes
+  {
+    path: "/user/ai-rewriter",
+    element: <AIRewriter />,
+  },
+  {
+    path: "/user/ai-seo-writer",
+    element: <AISEOWriter />,
+  },
+  {
+    path: "/user/ai-vision",
+    element: <AIVision />,
+  },
+  {
+    path: "/user/pdf-insight",
+    element: <PDFInsight />,
   },
 ]);
 

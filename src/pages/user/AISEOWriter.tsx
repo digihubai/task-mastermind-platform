@@ -3,34 +3,33 @@ import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Search, 
-  Globe, 
-  BarChart, 
-  ListChecks, 
   Edit, 
   Copy, 
-  Download,
-  Sparkles
+  RotateCcw,
+  Sparkles,
+  Globe,
+  BarChart3,
+  ArrowUp
 } from "lucide-react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 
 const AISEOWriter = () => {
   const [keyword, setKeyword] = useState("");
-  const [contentType, setContentType] = useState("blog-post");
+  const [contentType, setContentType] = useState("blogPost");
+  const [tone, setTone] = useState("professional");
+  const [wordCount, setWordCount] = useState("500");
   const [generatedContent, setGeneratedContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [seoScore, setSeoScore] = useState(0);
-  const [keywordDensity, setKeywordDensity] = useState(0);
-  const [readabilityScore, setReadabilityScore] = useState(0);
   
-  const handleGenerateContent = () => {
+  const handleGenerate = () => {
     if (!keyword.trim()) {
-      toast.error("Please enter a keyword to generate content");
+      toast.error("Please enter a target keyword");
       return;
     }
     
@@ -38,54 +37,35 @@ const AISEOWriter = () => {
     
     // Simulate AI generation process
     setTimeout(() => {
-      const sampleContent = `# ${keyword}: The Ultimate Guide
-
-## Introduction
-When it comes to ${keyword}, there's a lot to understand and explore. This comprehensive guide will walk you through everything you need to know about ${keyword} in 2023.
-
-## What is ${keyword}?
-${keyword} refers to a specialized approach in the industry that has gained significant attention in recent years. Experts in ${keyword} have noted its importance for businesses looking to gain a competitive edge.
-
-## Why ${keyword} Matters
-Understanding ${keyword} is crucial for several reasons:
-- It helps improve your overall digital strategy
-- It provides insights into customer behavior
-- It can significantly boost your conversion rates
-
-## How to Implement ${keyword} Strategies
-1. Start with a comprehensive audit
-2. Develop a tailored approach for your specific needs
-3. Monitor results and adjust accordingly
-4. Stay updated with the latest ${keyword} trends
-
-## Conclusion
-By leveraging ${keyword} effectively, organizations can see substantial improvements in their performance metrics and stay ahead of the competition.`;
+      const contentTypeFormats = {
+        blogPost: "# Blog Post",
+        metaDescription: "Meta Description",
+        productDescription: "## Product Description",
+        landingPage: "# Landing Page Content",
+        socialPost: "Social Media Post"
+      };
       
-      setGeneratedContent(sampleContent);
-      setSeoScore(Math.floor(Math.random() * 20) + 80); // 80-100
-      setKeywordDensity(Math.floor(Math.random() * 3) + 1); // 1-4%
-      setReadabilityScore(Math.floor(Math.random() * 15) + 70); // 70-85
+      const format = contentTypeFormats[contentType as keyof typeof contentTypeFormats];
+      
+      setGeneratedContent(`${format}: ${keyword}\n\nThis is an SEO-optimized ${contentType} about "${keyword}" in a ${tone} tone that is approximately ${wordCount} words in length.\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\n\n## Key SEO Elements\n\n- Primary keyword "${keyword}" used in title, headings, and body\n- Secondary keywords included naturally\n- Optimized heading structure (H1, H2, H3)\n- Proper keyword density (2-3%)\n- Meta description optimized for click-through\n- Internal and external linking opportunities\n\nThis content is designed to rank well for "${keyword}" while providing value to readers and maintaining a natural, engaging ${tone} tone.`);
       
       setIsGenerating(false);
-      toast.success("SEO content generated successfully!");
-    }, 3000);
+      toast.success("SEO content generated!");
+    }, 2000);
+  };
+  
+  const handleReset = () => {
+    setKeyword("");
+    setContentType("blogPost");
+    setTone("professional");
+    setWordCount("500");
+    setGeneratedContent("");
+    toast.info("All fields have been reset");
   };
   
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(generatedContent);
-    toast.success("Content copied to clipboard!");
-  };
-  
-  const handleDownload = () => {
-    const element = document.createElement("a");
-    const file = new Blob([generatedContent], {type: 'text/markdown'});
-    element.href = URL.createObjectURL(file);
-    element.download = `${keyword.replace(/\s+/g, '-').toLowerCase()}-seo-content.md`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-    
-    toast.success("Content downloaded as Markdown!");
+    toast.success("Copied to clipboard!");
   };
   
   return (
@@ -94,29 +74,125 @@ By leveraging ${keyword} effectively, organizations can see substantial improvem
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">AI SEO Writer</h1>
           <p className="text-muted-foreground mt-1">
-            Create SEO-optimized content that ranks well on search engines
+            Generate search-optimized content for better rankings and traffic
           </p>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <Card className="p-6 border border-border/40">
-              <Tabs defaultValue="editor" className="w-full">
+              <Tabs defaultValue="input" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-4">
-                  <TabsTrigger value="editor">Content Editor</TabsTrigger>
-                  <TabsTrigger value="analysis">SEO Analysis</TabsTrigger>
+                  <TabsTrigger value="input">Input Parameters</TabsTrigger>
+                  <TabsTrigger value="output">Generated Content</TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="editor">
+                <TabsContent value="input">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium mb-1.5 block">Target Keyword</label>
+                      <Input 
+                        placeholder="Enter your main SEO keyword or phrase" 
+                        value={keyword}
+                        onChange={(e) => setKeyword(e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="text-sm font-medium mb-1.5 block">Content Type</label>
+                        <Select 
+                          value={contentType} 
+                          onValueChange={setContentType}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select content type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="blogPost">Blog Post</SelectItem>
+                            <SelectItem value="metaDescription">Meta Description</SelectItem>
+                            <SelectItem value="productDescription">Product Description</SelectItem>
+                            <SelectItem value="landingPage">Landing Page</SelectItem>
+                            <SelectItem value="socialPost">Social Media Post</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-medium mb-1.5 block">Tone</label>
+                        <Select 
+                          value={tone} 
+                          onValueChange={setTone}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select tone" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="professional">Professional</SelectItem>
+                            <SelectItem value="conversational">Conversational</SelectItem>
+                            <SelectItem value="persuasive">Persuasive</SelectItem>
+                            <SelectItem value="educational">Educational</SelectItem>
+                            <SelectItem value="enthusiastic">Enthusiastic</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-medium mb-1.5 block">Word Count</label>
+                        <Select 
+                          value={wordCount} 
+                          onValueChange={setWordCount}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select length" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="100">Short (~100 words)</SelectItem>
+                            <SelectItem value="300">Brief (~300 words)</SelectItem>
+                            <SelectItem value="500">Standard (~500 words)</SelectItem>
+                            <SelectItem value="1000">Long (~1000 words)</SelectItem>
+                            <SelectItem value="2000">Comprehensive (~2000 words)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      className="w-full mt-4 gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+                      onClick={handleGenerate}
+                      disabled={isGenerating || !keyword.trim()}
+                    >
+                      {isGenerating ? (
+                        <>Generating content...</>
+                      ) : (
+                        <>
+                          <Sparkles size={16} />
+                          Generate SEO Content
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="output">
                   <Textarea
-                    placeholder="Generated SEO content will appear here..."
-                    className="min-h-[400px] font-mono text-sm resize-none"
+                    placeholder="SEO-optimized content will appear here..."
+                    className="min-h-[300px] resize-none font-mono text-sm"
                     value={generatedContent}
-                    onChange={(e) => setGeneratedContent(e.target.value)}
+                    readOnly
                   />
                   
                   {generatedContent && (
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex justify-between mt-4">
+                      <Button 
+                        variant="outline" 
+                        onClick={handleReset}
+                        className="gap-2"
+                      >
+                        <RotateCcw size={16} />
+                        Reset
+                      </Button>
+                      
                       <Button 
                         variant="outline" 
                         onClick={handleCopyToClipboard}
@@ -125,83 +201,6 @@ By leveraging ${keyword} effectively, organizations can see substantial improvem
                         <Copy size={16} />
                         Copy
                       </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        onClick={handleDownload}
-                        className="gap-2"
-                      >
-                        <Download size={16} />
-                        Download
-                      </Button>
-                    </div>
-                  )}
-                </TabsContent>
-                
-                <TabsContent value="analysis">
-                  {generatedContent ? (
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Card className="p-4 border border-border/40 bg-green-50 dark:bg-green-900/20">
-                          <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                            <BarChart size={18} />
-                            <h3 className="font-medium">SEO Score</h3>
-                          </div>
-                          <p className="text-3xl font-bold mt-2 text-green-700 dark:text-green-400">{seoScore}/100</p>
-                          <p className="text-xs text-green-700/70 dark:text-green-400/70 mt-1">
-                            {seoScore >= 90 ? 'Excellent' : seoScore >= 80 ? 'Good' : 'Needs Improvement'}
-                          </p>
-                        </Card>
-                        
-                        <Card className="p-4 border border-border/40 bg-blue-50 dark:bg-blue-900/20">
-                          <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
-                            <Globe size={18} />
-                            <h3 className="font-medium">Keyword Density</h3>
-                          </div>
-                          <p className="text-3xl font-bold mt-2 text-blue-700 dark:text-blue-400">{keywordDensity}%</p>
-                          <p className="text-xs text-blue-700/70 dark:text-blue-400/70 mt-1">
-                            {keywordDensity >= 3 ? 'High' : keywordDensity >= 2 ? 'Optimal' : 'Low'}
-                          </p>
-                        </Card>
-                        
-                        <Card className="p-4 border border-border/40 bg-purple-50 dark:bg-purple-900/20">
-                          <div className="flex items-center gap-2 text-purple-700 dark:text-purple-400">
-                            <Edit size={18} />
-                            <h3 className="font-medium">Readability</h3>
-                          </div>
-                          <p className="text-3xl font-bold mt-2 text-purple-700 dark:text-purple-400">{readabilityScore}/100</p>
-                          <p className="text-xs text-purple-700/70 dark:text-purple-400/70 mt-1">
-                            {readabilityScore >= 80 ? 'Easy to Read' : readabilityScore >= 70 ? 'Moderate' : 'Complex'}
-                          </p>
-                        </Card>
-                      </div>
-                      
-                      <Card className="p-4 border border-border/40">
-                        <h3 className="font-medium mb-3">SEO Recommendations</h3>
-                        <ul className="space-y-2">
-                          <li className="flex items-start gap-2">
-                            <ListChecks className="h-4 w-4 text-green-600 mt-0.5" />
-                            <span className="text-sm">Add more relevant heading tags (H2, H3)</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <ListChecks className="h-4 w-4 text-green-600 mt-0.5" />
-                            <span className="text-sm">Include the keyword in the first 100 words</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <ListChecks className="h-4 w-4 text-green-600 mt-0.5" />
-                            <span className="text-sm">Add more internal and external links</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <ListChecks className="h-4 w-4 text-green-600 mt-0.5" />
-                            <span className="text-sm">Consider adding image alt text with keywords</span>
-                          </li>
-                        </ul>
-                      </Card>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-12">
-                      <Search className="h-12 w-12 text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">Generate content to see SEO analysis</p>
                     </div>
                   )}
                 </TabsContent>
@@ -211,95 +210,69 @@ By leveraging ${keyword} effectively, organizations can see substantial improvem
           
           <div className="space-y-6">
             <Card className="p-6 border border-border/40">
-              <h3 className="text-lg font-medium mb-4">Content Generator</h3>
+              <h3 className="text-lg font-medium mb-4">SEO Performance</h3>
               
               <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-1.5 block">Target Keyword</label>
-                  <Input
-                    placeholder="e.g., digital marketing strategies"
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
-                  />
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium mb-1.5 block">Content Type</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      variant={contentType === "blog-post" ? "default" : "outline"}
-                      className="w-full justify-start"
-                      onClick={() => setContentType("blog-post")}
-                    >
-                      <Badge variant="outline" className="mr-2">Blog</Badge>
-                      Blog Post
-                    </Button>
-                    
-                    <Button
-                      variant={contentType === "landing-page" ? "default" : "outline"}
-                      className="w-full justify-start"
-                      onClick={() => setContentType("landing-page")}
-                    >
-                      <Badge variant="outline" className="mr-2">Page</Badge>
-                      Landing Page
-                    </Button>
-                    
-                    <Button
-                      variant={contentType === "product-desc" ? "default" : "outline"}
-                      className="w-full justify-start"
-                      onClick={() => setContentType("product-desc")}
-                    >
-                      <Badge variant="outline" className="mr-2">Prod</Badge>
-                      Product Desc
-                    </Button>
-                    
-                    <Button
-                      variant={contentType === "meta-tags" ? "default" : "outline"}
-                      className="w-full justify-start"
-                      onClick={() => setContentType("meta-tags")}
-                    >
-                      <Badge variant="outline" className="mr-2">Meta</Badge>
-                      Meta Tags
-                    </Button>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Keyword Optimization</span>
+                    <span className="text-sm font-medium text-green-600 flex items-center">
+                      Excellent
+                      <ArrowUp className="ml-1 h-3 w-3" />
+                    </span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-green-500 h-2 rounded-full" style={{ width: '92%' }}></div>
                   </div>
                 </div>
                 
-                <Button 
-                  className="w-full mt-4 gap-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
-                  onClick={handleGenerateContent}
-                  disabled={isGenerating || !keyword.trim()}
-                >
-                  {isGenerating ? (
-                    <>Generating content...</>
-                  ) : (
-                    <>
-                      <Sparkles size={16} />
-                      Generate SEO Content
-                    </>
-                  )}
-                </Button>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Readability</span>
+                    <span className="text-sm font-medium text-green-600 flex items-center">
+                      Good
+                      <ArrowUp className="ml-1 h-3 w-3" />
+                    </span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-green-500 h-2 rounded-full" style={{ width: '78%' }}></div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Originality</span>
+                    <span className="text-sm font-medium text-amber-600 flex items-center">
+                      Moderate
+                      <ArrowUp className="ml-1 h-3 w-3" />
+                    </span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-amber-500 h-2 rounded-full" style={{ width: '65%' }}></div>
+                  </div>
+                </div>
               </div>
             </Card>
             
             <Card className="p-6 border border-border/40">
-              <h3 className="text-lg font-medium mb-4">SEO Writing Tips</h3>
+              <h3 className="text-lg font-medium mb-4">SEO Tips</h3>
               
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex gap-2">
-                  <Globe className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                  <span>Use your target keyword in headings, intro and conclusion</span>
+                  <Search className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Include your target keyword in title, headings, and first paragraph</span>
                 </li>
                 <li className="flex gap-2">
                   <Globe className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                  <span>Create content that answers user's search intent</span>
+                  <span>Add relevant internal and external links</span>
                 </li>
                 <li className="flex gap-2">
-                  <Globe className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                  <span>Use related keywords and LSI terms throughout</span>
+                  <Edit className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Keep paragraphs short (3-4 sentences max)</span>
                 </li>
                 <li className="flex gap-2">
-                  <Globe className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                  <span>Maintain readability with short sentences and paragraphs</span>
+                  <BarChart3 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span>Maintain keyword density between 1-2%</span>
                 </li>
               </ul>
             </Card>

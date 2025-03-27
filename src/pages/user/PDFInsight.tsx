@@ -12,120 +12,78 @@ import {
   Search, 
   Download, 
   Copy, 
-  ListFilter,
-  FileQuestion,
+  RotateCcw,
+  Book,
+  FileSearch,
+  List,
   MessageSquare,
-  ExternalLink,
   Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
-import { ChatInterface } from "@/components/chatbot/ChatInterface";
 
 const PDFInsight = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [fileName, setFileName] = useState<string>("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isProcessed, setIsProcessed] = useState(false);
-  const [extractedText, setExtractedText] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState("upload");
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [prompt, setPrompt] = useState("");
+  const [analysisResult, setAnalysisResult] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && file.type === "application/pdf") {
+    if (file) {
       setSelectedFile(file);
-      setFileName(file.name);
-      setIsProcessed(false);
-      setExtractedText("");
-      setSearchResults([]);
-    } else if (file) {
-      toast.error("Please upload a PDF file");
+      
+      // For PDF we just store the name
+      setFilePreview(file.name);
+      
+      // Reset analysis
+      setAnalysisResult("");
     }
   };
   
-  const handleProcessPDF = () => {
+  const handleAnalyze = () => {
     if (!selectedFile) {
       toast.error("Please upload a PDF file first");
       return;
     }
     
-    setIsProcessing(true);
+    setIsAnalyzing(true);
     
-    // Simulate PDF processing
+    // Simulate AI analysis process
     setTimeout(() => {
-      const sampleText = `
-# Sample Document Title
-
-## Executive Summary
-This document provides an overview of the key findings from our research study conducted in Q2 2023. The analysis reveals significant opportunities for market expansion in the Asia-Pacific region, with particular focus on emerging technologies in the healthcare and finance sectors.
-
-## Introduction
-The global landscape for digital transformation has accelerated dramatically in recent years, with organizations across all sectors embracing new technologies to remain competitive. This report examines the current state of technology adoption and provides recommendations for strategic implementations.
-
-## Key Findings
-1. Cloud computing adoption increased by 34% year-over-year
-2. Artificial intelligence implementations showed positive ROI in 76% of cases
-3. Cybersecurity remains the top concern for 89% of IT decision-makers
-4. Remote workforce enablement continues to drive technology spending
-
-## Methodology
-Our research included surveys of 1,200 IT professionals across 14 countries, complemented by in-depth interviews with 75 CIOs and CTOs from Fortune 500 companies. Data collection occurred between March and May 2023.
-
-## Conclusions
-Organizations that prioritize digital resilience while focusing on customer experience will be best positioned to capitalize on emerging opportunities. We recommend a balanced approach to technology investment, with particular attention to security, scalability, and user experience.
-
-## Recommendations
-- Increase cloud infrastructure investments by 15-20%
-- Implement AI-driven analytics for customer insights
-- Enhance security protocols for remote work environments
-- Develop comprehensive digital transformation roadmaps
-      `;
+      const sampleAnalysis = prompt.trim() 
+        ? `Analysis based on prompt: "${prompt}"\n\n` 
+        : "";
       
-      setExtractedText(sampleText);
-      setIsProcessing(false);
-      setIsProcessed(true);
-      setActiveTab("content");
+      setAnalysisResult(`${sampleAnalysis}## PDF Analysis\n\nThis document appears to be a ${selectedFile.name.includes("report") ? "formal report" : "document"} containing information about business operations.\n\n### Key Points:\n- Executive Summary section on page 1\n- Financial data on pages 3-5\n- Conclusions and recommendations on page 8\n\n### Content Analysis:\n- Document tone: formal/professional\n- Primary topics: business strategy, financial performance\n- Key metrics identified: revenue growth (8%), customer acquisition cost ($52)\n\n### Summary:\nThe document presents an overview of quarterly business performance with positive growth indicators in most areas. Several recommendations are made for improving operations in the next quarter.`);
       
-      toast.success("PDF processed successfully!");
+      setIsAnalyzing(false);
+      toast.success("PDF analysis complete!");
     }, 2000);
   };
   
-  const handleSearch = () => {
-    if (!searchQuery.trim() || !extractedText) {
-      return;
-    }
-    
-    // Simple search implementation
-    const allLines = extractedText.split('\n').filter(line => line.trim());
-    const matchingLines = allLines.filter(line => 
-      line.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    
-    setSearchResults(matchingLines);
-    
-    if (matchingLines.length === 0) {
-      toast.info("No results found for your search query");
-    } else {
-      toast.success(`Found ${matchingLines.length} results`);
-    }
+  const handleClearFile = () => {
+    setSelectedFile(null);
+    setFilePreview(null);
+    setAnalysisResult("");
+    setPrompt("");
   };
   
   const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(extractedText);
-    toast.success("Content copied to clipboard!");
+    navigator.clipboard.writeText(analysisResult);
+    toast.success("Analysis copied to clipboard!");
   };
   
-  const handleDownloadText = () => {
+  const handleDownloadAnalysis = () => {
     const element = document.createElement("a");
-    const file = new Blob([extractedText], {type: 'text/plain'});
+    const file = new Blob([analysisResult], {type: 'text/markdown'});
     element.href = URL.createObjectURL(file);
-    element.download = `${fileName.replace('.pdf', '')}-extracted.txt`;
+    element.download = `pdf-analysis-${Date.now()}.md`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
     
-    toast.success("Content downloaded as text file!");
+    toast.success("Analysis downloaded as Markdown!");
   };
   
   return (
@@ -134,41 +92,71 @@ Organizations that prioritize digital resilience while focusing on customer expe
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">PDF Insight</h1>
           <p className="text-muted-foreground mt-1">
-            Extract and analyze information from PDF documents
+            Extract insights, summarize content, and ask questions about PDF documents
           </p>
         </div>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-4 mb-6">
-            <TabsTrigger value="upload" className="flex items-center gap-1">
-              <Upload className="h-4 w-4" />
-              <span className="hidden sm:inline">Upload</span>
-            </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center gap-1">
-              <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">Content</span>
-            </TabsTrigger>
-            <TabsTrigger value="search" className="flex items-center gap-1">
-              <Search className="h-4 w-4" />
-              <span className="hidden sm:inline">Search</span>
-            </TabsTrigger>
-            <TabsTrigger value="chat" className="flex items-center gap-1">
-              <MessageSquare className="h-4 w-4" />
-              <span className="hidden sm:inline">Chat</span>
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="upload">
-            <Card className="p-6 border border-border/40">
-              <h3 className="text-lg font-medium mb-4">Upload PDF Document</h3>
-              
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="p-6 border border-border/40">
+            <h3 className="text-lg font-medium mb-4">Document Input</h3>
+            
+            {filePreview ? (
+              <div className="space-y-4">
+                <div className="relative border rounded-md p-4 bg-muted/40">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-full">
+                      <FileText className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{filePreview}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedFile?.size ? `${(selectedFile.size / 1024 / 1024).toFixed(2)} MB` : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2 text-muted-foreground hover:text-foreground"
+                    onClick={handleClearFile}
+                  >
+                    <RotateCcw size={16} />
+                  </Button>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium mb-1.5 block">Analysis Prompt (Optional)</label>
+                  <Textarea 
+                    placeholder="E.g., 'Summarize the key points in this document' or 'Extract all financial data'"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    className="h-24 resize-none"
+                  />
+                </div>
+                
+                <Button 
+                  className="w-full gap-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white"
+                  onClick={handleAnalyze}
+                  disabled={isAnalyzing}
+                >
+                  {isAnalyzing ? (
+                    <>Analyzing document...</>
+                  ) : (
+                    <>
+                      <Search size={16} />
+                      Analyze Document
+                    </>
+                  )}
+                </Button>
+              </div>
+            ) : (
               <div 
                 className="border-2 border-dashed rounded-md p-8 text-center cursor-pointer hover:bg-accent/50 transition-colors"
                 onClick={() => document.getElementById('pdf-upload')?.click()}
               >
                 <div className="flex flex-col items-center">
                   <div className="bg-primary/10 p-3 rounded-full mb-3">
-                    <FileText className="h-6 w-6 text-primary" />
+                    <Upload className="h-6 w-6 text-primary" />
                   </div>
                   <h4 className="text-base font-medium">Upload a PDF document</h4>
                   <p className="text-sm text-muted-foreground mt-1 mb-3">
@@ -181,274 +169,122 @@ Organizations that prioritize digital resilience while focusing on customer expe
                     type="file" 
                     id="pdf-upload" 
                     className="hidden" 
-                    accept="application/pdf"
+                    accept=".pdf"
                     onChange={handleFileChange}
                   />
                 </div>
               </div>
+            )}
+          </Card>
+          
+          <Card className="p-6 border border-border/40">
+            <Tabs defaultValue="analysis" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="analysis">Analysis Results</TabsTrigger>
+                <TabsTrigger value="actions">Actions</TabsTrigger>
+              </TabsList>
               
-              {selectedFile && (
-                <div className="mt-6 p-4 border rounded-md">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-red-50 dark:bg-red-900/20 p-2 rounded-full">
-                        <FileText className="h-5 w-5 text-red-600 dark:text-red-400" />
+              <TabsContent value="analysis">
+                {analysisResult ? (
+                  <div>
+                    <Textarea
+                      value={analysisResult}
+                      readOnly
+                      className="min-h-[300px] font-mono text-sm resize-none"
+                    />
+                    
+                    <div className="flex gap-2 mt-4">
+                      <Button 
+                        variant="outline" 
+                        onClick={handleCopyToClipboard}
+                        className="gap-2"
+                      >
+                        <Copy size={16} />
+                        Copy
+                      </Button>
+                      
+                      <Button 
+                        variant="outline" 
+                        onClick={handleDownloadAnalysis}
+                        className="gap-2"
+                      >
+                        <Download size={16} />
+                        Download
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 h-[300px]">
+                    <div className="bg-muted p-3 rounded-full mb-3">
+                      <FileText className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <p className="text-muted-foreground">Upload and analyze a PDF to see results</p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="actions">
+                <div className="space-y-4">
+                  <Card className="p-4 border border-border/40 cursor-pointer hover:bg-accent/50 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded-full">
+                        <Book className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div>
-                        <p className="font-medium">{fileName}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                        <h4 className="font-medium">Summarize Document</h4>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Create concise summaries of long documents
                         </p>
                       </div>
                     </div>
-                    
-                    <Button 
-                      className="gap-2 bg-gradient-to-r from-red-500 to-orange-500 text-white"
-                      onClick={handleProcessPDF}
-                      disabled={isProcessing}
-                    >
-                      {isProcessing ? (
-                        <>Processing...</>
-                      ) : (
-                        <>
-                          <Sparkles size={16} />
-                          Process PDF
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="content">
-            <Card className="p-6 border border-border/40">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium">Extracted Content</h3>
-                
-                {isProcessed && (
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleCopyToClipboard}
-                      className="gap-1"
-                    >
-                      <Copy size={14} />
-                      <span>Copy</span>
-                    </Button>
-                    
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleDownloadText}
-                      className="gap-1"
-                    >
-                      <Download size={14} />
-                      <span>Download</span>
-                    </Button>
-                  </div>
-                )}
-              </div>
-              
-              {isProcessed ? (
-                <Textarea
-                  value={extractedText}
-                  onChange={(e) => setExtractedText(e.target.value)}
-                  className="min-h-[400px] font-mono text-sm"
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 h-[400px]">
-                  <div className="bg-muted p-3 rounded-full mb-3">
-                    <FileQuestion className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <p className="text-muted-foreground">
-                    {selectedFile 
-                      ? "Click 'Process PDF' to extract content" 
-                      : "Upload a PDF document first"
-                    }
-                  </p>
-                </div>
-              )}
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="search">
-            <Card className="p-6 border border-border/40">
-              <h3 className="text-lg font-medium mb-4">Search Document</h3>
-              
-              <div className="space-y-6">
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      className="pl-9"
-                      placeholder="Search within document..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                      disabled={!isProcessed}
-                    />
-                  </div>
-                  <Button 
-                    onClick={handleSearch}
-                    disabled={!isProcessed || !searchQuery.trim()}
-                  >
-                    Search
-                  </Button>
-                </div>
-                
-                {searchResults.length > 0 ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-medium">Search Results</h4>
-                      <span className="text-xs text-muted-foreground">
-                        {searchResults.length} results found
-                      </span>
-                    </div>
-                    
-                    <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                      {searchResults.map((result, index) => (
-                        <div 
-                          key={index} 
-                          className="p-3 rounded-md bg-accent/50 text-sm"
-                        >
-                          {result.replace(
-                            new RegExp(`(${searchQuery})`, 'gi'),
-                            '<mark>$1</mark>'
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : isProcessed ? (
-                  <div className="flex flex-col items-center justify-center py-12">
-                    <ListFilter className="h-12 w-12 text-muted-foreground mb-2" />
-                    <p className="text-muted-foreground">
-                      Search for specific information in the document
-                    </p>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center py-12">
-                    <FileQuestion className="h-12 w-12 text-muted-foreground mb-2" />
-                    <p className="text-muted-foreground">
-                      Process a PDF document first to search its content
-                    </p>
-                  </div>
-                )}
-              </div>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="chat">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <ChatInterface 
-                  title="PDF Assistant"
-                  variant="embedded"
-                  config={{
-                    initialMessage: "Hello! I'm your PDF assistant. Ask me anything about the document you've uploaded.",
-                    modelName: "gpt-4",
-                    maxTokens: 200,
-                    temperature: 0.7
-                  }}
-                />
-              </div>
-              
-              <div className="space-y-6">
-                <Card className="p-6 border border-border/40">
-                  <h3 className="text-lg font-medium mb-4">Document Information</h3>
+                  </Card>
                   
-                  {isProcessed ? (
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Filename:</span>
-                        <span className="text-sm font-medium">{fileName}</span>
+                  <Card className="p-4 border border-border/40 cursor-pointer hover:bg-accent/50 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-purple-50 dark:bg-purple-900/20 p-2 rounded-full">
+                        <FileSearch className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Pages:</span>
-                        <span className="text-sm font-medium">12</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Word Count:</span>
-                        <span className="text-sm font-medium">2,458</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Estimated Read Time:</span>
-                        <span className="text-sm font-medium">9 mins</span>
+                      <div>
+                        <h4 className="font-medium">Extract Data</h4>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Find and extract specific information from PDFs
+                        </p>
                       </div>
                     </div>
-                  ) : (
-                    <div className="text-center py-4">
-                      <p className="text-muted-foreground text-sm">
-                        Process a PDF to see document information
-                      </p>
+                  </Card>
+                  
+                  <Card className="p-4 border border-border/40 cursor-pointer hover:bg-accent/50 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-amber-50 dark:bg-amber-900/20 p-2 rounded-full">
+                        <List className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium">Generate Key Points</h4>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Identify and list the main points from documents
+                        </p>
+                      </div>
                     </div>
-                  )}
-                </Card>
-                
-                <Card className="p-6 border border-border/40">
-                  <h3 className="text-lg font-medium mb-4">Suggested Questions</h3>
+                  </Card>
                   
-                  <div className="space-y-2">
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start text-sm h-auto py-2 px-3"
-                      disabled={!isProcessed}
-                    >
-                      Summarize the key points of this document
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start text-sm h-auto py-2 px-3"
-                      disabled={!isProcessed}
-                    >
-                      What are the main recommendations?
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start text-sm h-auto py-2 px-3"
-                      disabled={!isProcessed}
-                    >
-                      Extract all tables and data points
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start text-sm h-auto py-2 px-3"
-                      disabled={!isProcessed}
-                    >
-                      Create a presentation based on this document
-                    </Button>
-                  </div>
-                </Card>
-                
-                <Card className="p-6 border border-border/40">
-                  <h3 className="text-lg font-medium mb-4">Tools</h3>
-                  
-                  <div className="space-y-3">
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start"
-                      disabled={!isProcessed}
-                    >
-                      <FileText className="mr-2 h-4 w-4" />
-                      Generate Executive Summary
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start"
-                      disabled={!isProcessed}
-                    >
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      Export to Google Docs
-                    </Button>
-                  </div>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+                  <Card className="p-4 border border-border/40 cursor-pointer hover:bg-accent/50 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded-full">
+                        <MessageSquare className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium">Ask Questions</h4>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Get answers to specific questions about the document
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </Card>
+        </div>
       </div>
     </AppLayout>
   );
