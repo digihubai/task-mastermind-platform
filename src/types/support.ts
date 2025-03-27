@@ -1,3 +1,4 @@
+
 // Team chat related types
 export interface TeamMessage {
   id: string;
@@ -38,6 +39,7 @@ export interface TeamChannel {
   unreadCount: number;
   isPinned?: boolean;
   icon?: string;
+  isActive?: boolean;
 }
 
 export interface TeamGroup {
@@ -49,6 +51,7 @@ export interface TeamGroup {
   lastMessage?: TeamMessage;
   unreadCount: number;
   isPinned?: boolean;
+  isActive?: boolean;
 }
 
 // Support ticket related types

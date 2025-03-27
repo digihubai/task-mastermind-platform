@@ -5,7 +5,6 @@ import { TeamChat } from '@/components/teamchat/TeamChat';
 import CreateChannelModal from '@/components/teamchat/CreateChannelModal';
 import ChannelInfoPanel from '@/components/teamchat/ChannelInfoPanel';
 import { TeamChannel } from '@/types/support';
-import { Info } from 'lucide-react';
 
 const TeamChatPage = () => {
   const [showCreateChannel, setShowCreateChannel] = useState(false);
@@ -109,30 +108,7 @@ const TeamChatPage = () => {
   return (
     <AppLayout>
       <div className="h-full flex flex-col">
-        <TeamChat 
-          channels={channels}
-          currentChannel={currentChannel}
-          onSelectChannel={handleSelectChannel}
-          onCreateChannel={() => setShowCreateChannel(true)}
-          onInfoClick={() => setShowChannelInfo(true)}
-        />
-        
-        {showCreateChannel && (
-          <CreateChannelModal 
-            isOpen={showCreateChannel}
-            onClose={() => setShowCreateChannel(false)}
-            onCreateChannel={handleCreateChannel}
-          />
-        )}
-        
-        {showChannelInfo && (
-          <ChannelInfoPanel 
-            channel={currentChannel}
-            isOpen={showChannelInfo}
-            onClose={() => setShowChannelInfo(false)}
-            onUpdateChannel={handleUpdateChannel}
-          />
-        )}
+        <TeamChat />
       </div>
     </AppLayout>
   );
