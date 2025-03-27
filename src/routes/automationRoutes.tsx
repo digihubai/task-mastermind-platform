@@ -7,7 +7,6 @@ import Workflows from '@/pages/automation/Workflows';
 const TemplatesPage = () => <div>Templates Page</div>;
 const EditorPage = () => <div>Editor Page</div>;
 const IndustryTemplatesPage = () => <div>Industry Templates Page</div>;
-const APIConnectorPage = () => <div>API Connector Page</div>;
 
 const automationRoutes: RouteObject[] = [
   {
@@ -25,10 +24,6 @@ const automationRoutes: RouteObject[] = [
   {
     path: '/automation/industry-templates',
     element: <IndustryTemplatesPage />,
-  },
-  {
-    path: '/automation/api-connector',
-    element: <APIConnectorPage />,
   },
 ];
 
