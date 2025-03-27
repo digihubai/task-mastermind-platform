@@ -4,8 +4,8 @@ import { RouteObject } from 'react-router-dom';
 import AIVisionPage from '@/pages/ai/AIVisionPage';
 import PDFInsightPage from '@/pages/ai/PDFInsightPage';
 import AICopywriterPage from '@/pages/ai/AICopywriterPage';
-import AISEOWriterPage from '@/pages/ai/AISEOWriterPage';
-import AIRewriterPage from '@/pages/ai/AIRewriterPage';
+import AIRewriter from '@/pages/user/AIRewriter';
+import AISEOWriter from '@/pages/user/AISEOWriter';
 import AIVision from '@/pages/user/AIVision';
 
 const aiRoutes: RouteObject[] = [
@@ -15,11 +15,11 @@ const aiRoutes: RouteObject[] = [
   },
   {
     path: '/ai-seo',
-    element: <AISEOWriterPage />,
+    element: <AISEOWriter />,
   },
   {
     path: '/ai-rewriter',
-    element: <AIRewriterPage />,
+    element: <AIRewriter />,
   },
   {
     path: '/ai-vision',

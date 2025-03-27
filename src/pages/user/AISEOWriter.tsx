@@ -15,9 +15,11 @@ import {
   Sparkles,
   Globe,
   BarChart3,
-  ArrowUp
+  ArrowUp,
+  Calendar
 } from "lucide-react";
 import { toast } from "sonner";
+import SEOContentPreview from "@/components/seo/SEOContentPreview";
 
 const AISEOWriter = () => {
   const [keyword, setKeyword] = useState("");
@@ -26,6 +28,10 @@ const AISEOWriter = () => {
   const [wordCount, setWordCount] = useState("500");
   const [generatedContent, setGeneratedContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [publishType, setPublishType] = useState("immediate");
+  const [scheduleDate, setScheduleDate] = useState("");
+  const [scheduleTime, setScheduleTime] = useState("");
+  const [showWordPressOptions, setShowWordPressOptions] = useState(false);
   
   const handleGenerate = () => {
     if (!keyword.trim()) {
@@ -51,6 +57,7 @@ const AISEOWriter = () => {
       
       setIsGenerating(false);
       toast.success("SEO content generated!");
+      setShowWordPressOptions(true);
     }, 2000);
   };
   
@@ -60,12 +67,30 @@ const AISEOWriter = () => {
     setTone("professional");
     setWordCount("500");
     setGeneratedContent("");
+    setShowWordPressOptions(false);
     toast.info("All fields have been reset");
   };
   
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(generatedContent);
     toast.success("Copied to clipboard!");
+  };
+
+  const handlePublishToWordPress = () => {
+    if (publishType === "scheduled" && (!scheduleDate || !scheduleTime)) {
+      toast.error("Please select both date and time for scheduled publishing");
+      return;
+    }
+
+    const publishAction = publishType === "immediate" ? "Publishing" : "Scheduling";
+    const scheduledInfo = publishType === "scheduled" ? ` for ${scheduleDate} at ${scheduleTime}` : "";
+    
+    toast.success(`${publishAction} to WordPress${scheduledInfo}...`);
+    
+    // Simulate publishing process
+    setTimeout(() => {
+      toast.success(`Successfully ${publishType === "immediate" ? "published" : "scheduled"} to WordPress${scheduledInfo}`);
+    }, 1500);
   };
   
   return (
@@ -183,29 +208,102 @@ const AISEOWriter = () => {
                   />
                   
                   {generatedContent && (
-                    <div className="flex justify-between mt-4">
-                      <Button 
-                        variant="outline" 
-                        onClick={handleReset}
-                        className="gap-2"
-                      >
-                        <RotateCcw size={16} />
-                        Reset
-                      </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        onClick={handleCopyToClipboard}
-                        className="gap-2"
-                      >
-                        <Copy size={16} />
-                        Copy
-                      </Button>
+                    <div className="flex flex-col gap-4 mt-4">
+                      <div className="flex justify-between">
+                        <Button 
+                          variant="outline" 
+                          onClick={handleReset}
+                          className="gap-2"
+                        >
+                          <RotateCcw size={16} />
+                          Reset
+                        </Button>
+                        
+                        <Button 
+                          variant="outline" 
+                          onClick={handleCopyToClipboard}
+                          className="gap-2"
+                        >
+                          <Copy size={16} />
+                          Copy
+                        </Button>
+                      </div>
+
+                      {showWordPressOptions && (
+                        <Card className="p-4 mt-2 border border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-900/20">
+                          <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                            <Globe size={16} className="text-green-600" />
+                            WordPress Publishing Options
+                          </h4>
+                          
+                          <div className="space-y-3">
+                            <div className="flex gap-3">
+                              <Select 
+                                value={publishType} 
+                                onValueChange={setPublishType}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Publish type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="immediate">Publish Immediately</SelectItem>
+                                  <SelectItem value="scheduled">Schedule Publication</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            {publishType === "scheduled" && (
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <label className="text-xs font-medium mb-1 block">Date</label>
+                                  <Input 
+                                    type="date" 
+                                    value={scheduleDate}
+                                    onChange={(e) => setScheduleDate(e.target.value)}
+                                    min={new Date().toISOString().split('T')[0]}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-xs font-medium mb-1 block">Time</label>
+                                  <Input 
+                                    type="time" 
+                                    value={scheduleTime}
+                                    onChange={(e) => setScheduleTime(e.target.value)}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                            
+                            <Button 
+                              onClick={handlePublishToWordPress}
+                              className="w-full gap-2"
+                              variant="secondary"
+                            >
+                              {publishType === "immediate" ? (
+                                <>
+                                  <Globe size={16} />
+                                  Publish to WordPress
+                                </>
+                              ) : (
+                                <>
+                                  <Calendar size={16} />
+                                  Schedule for WordPress
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </Card>
+                      )}
                     </div>
                   )}
                 </TabsContent>
               </Tabs>
             </Card>
+
+            {/* Add SEO Content Preview Component */}
+            {generatedContent && (
+              <SEOContentPreview content={generatedContent} />
+            )}
           </div>
           
           <div className="space-y-6">
@@ -278,6 +376,97 @@ const AISEOWriter = () => {
             </Card>
           </div>
         </div>
+
+        {/* Add SEO tools and integrations tabs section */}
+        <Tabs defaultValue="seo-tools" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4 max-w-md">
+            <TabsTrigger value="seo-tools">SEO Tools</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="seo-tools">
+            <Card className="p-6 border border-border/40">
+              <h3 className="text-lg font-medium mb-4">Advanced SEO Tools</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="p-4 hover:bg-accent/50 transition-colors cursor-pointer">
+                  <div className="flex flex-col items-center text-center gap-2">
+                    <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-full">
+                      <Search className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <h4 className="font-medium">Keyword Research</h4>
+                    <p className="text-xs text-muted-foreground">Find high-value keywords for your content</p>
+                  </div>
+                </Card>
+                
+                <Card className="p-4 hover:bg-accent/50 transition-colors cursor-pointer">
+                  <div className="flex flex-col items-center text-center gap-2">
+                    <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-full">
+                      <BarChart3 className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    </div>
+                    <h4 className="font-medium">SERP Analysis</h4>
+                    <p className="text-xs text-muted-foreground">Analyze top-ranking content for any keyword</p>
+                  </div>
+                </Card>
+                
+                <Card className="p-4 hover:bg-accent/50 transition-colors cursor-pointer">
+                  <div className="flex flex-col items-center text-center gap-2">
+                    <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-full">
+                      <Edit className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <h4 className="font-medium">Content Audit</h4>
+                    <p className="text-xs text-muted-foreground">Evaluate and optimize your existing content</p>
+                  </div>
+                </Card>
+              </div>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="integrations">
+            <Card className="p-6 border border-border/40">
+              <h3 className="text-lg font-medium mb-4">Content Distribution</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="p-4 border border-border/40">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded-full">
+                      <Globe className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">WordPress</h4>
+                      <p className="text-xs text-muted-foreground mt-1">Direct publishing to WordPress sites</p>
+                      <p className="text-xs text-green-600 mt-2">Connected</p>
+                    </div>
+                  </div>
+                </Card>
+                
+                <Card className="p-4 border border-border/40">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-purple-50 dark:bg-purple-900/20 p-2 rounded-full">
+                      <Edit className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Medium</h4>
+                      <p className="text-xs text-muted-foreground mt-1">Publish articles to Medium</p>
+                      <Button variant="outline" size="sm" className="mt-2 h-7 text-xs">Connect</Button>
+                    </div>
+                  </div>
+                </Card>
+                
+                <Card className="p-4 border border-border/40">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded-full">
+                      <Search className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Google Search Console</h4>
+                      <p className="text-xs text-muted-foreground mt-1">Track search performance</p>
+                      <Button variant="outline" size="sm" className="mt-2 h-7 text-xs">Connect</Button>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </AppLayout>
   );

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -15,7 +14,6 @@ import {
   MessageSquare
 } from "lucide-react";
 
-// Import the new components
 import AIToolHeader from "@/components/ai/AIToolHeader";
 import AIToolSearch from "@/components/ai/AIToolSearch";
 import AIToolCategoryFilter from "@/components/ai/AIToolCategoryFilter";
@@ -144,6 +142,14 @@ const AIToolsHub = () => {
   });
   
   const handleToolClick = (path: string) => {
+    if (path === "/ai-rewriter") {
+      navigate("/ai-rewriter");
+      return;
+    }
+    if (path === "/ai-seo") {
+      navigate("/ai-seo");
+      return;
+    }
     if (path.includes("coming-soon")) {
       return;
     }

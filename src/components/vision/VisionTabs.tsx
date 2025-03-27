@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useNavigate } from "react-router-dom";
 
 interface VisionTabsProps {
   selectedTab: string;
@@ -9,8 +10,24 @@ interface VisionTabsProps {
 }
 
 const VisionTabs = ({ selectedTab, onTabChange, children }: VisionTabsProps) => {
+  const navigate = useNavigate();
+
+  const handleTabChange = (value: string) => {
+    if (value === "seo") {
+      // Redirect to AI SEO Writer page when SEO Tools tab is clicked
+      navigate("/ai-seo");
+      return;
+    } else if (value === "integrations") {
+      // Redirect to AI SEO Writer page with integrations tab when Integrations tab is clicked
+      navigate("/ai-seo");
+      return;
+    }
+    
+    onTabChange(value);
+  };
+
   return (
-    <Tabs value={selectedTab} onValueChange={onTabChange} className="w-full">
+    <Tabs value={selectedTab} onValueChange={handleTabChange} className="w-full">
       <TabsList className="grid grid-cols-3 mb-4">
         <TabsTrigger value="vision">Vision Analysis</TabsTrigger>
         <TabsTrigger value="seo">SEO Tools</TabsTrigger>
