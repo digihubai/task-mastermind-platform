@@ -98,7 +98,7 @@ export const modulesStarter = {
   icon: <Package size={20} />,
 };
 
-// Add the missing moduleSection export
+// Add the moduleSection export
 export const moduleSection = {
   title: "Modules",
   items: [

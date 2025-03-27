@@ -15,15 +15,26 @@ export function useSidebarNavigation() {
     // Auto-expand sections based on the current path
     sidebarSections.forEach(section => {
       section.items.forEach(item => {
-        if (item.subItems && isPathActive(item.href)) {
+        if (isPathActive(item.href)) {
           newExpandedSections[item.title] = true;
           
           // Also expand nested subsections
-          item.subItems.forEach(subItem => {
-            if (subItem.subItems && isPathActive(subItem.href)) {
-              newExpandedSections[subItem.title] = true;
-            }
-          });
+          if (item.subItems) {
+            item.subItems.forEach(subItem => {
+              if (isPathActive(subItem.href)) {
+                newExpandedSections[subItem.title] = true;
+                
+                // Go one level deeper if needed
+                if (subItem.subItems) {
+                  subItem.subItems.forEach(nestedItem => {
+                    if (isPathActive(nestedItem.href)) {
+                      newExpandedSections[nestedItem.title] = true;
+                    }
+                  });
+                }
+              }
+            });
+          }
         }
       });
     });
@@ -44,7 +55,11 @@ export function useSidebarNavigation() {
   
   // Check if a path is active (starts with the given path)
   const isPathActive = useCallback((path: string) => {
-    return location.pathname.startsWith(path);
+    // Special case for root path
+    if (path === "/" && location.pathname === "/") {
+      return true;
+    }
+    return path !== "/" && location.pathname.startsWith(path);
   }, [location.pathname]);
   
   // Check if a path is exactly active

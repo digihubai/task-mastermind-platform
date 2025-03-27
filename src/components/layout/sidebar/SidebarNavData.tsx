@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import SidebarMenuItem from "./SidebarMenuItem";
 import {
   dashboardSection,
