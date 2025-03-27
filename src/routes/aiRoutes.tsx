@@ -6,6 +6,7 @@ import PDFInsightPage from '@/pages/ai/PDFInsightPage';
 import AICopywriterPage from '@/pages/ai/AICopywriterPage';
 import AIRewriter from '@/pages/user/AIRewriter';
 import AISEOPage from '@/pages/ai/AISEOPage';
+import ChatbotsPage from '@/pages/ai/ChatbotsPage';
 
 const aiRoutes: RouteObject[] = [
   {
@@ -31,6 +32,14 @@ const aiRoutes: RouteObject[] = [
   {
     path: '/pdf-insight',
     element: <PDFInsightPage />,
+  },
+  {
+    path: '/chatbots',
+    element: <ChatbotsPage />,
+  },
+  {
+    path: '/ai/chatbots',
+    element: <ChatbotsPage />,
   },
 ];
 

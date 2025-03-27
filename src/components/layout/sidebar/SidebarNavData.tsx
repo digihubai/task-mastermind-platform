@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Bot,
@@ -68,7 +69,7 @@ export const marketingItems = [
 export const aiToolsItems = [
   { name: "AI Tools Hub", path: "/ai-tools", icon: <Bot size={20} /> },
   { name: "AI Bots", path: "/bots", icon: <Bot size={20} /> },
-  { name: "AI Chat", path: "/chat", icon: <MessageSquare size={20} /> },
+  { name: "AI Chatbots", path: "/chatbots", icon: <MessageSquare size={20} /> },
   { name: "AI Vision", path: "/vision", icon: <Image size={20} /> },
   { name: "AI Copywriter", path: "/ai-copywriter", icon: <PenTool size={20} /> },
   { name: "AI SEO Writer", path: "/ai-seo", icon: <Search size={20} /> },
@@ -202,6 +203,11 @@ export const sidebarSections: SidebarSectionType[] = [
       {
         title: "AI Chatbot",
         href: "/chatbot",
+        icon: <MessageSquare size={20} />,
+      },
+      {
+        title: "AI Chatbots",
+        href: "/chatbots",
         icon: <MessageSquare size={20} />,
       },
       {
