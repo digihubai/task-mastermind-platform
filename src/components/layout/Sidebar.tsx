@@ -72,15 +72,24 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
         </div>
         
         <nav className="flex-1 px-2 py-4 overflow-y-auto">
-          {sidebarSections.map((section, index) => (
-            <SidebarSection
-              key={index}
-              title={section.title}
-              items={section.items}
-              collapsed={collapsed}
-              isMobile={isMobile}
-            />
-          ))}
+          {sidebarSections.map((section, index) => {
+            // Transform section items to match the expected props format
+            const transformedItems = section.items.map(item => ({
+              path: item.href,
+              icon: item.icon,
+              label: item.title
+            }));
+            
+            return (
+              <SidebarSection
+                key={index}
+                title={section.title}
+                items={transformedItems}
+                collapsed={collapsed}
+                isMobile={isMobile}
+              />
+            );
+          })}
         </nav>
         
         <div className="p-4 border-t border-sidebar-border">

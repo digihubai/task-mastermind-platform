@@ -5,7 +5,7 @@ import { LucideIcon } from "lucide-react";
 
 interface SidebarItemProps {
   path: string;
-  icon: LucideIcon;
+  icon: React.ReactNode;
   label: string;
   collapsed: boolean;
   isMobile: boolean;
@@ -42,8 +42,8 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
           }
         `}
       >
-        <Icon size={20} className={`${collapsed && !isMobile ? 'mx-auto' : 'mr-3'}`} />
-        {(!collapsed || isMobile) && <span>{label}</span>}
+        {Icon}
+        {(!collapsed || isMobile) && <span className="ml-3">{label}</span>}
       </Link>
     </li>
   );
@@ -53,7 +53,7 @@ interface SidebarSectionProps {
   title: string;
   items: Array<{
     path: string;
-    icon: LucideIcon;
+    icon: React.ReactNode;
     label: string;
   }>;
   collapsed: boolean;
