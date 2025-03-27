@@ -77,7 +77,6 @@ const Index = () => {
     });
   };
   
-  // Helper function to get KPI data by ID
   const getKpiDataById = (id: string) => {
     switch (id) {
       case "customer-satisfaction":
@@ -125,7 +124,6 @@ const Index = () => {
     }
   };
   
-  // Recent activities
   const recentActivities = [
     {
       type: "new_customer",
@@ -164,7 +162,6 @@ const Index = () => {
     }
   ];
   
-  // Active tasks
   const activeTasks = [
     {
       title: "Complete client proposal",
@@ -196,7 +193,6 @@ const Index = () => {
     }
   ];
   
-  // Dashboard card configuration
   const dashboardCards = [
     {
       title: "Projects",
