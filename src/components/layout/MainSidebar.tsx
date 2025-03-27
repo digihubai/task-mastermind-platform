@@ -92,6 +92,7 @@ const MainSidebar = ({ collapsed = false, isMobile = false, toggleSidebar }) => 
     { name: "CRM", path: "/crm", icon: <Users size={20} /> },
     { name: "Chatbot", path: "/chatbot", icon: <MessageSquare size={20} /> },
     { name: "Marketing", path: "/marketing", icon: <Bell size={20} /> },
+    { name: "Marketing SEO", path: "/marketing/seo", icon: <Search size={20} /> },
     { name: "Workflow", path: "/workflow", icon: <RefreshCw size={20} /> },
     { name: "Funnel Creator", path: "/funnel-creator", icon: <PenTool size={20} /> }
   ];

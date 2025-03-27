@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,10 +8,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
   PlusCircle, Mail, BarChart2, FileText, MessageSquare, 
   ArrowRight, Edit, Copy, Trash2, Send, Calendar, Clock,
-  CheckCircle, XCircle, Target
+  CheckCircle, XCircle, Target, Search, Globe
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -178,13 +179,22 @@ const MarketingPage = () => {
             </p>
           </div>
           
-          <Button
-            onClick={handleCreateCampaign}
-            className="flex items-center gap-2"
-          >
-            <PlusCircle size={18} />
-            <span>Create Campaign</span>
-          </Button>
+          <div className="flex gap-2">
+            <Link to="/marketing/seo">
+              <Button variant="outline" className="flex items-center gap-2">
+                <Search size={18} />
+                <span>SEO Tools</span>
+              </Button>
+            </Link>
+            
+            <Button
+              onClick={handleCreateCampaign}
+              className="flex items-center gap-2"
+            >
+              <PlusCircle size={18} />
+              <span>Create Campaign</span>
+            </Button>
+          </div>
         </div>
         
         <Tabs defaultValue="campaigns" className="w-full" onValueChange={setActiveTab}>

@@ -112,6 +112,13 @@ const AIVisionPage = () => {
     });
   };
 
+  const handleSettings = () => {
+    toast({
+      title: "Settings",
+      description: "Vision AI settings panel will open soon.",
+    });
+  };
+
   const handleQuickPrompt = (prompt: string) => {
     setMessage(prompt);
   };
@@ -202,10 +209,21 @@ const AIVisionPage = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="rounded-full" onClick={handleShare}>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="rounded-full" 
+                      onClick={handleShare}
+                    >
+                      <Share2 className="mr-2 h-4 w-4" />
                       Share
                     </Button>
-                    <Button variant="ghost" size="icon" className="rounded-full">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="rounded-full"
+                      onClick={handleSettings}
+                    >
                       <Settings size={18} />
                     </Button>
                   </div>
