@@ -5,7 +5,7 @@ import AIVisionPage from '@/pages/ai/AIVisionPage';
 import PDFInsightPage from '@/pages/ai/PDFInsightPage';
 import AICopywriterPage from '@/pages/ai/AICopywriterPage';
 import AIRewriter from '@/pages/user/AIRewriter';
-import AISEOWriter from '@/pages/user/AISEOWriter';
+import AISEOPage from '@/pages/ai/AISEOPage';
 import AIVision from '@/pages/user/AIVision';
 
 const aiRoutes: RouteObject[] = [
@@ -15,7 +15,7 @@ const aiRoutes: RouteObject[] = [
   },
   {
     path: '/ai-seo',
-    element: <AISEOWriter />,
+    element: <AISEOPage />,
   },
   {
     path: '/ai-rewriter',

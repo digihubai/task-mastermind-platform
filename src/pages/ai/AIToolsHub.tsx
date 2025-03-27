@@ -142,17 +142,6 @@ const AIToolsHub = () => {
   });
   
   const handleToolClick = (path: string) => {
-    if (path === "/ai-rewriter") {
-      navigate("/ai-rewriter");
-      return;
-    }
-    if (path === "/ai-seo") {
-      navigate("/ai-seo");
-      return;
-    }
-    if (path.includes("coming-soon")) {
-      return;
-    }
     navigate(path);
   };
 

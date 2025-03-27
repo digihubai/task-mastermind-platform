@@ -2,191 +2,302 @@
 import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
-import SEOKeywordStep from "@/components/seo/SEOKeywordStep";
-import SEOTitleStep from "@/components/seo/SEOTitleStep";
-import SEOOutlineStep from "@/components/seo/SEOOutlineStep";
-import SEOImageStep from "@/components/seo/SEOImageStep";
-import SEOContentPreview from "@/components/seo/SEOContentPreview";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { ChevronDown, ChevronRight, ArrowLeft } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-
-const steps = ["keywords", "title", "outline", "image", "content"];
 
 const AISEOPage = () => {
   const { toast } = useToast();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [seoData, setSeoData] = useState({
-    topic: "",
-    keywords: [],
-    selectedKeywords: [],
-    keywordCount: 10,
-    title: "",
-    titleTopic: "",
-    titleCount: 4,
-    maxTitleLength: 60,
-    outline: "",
-    outlineTopic: "",
-    subtitleCount: 5,
-    outlineCount: 2,
-    image: null,
-    featuredImage: "",
-    imagePrompt: "",
-    imageSize: "square",
-    imageCount: 4,
-    content: "",
-    savedContent: ""
-  });
-
-  const handleDataChange = (field: string, value: any) => {
-    setSeoData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    if (field === "savedContent") {
+  const [step, setStep] = useState(1);
+  const [topic, setTopic] = useState("");
+  const [keywordCount, setKeywordCount] = useState(10);
+  const [keywords, setKeywords] = useState<string[]>([]);
+  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  const [isGeneratingKeywords, setIsGeneratingKeywords] = useState(false);
+  
+  const handleGenerateKeywords = () => {
+    if (!topic.trim()) {
       toast({
-        title: "Content saved",
-        description: "Your SEO content has been saved successfully.",
+        title: "Please enter a topic",
+        description: "You need to provide a topic to generate keywords",
+        variant: "destructive"
       });
+      return;
+    }
+    
+    setIsGeneratingKeywords(true);
+    
+    // Simulate API call to generate keywords
+    setTimeout(() => {
+      const mockKeywords = [
+        "ai writer", "seo content", "content optimization", 
+        "keyword research", "blog writing", "seo strategy", 
+        "content marketing", "search engine optimization", 
+        "digital marketing", "ai content", "on-page seo",
+        "content creation", "seo tools", "keyword density"
+      ];
+      
+      // Take only the number of keywords specified by the user
+      setKeywords(mockKeywords.slice(0, keywordCount));
+      setIsGeneratingKeywords(false);
+      
+      toast({
+        title: "Keywords generated",
+        description: `Generated ${keywordCount} keywords based on your topic`,
+      });
+    }, 1500);
+  };
+  
+  const handleKeywordSelect = (keyword: string) => {
+    if (selectedKeywords.includes(keyword)) {
+      setSelectedKeywords(selectedKeywords.filter(k => k !== keyword));
+    } else {
+      setSelectedKeywords([...selectedKeywords, keyword]);
     }
   };
-
-  const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+  
+  const handleSelectAll = () => {
+    if (selectedKeywords.length === keywords.length) {
+      setSelectedKeywords([]);
+    } else {
+      setSelectedKeywords([...keywords]);
     }
   };
-
-  const handlePrev = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+  
+  const handleNextStep = () => {
+    if (step === 1 && selectedKeywords.length === 0) {
+      toast({
+        title: "No keywords selected",
+        description: "Please select at least one keyword to continue",
+        variant: "destructive"
+      });
+      return;
     }
+    
+    setStep(step + 1);
   };
-
+  
+  const handlePreviousStep = () => {
+    setStep(step - 1);
+  };
+  
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">SEO Content Generator</h1>
-          <p className="text-muted-foreground mt-1">
-            Create search optimized content with our step-by-step AI-powered system
-          </p>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => history.back()}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-3xl font-semibold tracking-tight">AI SEO Writer</h1>
         </div>
-
-        <Card className="p-6 border border-border/40">
-          <Tabs defaultValue={steps[currentStep]} value={steps[currentStep]} className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger 
-                value="keywords" 
-                onClick={() => setCurrentStep(0)}
-                disabled={currentStep < 0}
-              >
-                Keywords
-              </TabsTrigger>
-              <TabsTrigger 
-                value="title" 
-                onClick={() => setCurrentStep(1)}
-                disabled={currentStep < 1 && seoData.selectedKeywords.length === 0}
-              >
-                Title
-              </TabsTrigger>
-              <TabsTrigger 
-                value="outline" 
-                onClick={() => setCurrentStep(2)}
-                disabled={currentStep < 2 && !seoData.title}
-              >
-                Outline
-              </TabsTrigger>
-              <TabsTrigger 
-                value="image" 
-                onClick={() => setCurrentStep(3)}
-                disabled={currentStep < 3 && !seoData.outline}
-              >
-                Image
-              </TabsTrigger>
-              <TabsTrigger 
-                value="content" 
-                onClick={() => setCurrentStep(4)}
-                disabled={currentStep < 4}
-              >
-                Content
-              </TabsTrigger>
-            </TabsList>
-            
-            <div className="mt-6">
-              <TabsContent value="keywords">
-                <SEOKeywordStep 
-                  seoData={seoData} 
-                  onDataChange={handleDataChange} 
-                  onNext={handleNext}
-                  onPrev={handlePrev}
-                />
-              </TabsContent>
+        
+        <p className="text-muted-foreground">
+          Just choose your topic, and watch AI whip up SEO-optimized blog content in a matter of seconds!
+        </p>
+        
+        <div className="border-b pb-4">
+          <Tabs defaultValue="words" className="w-full">
+            <div className="flex justify-between items-center mb-2">
+              <TabsList>
+                <TabsTrigger value="words">Words <Badge className="ml-2 bg-primary text-white">Unlimited</Badge></TabsTrigger>
+                <TabsTrigger value="images">Images <Badge className="ml-2 bg-primary text-white">Unlimited</Badge></TabsTrigger>
+              </TabsList>
               
-              <TabsContent value="title">
-                <SEOTitleStep 
-                  seoData={seoData} 
-                  onDataChange={handleDataChange} 
-                  onNext={handleNext}
-                  onPrev={handlePrev}
-                />
-              </TabsContent>
-              
-              <TabsContent value="outline">
-                <SEOOutlineStep 
-                  seoData={seoData} 
-                  onDataChange={handleDataChange} 
-                  onNext={handleNext}
-                  onPrev={handlePrev}
-                />
-              </TabsContent>
-              
-              <TabsContent value="image">
-                <SEOImageStep 
-                  seoData={seoData} 
-                  onDataChange={handleDataChange} 
-                  onNext={handleNext}
-                  onPrev={handlePrev}
-                />
-              </TabsContent>
-              
-              <TabsContent value="content">
-                <SEOContentPreview 
-                  seoData={seoData}
-                  onDataChange={handleDataChange}
-                />
-              </TabsContent>
+              <Button size="sm" variant="outline">
+                <span>Start Over</span>
+              </Button>
             </div>
           </Tabs>
-          
-          <div className="flex justify-between mt-6">
-            <Button 
-              variant="outline" 
-              onClick={handlePrev}
-              disabled={currentStep === 0}
-              className="gap-2"
-            >
-              <ChevronLeft size={16} />
-              Previous Step
-            </Button>
+        </div>
+        
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex gap-6">
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 1 ? 'bg-primary text-white' : 'bg-secondary'}`}>
+                1
+              </div>
+              <span className="font-medium">Topic</span>
+            </div>
             
-            <Button 
-              onClick={handleNext}
-              disabled={
-                (currentStep === 0 && seoData.selectedKeywords.length === 0) ||
-                (currentStep === 1 && !seoData.title) ||
-                (currentStep === 2 && !seoData.outline) ||
-                (currentStep === 4)
-              }
-              className="gap-2"
-            >
-              Next Step
-              <ChevronRight size={16} />
-            </Button>
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 2 ? 'bg-primary text-white' : 'bg-secondary'}`}>
+                2
+              </div>
+              <span className="font-medium">Title</span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 3 ? 'bg-primary text-white' : 'bg-secondary'}`}>
+                3
+              </div>
+              <span className="font-medium">Outline</span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 4 ? 'bg-primary text-white' : 'bg-secondary'}`}>
+                4
+              </div>
+              <span className="font-medium">Content</span>
+            </div>
           </div>
-        </Card>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-6">
+          {step === 1 && (
+            <>
+              <Card className="p-6">
+                <h2 className="text-lg font-medium mb-4">Topic</h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">What is this article about?</label>
+                    <Textarea 
+                      placeholder="What is this article about?"
+                      value={topic}
+                      onChange={(e) => setTopic(e.target.value)}
+                      className="resize-none h-32"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Number of Keywords</label>
+                    <Input 
+                      type="number" 
+                      value={keywordCount}
+                      onChange={(e) => setKeywordCount(parseInt(e.target.value) || 10)}
+                      min={1}
+                      max={20}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Button 
+                      className="w-full"
+                      onClick={handleGenerateKeywords}
+                      disabled={isGeneratingKeywords || !topic.trim()}
+                    >
+                      {isGeneratingKeywords ? "Generating Keywords..." : "Generate Keywords"}
+                    </Button>
+                  </div>
+                  
+                  <div>
+                    <Button 
+                      variant="outline" 
+                      className="w-full flex items-center justify-between"
+                      onClick={() => {}}
+                    >
+                      <span>Advanced Options</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+              
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-medium">Select Keywords</h2>
+                  {keywords.length > 0 && (
+                    <Button variant="ghost" size="sm" onClick={handleSelectAll}>
+                      {selectedKeywords.length === keywords.length ? "Deselect All" : "Select All"}
+                    </Button>
+                  )}
+                </div>
+                
+                {keywords.length > 0 ? (
+                  <>
+                    <div className="mb-6">
+                      <div className="flex flex-wrap gap-2">
+                        {keywords.map((keyword, index) => (
+                          <Button
+                            key={index}
+                            variant={selectedKeywords.includes(keyword) ? "default" : "outline"}
+                            className="rounded-full"
+                            onClick={() => handleKeywordSelect(keyword)}
+                          >
+                            {keyword}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      onClick={handleNextStep} 
+                      disabled={selectedKeywords.length === 0}
+                      className="w-full"
+                    >
+                      Continue <ChevronRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-64 text-center text-muted-foreground">
+                    <p className="mb-2">No keywords generated yet</p>
+                    <p className="text-sm">Generate keywords using the form on the left</p>
+                  </div>
+                )}
+              </Card>
+            </>
+          )}
+          
+          {step === 2 && (
+            <div className="col-span-2">
+              <Card className="p-6">
+                <h2 className="text-lg font-medium mb-4">Title</h2>
+                <p>Title generation will be implemented in the next phase.</p>
+                
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={handlePreviousStep}>
+                    Back
+                  </Button>
+                  <Button onClick={() => setStep(3)}>
+                    Continue <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          )}
+          
+          {step === 3 && (
+            <div className="col-span-2">
+              <Card className="p-6">
+                <h2 className="text-lg font-medium mb-4">Outline</h2>
+                <p>Outline generation will be implemented in the next phase.</p>
+                
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={handlePreviousStep}>
+                    Back
+                  </Button>
+                  <Button onClick={() => setStep(4)}>
+                    Continue <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          )}
+          
+          {step === 4 && (
+            <div className="col-span-2">
+              <Card className="p-6">
+                <h2 className="text-lg font-medium mb-4">Content</h2>
+                <p>Content generation will be implemented in the next phase.</p>
+                
+                <div className="flex justify-between mt-6">
+                  <Button variant="outline" onClick={handlePreviousStep}>
+                    Back
+                  </Button>
+                  <Button onClick={() => toast({
+                    title: "Content Generated",
+                    description: "Your SEO-optimized content has been generated successfully!",
+                  })}>
+                    Generate Content
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          )}
+        </div>
       </div>
     </AppLayout>
   );

@@ -18,8 +18,8 @@ const VisionTabs = ({ selectedTab, onTabChange, children }: VisionTabsProps) => 
       navigate("/ai-seo");
       return;
     } else if (value === "integrations") {
-      // Redirect to AI SEO Writer page with integrations tab when Integrations tab is clicked
-      navigate("/ai-seo");
+      // Redirect to the integrations tab
+      navigate("/marketing-seo?tab=integrations");
       return;
     }
     
