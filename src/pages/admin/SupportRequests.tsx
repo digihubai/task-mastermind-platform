@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
@@ -326,7 +327,7 @@ const SupportRequests = () => {
         const query = searchQuery.toLowerCase();
         return (
           ticket.subject.toLowerCase().includes(query) ||
-          ticket.description.toLowerCase().includes(query) ||
+          ticket.description?.toLowerCase().includes(query) ||
           ticket.id.toLowerCase().includes(query) ||
           ticket.userId.toLowerCase().includes(query)
         );
@@ -830,4 +831,59 @@ const SupportRequests = () => {
                       <div className="flex justify-between mb-1">
                         <span className="text-sm">High</span>
                         <span className="text-sm">
-                          {tickets.filter(t =>
+                          {tickets.filter(t => t.priority === 'high').length}
+                        </span>
+                      </div>
+                      <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-orange-500 h-full rounded-full" 
+                          style={{ 
+                            width: `${(tickets.filter(t => t.priority === 'high').length / tickets.length) * 100}%` 
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-sm">Medium</span>
+                        <span className="text-sm">
+                          {tickets.filter(t => t.priority === 'medium').length}
+                        </span>
+                      </div>
+                      <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-yellow-500 h-full rounded-full" 
+                          style={{ 
+                            width: `${(tickets.filter(t => t.priority === 'medium').length / tickets.length) * 100}%` 
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-sm">Low</span>
+                        <span className="text-sm">
+                          {tickets.filter(t => t.priority === 'low').length}
+                        </span>
+                      </div>
+                      <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-blue-500 h-full rounded-full" 
+                          style={{ 
+                            width: `${(tickets.filter(t => t.priority === 'low').length / tickets.length) * 100}%` 
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </AppLayout>
+  );
+};
+
+export default SupportRequests;
