@@ -11,14 +11,7 @@ import {
   MessageSquare, 
   VoicemailIcon
 } from "lucide-react";
-
-interface CallScript {
-  id: string;
-  name: string;
-  description: string;
-  lastEdited: string;
-  type: string;
-}
+import { CallScript } from "@/services/outboundCallService";
 
 interface OutboundCallScriptsProps {
   scripts: CallScript[];

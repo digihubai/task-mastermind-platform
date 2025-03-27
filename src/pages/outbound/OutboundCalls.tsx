@@ -6,13 +6,15 @@ import OutboundCallAnalytics from "@/components/outbound/OutboundCallAnalytics";
 import OutboundCallCampaigns from "@/components/outbound/OutboundCallCampaigns";
 import OutboundCallScripts from "@/components/outbound/OutboundCallScripts";
 import OutboundContactLists from "@/components/outbound/OutboundContactLists";
-import { useCallCampaigns, useCallStats } from "@/services/outboundCallService";
+import { useCallCampaigns, useCallStats, useCallScripts, useContactLists } from "@/services/outboundCallService";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Phone } from "lucide-react";
 
 const OutboundCalls = () => {
   const { data: campaigns, isLoading: campaignsLoading } = useCallCampaigns();
   const { data: stats } = useCallStats();
+  const { data: scripts } = useCallScripts();
+  const { data: contactLists } = useContactLists();
 
   return (
     <AppLayout>
@@ -54,11 +56,11 @@ const OutboundCalls = () => {
           </TabsContent>
           
           <TabsContent value="scripts">
-            <OutboundCallScripts />
+            <OutboundCallScripts scripts={scripts || []} />
           </TabsContent>
           
           <TabsContent value="contacts">
-            <OutboundContactLists />
+            <OutboundContactLists contactLists={contactLists || []} />
           </TabsContent>
         </Tabs>
       </div>

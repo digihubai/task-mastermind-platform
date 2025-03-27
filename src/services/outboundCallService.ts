@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 
 // Types
@@ -15,6 +14,25 @@ export interface CallCampaign {
   conversionRate: number;
   trend: 'up' | 'down';
   createdAt: string;
+  completed: number;
+  progress: number;
+  scheduled: string;
+}
+
+export interface CallScript {
+  id: string;
+  name: string;
+  description: string;
+  lastEdited: string;
+  type: string;
+}
+
+export interface ContactList {
+  id: string;
+  name: string;
+  count: number;
+  lastUpdated: string;
+  status: string;
 }
 
 export interface CallRecord {
@@ -52,7 +70,10 @@ const mockCampaigns: CallCampaign[] = [
     conversions: 28,
     conversionRate: 11,
     trend: "up",
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    completed: 92,
+    progress: 37,
+    scheduled: "Today, 9:00 AM"
   },
   {
     id: "camp-2",
@@ -66,7 +87,10 @@ const mockCampaigns: CallCampaign[] = [
     conversions: 22,
     conversionRate: 18,
     trend: "up",
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    completed: 45,
+    progress: 38,
+    scheduled: "Tomorrow, 10:00 AM"
   },
   {
     id: "camp-3",
@@ -80,7 +104,10 @@ const mockCampaigns: CallCampaign[] = [
     conversions: 12,
     conversionRate: 6,
     trend: "down",
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    completed: 58,
+    progress: 27,
+    scheduled: "Monday, 11:00 AM"
   }
 ];
 
@@ -143,6 +170,56 @@ const mockCallRecords: CallRecord[] = [
   }
 ];
 
+// Mock data for scripts
+const mockCallScripts: CallScript[] = [
+  {
+    id: "script-1",
+    name: "Lead Qualification Script",
+    description: "Standard script for qualifying new leads",
+    lastEdited: "2 days ago",
+    type: "Qualification"
+  },
+  {
+    id: "script-2",
+    name: "Product Demo Follow-up",
+    description: "Script for following up after product demos",
+    lastEdited: "1 week ago",
+    type: "Follow-up"
+  },
+  {
+    id: "script-3",
+    name: "Customer Satisfaction Survey",
+    description: "Script for collecting customer feedback",
+    lastEdited: "3 days ago",
+    type: "Survey"
+  }
+];
+
+// Mock data for contact lists
+const mockContactLists: ContactList[] = [
+  {
+    id: "list-1",
+    name: "New Leads - March 2025",
+    count: 120,
+    lastUpdated: "2 days ago",
+    status: "Active"
+  },
+  {
+    id: "list-2",
+    name: "Enterprise Customers",
+    count: 45,
+    lastUpdated: "1 week ago",
+    status: "Active"
+  },
+  {
+    id: "list-3",
+    name: "Inactive Customers",
+    count: 87,
+    lastUpdated: "3 days ago",
+    status: "Inactive"
+  }
+];
+
 // Service functions
 export const useCallCampaigns = () => {
   return useQuery({
@@ -175,6 +252,31 @@ export const useCallRecords = () => {
       // Simulate API request
       return new Promise<CallRecord[]>((resolve) => {
         setTimeout(() => resolve(mockCallRecords), 500);
+      });
+    }
+  });
+};
+
+// New service functions for scripts and contact lists
+export const useCallScripts = () => {
+  return useQuery({
+    queryKey: ['outbound-call-scripts'],
+    queryFn: async () => {
+      // Simulate API request
+      return new Promise<CallScript[]>((resolve) => {
+        setTimeout(() => resolve(mockCallScripts), 500);
+      });
+    }
+  });
+};
+
+export const useContactLists = () => {
+  return useQuery({
+    queryKey: ['outbound-contact-lists'],
+    queryFn: async () => {
+      // Simulate API request
+      return new Promise<ContactList[]>((resolve) => {
+        setTimeout(() => resolve(mockContactLists), 500);
       });
     }
   });

@@ -10,23 +10,53 @@ import {
   Settings,
   Clock
 } from "lucide-react";
-
-interface Campaign {
-  id: string;
-  name: string;
-  status: string;
-  calls: number;
-  completed: number;
-  answered: number;
-  progress: number;
-  scheduled: string;
-}
+import { CallCampaign } from '@/services/outboundCallService';
 
 interface OutboundCallCampaignsProps {
-  campaigns: Campaign[];
+  campaigns: CallCampaign[];
+  isLoading?: boolean;
 }
 
-const OutboundCallCampaigns: React.FC<OutboundCallCampaignsProps> = ({ campaigns }) => {
+const OutboundCallCampaigns: React.FC<OutboundCallCampaignsProps> = ({ campaigns, isLoading = false }) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="overflow-hidden">
+            <CardHeader className="bg-muted/40 pb-3">
+              <div className="h-6 w-28 bg-muted rounded animate-pulse mb-2"></div>
+              <div className="h-5 w-16 bg-muted rounded animate-pulse"></div>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="space-y-4">
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  {[1, 2, 3].map((j) => (
+                    <div key={j}>
+                      <div className="h-8 w-full bg-muted rounded animate-pulse"></div>
+                      <div className="h-4 w-full bg-muted rounded animate-pulse mt-1"></div>
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <div className="h-4 w-16 bg-muted rounded animate-pulse"></div>
+                    <div className="h-4 w-8 bg-muted rounded animate-pulse"></div>
+                  </div>
+                  <div className="h-2 w-full bg-muted rounded animate-pulse"></div>
+                </div>
+                <div className="h-4 w-32 bg-muted rounded animate-pulse"></div>
+                <div className="flex gap-2">
+                  <div className="h-9 w-full bg-muted rounded animate-pulse"></div>
+                  <div className="h-9 w-full bg-muted rounded animate-pulse"></div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {campaigns.map((campaign) => (
@@ -36,10 +66,10 @@ const OutboundCallCampaigns: React.FC<OutboundCallCampaignsProps> = ({ campaigns
               <div>
                 <h3 className="font-medium">{campaign.name}</h3>
                 <Badge 
-                  variant={campaign.status === "Active" ? "default" : campaign.status === "Paused" ? "outline" : "secondary"}
+                  variant={campaign.status === "active" ? "default" : campaign.status === "paused" ? "outline" : "secondary"}
                   className="mt-1"
                 >
-                  {campaign.status}
+                  {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
                 </Badge>
               </div>
               <Button variant="ghost" size="icon">
@@ -83,7 +113,7 @@ const OutboundCallCampaigns: React.FC<OutboundCallCampaignsProps> = ({ campaigns
               </div>
               
               <div className="flex gap-2">
-                {campaign.status === "Active" ? (
+                {campaign.status === "active" ? (
                   <Button variant="outline" size="sm" className="flex-1">
                     <PauseCircle size={14} className="mr-1.5" /> Pause
                   </Button>
