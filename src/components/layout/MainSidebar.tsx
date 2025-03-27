@@ -36,17 +36,23 @@ import {
   ExternalLink,
   Target,
   Zap,
-  Calendar
+  Calendar,
+  ChevronDown,
+  Headphones,
+  UserCheck
 } from "lucide-react";
 
 const MainSidebar = ({ collapsed = false, isMobile = false, toggleSidebar }) => {
   const location = useLocation();
   const [expandedSections, setExpandedSections] = useState({
-    marketing: true,
+    marketing: false,
     crm: false,
-    projects: false
+    projects: false,
+    settings: false,
+    ai: false
   });
   
+  // Toggle section expansion
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
       ...prev,
@@ -54,106 +60,104 @@ const MainSidebar = ({ collapsed = false, isMobile = false, toggleSidebar }) => 
     }));
   };
   
+  // Check if current path starts with a given path
+  const isPathActive = (path) => {
+    return location.pathname.startsWith(path);
+  };
+  
+  // Check if exactly the path is active
+  const isExactPathActive = (path) => {
+    return location.pathname === path;
+  };
+  
+  // Auto-expand sections based on current route
+  React.useEffect(() => {
+    if (isPathActive('/marketing')) {
+      setExpandedSections(prev => ({ ...prev, marketing: true }));
+    }
+    if (isPathActive('/crm')) {
+      setExpandedSections(prev => ({ ...prev, crm: true }));
+    }
+    if (isPathActive('/project-management')) {
+      setExpandedSections(prev => ({ ...prev, projects: true }));
+    }
+    if (isPathActive('/settings')) {
+      setExpandedSections(prev => ({ ...prev, settings: true }));
+    }
+    if (isPathActive('/ai-') || isPathActive('/bots') || isPathActive('/vision') || 
+        isPathActive('/copywriter') || isPathActive('/seo-writer') || 
+        isPathActive('/chat') || isPathActive('/rewriter')) {
+      setExpandedSections(prev => ({ ...prev, ai: true }));
+    }
+  }, [location.pathname]);
+  
+  // Basic menu items
   const userMenuItems = [
     { name: "Dashboard", path: "/dashboard", icon: <Home size={20} /> },
-    { name: "AI Bots", path: "/bots", icon: <Bot size={20} /> },
-    { name: "Documents", path: "/documents", icon: <FileText size={20} /> },
-    { name: "AI Editor", path: "/editor", icon: <Edit size={20} /> },
-    { name: "AI Copywriter", path: "/copywriter", icon: <PenTool size={20} /> },
-    { name: "Chat Settings", path: "/chat-settings", icon: <MessageSquare size={20} /> },
-    { name: "AI SEO Writer", path: "/seo-writer", icon: <Search size={20} /> },
-    { name: "PDF Insight", path: "/pdf-insight", icon: <FileSpreadsheet size={20} /> },
-    { name: "AI Vision", path: "/vision", icon: <Image size={20} /> },
-    { name: "AI ReWriter", path: "/rewriter", icon: <RefreshCw size={20} /> },
-    { name: "AI Chat", path: "/chat", icon: <MessageSquare size={20} /> },
-    { name: "Brand Voice", path: "/brand-voice", icon: <PenTool size={20} /> },
-    { name: "Affiliates", path: "/affiliates", icon: <Users size={20} /> },
-    { name: "Support", path: "/support", icon: <MessageSquare size={20} /> },
-    { name: "Integration", path: "/integration", icon: <FileCode size={20} /> },
-    { name: "Links", path: "/links", icon: <Globe size={20} /> }
   ];
   
-  const quickAccessItems = [
-    { name: "Favorites", path: "/favorites", icon: <Heart size={20} /> },
-    { name: "Workbook", path: "/workbook", icon: <Bookmark size={20} /> }
-  ];
-  
-  const adminMenuItems = [
-    { name: "Dashboard", path: "/admin/dashboard", icon: <BarChart2 size={20} /> },
-    { name: "Marketplace", path: "/admin/marketplace", icon: <ShoppingBag size={20} /> },
-    { name: "Themes", path: "/admin/themes", icon: <Palette size={20} /> },
-    { name: "User Management", path: "/admin/users", icon: <Users size={20} /> },
-    { name: "Announcements", path: "/admin/announcements", icon: <Bell size={20} /> },
-    { name: "Google Adsense", path: "/admin/adsense", icon: <DollarSign size={20} /> },
-    { name: "Support Requests", path: "/admin/support-requests", icon: <MessageSquare size={20} /> },
-    { name: "Templates", path: "/admin/templates", icon: <FileText size={20} /> },
-    { name: "Chat Settings", path: "/admin/chat-settings", icon: <MessageSquare size={20} /> },
-    { name: "Frontend", path: "/admin/frontend", icon: <Globe size={20} /> },
-    { name: "Finance", path: "/admin/finance", icon: <CreditCard size={20} /> },
-    { name: "Pages", path: "/admin/pages", icon: <FileText size={20} /> },
-    { name: "Blog", path: "/admin/blog", icon: <Edit size={20} /> },
-    { name: "Affiliates", path: "/admin/affiliates", icon: <Users size={20} /> },
-    { name: "Coupons", path: "/admin/coupons", icon: <Tag size={20} /> },
-    { name: "Email Templates", path: "/admin/email-templates", icon: <Mail size={20} /> },
-    { name: "API Integration", path: "/admin/api-integration", icon: <FileCode size={20} /> },
-    { name: "Settings", path: "/admin/settings", icon: <Settings size={20} /> },
-    { name: "Site Health", path: "/admin/site-health", icon: <Activity size={20} /> },
-    { name: "Credits", path: "/admin/credits", icon: <DollarSign size={20} /> }
-  ];
-  
-  // Marketing submenu items
+  // Marketing menu items
   const marketingItems = [
     { name: "Marketing Hub", path: "/marketing", icon: <Globe size={20} /> },
     { name: "Campaigns", path: "/marketing/campaigns", icon: <Target size={20} /> },
     { name: "Automation", path: "/marketing/automation", icon: <Zap size={20} /> },
-    { name: "SEO", path: "/marketing/seo", icon: <Search size={20} /> },
-    { name: "SEO Tools", path: "/marketing/seo/tools", icon: <Globe size={20} /> },
-    { name: "AI SEO Writer", path: "/marketing/seo/ai-writer", icon: <Edit size={20} /> },
+    { name: "SEO", path: "/marketing/seo", icon: <Search size={20} />, 
+      subItems: [
+        { name: "SEO Tools", path: "/marketing/seo/tools", icon: <Globe size={18} /> },
+        { name: "AI SEO Writer", path: "/marketing/seo/ai-writer", icon: <Edit size={18} /> }
+      ]
+    },
     { name: "Email Marketing", path: "/marketing/email", icon: <Mail size={20} /> },
     { name: "Social Media", path: "/marketing/social", icon: <Bell size={20} /> },
     { name: "Analytics", path: "/marketing/analytics", icon: <BarChart2 size={20} /> },
   ];
   
-  // Additional new modules from requirements
-  const newModulesItems = [
-    { name: "Project Management", path: "/project-management", icon: <FolderOpen size={20} /> },
-    { name: "CRM", path: "/crm", icon: <Users size={20} /> },
-    { name: "Chatbot", path: "/chatbot", icon: <MessageSquare size={20} /> },
-    { name: "Workflow", path: "/workflow", icon: <RefreshCw size={20} /> },
-    { name: "Funnel Creator", path: "/funnel-creator", icon: <PenTool size={20} /> }
+  // AI Tools items
+  const aiToolsItems = [
+    { name: "AI Tools Hub", path: "/ai-tools", icon: <Bot size={20} /> },
+    { name: "AI Bots", path: "/bots", icon: <Bot size={20} /> },
+    { name: "AI Chat", path: "/chat", icon: <MessageSquare size={20} /> },
+    { name: "AI Vision", path: "/vision", icon: <Image size={20} /> },
+    { name: "AI Copywriter", path: "/copywriter", icon: <PenTool size={20} /> },
+    { name: "AI SEO Writer", path: "/seo-writer", icon: <Search size={20} /> },
+    { name: "AI ReWriter", path: "/rewriter", icon: <RefreshCw size={20} /> },
+    { name: "PDF Insight", path: "/pdf-insight", icon: <FileSpreadsheet size={20} /> },
   ];
   
-  const renderMenuItems = (items) => {
-    return items.map((item) => (
-      <li key={item.path} className="px-2">
-        <Link
-          to={item.path}
-          className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-            location.pathname === item.path
-              ? "bg-primary text-primary-foreground"
-              : "hover:bg-secondary"
-          }`}
-        >
-          {item.icon}
-          {!collapsed && <span>{item.name}</span>}
-        </Link>
-      </li>
-    ));
-  };
+  // Additional modules
+  const moduleItems = [
+    { name: "CRM", path: "/crm", icon: <Users size={20} /> },
+    { name: "Project Management", path: "/project-management", icon: <FolderOpen size={20} /> },
+    { name: "Workflow", path: "/workflow", icon: <Activity size={20} /> },
+    { name: "Customer Support", path: "/support", icon: <Headphones size={20} /> },
+    { name: "Finance", path: "/finance", icon: <DollarSign size={20} /> },
+    { name: "HR", path: "/hr", icon: <UserCheck size={20} /> },
+  ];
   
-  const renderMarketingSection = () => {
+  // Settings items
+  const settingsItems = [
+    { name: "Account Settings", path: "/settings/account", icon: <User size={20} /> },
+    { name: "Tools Settings", path: "/settings/tools", icon: <Settings size={20} /> },
+    { name: "Integrations", path: "/settings/integrations", icon: <FileCode size={20} /> },
+    { name: "Notifications", path: "/settings/notifications", icon: <Bell size={20} /> },
+  ];
+  
+  // Render a section with collapsible header
+  const renderSection = (title, items, sectionKey, icon) => {
+    const isExpanded = expandedSections[sectionKey];
+    
     if (collapsed) {
       return (
         <li className="px-2">
           <Link
-            to="/marketing"
+            to={items[0].path}
             className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-              location.pathname.includes('/marketing')
+              items.some(item => isPathActive(item.path))
                 ? "bg-primary text-primary-foreground"
                 : "hover:bg-secondary"
             }`}
           >
-            <Globe size={20} />
+            {icon || items[0].icon}
           </Link>
         </li>
       );
@@ -163,124 +167,61 @@ const MainSidebar = ({ collapsed = false, isMobile = false, toggleSidebar }) => 
       <div className="space-y-1">
         <div 
           className="flex items-center justify-between px-3 py-2 text-sm font-medium cursor-pointer hover:bg-secondary/50 rounded-md"
-          onClick={() => toggleSection('marketing')}
+          onClick={() => toggleSection(sectionKey)}
         >
           <div className="flex items-center gap-3">
-            <Globe size={20} />
-            <span>Marketing</span>
+            {icon || items[0].icon}
+            <span>{title}</span>
           </div>
-          {expandedSections.marketing ? (
-            <ChevronRight size={16} className="transform rotate-90" />
-          ) : (
-            <ChevronRight size={16} />
-          )}
+          <ChevronDown 
+            size={16} 
+            className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
+          />
         </div>
         
-        {expandedSections.marketing && (
-          <div className="pl-4 space-y-1">
+        {isExpanded && renderNestedItems(items)}
+      </div>
+    );
+  };
+  
+  // Render nested items (potentially with further nesting)
+  const renderNestedItems = (items, level = 0) => {
+    return (
+      <div className={`pl-${level > 0 ? 4 : 4} space-y-1 ${level > 0 ? 'mt-1' : 'mt-1'}`}>
+        {items.map((item) => (
+          <div key={item.path}>
             <Link
-              to="/marketing/campaigns"
+              to={item.path}
               className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                location.pathname === '/marketing/campaigns'
+                isExactPathActive(item.path)
                   ? "bg-primary text-primary-foreground"
                   : "hover:bg-secondary"
               }`}
             >
-              <Target size={18} />
-              <span>Campaigns</span>
+              {item.icon}
+              <span>{item.name}</span>
             </Link>
             
-            <Link
-              to="/marketing/automation"
-              className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                location.pathname === '/marketing/automation'
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-secondary"
-              }`}
-            >
-              <Zap size={18} />
-              <span>Automation</span>
-            </Link>
-            
-            <div>
-              <Link
-                to="/marketing/seo"
-                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                  location.pathname === '/marketing/seo'
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-secondary"
-                }`}
-              >
-                <Search size={18} />
-                <span>SEO</span>
-              </Link>
-              
-              {(location.pathname.includes('/marketing/seo') || location.pathname.includes('/seo-writer')) && (
-                <div className="pl-4 space-y-1 mt-1">
+            {item.subItems && isPathActive(item.path) && (
+              <div className="pl-6 mt-1 border-l border-border space-y-1">
+                {item.subItems.map(subItem => (
                   <Link
-                    to="/marketing/seo/tools"
-                    className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                      location.pathname === '/marketing/seo/tools'
+                    key={subItem.path}
+                    to={subItem.path}
+                    className={`flex items-center gap-3 rounded-md px-3 py-2 text-xs transition-colors ${
+                      isExactPathActive(subItem.path)
                         ? "bg-primary text-primary-foreground"
                         : "hover:bg-secondary"
                     }`}
                   >
-                    <Globe size={16} />
-                    <span>SEO Tools</span>
+                    {subItem.icon}
+                    <span>{subItem.name}</span>
                   </Link>
-                  
-                  <Link
-                    to="/marketing/seo/ai-writer"
-                    className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                      location.pathname === '/marketing/seo/ai-writer'
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-secondary"
-                    }`}
-                  >
-                    <Edit size={16} />
-                    <span>AI SEO Writer</span>
-                  </Link>
-                </div>
-              )}
-            </div>
-            
-            <Link
-              to="/marketing/email"
-              className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                location.pathname === '/marketing/email'
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-secondary"
-              }`}
-            >
-              <Mail size={18} />
-              <span>Email</span>
-            </Link>
-            
-            <Link
-              to="/marketing/social"
-              className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                location.pathname === '/marketing/social'
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-secondary"
-              }`}
-            >
-              <Bell size={18} />
-              <span>Social Media</span>
-            </Link>
-            
-            <Link
-              to="/marketing/analytics"
-              className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                location.pathname === '/marketing/analytics'
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-secondary"
-              }`}
-            >
-              <BarChart2 size={18} />
-              <span>Analytics</span>
-            </Link>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        ))}
       </div>
     );
   };
@@ -303,43 +244,61 @@ const MainSidebar = ({ collapsed = false, isMobile = false, toggleSidebar }) => 
         
         <div className="flex-1 overflow-y-auto p-2">
           <nav className="space-y-4">
+            {/* Dashboard */}
             <div>
               <h3 className={`px-4 text-xs font-semibold text-muted-foreground mb-2 ${collapsed ? "sr-only" : ""}`}>
-                MAIN MODULES
+                DASHBOARD
               </h3>
               <ul className="space-y-1">
-                {renderMenuItems(newModulesItems.filter(item => 
-                  item.name !== "Marketing" && 
-                  !item.path.includes('/marketing')
+                {userMenuItems.map((item) => (
+                  <li key={item.path} className="px-2">
+                    <Link
+                      to={item.path}
+                      className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                        isExactPathActive(item.path)
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-secondary"
+                      }`}
+                    >
+                      {item.icon}
+                      {!collapsed && <span>{item.name}</span>}
+                    </Link>
+                  </li>
                 ))}
-                {renderMarketingSection()}
               </ul>
             </div>
             
+            {/* Core Modules */}
+            <div>
+              <h3 className={`px-4 text-xs font-semibold text-muted-foreground mb-2 ${collapsed ? "sr-only" : ""}`}>
+                CORE MODULES
+              </h3>
+              <ul className="space-y-1">
+                {/* Modules */}
+                {renderSection("Modules", moduleItems, "modules", <Package size={20} />)}
+                
+                {/* Marketing with nested structure */}
+                {renderSection("Marketing", marketingItems, "marketing", <Target size={20} />)}
+              </ul>
+            </div>
+            
+            {/* AI Tools */}
             <div>
               <h3 className={`px-4 text-xs font-semibold text-muted-foreground mb-2 ${collapsed ? "sr-only" : ""}`}>
                 AI TOOLS
               </h3>
               <ul className="space-y-1">
-                {renderMenuItems(userMenuItems)}
+                {renderSection("AI Tools", aiToolsItems, "ai", <Bot size={20} />)}
               </ul>
             </div>
             
+            {/* Settings */}
             <div>
               <h3 className={`px-4 text-xs font-semibold text-muted-foreground mb-2 ${collapsed ? "sr-only" : ""}`}>
-                QUICK ACCESS
+                SETTINGS
               </h3>
               <ul className="space-y-1">
-                {renderMenuItems(quickAccessItems)}
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className={`px-4 text-xs font-semibold text-muted-foreground mb-2 ${collapsed ? "sr-only" : ""}`}>
-                ADMIN
-              </h3>
-              <ul className="space-y-1">
-                {renderMenuItems(adminMenuItems)}
+                {renderSection("Settings", settingsItems, "settings", <Settings size={20} />)}
               </ul>
             </div>
           </nav>

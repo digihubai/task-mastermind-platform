@@ -36,6 +36,9 @@ import {
   ClipboardList,
   Briefcase,
   UserCheck,
+  Zap,
+  Building,
+  ListChecks,
 } from "lucide-react";
 
 export const sidebarSections = [
@@ -72,6 +75,50 @@ export const sidebarSections = [
         title: "Marketing",
         href: "/marketing",
         icon: <Target size={20} />,
+        subItems: [
+          {
+            title: "Campaigns",
+            href: "/marketing/campaigns",
+            icon: <Target size={18} />,
+          },
+          {
+            title: "Automation",
+            href: "/marketing/automation",
+            icon: <Zap size={18} />,
+          },
+          {
+            title: "SEO",
+            href: "/marketing/seo",
+            icon: <Search size={18} />,
+            subItems: [
+              {
+                title: "SEO Tools",
+                href: "/marketing/seo/tools",
+                icon: <ListChecks size={16} />,
+              },
+              {
+                title: "AI SEO Writer",
+                href: "/marketing/seo/ai-writer",
+                icon: <Edit size={16} />,
+              },
+            ],
+          },
+          {
+            title: "Email Marketing",
+            href: "/marketing/email",
+            icon: <Mail size={18} />,
+          },
+          {
+            title: "Social Media",
+            href: "/marketing/social",
+            icon: <Bell size={18} />,
+          },
+          {
+            title: "Analytics",
+            href: "/marketing/analytics",
+            icon: <BarChart2 size={18} />,
+          },
+        ],
       },
       {
         title: "Sales",
@@ -98,6 +145,11 @@ export const sidebarSections = [
   {
     title: "AI Tools",
     items: [
+      {
+        title: "AI Chatbot",
+        href: "/chatbot",
+        icon: <MessageSquare size={20} />,
+      },
       {
         title: "AI Vision",
         href: "/vision",
@@ -134,11 +186,6 @@ export const sidebarSections = [
         icon: <Activity size={20} />,
       },
       {
-        title: "Funnel Creator",
-        href: "/funnel-creator",
-        icon: <Target size={20} />,
-      },
-      {
         title: "Email Campaigns",
         href: "/marketing/email",
         icon: <Mail size={20} />,
@@ -167,6 +214,36 @@ export const sidebarSections = [
         title: "Customer Insights",
         href: "/analytics/customer-insights",
         icon: <Users size={20} />,
+      },
+    ],
+  },
+  {
+    title: "Settings",
+    items: [
+      {
+        title: "Account & Profile",
+        href: "/settings/profile",
+        icon: <User size={20} />,
+      },
+      {
+        title: "Tool Settings",
+        href: "/settings/tools",
+        icon: <Settings size={20} />,
+      },
+      {
+        title: "Integrations",
+        href: "/settings/integrations",
+        icon: <FileCode size={20} />,
+      },
+      {
+        title: "Notifications",
+        href: "/settings/notifications",
+        icon: <Bell size={20} />,
+      },
+      {
+        title: "Support & Help",
+        href: "/support/help",
+        icon: <Headphones size={20} />,
       },
     ],
   },
