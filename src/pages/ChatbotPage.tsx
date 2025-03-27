@@ -19,6 +19,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/Badge";
+import { ChatInterface } from "@/components/chatbot/ChatInterface";
 
 const ChatbotPage = () => {
   const { toast } = useToast();
@@ -311,6 +312,24 @@ const ChatbotPage = () => {
                         );
                       })}
                     </div>
+                  </div>
+                </Card>
+                
+                <Card className="border border-border/40 lg:col-span-2">
+                  <div className="p-4 border-b border-border flex justify-between items-center">
+                    <h3 className="font-medium">Test Your Chatbot</h3>
+                    <Button variant="ghost" size="sm" className="gap-1">
+                      <span>Settings</span>
+                      <Settings size={16} />
+                    </Button>
+                  </div>
+                  
+                  <div className="p-4 h-[400px]">
+                    <ChatInterface 
+                      config={{
+                        initialMessage: "Hello! I'm your Digihub AI assistant. Ask me anything about our features, pricing, or how I can help you with your business needs."
+                      }}
+                    />
                   </div>
                 </Card>
               </div>
