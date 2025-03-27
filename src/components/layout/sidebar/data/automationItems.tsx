@@ -16,7 +16,7 @@ export const automationSection = {
       icon: <Activity size={20} />,
     },
     {
-      title: "Email Campaigns",
+      title: "Email Marketing",
       href: "/marketing/email",
       icon: <Mail size={20} />,
     },

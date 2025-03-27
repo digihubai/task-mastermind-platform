@@ -10,6 +10,7 @@ import aiRoutes from '../routes/aiRoutes';
 import marketingRoutes from '../routes/marketingRoutes';
 import automationRoutes from '../routes/automationRoutes';
 import crmRoutes from '../routes/crmRoutes';
+import supportRoutes from '../routes/supportRoutes';
 
 // Create a proper router configuration
 const routes = [
@@ -27,7 +28,8 @@ const routes = [
       ...aiRoutes,
       ...marketingRoutes,
       ...automationRoutes,
-      ...crmRoutes
+      ...crmRoutes,
+      ...supportRoutes
     ],
   },
 ];

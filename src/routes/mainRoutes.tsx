@@ -12,6 +12,13 @@ import AIVisionPage from '@/pages/ai/AIVisionPage';
 import ChatbotsPage from '@/pages/ai/ChatbotsPage';
 import SettingsIntegrationsPage from '@/pages/settings/SettingsIntegrationsPage';
 
+// Create placeholder components for new support routes
+const CallCenterPage = () => <div>Call Center Dashboard</div>;
+const InboundCallsPage = () => <div>Inbound Calls Management</div>;
+const OutboundCallsPage = () => <div>Outbound Calls Management</div>;
+const OmnichannelSupportPage = () => <div>Omnichannel Support Dashboard</div>;
+const TicketsPage = () => <div>Support Tickets Management</div>;
+
 const mainRoutes: RouteObject[] = [
   {
     path: '/',
@@ -56,6 +63,27 @@ const mainRoutes: RouteObject[] = [
   {
     path: '/settings/integrations',
     element: <SettingsIntegrationsPage />,
+  },
+  // New Support routes
+  {
+    path: '/support/call-center',
+    element: <CallCenterPage />,
+  },
+  {
+    path: '/support/call-center/inbound',
+    element: <InboundCallsPage />,
+  },
+  {
+    path: '/support/call-center/outbound',
+    element: <OutboundCallsPage />,
+  },
+  {
+    path: '/support/omnichannel',
+    element: <OmnichannelSupportPage />,
+  },
+  {
+    path: '/support/tickets',
+    element: <TicketsPage />,
   },
 ];
 

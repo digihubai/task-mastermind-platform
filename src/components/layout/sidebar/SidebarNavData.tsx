@@ -30,7 +30,7 @@ export {
 // Main sidebar navigation sections (used by Sidebar.tsx)
 export const sidebarSections: SidebarSectionType[] = [
   dashboardSection,
-  coreModulesSection,
+  coreModulesSection, // Now renamed to "Department" in the moduleItems file
   aiToolsSection,
   automationSection,
   analyticsSection,

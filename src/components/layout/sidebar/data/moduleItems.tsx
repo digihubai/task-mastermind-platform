@@ -6,6 +6,12 @@ import {
   Activity,
   Headphones,
   Package,
+  Phone,
+  PhoneCall,
+  PhoneIncoming,
+  PhoneOutgoing,
+  MessageSquare,
+  Ticket,
 } from "lucide-react";
 import { SidebarItemType } from "@/types/sidebar";
 
@@ -13,13 +19,13 @@ import { SidebarItemType } from "@/types/sidebar";
 export const moduleItems = [
   { name: "CRM", path: "/crm", icon: <Users size={20} /> },
   { name: "Project Management", path: "/project-management", icon: <FolderOpen size={20} /> },
-  { name: "Workflow", path: "/workflow", icon: <Activity size={20} /> },
+  { name: "Marketing", path: "/marketing", icon: <Activity size={20} /> },
   { name: "Customer Support", path: "/support", icon: <Headphones size={20} /> },
 ];
 
-// Core modules section for sidebar
+// Core modules section for sidebar (renamed to Department)
 export const coreModulesSection = {
-  title: "Core SaaS Modules",
+  title: "Department",
   items: [
     {
       title: "CRM",
@@ -33,9 +39,55 @@ export const coreModulesSection = {
       icon: <FolderOpen size={20} />,
     },
     {
+      title: "Marketing",
+      href: "/marketing",
+      icon: <Activity size={20} />,
+      subItems: [
+        {
+          title: "SEO",
+          href: "/marketing/seo",
+          icon: <Activity size={18} />,
+        },
+        {
+          title: "Email Marketing",
+          href: "/marketing/email",
+          icon: <Activity size={18} />,
+        }
+      ],
+    },
+    {
       title: "Customer Support",
       href: "/support",
       icon: <Headphones size={20} />,
+      subItems: [
+        {
+          title: "Call Center",
+          href: "/support/call-center",
+          icon: <Phone size={18} />,
+          subItems: [
+            {
+              title: "Inbound",
+              href: "/support/call-center/inbound",
+              icon: <PhoneIncoming size={16} />,
+            },
+            {
+              title: "Outbound",
+              href: "/support/call-center/outbound",
+              icon: <PhoneOutgoing size={16} />,
+            }
+          ],
+        },
+        {
+          title: "Omnichannel Support",
+          href: "/support/omnichannel",
+          icon: <MessageSquare size={18} />,
+        },
+        {
+          title: "Tickets",
+          href: "/support/tickets",
+          icon: <Ticket size={18} />,
+        }
+      ],
     },
   ] as SidebarItemType[],
 };
