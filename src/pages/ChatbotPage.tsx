@@ -1,6 +1,5 @@
 
 import React, { useState } from "react";
-import AppLayout from "@/components/layout/AppLayout";
 import { toast } from "sonner";
 import { Bot, User } from "lucide-react";
 import { ChatbotDashboard } from "@/components/chatbot/ChatbotDashboard";
@@ -8,7 +7,6 @@ import { ChatbotConfigView } from "@/components/chatbot/ChatbotConfigView";
 import { ChatbotEditView } from "@/components/chatbot/ChatbotEditView";
 
 const ChatbotPage = () => {
-  const [activeTab, setActiveTab] = useState("dashboard");
   const [chatbotView, setChatbotView] = useState<"list" | "create" | "edit" | "configure">("list");
   const [selectedChatbot, setSelectedChatbot] = useState<string | null>(null);
   const [configStep, setConfigStep] = useState(1);
@@ -82,11 +80,6 @@ const ChatbotPage = () => {
     setConfigStep(1);
   };
   
-  const handleCreateChatbot = () => {
-    toast.success("New chatbot created successfully!");
-    setChatbotView("list");
-  };
-  
   const handleBackToDashboard = () => {
     setChatbotView("list");
     setSelectedChatbot(null);
@@ -103,37 +96,35 @@ const ChatbotPage = () => {
   };
   
   return (
-    <AppLayout>
-      <div className="p-6 animate-fade-in">
-        {chatbotView === "list" && (
-          <ChatbotDashboard
-            activeChatbots={activeChatbots}
-            onNewChatbot={handleNewChatbot}
-            onEditChatbot={handleEditChatbot}
-            onConfigureChatbot={handleConfigureChatbot}
-            onViewHistory={handleViewHistory}
-          />
-        )}
-        
-        {(chatbotView === "configure" || chatbotView === "create") && (
-          <ChatbotConfigView
-            selectedChatbot={selectedChatbot}
-            configStep={configStep}
-            setConfigStep={setConfigStep}
-            newChatbotInfo={newChatbotInfo}
-            setNewChatbotInfo={setNewChatbotInfo}
-            handleNextStep={handleNextStep}
-            handleBackToDashboard={handleBackToDashboard}
-          />
-        )}
-        
-        {chatbotView === "edit" && (
-          <ChatbotEditView
-            handleBackToDashboard={handleBackToDashboard}
-          />
-        )}
-      </div>
-    </AppLayout>
+    <div className="p-6 animate-fade-in">
+      {chatbotView === "list" && (
+        <ChatbotDashboard
+          activeChatbots={activeChatbots}
+          onNewChatbot={handleNewChatbot}
+          onEditChatbot={handleEditChatbot}
+          onConfigureChatbot={handleConfigureChatbot}
+          onViewHistory={handleViewHistory}
+        />
+      )}
+      
+      {(chatbotView === "configure" || chatbotView === "create") && (
+        <ChatbotConfigView
+          selectedChatbot={selectedChatbot}
+          configStep={configStep}
+          setConfigStep={setConfigStep}
+          newChatbotInfo={newChatbotInfo}
+          setNewChatbotInfo={setNewChatbotInfo}
+          handleNextStep={handleNextStep}
+          handleBackToDashboard={handleBackToDashboard}
+        />
+      )}
+      
+      {chatbotView === "edit" && (
+        <ChatbotEditView
+          handleBackToDashboard={handleBackToDashboard}
+        />
+      )}
+    </div>
   );
 };
 

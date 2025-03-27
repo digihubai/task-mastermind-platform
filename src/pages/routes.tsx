@@ -1,35 +1,33 @@
 
 import React from 'react';
-import { createBrowserRouter, RouteObject } from 'react-router-dom';
-import App from '@/App';
+import { createBrowserRouter } from 'react-router-dom';
+import App from '../App';
+import NotFound from './NotFound';
+import mainRoutes from '../routes/mainRoutes';
+import authRoutes from '../routes/authRoutes';
+import aiRoutes from '../routes/aiRoutes';
+import marketingRoutes from '../routes/marketingRoutes';
+import automationRoutes from '../routes/automationRoutes';
+import crmRoutes from '../routes/crmRoutes';
+import financeRoutes from '../routes/financeRoutes';
 
-// Import route category files
-import mainRoutes from '@/routes/mainRoutes';
-import financeRoutes from '@/routes/financeRoutes';
-import automationRoutes from '@/routes/automationRoutes';
-import marketingRoutes from '@/routes/marketingRoutes';
-import aiRoutes from '@/routes/aiRoutes';
-import authRoutes from '@/routes/authRoutes';
-import crmRoutes from '@/routes/crmRoutes';
+const routes = [
+  {
+    path: '/',
+    element: <App />,
+    errorElement: <NotFound />,
+    children: [
+      ...mainRoutes,
+      ...authRoutes,
+      ...aiRoutes,
+      ...marketingRoutes,
+      ...automationRoutes,
+      ...crmRoutes,
+      ...financeRoutes
+    ],
+  },
+];
 
-// Combine all child routes under the App layout
-const appRoutes: RouteObject = {
-  path: '/',
-  element: <App />,
-  children: [
-    ...mainRoutes,
-    ...financeRoutes,
-    ...automationRoutes,
-    ...marketingRoutes,
-    ...aiRoutes,
-    ...crmRoutes,
-  ],
-};
-
-// Create the router with all routes
-const router = createBrowserRouter([
-  appRoutes,
-  ...authRoutes,
-]);
+const router = createBrowserRouter(routes);
 
 export default router;
