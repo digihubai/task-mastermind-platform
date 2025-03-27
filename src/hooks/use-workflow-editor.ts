@@ -19,7 +19,7 @@ export interface WorkflowTemplate {
 export const useWorkflowEditor = (initialTemplateId?: string) => {
   const { toast } = useToast();
   
-  const templateData = {
+  const templateData: Record<number, WorkflowTemplate> = {
     1: {
       name: "Customer Support IVR",
       description: "Interactive voice response system for customer support",

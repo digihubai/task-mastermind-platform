@@ -1,7 +1,9 @@
 
 import { useState } from "react";
-import { MessageSquare, Mail, Phone, Users, Database, FileText, 
-  BarChart3, RefreshCw, Calendar, Bell, ArrowDownUp, CheckCircle } from "lucide-react";
+import { 
+  MessageSquare, Mail, Phone, Users, Database, FileText, 
+  BarChart3, RefreshCw, Calendar, Bell, ArrowDownUp, CheckCircle 
+} from "lucide-react";
 
 export interface WorkflowTemplate {
   id: number;
