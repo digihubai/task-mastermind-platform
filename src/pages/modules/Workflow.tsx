@@ -1,11 +1,30 @@
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, PlusCircle, ChevronRight } from "lucide-react";
 
 const Workflow = () => {
+  const navigate = useNavigate();
+
+  const handleNewWorkflow = () => {
+    navigate('/automation/editor');
+  };
+
+  const handleEditWorkflow = (id: number) => {
+    navigate(`/automation/editor/${id}`);
+  };
+
+  const handleViewTemplates = () => {
+    navigate('/automation/templates');
+  };
+
+  const handleViewAllWorkflows = () => {
+    navigate('/automation/workflows');
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -17,7 +36,7 @@ const Workflow = () => {
             </p>
           </div>
           
-          <Button className="flex items-center gap-2">
+          <Button className="flex items-center gap-2" onClick={handleNewWorkflow}>
             <PlusCircle size={18} />
             <span>New Workflow</span>
           </Button>
@@ -38,7 +57,7 @@ const Workflow = () => {
               Automatically follow up with new leads and nurture them through the sales pipeline
             </p>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="flex-1">Edit</Button>
+              <Button variant="outline" size="sm" className="flex-1" onClick={() => handleEditWorkflow(1)}>Edit</Button>
               <Button variant="outline" size="sm" className="flex-1">Metrics</Button>
             </div>
           </Card>
@@ -57,7 +76,7 @@ const Workflow = () => {
               Route and assign support tickets based on topic, priority, and agent availability
             </p>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="flex-1">Edit</Button>
+              <Button variant="outline" size="sm" className="flex-1" onClick={() => handleEditWorkflow(2)}>Edit</Button>
               <Button variant="outline" size="sm" className="flex-1">Metrics</Button>
             </div>
           </Card>
@@ -76,7 +95,7 @@ const Workflow = () => {
               Automate the content review and approval process for marketing materials
             </p>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="flex-1">Edit</Button>
+              <Button variant="outline" size="sm" className="flex-1" onClick={() => handleEditWorkflow(3)}>Edit</Button>
               <Button variant="outline" size="sm" className="flex-1">Metrics</Button>
             </div>
           </Card>
@@ -94,7 +113,11 @@ const Workflow = () => {
               { name: "Document Approval", steps: 4, category: "Operations" },
               { name: "Event Registration", steps: 7, category: "Marketing" }
             ].map((template, i) => (
-              <div key={i} className="p-4 border rounded-md hover:bg-muted/30 transition-colors cursor-pointer flex flex-col">
+              <div 
+                key={i} 
+                className="p-4 border rounded-md hover:bg-muted/30 transition-colors cursor-pointer flex flex-col"
+                onClick={handleViewTemplates}
+              >
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium">{template.name}</h4>
                   <ChevronRight size={16} className="text-muted-foreground" />
@@ -180,6 +203,12 @@ const Workflow = () => {
               </div>
             </div>
           </Card>
+        </div>
+        
+        <div className="flex justify-center">
+          <Button variant="ghost" className="text-violet-600" onClick={handleViewAllWorkflows}>
+            View All Workflows
+          </Button>
         </div>
       </div>
     </AppLayout>

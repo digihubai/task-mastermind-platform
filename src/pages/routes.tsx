@@ -1,39 +1,127 @@
 
-import React from 'react';
-import { createBrowserRouter } from 'react-router-dom';
-import App from '../App';
-import NotFound from './NotFound';
-import DashboardPage from './DashboardPage';
-import mainRoutes from '../routes/mainRoutes';
-import authRoutes from '../routes/authRoutes';
-import aiRoutes from '../routes/aiRoutes';
-import marketingRoutes from '../routes/marketingRoutes';
-import automationRoutes from '../routes/automationRoutes';
-import crmRoutes from '../routes/crmRoutes';
-import supportRoutes from '../routes/supportRoutes';
+import React from "react";
+import { RouteObject, Navigate } from "react-router-dom";
+import DashboardPage from "@/pages/DashboardPage";
+import ChatPage from "@/pages/ChatPage";
+import CustomersPage from "@/pages/CustomersPage";
+import MarketingPage from "@/pages/MarketingPage";
+import ProjectsPage from "@/pages/ProjectsPage";
+import SettingsPage from "@/pages/SettingsPage";
+import NotFound from "@/pages/NotFound";
+import TeamChatPage from "@/pages/TeamChatPage";
+import ChatbotPage from "@/pages/ChatbotPage";
+import MarketingSEOPage from "@/pages/MarketingSEOPage";
+import AIRewriterPage from "@/pages/ai/AIRewriterPage";
+import AIToolsHub from "@/pages/ai/AIToolsHub";
+import AIVisionPage from "@/pages/ai/AIVisionPage";
+import AISEOPage from "@/pages/ai/AISEOPage";
+import PDFInsightPage from "@/pages/ai/PDFInsightPage";
+import AICopywriterPage from "@/pages/ai/AICopywriterPage";
+import ChatbotsPage from "@/pages/ai/ChatbotsPage";
+import authRoutes from "@/routes/authRoutes";
+import mainRoutes from "@/routes/mainRoutes";
+import aiRoutes from "@/routes/aiRoutes";
+import marketingRoutes from "@/routes/marketingRoutes";
+import supportRoutes from "@/routes/supportRoutes";
+import financeRoutes from "@/routes/financeRoutes";
+import crmRoutes from "@/routes/crmRoutes";
+import automationRoutes from "@/routes/automationRoutes";
+import Workflow from "@/pages/modules/Workflow";
 
-// Create a proper router configuration
-const routes = [
+// Main application routes
+const routes: RouteObject[] = [
   {
-    path: '/',
-    element: <App />,
-    errorElement: <NotFound />,
-    children: [
-      {
-        index: true,
-        element: <DashboardPage />,
-      },
-      ...mainRoutes,
-      ...authRoutes,
-      ...aiRoutes,
-      ...marketingRoutes,
-      ...automationRoutes,
-      ...crmRoutes,
-      ...supportRoutes
-    ],
+    path: "/",
+    element: <Navigate to="/dashboard" replace />,
+  },
+  {
+    path: "/dashboard",
+    element: <DashboardPage />,
+  },
+  {
+    path: "/chat",
+    element: <ChatPage />,
+  },
+  {
+    path: "/chat/:id",
+    element: <ChatPage />,
+  },
+  {
+    path: "/customers",
+    element: <CustomersPage />,
+  },
+  {
+    path: "/marketing",
+    element: <MarketingPage />,
+  },
+  {
+    path: "/marketing/seo",
+    element: <MarketingSEOPage />,
+  },
+  {
+    path: "/projects",
+    element: <ProjectsPage />,
+  },
+  {
+    path: "/settings",
+    element: <SettingsPage />,
+  },
+  {
+    path: "/settings/*",
+    element: <SettingsPage />,
+  },
+  {
+    path: "/teamchat",
+    element: <TeamChatPage />,
+  },
+  {
+    path: "/chatbot",
+    element: <ChatbotPage />,
+  },
+  {
+    path: "/workflow",
+    element: <Workflow />,
+  },
+  {
+    path: "/ai/rewriter",
+    element: <AIRewriterPage />,
+  },
+  {
+    path: "/ai",
+    element: <AIToolsHub />,
+  },
+  {
+    path: "/ai/vision",
+    element: <AIVisionPage />,
+  },
+  {
+    path: "/ai/seo",
+    element: <AISEOPage />,
+  },
+  {
+    path: "/ai/pdf",
+    element: <PDFInsightPage />,
+  },
+  {
+    path: "/ai/copywriter",
+    element: <AICopywriterPage />,
+  },
+  {
+    path: "/ai/chatbots",
+    element: <ChatbotsPage />,
+  },
+  ...mainRoutes,
+  ...authRoutes,
+  ...aiRoutes,
+  ...marketingRoutes,
+  ...supportRoutes,
+  ...financeRoutes,
+  ...crmRoutes,
+  ...automationRoutes, // Include automation routes
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ];
 
-const router = createBrowserRouter(routes);
-
-export default router;
+export default routes;

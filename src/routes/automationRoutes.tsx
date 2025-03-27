@@ -2,11 +2,11 @@
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import Workflows from '@/pages/automation/Workflows';
+import WorkflowEditor from '@/pages/automation/WorkflowEditor';
+import WorkflowTemplates from '@/pages/automation/WorkflowTemplates';
 
-// Create placeholder components for automation routes
-const TemplatesPage = () => <div>Templates Page</div>;
-const EditorPage = () => <div>Editor Page</div>;
-const IndustryTemplatesPage = () => <div>Industry Templates Page</div>;
+// Create placeholder component for automation settings
+const AutomationSettings = () => <div>Automation Settings Page</div>;
 
 const automationRoutes: RouteObject[] = [
   {
@@ -14,16 +14,20 @@ const automationRoutes: RouteObject[] = [
     element: <Workflows />,
   },
   {
-    path: '/automation/templates',
-    element: <TemplatesPage />,
+    path: '/automation/editor/:id',
+    element: <WorkflowEditor />,
   },
   {
     path: '/automation/editor',
-    element: <EditorPage />,
+    element: <WorkflowEditor />,
   },
   {
-    path: '/automation/industry-templates',
-    element: <IndustryTemplatesPage />,
+    path: '/automation/templates',
+    element: <WorkflowTemplates />,
+  },
+  {
+    path: '/automation/settings',
+    element: <AutomationSettings />,
   },
 ];
 
