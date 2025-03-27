@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_tool_usage: {
+        Row: {
+          action: string
+          created_at: string | null
+          icon_type: string
+          id: string
+          tool: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          icon_type: string
+          id?: string
+          tool: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          icon_type?: string
+          id?: string
+          tool?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       analytics_data: {
         Row: {
           avg_time_on_site: number | null

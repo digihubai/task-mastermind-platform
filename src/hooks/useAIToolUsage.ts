@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 export interface AIToolUsageItem {
-  id: string; // Changed from number to string to match UUID format
+  id: string;
   action: string;
   tool: string;
   timeAgo: string;
@@ -23,36 +23,32 @@ export function useAIToolUsage() {
     setError(null);
 
     try {
-      // Since ai_tool_usage table doesn't exist yet, we'll use fallback data
-      // In a real implementation, you'd create and use the table
-      const fallbackData: AIToolUsageItem[] = [
-        {
-          id: "1",
-          action: "Created marketing copy",
-          tool: "AI Copywriter",
-          timeAgo: "2 hours ago",
-          iconType: "pen-tool",
-          iconBgClass: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-        },
-        {
-          id: "2",
-          action: "Generated product images",
-          tool: "AI Vision",
-          timeAgo: "Yesterday",
-          iconType: "image",
-          iconBgClass: "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400"
-        },
-        {
-          id: "3",
-          action: "Trained customer service chatbot",
-          tool: "AI Chatbot",
-          timeAgo: "3 days ago",
-          iconType: "bot",
-          iconBgClass: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400"
-        }
-      ];
-      
-      setRecentUsage(fallbackData);
+      const { data, error } = await supabase
+        .from('ai_tool_usage')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (error) {
+        throw error;
+      }
+
+      if (data && data.length > 0) {
+        // Transform the data to match our interface
+        const formattedData: AIToolUsageItem[] = data.map(item => ({
+          id: item.id,
+          action: item.action,
+          tool: item.tool,
+          timeAgo: formatTimeAgo(new Date(item.created_at)),
+          iconType: item.icon_type,
+          iconBgClass: getIconBgClass(item.icon_type)
+        }));
+        
+        setRecentUsage(formattedData);
+      } else {
+        // If no data is returned, set an empty array
+        setRecentUsage([]);
+      }
     } catch (err) {
       console.error("Error fetching AI tool usage:", err);
       setError(err instanceof Error ? err : new Error("Failed to fetch recent usage"));
