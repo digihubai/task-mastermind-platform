@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -40,32 +41,32 @@ const Index = () => {
     customerSatisfaction: {
       value: "92%",
       change: "+3%",
-      trend: "up" as "up" | "down"
+      trend: "up" as "up" | "down"  // Added explicit type assertion here
     },
     salesPipeline: {
       value: "$243,578",
       change: "+12%",
-      trend: "up" as "up" | "down"
+      trend: "up" as "up" | "down"  // Added explicit type assertion here
     },
     activeProjects: {
       value: "24",
       change: "+5",
-      trend: "up" as "up" | "down"
+      trend: "up" as "up" | "down"  // Added explicit type assertion here
     },
     taskCompletion: {
       value: "87%",
       change: "-2%",
-      trend: "down" as "up" | "down"
+      trend: "down" as "up" | "down"  // Added explicit type assertion here
     },
     leadConversion: {
       value: "32%",
       change: "+5%",
-      trend: "up" as "up" | "down"
+      trend: "up" as "up" | "down"  // Added explicit type assertion here
     },
     averageResolutionTime: {
       value: "2.4h",
       change: "-15%",
-      trend: "up" as "up" | "down" // down is good for resolution time
+      trend: "up" as "up" | "down"  // Added explicit type assertion here
     }
   };
   
@@ -118,7 +119,11 @@ const Index = () => {
       default:
         return { 
           title: "Unknown KPI", 
-          data: { value: "0", change: "0%", trend: "up" }, 
+          data: { 
+            value: "0", 
+            change: "0%", 
+            trend: "up" as "up" | "down" // Added explicit type assertion here
+          }, 
           icon: <AlertCircle size={18} /> 
         };
     }
