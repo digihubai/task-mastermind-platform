@@ -36,6 +36,9 @@ const RewritingOptions: React.FC<RewritingOptionsProps> = ({
             <SelectItem value="casual">Casual</SelectItem>
             <SelectItem value="enthusiastic">Enthusiastic</SelectItem>
             <SelectItem value="serious">Serious</SelectItem>
+            <SelectItem value="friendly">Friendly</SelectItem>
+            <SelectItem value="technical">Technical</SelectItem>
+            <SelectItem value="formal">Formal</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -51,6 +54,9 @@ const RewritingOptions: React.FC<RewritingOptionsProps> = ({
             <SelectItem value="detailed">Detailed</SelectItem>
             <SelectItem value="persuasive">Persuasive</SelectItem>
             <SelectItem value="simple">Simple</SelectItem>
+            <SelectItem value="creative">Creative</SelectItem>
+            <SelectItem value="instructional">Instructional</SelectItem>
+            <SelectItem value="conversational">Conversational</SelectItem>
           </SelectContent>
         </Select>
       </div>

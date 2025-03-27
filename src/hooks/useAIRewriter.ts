@@ -40,14 +40,20 @@ export const useAIRewriter = (): RewriteResult => {
         professional: "This is a professionally rewritten version with formal language and structure.",
         casual: "Hey there! Here's a more casual take on your content, keeping it friendly.",
         enthusiastic: "WOW! Your content just got an AMAZING upgrade with lots of energy and excitement!",
-        serious: "The following represents a more formal, fact-oriented approach to your original text."
+        serious: "The following represents a more formal, fact-oriented approach to your original text.",
+        friendly: "Hi there! I've rewritten this in a warm, approachable way that feels like a friend talking.",
+        technical: "The following text has been optimized with precise terminology and technical accuracy.",
+        formal: "The content has been restructured with proper formality and professional decorum."
       };
       
       const styleAdjustments = {
         concise: "Shortened while maintaining key points.",
         detailed: "Expanded with additional context and information.",
         persuasive: "Reframed to be more convincing and compelling.",
-        simple: "Simplified using clearer and more straightforward language."
+        simple: "Simplified using clearer and more straightforward language.",
+        creative: "Reimagined with colorful language and creative expressions.",
+        instructional: "Reformatted as clear step-by-step instructions for better comprehension.",
+        conversational: "Rewritten to flow naturally like a conversation between friends."
       };
       
       setRewrittenText(`${originalText}\n\n${toneAdjustments[tone as keyof typeof toneAdjustments]} ${styleAdjustments[style as keyof typeof styleAdjustments]}`);
