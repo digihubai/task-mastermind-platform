@@ -1,130 +1,136 @@
-
-import { 
-  LayoutDashboard, 
-  MessageSquare, 
+import {
+  LayoutDashboard,
   Users,
-  Briefcase,
-  Settings, 
   BarChart3,
-  Bot,
+  MessageSquare,
   Mail,
-  Headphones,
-  Server,
-  Globe,
+  Bell,
+  Settings,
   FileText,
-  Phone,
-  PhoneOutgoing,
-  HelpCircle,
-  Heart,
-  Star,
-  Calendar,
-  AlertCircle,
-  Activity,
-  BookOpen,
-  LucideIcon,
-  Target,
-  PenTool,
-  Zap,
-  Database,
-  Layers,
   Image,
-  Search,
-  FileSpreadsheet,
+  Video,
+  CalendarDays,
+  MessageCircle,
+  Briefcase,
+  ShoppingCart,
+  UserPlus,
+  Headphones,
+  Globe,
   CreditCard,
-  Megaphone,
-  DollarSign,
-  Calculator,
-  Wallet,
-  PieChart,
-  Receipt,
-  Building,
-  Sparkles,
-  LayoutTemplate
+  ListChecks,
+  KanbanSquare,
+  Building2,
+  HelpCircle,
+  Contact2,
+  LucideIcon,
 } from "lucide-react";
 
-export interface SidebarItem {
-  path: string;
-  icon: LucideIcon;
-  label: string;
-}
-
-export interface SidebarSection {
+interface SidebarItem {
   title: string;
-  items: SidebarItem[];
+  href: string;
+  icon: string;
+  children?: SidebarItem[];
 }
 
-export const sidebarSections: SidebarSection[] = [
+export const SIDEBAR_ITEMS: SidebarItem[] = [
   {
     title: "Dashboard",
-    items: [
-      { path: "/", icon: LayoutDashboard, label: "Overview" },
-      { path: "/analytics", icon: BarChart3, label: "Analytics" },
-      { path: "/calendar", icon: Calendar, label: "Calendar" },
-    ]
+    href: "/",
+    icon: "dashboard",
   },
   {
-    title: "Customer Service",
-    items: [
-      { path: "/chat", icon: MessageSquare, label: "Customer Chat" },
-      { path: "/support", icon: HelpCircle, label: "Support Tickets" },
-      { path: "/chatbot", icon: Bot, label: "AI Chatbot" },
-      { path: "/phone/ivr-system", icon: Phone, label: "IVR System" }, // Updated path
-      { path: "/outbound", icon: PhoneOutgoing, label: "Outbound Calls" }, // Matches route in App.tsx
-    ]
+    title: "CRM",
+    icon: "customers",
+    href: "/customers",
+    children: [
+      {
+        title: "Customers",
+        href: "/customers",
+      },
+      {
+        title: "Leads",
+        href: "/leads",
+      },
+      {
+        title: "Deals",
+        href: "/deals",
+      },
+    ],
   },
   {
-    title: "Team Collaboration",
-    items: [
-      { path: "/team-chat", icon: MessageSquare, label: "Team Chat" },
-      { path: "/projects", icon: Briefcase, label: "Project Management" }, // Updated path
-      { path: "/customers", icon: Users, label: "CRM" }, // Updated path
-    ]
+    title: "Communication",
+    icon: "communication",
+    children: [
+      {
+        title: "Chat",
+        href: "/chat",
+      },
+      {
+        title: "Team Chat",
+        href: "/team-chat",
+      },
+      {
+        title: "Messaging",
+        href: "/messaging",
+      },
+      {
+        title: "Email",
+        href: "/email",
+      },
+      {
+        title: "SMS",
+        href: "/sms",
+      },
+    ],
   },
   {
-    title: "Finance",
-    items: [
-      { path: "/finance", icon: DollarSign, label: "Finance Dashboard" },
-      { path: "/finance/tax-calculator", icon: Calculator, label: "Tax Calculator" },
-      { path: "/finance/invoices", icon: Receipt, label: "Invoices" },
-      { path: "/finance/expenses", icon: CreditCard, label: "Expenses" },
-      { path: "/finance/reports", icon: PieChart, label: "Financial Reports" },
-    ]
+    title: "Projects",
+    icon: "projects",
+    children: [
+      {
+        title: "Kanban Board",
+        href: "/kanban",
+      },
+      {
+        title: "Task List",
+        href: "/tasks",
+      },
+      {
+        title: "Gantt Chart",
+        href: "/gantt",
+      },
+    ],
   },
   {
-    title: "Workflow Automation",
-    items: [
-      { path: "/automation/workflows", icon: LayoutTemplate, label: "Workflows" },
-      { path: "/automation/workflow-templates", icon: FileText, label: "Templates" }, // Updated path
-      { path: "/automation/workflow-editor", icon: Zap, label: "Create Workflow" }, // Updated path
-      { path: "/automation/industry-templates", icon: Building, label: "Industry Solutions" },
-      { path: "/automation/api-connector", icon: Database, label: "API Connector" },
-    ]
+    title: "Support",
+    icon: "support",
+    children: [
+      {
+        title: "Tickets",
+        href: "/support",
+      },
+      {
+        title: "Knowledge Base",
+        href: "/knowledge-base",
+      },
+      {
+        title: "FAQ",
+        href: "/faq",
+      },
+    ],
   },
   {
-    title: "Marketing",
-    items: [
-      { path: "/marketing", icon: Mail, label: "Email Marketing" }, 
-      { path: "/marketing/social", icon: Globe, label: "Social Media" }, // Updated path
-      { path: "/marketing/campaigns", icon: Target, label: "Campaigns" }, // Updated path
-      { path: "/marketing/brand-voice", icon: Megaphone, label: "Brand Voice" }, // Updated path
-    ]
+    title: "Settings",
+    href: "/settings",
+    icon: "settings",
   },
-  {
-    title: "AI Tools",
-    items: [
-      { path: "/ai-tools/copywriter", icon: PenTool, label: "AI Copywriter" }, // Updated path
-      { path: "/ai-tools/seo", icon: Search, label: "AI SEO Writer" }, // Updated path
-      { path: "/ai-tools/vision", icon: Image, label: "AI Vision" }, // Updated path
-      { path: "/ai-tools/rewriter", icon: Zap, label: "AI Rewriter" }, // Updated path
-      { path: "/ai-tools/pdf-insight", icon: FileSpreadsheet, label: "PDF Insight" }, // Updated path
-    ]
-  },
-  {
-    title: "Resources",
-    items: [
-      { path: "/knowledge", icon: BookOpen, label: "Knowledge Base" },
-      { path: "/reports", icon: FileText, label: "Reports" },
-      { path: "/settings", icon: Settings, label: "Settings" },
-    ]
-  }
 ];
+
+export const ICON_MAP: Record<string, LucideIcon> = {
+  dashboard: LayoutDashboard,
+  customers: Users,
+  communication: MessageSquare,
+  projects: Briefcase,
+  support: Headphones,
+  settings: Settings,
+};
