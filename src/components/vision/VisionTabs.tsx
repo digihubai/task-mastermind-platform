@@ -15,7 +15,7 @@ const VisionTabs = ({ selectedTab, onTabChange, children }: VisionTabsProps) => 
   const handleTabChange = (value: string) => {
     if (value === "seo") {
       // Redirect to AI SEO Writer page when SEO Tools tab is clicked
-      navigate("/ai/seo");
+      navigate("/ai-seo");
       return;
     } else if (value === "integrations") {
       // Redirect to the integrations tab

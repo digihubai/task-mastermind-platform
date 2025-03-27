@@ -9,6 +9,7 @@ import WorkflowPage from '@/pages/modules/Workflow';
 import FunnelCreator from '@/pages/modules/FunnelCreator';
 import AISEOPage from '@/pages/ai/AISEOPage';
 import AIVisionPage from '@/pages/ai/AIVisionPage';
+import ChatbotPage from '@/pages/ChatbotPage';
 
 const mainRoutes: RouteObject[] = [
   {
@@ -46,6 +47,10 @@ const mainRoutes: RouteObject[] = [
   {
     path: '/funnel-creator',
     element: <FunnelCreator />,
+  },
+  {
+    path: '/chatbot',
+    element: <ChatbotPage />,
   },
 ];
 

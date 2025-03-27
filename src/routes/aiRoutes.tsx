@@ -9,10 +9,15 @@ import AISEOWriterPage from '@/pages/ai/AISEOWriterPage';
 import AIVisionPage from '@/pages/ai/AIVisionPage';
 import PDFInsightPage from '@/pages/ai/PDFInsightPage';
 import ChatbotsPage from '@/pages/ai/ChatbotsPage';
+import ChatbotPage from '@/pages/ChatbotPage';
 
 const aiRoutes: RouteObject[] = [
   {
     path: '/ai/tools',
+    element: <AIToolsHub />,
+  },
+  {
+    path: '/ai-tools',
     element: <AIToolsHub />,
   },
   {
@@ -28,7 +33,15 @@ const aiRoutes: RouteObject[] = [
     element: <AIRewriterPage />,
   },
   {
+    path: '/ai-rewriter',
+    element: <AIRewriterPage />,
+  },
+  {
     path: '/ai/copywriter',
+    element: <AICopywriterPage />,
+  },
+  {
+    path: '/ai-copywriter',
     element: <AICopywriterPage />,
   },
   {
@@ -48,12 +61,24 @@ const aiRoutes: RouteObject[] = [
     element: <PDFInsightPage />,
   },
   {
+    path: '/pdf-insight',
+    element: <PDFInsightPage />,
+  },
+  {
     path: '/ai/chatbots',
     element: <ChatbotsPage />,
   },
   {
     path: '/chatbots',
     element: <ChatbotsPage />,
+  },
+  {
+    path: '/chatbot',
+    element: <ChatbotPage />,
+  },
+  {
+    path: '/ai/chatbot',
+    element: <ChatbotPage />,
   }
 ];
 

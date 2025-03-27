@@ -14,7 +14,7 @@ import { SidebarItemType } from "@/types/sidebar";
 // AI Tools items
 export const aiToolsItems = [
   { name: "AI Tools Hub", path: "/ai-tools", icon: <Bot size={20} /> },
-  { name: "AI Bots", path: "/bots", icon: <Bot size={20} /> },
+  { name: "AI Bots", path: "/ai-bots", icon: <Bot size={20} /> },
   { name: "AI Chatbots", path: "/chatbots", icon: <MessageSquare size={20} /> },
   { name: "AI Vision", path: "/vision", icon: <Image size={20} /> },
   { name: "AI Copywriter", path: "/ai-copywriter", icon: <PenTool size={20} /> },
