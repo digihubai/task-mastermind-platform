@@ -1,18 +1,21 @@
 
 import React from "react";
-import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 
 const VisionBackButton = () => {
+  const navigate = useNavigate();
+  
   return (
     <Button 
       variant="ghost" 
       size="sm" 
       className="gap-1"
-      onClick={() => window.history.back()}
+      onClick={() => navigate(-1)}
     >
-      <ArrowLeft size={16} />
-      <span>Back to dashboard</span>
+      <ChevronLeft size={16} />
+      <span>Back</span>
     </Button>
   );
 };
