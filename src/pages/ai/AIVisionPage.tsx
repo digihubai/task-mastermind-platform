@@ -138,7 +138,7 @@ const AIVisionPage = () => {
               <span>Back to dashboard</span>
             </Button>
           </div>
-          <Button className="gap-2 rounded-full">
+          <Button className="gap-2 rounded-full" onClick={handleNewConversation}>
             <Plus size={16} />
             <span>New</span>
           </Button>
@@ -315,6 +315,11 @@ const AIVisionPage = () => {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     className="pr-20"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSendMessage();
+                      }
+                    }}
                   />
                   <Button 
                     className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 rounded-full"
@@ -442,7 +447,12 @@ const AIVisionPage = () => {
                 </div>
                 
                 <div>
-                  <Button className="w-full mb-4">Connect Google Search Console</Button>
+                  <Button className="w-full mb-4" onClick={() => {
+                    toast({
+                      title: "Connection initiated",
+                      description: "We're connecting to Google Search Console...",
+                    });
+                  }}>Connect Google Search Console</Button>
                   <p className="text-xs text-muted-foreground text-center">
                     We'll guide you through the authorization process
                   </p>

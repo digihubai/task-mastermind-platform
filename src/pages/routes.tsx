@@ -16,6 +16,7 @@ import AIVisionPage from './ai/AIVisionPage';
 import PDFInsightPage from './ai/PDFInsightPage';
 import AICopywriterPage from './ai/AICopywriterPage';
 import AISEOWriterPage from './ai/AISEOWriterPage';
+import AIRewriterPage from './ai/AIRewriterPage';
 
 // User pages
 import AIVision from './user/AIVision';
@@ -23,6 +24,7 @@ import AIVision from './user/AIVision';
 // Marketing pages
 import MarketingPage from './MarketingPage';
 import MarketingSEOPage from './MarketingSEOPage';
+import SEOToolsPage from './marketing/SEOToolsPage';
 
 // Create placeholder components for missing pages
 const DashboardPage = () => <Index />;
@@ -168,6 +170,10 @@ const router = createBrowserRouter([
         element: <MarketingSEOPage />,
       },
       {
+        path: '/marketing/seo/tools',
+        element: <SEOToolsPage />,
+      },
+      {
         path: '/social',
         element: <SocialPage />,
       },
@@ -186,6 +192,10 @@ const router = createBrowserRouter([
       {
         path: '/ai-seo',
         element: <AISEOWriterPage />,
+      },
+      {
+        path: '/ai-rewriter',
+        element: <AIRewriterPage />,
       },
       // AI routes
       {
