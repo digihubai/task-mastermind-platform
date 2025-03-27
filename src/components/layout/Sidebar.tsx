@@ -1,10 +1,11 @@
 
 import React from "react";
-import { useLocation } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Users } from "lucide-react";
 import SidebarSection from "./SidebarSection";
 import { sidebarSections } from "./SidebarData";
 import { SidebarThemeSwitcher } from "@/components/ui/sidebar";
+import { useEffect } from "react";
+import { useSidebarControl } from "@/hooks/use-sidebar-control";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -13,6 +14,25 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar }) => {
+  // Access more sidebar controls for potential future enhancements
+  const { theme } = useSidebarControl();
+  
+  // Close sidebar when clicking outside on mobile
+  useEffect(() => {
+    if (isMobile && !collapsed) {
+      const handleClickOutside = (e: MouseEvent) => {
+        // Close if clicking outside the sidebar
+        const sidebarElement = document.querySelector('aside');
+        if (sidebarElement && !sidebarElement.contains(e.target as Node)) {
+          toggleSidebar();
+        }
+      };
+      
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isMobile, collapsed, toggleSidebar]);
+
   return (
     <>
       {/* Mobile Overlay */}

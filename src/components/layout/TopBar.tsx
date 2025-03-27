@@ -2,6 +2,7 @@
 import React from "react";
 import { Bell, Moon, Search, Sun } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { SidebarToggleButton } from "@/components/ui/sidebar-toggle-button";
 
 interface TopBarProps {
   toggleSidebar: () => void;
@@ -28,16 +29,7 @@ const TopBar: React.FC<TopBarProps> = ({ toggleSidebar }) => {
   return (
     <header className="h-16 border-b border-border bg-background flex items-center justify-between px-4 md:px-6">
       <div className="flex items-center md:hidden">
-        <button 
-          onClick={toggleSidebar}
-          className="rounded-md p-2 text-foreground hover:bg-secondary transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-menu">
-            <line x1="4" x2="20" y1="12" y2="12"></line>
-            <line x1="4" x2="20" y1="6" y2="6"></line>
-            <line x1="4" x2="20" y1="18" y2="18"></line>
-          </svg>
-        </button>
+        <SidebarToggleButton />
       </div>
       
       <div className="hidden md:flex items-center">
