@@ -39,6 +39,7 @@ import {
   Zap,
   Building,
   ListChecks,
+  User,
 } from "lucide-react";
 
 export const sidebarSections = [
