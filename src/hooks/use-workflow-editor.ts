@@ -25,20 +25,20 @@ export const useWorkflowEditor = (initialTemplateId?: string) => {
       name: "Customer Support IVR",
       description: "Interactive voice response system for customer support",
       steps: [
-        { id: "trigger", type: "trigger", name: "Phone Call Received", icon: React.createElement(Phone, { size: 20 }) },
-        { id: "step1", type: "action", name: "Welcome Message", icon: React.createElement(MessageSquare, { size: 20 }) },
-        { id: "step2", type: "condition", name: "Language Selection", icon: React.createElement(ArrowDownUp, { size: 20 }) },
-        { id: "step3", type: "action", name: "Route to Department", icon: React.createElement(Users, { size: 20 }) },
+        { id: "trigger", type: "trigger" as const, name: "Phone Call Received", icon: React.createElement(Phone, { size: 20 }) },
+        { id: "step1", type: "action" as const, name: "Welcome Message", icon: React.createElement(MessageSquare, { size: 20 }) },
+        { id: "step2", type: "condition" as const, name: "Language Selection", icon: React.createElement(ArrowDownUp, { size: 20 }) },
+        { id: "step3", type: "action" as const, name: "Route to Department", icon: React.createElement(Users, { size: 20 }) },
       ]
     },
     2: {
       name: "Multi-Channel Chat Support",
       description: "Manage customer chat from multiple channels",
       steps: [
-        { id: "trigger", type: "trigger", name: "Message Received", icon: React.createElement(MessageSquare, { size: 20 }) },
-        { id: "step1", type: "condition", name: "Check Channel Type", icon: React.createElement(ArrowDownUp, { size: 20 }) },
-        { id: "step2", type: "action", name: "Auto Response", icon: React.createElement(MessageSquare, { size: 20 }) },
-        { id: "step3", type: "action", name: "Create Support Ticket", icon: React.createElement(FileText, { size: 20 }) },
+        { id: "trigger", type: "trigger" as const, name: "Message Received", icon: React.createElement(MessageSquare, { size: 20 }) },
+        { id: "step1", type: "condition" as const, name: "Check Channel Type", icon: React.createElement(ArrowDownUp, { size: 20 }) },
+        { id: "step2", type: "action" as const, name: "Auto Response", icon: React.createElement(MessageSquare, { size: 20 }) },
+        { id: "step3", type: "action" as const, name: "Create Support Ticket", icon: React.createElement(FileText, { size: 20 }) },
       ]
     }
   };
@@ -47,7 +47,7 @@ export const useWorkflowEditor = (initialTemplateId?: string) => {
     name: "New Workflow",
     description: "Create your workflow from scratch",
     steps: [
-      { id: "trigger", type: "trigger", name: "Select Trigger", icon: React.createElement(Zap, { size: 20 }) },
+      { id: "trigger", type: "trigger" as const, name: "Select Trigger", icon: React.createElement(Zap, { size: 20 }) },
     ]
   };
 
@@ -60,9 +60,9 @@ export const useWorkflowEditor = (initialTemplateId?: string) => {
   const [isAiGenerating, setIsAiGenerating] = useState(false);
 
   const handleAddStep = () => {
-    const newStep = {
+    const newStep: WorkflowStep = {
       id: `step${steps.length}`,
-      type: "action" as const,
+      type: "action",
       name: "New Step",
       icon: React.createElement(MessageSquare, { size: 20 })
     };
@@ -89,11 +89,26 @@ export const useWorkflowEditor = (initialTemplateId?: string) => {
     
     // Simulate AI generating workflow suggestions
     setTimeout(() => {
-      const aiSuggestedSteps = [
+      const aiSuggestedSteps: WorkflowStep[] = [
         ...steps,
-        { id: `step${steps.length}`, type: "action" as const, name: "AI Suggested: Personalized Response", icon: React.createElement(MessageSquare, { size: 20 }) },
-        { id: `step${steps.length + 1}`, type: "condition" as const, name: "AI Suggested: Check Sentiment", icon: React.createElement(ArrowDownUp, { size: 20 }) },
-        { id: `step${steps.length + 2}`, type: "action" as const, name: "AI Suggested: Update CRM", icon: React.createElement(Database, { size: 20 }) }
+        { 
+          id: `step${steps.length}`, 
+          type: "action", 
+          name: "AI Suggested: Personalized Response", 
+          icon: React.createElement(MessageSquare, { size: 20 }) 
+        },
+        { 
+          id: `step${steps.length + 1}`, 
+          type: "condition", 
+          name: "AI Suggested: Check Sentiment", 
+          icon: React.createElement(ArrowDownUp, { size: 20 }) 
+        },
+        { 
+          id: `step${steps.length + 2}`, 
+          type: "action", 
+          name: "AI Suggested: Update CRM", 
+          icon: React.createElement(Database, { size: 20 }) 
+        }
       ];
       
       setSteps(aiSuggestedSteps);

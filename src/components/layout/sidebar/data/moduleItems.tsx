@@ -97,3 +97,25 @@ export const modulesStarter = {
   title: "Modules",
   icon: <Package size={20} />,
 };
+
+// Add the missing moduleSection export
+export const moduleSection = {
+  title: "Modules",
+  items: [
+    {
+      title: "CRM",
+      href: "/crm",
+      icon: <Users size={20} />,
+    },
+    {
+      title: "Project Management",
+      href: "/project-management",
+      icon: <FolderOpen size={20} />,
+    },
+    {
+      title: "Support",
+      href: "/support",
+      icon: <Headphones size={20} />,
+    }
+  ] as SidebarItemType[]
+};

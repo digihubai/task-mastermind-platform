@@ -1,43 +1,33 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { RouterProvider } from 'react-router-dom'
+import { BrowserRouter, RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { ThemeProvider } from "@/components/ui/theme-provider"
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from "@/components/ui/toaster"
+import routes from './pages/routes';
 import './index.css'
-import router from './pages/routes'
-import { Toaster } from './components/ui/toaster'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-// Set up QueryClient for React Query
+// Create a query client for Tanstack React Query
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
     },
   },
-})
+});
 
-console.log('🚀 Application starting...')
-console.log('📁 Creating root element')
+// Create router from routes
+const router = createBrowserRouter(routes);
 
-// Create the root element
-const rootElement = document.getElementById('root')
-
-if (!rootElement) {
-  console.error('❌ Root element not found! Check the index.html file')
-} else {
-  console.log('✅ Root element found, rendering application')
-  
-  const root = ReactDOM.createRoot(rootElement)
-  
-  root.render(
-    <React.StrictMode>
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <ThemeProvider defaultTheme="light" storageKey="digihub-theme">
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
         <Toaster />
       </QueryClientProvider>
-    </React.StrictMode>,
-  )
-  
-  console.log('✅ Application rendered successfully')
-}
+    </ThemeProvider>
+  </React.StrictMode>,
+)
