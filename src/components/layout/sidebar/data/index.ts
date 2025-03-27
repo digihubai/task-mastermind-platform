@@ -5,7 +5,6 @@ import { SidebarSectionType } from "@/types/sidebar";
 import { dashboardSection } from "./dashboardItems";
 import { automationSection } from "./automationItems";
 import { analyticsSection } from "./analyticsItems";
-import { marketingSection } from "./marketingItems";
 import { aiToolsSection } from "./aiTools";
 import { coreModulesSection } from "./moduleItems";
 import { settingsSection } from "./settingsItems";
@@ -15,7 +14,6 @@ export {
   dashboardSection,
   automationSection,
   analyticsSection,
-  marketingSection,
   aiToolsSection,
   coreModulesSection,
   settingsSection

@@ -5,7 +5,6 @@ import {
   dashboardSection,
   automationSection,
   analyticsSection,
-  marketingSection,
   aiToolsSection,
   coreModulesSection,
   settingsSection
@@ -45,7 +44,6 @@ export const sidebarSections: SidebarSectionType[] = [
   dashboardSection,
   automationSection,
   analyticsSection,
-  marketingSection,
   aiToolsSection,
   coreModulesSection,
   settingsSection
@@ -87,16 +85,6 @@ export const SidebarNavData = () => {
         key="analytics"  
         section={analyticsSection}
         pathname={pathname}
-        expandedSections={expandedSections}
-        toggleSection={toggleSection}
-        isPathActive={isPathActive}
-        isExactPathActive={isExactPathActive}
-      />
-      
-      <SidebarMenuItem 
-        key="marketing"
-        section={marketingSection} 
-        pathname={pathname} 
         expandedSections={expandedSections}
         toggleSection={toggleSection}
         isPathActive={isPathActive}
