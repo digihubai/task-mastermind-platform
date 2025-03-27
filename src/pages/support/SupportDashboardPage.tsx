@@ -3,13 +3,58 @@ import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import OmnichannelInbox from "@/components/communication/OmnichannelInbox";
 import SupportStats from "@/components/support/SupportStats";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, TicketIcon, MessageSquare, Phone, Users } from "lucide-react";
+import OmnichannelInbox from "@/components/communication/OmnichannelInbox";
+import { useNavigate } from 'react-router-dom';
+import { TicketList } from "@/components/support/TicketList";
+import { SupportTicket } from "@/types/support";
+
+// Mock data for recent tickets
+const recentTickets: SupportTicket[] = [
+  {
+    id: "ticket-001",
+    subject: "Setup assistance for chatbot",
+    description: "I'm having trouble setting up the chatbot for my website.",
+    status: "in_progress",
+    priority: "medium",
+    category: "technical",
+    createdAt: "2023-04-10T14:30:00Z",
+    updatedAt: "2023-04-11T09:15:00Z",
+    userId: "user-123",
+    assignedTo: "agent-456",
+    department: "technical",
+    tags: ["chatbot", "setup"],
+    messages: []
+  },
+  {
+    id: "ticket-002",
+    subject: "API integration questions",
+    description: "I need help understanding how to integrate your API.",
+    status: "open",
+    priority: "low",
+    category: "integration",
+    createdAt: "2023-04-12T10:45:00Z", 
+    updatedAt: "2023-04-12T10:45:00Z",
+    userId: "user-456",
+    department: "technical",
+    tags: ["api", "integration"],
+    messages: []
+  }
+];
 
 const SupportDashboardPage = () => {
   const [activeTab, setActiveTab] = useState<string>("overview");
+  const navigate = useNavigate();
+
+  const handleViewAllTickets = () => {
+    navigate('/support/tickets');
+  };
+
+  const handleNewTicket = () => {
+    navigate('/support/tickets');
+  };
 
   return (
     <AppLayout showModuleName moduleName="Support Dashboard">
@@ -21,7 +66,7 @@ const SupportDashboardPage = () => {
               <Users className="mr-2 h-4 w-4" />
               Team Members
             </Button>
-            <Button>
+            <Button onClick={handleNewTicket}>
               <PlusCircle className="mr-2 h-4 w-4" />
               New Ticket
             </Button>
@@ -50,13 +95,23 @@ const SupportDashboardPage = () => {
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="col-span-1">
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Recent Tickets</CardTitle>
+                  <Button variant="link" size="sm" onClick={handleViewAllTickets}>
+                    View all
+                  </Button>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    No recent tickets found. Create a new ticket to get started.
-                  </p>
+                  {recentTickets.length > 0 ? (
+                    <TicketList 
+                      tickets={recentTickets} 
+                      onViewTicket={(ticket) => navigate('/support/tickets')}
+                    />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No recent tickets found. Create a new ticket to get started.
+                    </p>
+                  )}
                 </CardContent>
               </Card>
               
@@ -75,14 +130,17 @@ const SupportDashboardPage = () => {
           
           <TabsContent value="tickets" className="space-y-4">
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>All Support Tickets</CardTitle>
+                <Button size="sm" onClick={handleViewAllTickets}>
+                  View all tickets
+                </Button>
               </CardHeader>
               <CardContent>
-                {/* Placeholder for TicketList component */}
-                <p className="text-muted-foreground">
-                  Support tickets will be displayed here.
-                </p>
+                <TicketList 
+                  tickets={recentTickets} 
+                  onViewTicket={(ticket) => navigate('/support/tickets')}
+                />
               </CardContent>
             </Card>
           </TabsContent>
@@ -101,7 +159,7 @@ const SupportDashboardPage = () => {
                   View all call center activity here.
                 </p>
                 <div className="mt-4">
-                  <Button variant="outline" onClick={() => window.location.href = "/support/call-center"}>
+                  <Button variant="outline" onClick={() => navigate('/support/call-center')}>
                     <Phone className="mr-2 h-4 w-4" />
                     Go to Call Center
                   </Button>

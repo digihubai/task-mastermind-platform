@@ -6,9 +6,7 @@ import OmnichannelSupportPage from '@/pages/support/OmnichannelSupportPage';
 import SupportDashboardPage from '@/pages/support/SupportDashboardPage';
 import InboundCallsPage from '@/pages/support/InboundCallsPage';
 import OutboundCallsPage from '@/pages/support/OutboundCallsPage';
-
-// Create placeholder component for tickets page
-const TicketsPage = () => <div>Support Tickets Management</div>;
+import TicketsPage from '@/pages/support/TicketsPage';
 
 const supportRoutes: RouteObject[] = [
   {
