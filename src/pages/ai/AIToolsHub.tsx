@@ -1,26 +1,26 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
-  Search,
   PenTool,
   Edit,
   FileText,
   Image,
   FileSpreadsheet,
-  Zap,
   Bot,
   Sparkles,
   Globe,
   Headphones,
-  MessageSquare,
-  Star
+  MessageSquare
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+
+// Import the new components
+import AIToolHeader from "@/components/ai/AIToolHeader";
+import AIToolSearch from "@/components/ai/AIToolSearch";
+import AIToolCategoryFilter from "@/components/ai/AIToolCategoryFilter";
+import AIToolGrid from "@/components/ai/AIToolGrid";
+import AIToolRecentUsage from "@/components/ai/AIToolRecentUsage";
 
 const AIToolsHub = () => {
   const navigate = useNavigate();
@@ -132,8 +132,8 @@ const AIToolsHub = () => {
     { id: "automation", name: "Automation" }
   ];
   
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const [activeCategory, setActiveCategory] = React.useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all");
   
   const filteredTools = aiTools.filter(tool => {
     const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -153,127 +153,27 @@ const AIToolsHub = () => {
   return (
     <AppLayout>
       <div className="space-y-6 animate-fade-in">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">AI Tools</h1>
-          <p className="text-muted-foreground mt-1">
-            Powerful AI-powered tools to enhance your productivity
-          </p>
-        </div>
+        <AIToolHeader 
+          title="AI Tools" 
+          description="Powerful AI-powered tools to enhance your productivity" 
+        />
         
         <div className="flex flex-col sm:flex-row gap-4 justify-between">
-          <div className="relative flex-1 max-w-lg">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-            <Input
-              placeholder="Search AI tools..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+          <AIToolSearch 
+            searchQuery={searchQuery} 
+            setSearchQuery={setSearchQuery} 
+          />
           
-          <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
-            {categories.map((category) => (
-              <Button
-                key={category.id}
-                variant={activeCategory === category.id ? "default" : "outline"}
-                onClick={() => setActiveCategory(category.id)}
-                className="whitespace-nowrap"
-              >
-                {category.name}
-              </Button>
-            ))}
-          </div>
+          <AIToolCategoryFilter 
+            categories={categories} 
+            activeCategory={activeCategory} 
+            setActiveCategory={setActiveCategory} 
+          />
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredTools.map((tool) => (
-            <Card
-              key={tool.id}
-              className={`hover-lift border border-border/40 p-6 cursor-pointer ${
-                tool.badge === "Coming Soon" ? "opacity-80" : ""
-              }`}
-              onClick={() => handleToolClick(tool.path)}
-            >
-              <div className="flex gap-4">
-                <div className={`${tool.color} p-3 rounded-full`}>
-                  {tool.icon}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-lg">{tool.name}</h3>
-                    {tool.badge && (
-                      <Badge variant="outline" className={
-                        tool.badge === "New" 
-                          ? "bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400" 
-                          : tool.badge === "Popular"
-                          ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
-                          : "bg-gray-50 text-gray-600 dark:bg-gray-900/20 dark:text-gray-400"
-                      }>
-                        {tool.badge}
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">{tool.description}</p>
-                  
-                  <div className="flex justify-between items-center mt-4">
-                    <span className="text-xs text-muted-foreground">{tool.category}</span>
-                    {tool.badge !== "Coming Soon" && (
-                      <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                        <span>Use Tool</span>
-                        <Zap size={14} />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+        <AIToolGrid tools={filteredTools} onToolClick={handleToolClick} />
         
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Recent Usage</h2>
-          <Card className="border border-border/40 p-6">
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between pb-4 last:pb-0 last:border-0 border-b border-border/40">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${
-                      i === 1 ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" :
-                      i === 2 ? "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400" :
-                      "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400"
-                    }`}>
-                      {i === 1 ? <PenTool size={16} /> : 
-                       i === 2 ? <Image size={16} /> : 
-                       <Bot size={16} />}
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">
-                        {i === 1 ? "Created marketing copy" : 
-                         i === 2 ? "Generated product images" : 
-                         "Trained customer service chatbot"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {i === 1 ? "AI Copywriter" : 
-                         i === 2 ? "AI Vision" : 
-                         "AI Chatbot"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <p className="text-xs text-muted-foreground">
-                      {i === 1 ? "2 hours ago" : 
-                       i === 2 ? "Yesterday" : 
-                       "3 days ago"}
-                    </p>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Star size={16} />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
+        <AIToolRecentUsage />
       </div>
     </AppLayout>
   );
