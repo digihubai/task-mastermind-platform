@@ -27,7 +27,7 @@ export const moduleItems = [
 
 // Core modules section for sidebar (Department)
 export const coreModulesSection = {
-  title: "Department",
+  title: "Departments",
   items: [
     {
       title: "CRM",

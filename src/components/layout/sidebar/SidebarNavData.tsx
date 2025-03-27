@@ -114,7 +114,7 @@ export const SidebarNavData = () => {
       />
       
       <SidebarMenuItem
-        key="department"
+        key="departments"
         section={coreModulesSection}
         pathname={pathname}
         expandedSections={expandedSections}

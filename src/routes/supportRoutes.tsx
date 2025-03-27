@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
+import CallCenterPage from '@/pages/support/CallCenterPage';
 
 // Create placeholder components for support routes
 const SupportDashboardPage = () => <div>Support Dashboard</div>;
-const CallCenterPage = () => <div>Call Center Dashboard</div>;
 const InboundCallsPage = () => <div>Inbound Calls Management</div>;
 const OutboundCallsPage = () => <div>Outbound Calls Management</div>;
 const OmnichannelSupportPage = () => <div>Omnichannel Support Dashboard</div>;
