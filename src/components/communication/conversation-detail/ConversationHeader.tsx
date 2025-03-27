@@ -4,13 +4,27 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, MessageSquare, Mail, Phone } from "lucide-react";
 import type { Conversation } from "@/types/omnichannel";
 
 interface ConversationHeaderProps {
   conversation: Conversation | undefined;
   onAssignToHuman: () => void;
 }
+
+const getChannelIcon = (channel: string) => {
+  switch (channel.toLowerCase()) {
+    case 'email':
+      return <Mail size={14} className="mr-1" />;
+    case 'phone':
+    case 'sms':
+      return <Phone size={14} className="mr-1" />;
+    case 'chat':
+    case 'website':
+    default:
+      return <MessageSquare size={14} className="mr-1" />;
+  }
+};
 
 const ConversationHeader: React.FC<ConversationHeaderProps> = ({
   conversation,
@@ -30,7 +44,8 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <h3 className="font-medium">{conversation.name}</h3>
-            <Badge variant="outline" className="text-xs capitalize">
+            <Badge variant="outline" className="text-xs capitalize flex items-center">
+              {getChannelIcon(conversation.channel)}
               {conversation.channel}
             </Badge>
           </div>
@@ -41,11 +56,16 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
       </div>
       
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" onClick={onAssignToHuman}>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={onAssignToHuman} 
+          className="bg-primary text-white hover:bg-primary/90 hover:text-white"
+        >
           <ArrowUpRight size={14} className="mr-1.5" />
           Assign to Human
         </Button>
-        <Select defaultValue="open">
+        <Select defaultValue={conversation.status || "open"}>
           <SelectTrigger className="w-[110px]">
             <SelectValue placeholder="Status" />
           </SelectTrigger>

@@ -20,6 +20,11 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
   onSendMessage,
   onAssignToHuman
 }) => {
+  // Filter messages for the selected conversation
+  const conversationMessages = selectedConversation 
+    ? messages.filter(m => m.channel === selectedConversation.channel) 
+    : [];
+
   return (
     <Card className="h-full flex flex-col">
       {selectedConversation ? (
@@ -32,7 +37,7 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
           </CardHeader>
           
           <div className="flex-1 overflow-hidden">
-            <MessageList messages={messages} />
+            <MessageList messages={conversationMessages} />
           </div>
           
           <MessageInput onSendMessage={onSendMessage} />
