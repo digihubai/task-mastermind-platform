@@ -40,6 +40,10 @@ const aiRoutes: RouteObject[] = [
     element: <AIVisionPage />,
   },
   {
+    path: '/vision',
+    element: <AIVisionPage />,
+  },
+  {
     path: '/ai/pdf-insight',
     element: <PDFInsightPage />,
   },

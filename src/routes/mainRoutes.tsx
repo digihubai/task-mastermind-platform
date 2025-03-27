@@ -8,6 +8,7 @@ import ProjectManagement from '@/pages/modules/ProjectManagement';
 import WorkflowPage from '@/pages/modules/Workflow';
 import FunnelCreator from '@/pages/modules/FunnelCreator';
 import AISEOPage from '@/pages/ai/AISEOPage';
+import AIVisionPage from '@/pages/ai/AIVisionPage';
 
 const mainRoutes: RouteObject[] = [
   {
@@ -25,6 +26,10 @@ const mainRoutes: RouteObject[] = [
   {
     path: '/ai-seo',
     element: <AISEOPage />,
+  },
+  {
+    path: '/vision',
+    element: <AIVisionPage />,
   },
   {
     path: '/crm',
