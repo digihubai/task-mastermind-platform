@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { PricingPlan, FeatureCategory } from '@/types/settings';
 import { useToast } from '@/hooks/use-toast';
@@ -73,16 +72,12 @@ const initialPricingPlans: PricingPlan[] = [
     billingPeriod: "monthly",
     isPopular: false,
     features: [
-      { id: "pm1", name: "Project Creation", description: "Ability to create new projects", included: true, 
-        limits: { type: 'count', value: 5, unit: 'projects' }},
-      { id: "pm2", name: "Task Management", description: "Create and assign tasks to team members", included: true },
-      { id: "comm1", name: "Team Chat", description: "Real-time messaging between team members", included: true, 
-        limits: { type: 'count', value: 3, unit: 'users' }},
-      { id: "cb1", name: "Website Integration", description: "Embed chatbot on your website", included: true, 
-        limits: { type: 'count', value: 1, unit: 'chatbot' }},
-      { id: "crm1", name: "Contact Management", description: "Manage and organize customer contacts", included: true, 
-        limits: { type: 'count', value: 100, unit: 'contacts' }},
-      { id: "an1", name: "Basic Reporting", description: "View basic usage and performance reports", included: true }
+      { id: "pm1", included: true, limits: { type: 'limited', value: 5, unit: 'projects' }},
+      { id: "pm2", included: true },
+      { id: "comm1", included: true, limits: { type: 'limited', value: 3, unit: 'users' }},
+      { id: "cb1", included: true, limits: { type: 'limited', value: 1, unit: 'chatbot' }},
+      { id: "crm1", included: true, limits: { type: 'limited', value: 100, unit: 'contacts' }},
+      { id: "an1", included: true }
     ]
   },
   {
@@ -93,22 +88,18 @@ const initialPricingPlans: PricingPlan[] = [
     billingPeriod: "monthly",
     isPopular: true,
     features: [
-      { id: "pm1", name: "Project Creation", description: "Ability to create new projects", included: true, 
-        limits: { type: 'count', value: 20, unit: 'projects' }},
-      { id: "pm2", name: "Task Management", description: "Create and assign tasks to team members", included: true },
-      { id: "pm3", name: "File Sharing", description: "Share files and documents within projects", included: true },
-      { id: "pm4", name: "Progress Tracking", description: "Track project progress and milestones", included: true },
-      { id: "comm1", name: "Team Chat", description: "Real-time messaging between team members", included: true, 
-        limits: { type: 'count', value: 10, unit: 'users' }},
-      { id: "comm2", name: "Client Communication", description: "Communicate with clients through the platform", included: true },
-      { id: "cb1", name: "Website Integration", description: "Embed chatbot on your website", included: true, 
-        limits: { type: 'count', value: 1, unit: 'chatbot' }},
-      { id: "cb2", name: "WhatsApp Integration", description: "Connect chatbot to WhatsApp Business", included: true },
-      { id: "crm1", name: "Contact Management", description: "Manage and organize customer contacts", included: true, 
-        limits: { type: 'count', value: 1000, unit: 'contacts' }},
-      { id: "crm2", name: "Lead Tracking", description: "Track and manage sales leads", included: true },
-      { id: "an1", name: "Basic Reporting", description: "View basic usage and performance reports", included: true },
-      { id: "an2", name: "Advanced Analytics", description: "Detailed analytics and custom reports", included: true }
+      { id: "pm1", included: true, limits: { type: 'limited', value: 20, unit: 'projects' }},
+      { id: "pm2", included: true },
+      { id: "pm3", included: true },
+      { id: "pm4", included: true },
+      { id: "comm1", included: true, limits: { type: 'limited', value: 10, unit: 'users' }},
+      { id: "comm2", included: true },
+      { id: "cb1", included: true, limits: { type: 'limited', value: 1, unit: 'chatbot' }},
+      { id: "cb2", included: true },
+      { id: "crm1", included: true, limits: { type: 'limited', value: 1000, unit: 'contacts' }},
+      { id: "crm2", included: true },
+      { id: "an1", included: true },
+      { id: "an2", included: true }
     ]
   },
   {
@@ -119,34 +110,30 @@ const initialPricingPlans: PricingPlan[] = [
     billingPeriod: "monthly",
     isPopular: false,
     features: [
-      { id: "pm1", name: "Project Creation", description: "Ability to create new projects", included: true, 
-        limits: { type: 'unlimited' }},
-      { id: "pm2", name: "Task Management", description: "Create and assign tasks to team members", included: true },
-      { id: "pm3", name: "File Sharing", description: "Share files and documents within projects", included: true },
-      { id: "pm4", name: "Progress Tracking", description: "Track project progress and milestones", included: true },
-      { id: "pm5", name: "AI Task Reassignment", description: "Automatic task reassignment based on availability", included: true },
-      { id: "comm1", name: "Team Chat", description: "Real-time messaging between team members", included: true, 
-        limits: { type: 'unlimited' }},
-      { id: "comm2", name: "Client Communication", description: "Communicate with clients through the platform", included: true },
-      { id: "comm3", name: "Video Meetings", description: "Host video meetings and screen sharing", included: true },
-      { id: "comm4", name: "AI Meeting Summaries", description: "Automatic summarization of meetings", included: true },
-      { id: "cb1", name: "Website Integration", description: "Embed chatbot on your website", included: true, 
-        limits: { type: 'count', value: 5, unit: 'chatbots' }},
-      { id: "cb2", name: "WhatsApp Integration", description: "Connect chatbot to WhatsApp Business", included: true },
-      { id: "cb3", name: "Facebook Messenger", description: "Integrate with Facebook Messenger", included: true },
-      { id: "cb4", name: "Email Integration", description: "Integrate with email systems", included: true },
-      { id: "cb5", name: "E-commerce Integration", description: "Connect to Shopify and WooCommerce", included: true },
-      { id: "crm1", name: "Contact Management", description: "Manage and organize customer contacts", included: true, 
-        limits: { type: 'unlimited' }},
-      { id: "crm2", name: "Lead Tracking", description: "Track and manage sales leads", included: true },
-      { id: "crm3", name: "Sales Pipeline", description: "Visualize and manage sales pipeline", included: true },
-      { id: "crm4", name: "AI Lead Scoring", description: "Automatic lead scoring and prioritization", included: true },
-      { id: "mkt1", name: "Email Campaigns", description: "Create and send email marketing campaigns", included: true },
-      { id: "mkt2", name: "Social Media Integration", description: "Post and schedule on social media", included: true },
-      { id: "an1", name: "Basic Reporting", description: "View basic usage and performance reports", included: true },
-      { id: "an2", name: "Advanced Analytics", description: "Detailed analytics and custom reports", included: true },
-      { id: "an3", name: "AI Insights", description: "AI-powered insights and recommendations", included: true },
-      { id: "an4", name: "Export Data", description: "Export data and reports", included: true }
+      { id: "pm1", included: true, limits: { type: 'unlimited' }},
+      { id: "pm2", included: true },
+      { id: "pm3", included: true },
+      { id: "pm4", included: true },
+      { id: "pm5", included: true },
+      { id: "comm1", included: true, limits: { type: 'unlimited' }},
+      { id: "comm2", included: true },
+      { id: "comm3", included: true },
+      { id: "comm4", included: true },
+      { id: "cb1", included: true, limits: { type: 'limited', value: 5, unit: 'chatbots' }},
+      { id: "cb2", included: true },
+      { id: "cb3", included: true },
+      { id: "cb4", included: true },
+      { id: "cb5", included: true },
+      { id: "crm1", included: true, limits: { type: 'unlimited' }},
+      { id: "crm2", included: true },
+      { id: "crm3", included: true },
+      { id: "crm4", included: true },
+      { id: "mkt1", included: true },
+      { id: "mkt2", included: true },
+      { id: "an1", included: true },
+      { id: "an2", included: true },
+      { id: "an3", included: true },
+      { id: "an4", included: true }
     ]
   }
 ];
