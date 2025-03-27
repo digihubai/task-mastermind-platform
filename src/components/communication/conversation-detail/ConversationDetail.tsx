@@ -21,7 +21,7 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
   onAssignToHuman
 }) => {
   return (
-    <Card className="h-[calc(100vh-180px)] flex flex-col">
+    <Card className="h-full flex flex-col">
       {selectedConversation ? (
         <>
           <CardHeader className="pb-3 border-b">

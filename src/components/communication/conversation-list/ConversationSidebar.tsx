@@ -35,7 +35,7 @@ const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
   });
 
   return (
-    <Card className="h-[calc(100vh-180px)]">
+    <Card className="h-full">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg">Conversations</CardTitle>

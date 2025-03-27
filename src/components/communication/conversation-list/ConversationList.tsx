@@ -16,7 +16,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
   onSelectConversation
 }) => {
   return (
-    <ScrollArea className="h-[calc(100vh-300px)]">
+    <ScrollArea className="h-[calc(100vh-400px)]">
       <div className="px-4 space-y-2">
         {conversations.map((conversation) => (
           <ConversationItem

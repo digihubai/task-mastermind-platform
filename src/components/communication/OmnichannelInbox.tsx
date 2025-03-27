@@ -24,7 +24,7 @@ const OmnichannelInbox: React.FC = () => {
   const selectedConversation = mockConversations.find(c => c.id === selectedConversationId);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-[calc(100vh-400px)]">
       {/* Conversation Sidebar */}
       <div className="md:col-span-4 lg:col-span-3">
         <ConversationSidebar
