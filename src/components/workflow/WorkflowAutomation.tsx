@@ -124,9 +124,10 @@ const WorkflowAutomation = () => {
       node.id === nodeId ? { ...node, isActive: !node.isActive } : node
     ));
     
-    toast({
-      title: "Node status updated",
-      description: `The node has been ${nodes.find(n => n.id === nodeId)?.isActive ? 'deactivated' : 'activated'}.`
+    // Fix: Using toast properly by passing title and description as strings
+    const node = nodes.find(n => n.id === nodeId);
+    toast.success(node?.isActive ? "Node deactivated" : "Node activated", {
+      description: `The ${node?.title} node has been ${node?.isActive ? 'deactivated' : 'activated'}.`
     });
   };
   
@@ -137,8 +138,8 @@ const WorkflowAutomation = () => {
     
     setShowConnector(false);
     
-    toast({
-      title: "Connection configured",
+    // Fix: Using toast properly by passing title and description as strings
+    toast.success("Connection configured", {
       description: "The integration has been successfully configured."
     });
   };
