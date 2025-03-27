@@ -1,180 +1,162 @@
 
-import React from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
+import React, { useState } from "react";
+import { SupportTicket } from "@/types/support";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 
-const formSchema = z.object({
-  subject: z.string().min(2, {
-    message: "Subject must be at least 2 characters.",
-  }).max(100),
-  description: z.string().min(10, {
-    message: "Description must be at least 10 characters.",
-  }),
-  priority: z.enum(["low", "medium", "high", "urgent"]),
-  department: z.enum(["sales", "technical", "billing", "general"]),
-});
-
-interface NewTicketFormProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSubmit: (values: z.infer<typeof formSchema>) => void;
+export interface NewTicketFormProps {
+  onSubmit: (newTicket: Partial<SupportTicket>) => void;
+  onCancel: () => void;
 }
 
-export const NewTicketForm: React.FC<NewTicketFormProps> = ({
-  open,
-  onOpenChange,
-  onSubmit,
+export const NewTicketForm: React.FC<NewTicketFormProps> = ({ 
+  onSubmit, 
+  onCancel
 }) => {
-  const { toast } = useToast();
-  
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      subject: "",
-      description: "",
-      priority: "medium",
-      department: "general",
-    },
+  const [formData, setFormData] = useState<Partial<SupportTicket>>({
+    subject: "",
+    description: "",
+    priority: "medium",
+    category: "general",
+    department: "Support",
+    tags: []
   });
-
-  const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    onSubmit(values);
-    form.reset();
-    toast({
-      title: "Ticket created",
-      description: "Your support ticket has been created successfully.",
+  
+  const handleChange = (field: keyof SupportTicket, value: any) => {
+    setFormData({
+      ...formData,
+      [field]: value
     });
   };
-
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+  
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Create New Support Ticket</DialogTitle>
-          <DialogDescription>
-            Fill out the form below to create a new support ticket. Our team will respond as soon as possible.
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="subject"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Subject</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Briefly describe your issue" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+    <Card>
+      <CardHeader>
+        <CardTitle>Create New Support Ticket</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="subject" className="block text-sm font-medium mb-1">
+              Subject
+            </label>
+            <Input
+              id="subject"
+              placeholder="Brief description of your issue"
+              value={formData.subject}
+              onChange={(e) => handleChange("subject", e.target.value)}
+              required
             />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Please provide details about your issue"
-                      className="resize-none min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+          </div>
+          
+          <div>
+            <label htmlFor="description" className="block text-sm font-medium mb-1">
+              Description
+            </label>
+            <Textarea
+              id="description"
+              placeholder="Detailed description of your issue"
+              rows={5}
+              value={formData.description}
+              onChange={(e) => handleChange("description", e.target.value)}
+              required
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="priority"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Priority</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select priority" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="department"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Department</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select department" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="general">General</SelectItem>
-                        <SelectItem value="technical">Technical</SelectItem>
-                        <SelectItem value="billing">Billing</SelectItem>
-                        <SelectItem value="sales">Sales</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="priority" className="block text-sm font-medium mb-1">
+                Priority
+              </label>
+              <Select 
+                value={formData.priority} 
+                onValueChange={(value) => handleChange("priority", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
-            <DialogFooter>
-              <Button type="submit">Submit Ticket</Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+            
+            <div>
+              <label htmlFor="category" className="block text-sm font-medium mb-1">
+                Category
+              </label>
+              <Select 
+                value={formData.category} 
+                onValueChange={(value) => handleChange("category", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="general">General</SelectItem>
+                    <SelectItem value="account">Account</SelectItem>
+                    <SelectItem value="billing">Billing</SelectItem>
+                    <SelectItem value="technical">Technical</SelectItem>
+                    <SelectItem value="feature">Feature Request</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div>
+            <label htmlFor="department" className="block text-sm font-medium mb-1">
+              Department
+            </label>
+            <Select 
+              value={formData.department} 
+              onValueChange={(value) => handleChange("department", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select department" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="Support">Support</SelectItem>
+                  <SelectItem value="Sales">Sales</SelectItem>
+                  <SelectItem value="Billing">Billing</SelectItem>
+                  <SelectItem value="Product">Product</SelectItem>
+                  <SelectItem value="Technical">Technical</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button type="submit">
+              Submit Ticket
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,7 +27,7 @@ import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 import ChannelSidebar from "./ChannelSidebar";
 import DirectMessagesSidebar from "./DirectMessagesSidebar";
-import { mockChannels, mockGroups, mockTeamMembers, mockMessages } from "./mockData";
+import { mockChannels, mockGroups, mockTeamMembers, mockMessages, mockGifs } from "./mockData";
 
 export type TeamMember = {
   id: string;

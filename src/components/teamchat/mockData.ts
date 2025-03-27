@@ -1,158 +1,136 @@
 
 import { TeamChannel, TeamGroup, TeamMessage } from "@/types/support";
-import { TeamMember } from "./TeamChat";
 
-// Mock Gifs data
-export const mockGifs = [
-  { id: "gif1", url: "https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif", title: "Happy" },
-  { id: "gif2", url: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnlya2VpamRjcHUyNDI2c2JzMHRtOTduemRmdWFvYWZ0ZTB6YmtpcSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Ju7l5y9osyymQ/giphy.gif", title: "Thinking" },
-  { id: "gif3", url: "https://media.giphy.com/media/3oKIPf3C7HqqYBVcCk/giphy.gif", title: "Working" },
-  { id: "gif4", url: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnZrYmJ3YTNram43dDZsZXk3MjY3ajg3dW1qZGx6cGxvYWwyb2YwdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3ohhwytHcusSCXXp96/giphy.gif", title: "Hello" },
-];
+export type TeamMember = {
+  id: string;
+  name: string;
+  status: string;
+  avatar?: string;
+};
 
-// Mock Channels data
-export const mockChannels: TeamChannel[] = [
-  {
-    id: "channel-1",
-    name: "general",
-    description: "General discussions",
-    createdAt: "2023-04-01T10:00:00Z",
-    createdBy: "user-1",
-    isPrivate: false,
-    members: ["user-1", "user-2", "user-3"],
-    lastMessage: {
-      id: "msg-1",
-      channelId: "channel-1",
-      content: "Has anyone seen the new product demo?",
-      createdAt: "2023-04-15T14:30:00Z",
-      senderId: "user-2"
-    },
-    unreadCount: 3,
-    isPinned: true,
-    topic: "Company-wide discussions",
-    purpose: "For general company discussions and announcements"
-  },
-  {
-    id: "channel-2",
-    name: "support",
-    description: "Customer support discussions",
-    createdAt: "2023-05-15T10:30:00Z",
-    createdBy: "user-1",
-    isPrivate: false,
-    members: ["user-1", "user-2"],
-    unreadCount: 3,
-    isPinned: true,
-    topic: "Customer support issues",
-    purpose: "For discussing customer support tickets and issues"
-  },
-  {
-    id: "channel-3",
-    name: "development",
-    description: "Development team channel",
-    createdAt: "2023-05-15T11:00:00Z",
-    createdBy: "user-2",
-    isPrivate: true,
-    members: ["user-1", "user-2"],
-    unreadCount: 0,
-    isPinned: false,
-    topic: "Code reviews and technical discussions",
-    purpose: "For development team coordination and code discussions"
-  }
-];
-
-// Mock Groups data
-export const mockGroups: TeamGroup[] = [
-  {
-    id: "group-1",
-    name: "Project Alpha Team",
-    members: ["user-1", "user-2", "user-3"],
-    createdAt: "2023-04-02T11:00:00Z",
-    createdBy: "user-1",
-    lastMessage: {
-      id: "msg-7",
-      groupId: "group-1",
-      content: "Let's finalize the design by tomorrow",
-      createdAt: "2023-04-15T16:45:00Z",
-      senderId: "user-3"
-    },
-    unreadCount: 2
-  },
-  {
-    id: "group-2",
-    name: "Project X",
-    members: ["user-1", "user-2", "user-3"],
-    createdAt: "2023-05-15T13:00:00Z",
-    createdBy: "user-2",
-    unreadCount: 0,
-    isPinned: false,
-  }
-];
-
-// Mock Team Members data
 export const mockTeamMembers: TeamMember[] = [
   {
     id: "user-1",
     name: "John Doe",
-    avatar: "/avatar-1.png",
-    status: "online"
+    status: "online",
+    avatar: "/assets/avatars/avatar-1.png"
   },
   {
     id: "user-2",
     name: "Jane Smith",
-    status: "away"
+    status: "away",
+    avatar: "/assets/avatars/avatar-2.png"
   },
   {
     id: "user-3",
-    name: "Michael Johnson",
-    avatar: "/avatar-3.png",
-    status: "offline"
+    name: "Mike Johnson",
+    status: "offline",
+    avatar: "/assets/avatars/avatar-3.png"
   }
 ];
 
-// Mock Messages data
+export const mockChannels: TeamChannel[] = [
+  {
+    id: "channel-1",
+    name: "general",
+    icon: "📢",
+    topic: "Company-wide announcements and work-related matters",
+    description: "This channel is for company-wide communication",
+    purpose: "Company announcements",
+    isActive: true,
+    unreadCount: 0,
+    createdAt: new Date().toISOString(),
+    createdBy: "system",
+    members: ["user-1", "user-2", "user-3"]
+  },
+  {
+    id: "channel-2",
+    name: "random",
+    icon: "🎭",
+    topic: "Non-work banter and water cooler conversation",
+    description: "A place for non-work-related flimflam, faffing, and general nonsense",
+    purpose: "Fun stuff",
+    isActive: false,
+    unreadCount: 3,
+    createdAt: new Date().toISOString(),
+    createdBy: "user-1",
+    members: ["user-1", "user-2"],
+    isPrivate: false
+  },
+  {
+    id: "channel-3",
+    name: "marketing",
+    icon: "📣",
+    topic: "Marketing team discussions",
+    description: "Marketing campaigns, strategies, and results",
+    purpose: "Marketing team coordination",
+    isActive: false,
+    unreadCount: 12,
+    createdAt: new Date().toISOString(),
+    createdBy: "user-2",
+    members: ["user-1", "user-2"],
+    isPrivate: true
+  }
+];
+
+export const mockGroups: TeamGroup[] = [
+  {
+    id: "group-1",
+    name: "Sales Team",
+    members: ["user-1", "user-2"],
+    createdAt: new Date().toISOString(),
+    createdBy: "user-1",
+    unreadCount: 5,
+    isPinned: true,
+    isActive: false
+  },
+  {
+    id: "group-2",
+    name: "Development Team",
+    members: ["user-1", "user-3"],
+    createdAt: new Date().toISOString(),
+    createdBy: "user-3",
+    unreadCount: 0,
+    isPinned: false,
+    isActive: false
+  }
+];
+
 export const mockMessages: TeamMessage[] = [
   {
     id: "msg-1",
     channelId: "channel-1",
-    content: "Has anyone seen the new product demo?",
-    createdAt: "2023-04-15T14:30:00Z",
-    senderId: "user-2",
+    content: "Welcome to the general channel!",
+    createdAt: new Date().toISOString(),
+    senderId: "user-1",
     isPinned: true
   },
   {
     id: "msg-2",
     channelId: "channel-1",
-    content: "Thanks for setting this up! I think this will really improve our communication.",
-    createdAt: "2023-05-15T14:05:00Z",
-    senderId: "user-2",
-    reactions: [
-      { emoji: "👍", count: 1, users: ["user-1"] }
-    ]
+    content: "Thanks! Happy to be here.",
+    createdAt: new Date(Date.now() - 3600000).toISOString(),
+    senderId: "user-2"
   },
   {
     id: "msg-3",
-    channelId: "channel-1",
-    content: "I've shared some documents for the upcoming meeting. Please take a look when you get a chance.",
-    createdAt: "2023-05-15T14:10:00Z",
-    senderId: "user-3",
-    isPinned: true,
-    attachments: [
-      {
-        id: "attach-1",
-        name: "meeting-agenda.pdf",
-        url: "/attachments/meeting-agenda.pdf",
-        type: "application/pdf",
-        size: 2500000,
-        createdAt: "2023-05-15T14:10:00Z"
-      }
-    ]
+    channelId: "channel-2",
+    content: "Anyone watching the game tonight?",
+    createdAt: new Date(Date.now() - 7200000).toISOString(),
+    senderId: "user-1"
   },
   {
     id: "msg-4",
-    channelId: "channel-1",
-    content: "Just a reminder that we have a team meeting tomorrow at 10 AM.",
-    createdAt: "2023-05-15T16:00:00Z",
-    senderId: "user-1",
-    mentions: ["user-2", "user-3"]
+    groupId: "group-1",
+    content: "Let's discuss the Q2 targets",
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    senderId: "user-1"
   }
+];
+
+export const mockGifs = [
+  { id: "gif-1", url: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbTBwd2FtZGd3ZXBkYmRxbHR0NHNzamFkY2J0aGZ2dDV0NzJ1aDRjNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT1XGS8T8m0sitetBC/giphy.gif", title: "Happy dance" },
+  { id: "gif-2", url: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWl0ZXV0cHRwZnV0aXhnOGYza2U0YW1idGYzZ2tmOGVtbTJ2ZTlyMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26FPpSuhgHvYo9Kyk/giphy.gif", title: "Typing" },
+  { id: "gif-3", url: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYTRmZWNiNzZreG1jdjkwcGl0OGdxaWg2cTltOHlncXBlc2w0cW9xZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0MYt5jPR6QX5pnqM/giphy.gif", title: "Thumbs up" },
+  { id: "gif-4", url: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDVmd2V3emN1NWNhYTg1ZHZ5aGxwMTlyM3dzbWF2bWZkMWZ0aHY2dCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oEjHAUOqG3lSS0f1C/giphy.gif", title: "High five" }
 ];

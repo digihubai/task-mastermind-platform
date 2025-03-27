@@ -3,7 +3,7 @@ import React from "react";
 import { TeamChannel } from "@/types/support";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Hash, MoreVertical, Pin, BellOff, UserPlus, Trash2 } from "lucide-react";
+import { Hash, MoreVertical, Pin, BellOff, UserPlus, Trash2, Plus } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   DropdownMenu,
