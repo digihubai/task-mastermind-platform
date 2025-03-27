@@ -14,6 +14,10 @@ const supportRoutes: RouteObject[] = [
     element: <SupportDashboardPage />,
   },
   {
+    path: '/support/dashboard',
+    element: <SupportDashboardPage />,
+  },
+  {
     path: '/support/call-center',
     element: <CallCenterPage />,
   },

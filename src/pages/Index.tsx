@@ -14,7 +14,7 @@ const Index = () => {
         Your AI-powered workspace for streamlining business operations.
       </p>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
         <Link to="/crm" className="block">
           <div className="p-6 bg-card rounded-lg border shadow-sm hover:shadow-md transition-shadow">
             <h2 className="text-xl font-medium mb-2">CRM & Sales</h2>
@@ -22,14 +22,21 @@ const Index = () => {
           </div>
         </Link>
         
-        <Link to="/ai/tools" className="block">
+        <Link to="/ai-tools" className="block">
           <div className="p-6 bg-card rounded-lg border shadow-sm hover:shadow-md transition-shadow">
             <h2 className="text-xl font-medium mb-2">AI Tools</h2>
             <p className="text-muted-foreground">Access powerful AI tools to enhance your productivity</p>
           </div>
         </Link>
         
-        <Link to="/ai/chatbots" className="block">
+        <Link to="/support" className="block">
+          <div className="p-6 bg-card rounded-lg border shadow-sm hover:shadow-md transition-shadow">
+            <h2 className="text-xl font-medium mb-2">Support</h2>
+            <p className="text-muted-foreground">Manage support tickets and customer interactions</p>
+          </div>
+        </Link>
+        
+        <Link to="/chatbots" className="block">
           <div className="p-6 bg-card rounded-lg border shadow-sm hover:shadow-md transition-shadow">
             <h2 className="text-xl font-medium mb-2">AI Chatbots</h2>
             <p className="text-muted-foreground">Create and manage AI-powered chatbots</p>
@@ -52,15 +59,23 @@ const Index = () => {
             <h3 className="font-medium mb-2">2. Try AI Tools</h3>
             <p className="text-muted-foreground mb-2">Enhance your productivity with our suite of AI-powered tools.</p>
             <Button asChild variant="outline">
-              <Link to="/ai/tools">Explore AI Tools</Link>
+              <Link to="/ai-tools">Explore AI Tools</Link>
             </Button>
           </div>
           
           <div className="p-4 bg-muted rounded-lg">
-            <h3 className="font-medium mb-2">3. Create Chatbots</h3>
+            <h3 className="font-medium mb-2">3. Manage Support</h3>
+            <p className="text-muted-foreground mb-2">Handle support tickets and customer inquiries efficiently.</p>
+            <Button asChild variant="outline">
+              <Link to="/support">Support Dashboard</Link>
+            </Button>
+          </div>
+          
+          <div className="p-4 bg-muted rounded-lg">
+            <h3 className="font-medium mb-2">4. Create Chatbots</h3>
             <p className="text-muted-foreground mb-2">Build AI chatbots to automate customer interactions.</p>
             <Button asChild variant="outline">
-              <Link to="/ai/chatbots">Create Chatbots</Link>
+              <Link to="/chatbots">Create Chatbots</Link>
             </Button>
           </div>
         </div>

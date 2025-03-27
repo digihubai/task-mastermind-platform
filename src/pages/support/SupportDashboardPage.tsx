@@ -10,6 +10,7 @@ import OmnichannelInbox from "@/components/communication/OmnichannelInbox";
 import { useNavigate } from 'react-router-dom';
 import { TicketList } from "@/components/support/TicketList";
 import { SupportTicket } from "@/types/support";
+import { toast } from "@/hooks/use-toast";
 
 // Mock data for recent tickets
 const recentTickets: SupportTicket[] = [
@@ -73,12 +74,19 @@ const SupportDashboardPage = () => {
   const navigate = useNavigate();
 
   const handleViewTicket = (ticket: SupportTicket) => {
-    // Navigate to tickets page with the selected ticket
     navigate('/support/tickets', { state: { selectedTicketId: ticket.id } });
+    toast({
+      title: "Opening ticket",
+      description: `Viewing details for ticket: ${ticket.subject}`
+    });
   };
 
   const handleNewTicket = () => {
     navigate('/support/tickets', { state: { showNewTicketForm: true } });
+    toast({
+      title: "New ticket",
+      description: "Creating a new support ticket"
+    });
   };
 
   return (
@@ -87,9 +95,9 @@ const SupportDashboardPage = () => {
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-semibold">Support Dashboard</h1>
           <div className="flex gap-3">
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => navigate('/support/tickets')}>
               <Users className="mr-2 h-4 w-4" />
-              Team Members
+              All Tickets
             </Button>
             <Button onClick={handleNewTicket}>
               <PlusCircle className="mr-2 h-4 w-4" />
@@ -180,7 +188,17 @@ const SupportDashboardPage = () => {
           </TabsContent>
           
           <TabsContent value="inbox" className="space-y-4 h-[calc(100vh-22rem)]">
-            <OmnichannelInbox />
+            <Card className="h-full">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Communication Inbox</CardTitle>
+                <Button size="sm" onClick={() => navigate('/support/omnichannel')}>
+                  Full Inbox
+                </Button>
+              </CardHeader>
+              <CardContent className="h-[calc(100%-4rem)]">
+                <OmnichannelInbox />
+              </CardContent>
+            </Card>
           </TabsContent>
           
           <TabsContent value="calls" className="space-y-4">

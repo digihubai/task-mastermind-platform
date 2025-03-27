@@ -10,6 +10,7 @@ import { PlusCircle, Settings, Users } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { TicketList } from '@/components/support/TicketList';
 import { SupportTicket } from '@/types/support';
+import { toast } from "@/hooks/use-toast";
 
 // Mock data for tickets
 const mockTickets: SupportTicket[] = [
@@ -72,12 +73,19 @@ const OmnichannelSupportPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleNewTicket = () => {
-    navigate('/support/tickets');
+    navigate('/support/tickets', { state: { showNewTicketForm: true } });
+    toast({
+      title: "New ticket form",
+      description: "Create a new support ticket"
+    });
   };
 
   const handleViewTicket = (ticket: SupportTicket) => {
-    // Pass selected ticket to the tickets page
     navigate('/support/tickets', { state: { selectedTicketId: ticket.id } });
+    toast({
+      title: "Opening ticket",
+      description: `Viewing details for ticket: ${ticket.subject}`
+    });
   };
 
   return (
@@ -87,13 +95,9 @@ const OmnichannelSupportPage: React.FC = () => {
           <h1 className="text-3xl font-semibold">Omnichannel Support</h1>
           
           <div className="flex gap-3">
-            <Button variant="outline">
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </Button>
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => navigate('/support/tickets')}>
               <Users className="mr-2 h-4 w-4" />
-              Team
+              All Tickets
             </Button>
             <Button onClick={handleNewTicket}>
               <PlusCircle className="mr-2 h-4 w-4" />
