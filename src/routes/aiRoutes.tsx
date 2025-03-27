@@ -20,6 +20,10 @@ const aiRoutes: RouteObject[] = [
     element: <AISEOPage />,
   },
   {
+    path: '/ai-seo',
+    element: <AISEOPage />,
+  },
+  {
     path: '/ai/rewriter',
     element: <AIRewriterPage />,
   },

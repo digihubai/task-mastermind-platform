@@ -10,6 +10,8 @@ import logger from './utils/logger';
 logger.info("App component is loading");
 
 function App() {
+  logger.debug("Rendering App component with Outlet");
+  
   return (
     <div className="app">
       <Outlet />
