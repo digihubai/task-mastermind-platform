@@ -9,17 +9,25 @@ import { useSidebarControl } from "@/hooks/use-sidebar-control";
 interface AppLayoutProps {
   children: React.ReactNode;
   defaultSidebarTheme?: "default" | "violet" | "blue" | "gray" | "dark";
+  showModuleName?: boolean;
+  moduleName?: string;
 }
 
 const AppLayout: React.FC<AppLayoutProps> = ({ 
   children, 
-  defaultSidebarTheme = "default" 
+  defaultSidebarTheme = "default",
+  showModuleName = false,
+  moduleName
 }) => {
   const isMobile = useIsMobile();
 
   return (
     <SidebarProvider defaultTheme={defaultSidebarTheme}>
-      <AppLayoutContent isMobile={isMobile}>
+      <AppLayoutContent 
+        isMobile={isMobile}
+        showModuleName={showModuleName}
+        moduleName={moduleName}
+      >
         {children}
       </AppLayoutContent>
     </SidebarProvider>
@@ -30,7 +38,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 const AppLayoutContent: React.FC<{
   children: React.ReactNode;
   isMobile: boolean;
-}> = ({ children, isMobile }) => {
+  showModuleName?: boolean;
+  moduleName?: string;
+}> = ({ children, isMobile, showModuleName, moduleName }) => {
   const { 
     state, 
     openMobile, 
@@ -46,7 +56,10 @@ const AppLayoutContent: React.FC<{
 
   return (
     <div className="h-screen w-full overflow-hidden flex flex-col bg-background">
-      <TopBar toggleSidebar={toggleSidebar} />
+      <TopBar 
+        toggleSidebar={toggleSidebar} 
+        moduleName={showModuleName ? moduleName : undefined} 
+      />
       
       <div className="flex flex-1 overflow-hidden">
         <Sidebar 

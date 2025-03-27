@@ -1,14 +1,17 @@
 
 import React from "react";
-import { Bell, Moon, Search, Sun } from "lucide-react";
+import { Bell, Moon, Search, Sun, PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SidebarToggleButton } from "@/components/ui/sidebar-toggle-button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 interface TopBarProps {
   toggleSidebar: () => void;
+  moduleName?: string;
 }
 
-const TopBar: React.FC<TopBarProps> = ({ toggleSidebar }) => {
+const TopBar: React.FC<TopBarProps> = ({ toggleSidebar, moduleName }) => {
   const [isDarkMode, setIsDarkMode] = React.useState(false);
   const { toast } = useToast();
   
@@ -28,8 +31,16 @@ const TopBar: React.FC<TopBarProps> = ({ toggleSidebar }) => {
 
   return (
     <header className="h-16 border-b border-border bg-background flex items-center justify-between px-4 md:px-6">
-      <div className="flex items-center md:hidden">
-        <SidebarToggleButton />
+      <div className="flex items-center gap-3">
+        <div className="md:hidden">
+          <SidebarToggleButton />
+        </div>
+        
+        {moduleName && (
+          <div className="hidden md:block text-lg font-semibold text-foreground">
+            {moduleName}
+          </div>
+        )}
       </div>
       
       <div className="hidden md:flex items-center">
@@ -44,6 +55,21 @@ const TopBar: React.FC<TopBarProps> = ({ toggleSidebar }) => {
       </div>
       
       <div className="flex items-center space-x-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" variant="outline" className="gap-1">
+              <PlusCircle size={16} />
+              <span className="hidden md:inline">Create</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>New Task</DropdownMenuItem>
+            <DropdownMenuItem>New Contact</DropdownMenuItem>
+            <DropdownMenuItem>New Project</DropdownMenuItem>
+            <DropdownMenuItem>New Campaign</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        
         <button 
           className="p-2 rounded-md hover:bg-secondary transition-colors relative text-foreground"
           onClick={() => {

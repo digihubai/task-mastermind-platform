@@ -46,14 +46,14 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
       <aside 
         className={`
           ${isMobile ? 'fixed left-0 top-0 bottom-0 z-30' : 'relative'}
-          ${collapsed ? (isMobile ? '-translate-x-full' : 'w-16') : (isMobile ? 'w-64' : 'w-64')}
+          ${collapsed ? (isMobile ? '-translate-x-full' : 'w-16') : (isMobile ? 'w-72' : 'w-72')}
           h-full bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col
           transition-all duration-300 ease-in-out overflow-y-auto overflow-x-hidden
         `}
       >
         <div className="p-4 flex justify-between items-center sticky top-0 bg-sidebar z-10 border-b border-sidebar-border">
           <div className={`overflow-hidden transition-opacity ${collapsed && !isMobile ? 'opacity-0 w-0' : 'opacity-100'}`}>
-            <h1 className="text-xl font-semibold text-modern-gradient">DigiHub AI</h1>
+            <h1 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-foreground">DigiHub AI</h1>
           </div>
           
           <div className="flex items-center gap-1">

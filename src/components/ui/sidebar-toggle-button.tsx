@@ -39,6 +39,7 @@ export const SidebarToggleButton: React.FC<SidebarToggleButtonProps> = ({
       className={`${sizeClasses[size]} ${className}`}
       onClick={toggleSidebar}
       title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+      aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
     >
       {variant === "icon" || variant === "both" ? (
         isMobile ? (

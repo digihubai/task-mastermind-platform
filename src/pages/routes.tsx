@@ -10,6 +10,7 @@ import automationRoutes from '@/routes/automationRoutes';
 import marketingRoutes from '@/routes/marketingRoutes';
 import aiRoutes from '@/routes/aiRoutes';
 import authRoutes from '@/routes/authRoutes';
+import crmRoutes from '@/routes/crmRoutes';
 
 // Combine all child routes under the App layout
 const appRoutes: RouteObject = {
@@ -21,6 +22,7 @@ const appRoutes: RouteObject = {
     ...automationRoutes,
     ...marketingRoutes,
     ...aiRoutes,
+    ...crmRoutes,
   ],
 };
 
