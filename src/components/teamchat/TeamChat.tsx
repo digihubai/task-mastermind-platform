@@ -141,6 +141,21 @@ const mockMessages = [
     createdAt: "2023-05-15T16:00:00Z",
     senderId: "user-1",
     mentions: ["user-2", "user-3"]
+  },
+  // Add support for group messages
+  {
+    id: "msg-5",
+    groupId: "group-1",
+    content: "Let's discuss the project timeline.",
+    createdAt: "2023-05-16T09:00:00Z",
+    senderId: "user-1"
+  },
+  {
+    id: "msg-6",
+    groupId: "group-1",
+    content: "I think we should schedule a call to go over the details.",
+    createdAt: "2023-05-16T09:05:00Z",
+    senderId: "user-2"
   }
 ];
 
@@ -187,9 +202,9 @@ export const TeamChat: React.FC = () => {
     : null;
   
   const currentMessages = selectedChannelId 
-    ? mockMessages.filter(m => m.channelId === selectedChannelId)
+    ? mockMessages.filter(m => 'channelId' in m && m.channelId === selectedChannelId)
     : selectedGroupId 
-      ? mockMessages.filter(m => m.groupId === selectedGroupId)
+      ? mockMessages.filter(m => 'groupId' in m && m.groupId === selectedGroupId)
       : [];
 
   const handleSelectChannel = (channelId: string) => {
