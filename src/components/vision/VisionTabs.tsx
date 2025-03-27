@@ -19,7 +19,7 @@ const VisionTabs = ({ selectedTab, onTabChange, children }: VisionTabsProps) => 
       return;
     } else if (value === "integrations") {
       // Redirect to the integrations tab
-      navigate("/marketing-seo?tab=integrations");
+      navigate("/settings/integrations");
       return;
     }
     

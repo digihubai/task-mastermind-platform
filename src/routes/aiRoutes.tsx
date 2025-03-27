@@ -6,7 +6,6 @@ import PDFInsightPage from '@/pages/ai/PDFInsightPage';
 import AICopywriterPage from '@/pages/ai/AICopywriterPage';
 import AIRewriter from '@/pages/user/AIRewriter';
 import AISEOPage from '@/pages/ai/AISEOPage';
-import AIVision from '@/pages/user/AIVision';
 
 const aiRoutes: RouteObject[] = [
   {
@@ -22,16 +21,16 @@ const aiRoutes: RouteObject[] = [
     element: <AIRewriter />,
   },
   {
+    path: '/vision',
+    element: <AIVisionPage />,
+  },
+  {
     path: '/ai-vision',
     element: <AIVisionPage />,
   },
   {
     path: '/pdf-insight',
     element: <PDFInsightPage />,
-  },
-  {
-    path: '/vision',
-    element: <AIVision />,
   },
 ];
 

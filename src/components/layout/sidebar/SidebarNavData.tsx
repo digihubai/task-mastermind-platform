@@ -70,9 +70,9 @@ export const aiToolsItems = [
   { name: "AI Bots", path: "/bots", icon: <Bot size={20} /> },
   { name: "AI Chat", path: "/chat", icon: <MessageSquare size={20} /> },
   { name: "AI Vision", path: "/vision", icon: <Image size={20} /> },
-  { name: "AI Copywriter", path: "/copywriter", icon: <PenTool size={20} /> },
-  { name: "AI SEO Writer", path: "/seo-writer", icon: <Search size={20} /> },
-  { name: "AI ReWriter", path: "/rewriter", icon: <RefreshCw size={20} /> },
+  { name: "AI Copywriter", path: "/ai-copywriter", icon: <PenTool size={20} /> },
+  { name: "AI SEO Writer", path: "/ai-seo", icon: <Search size={20} /> },
+  { name: "AI ReWriter", path: "/ai-rewriter", icon: <RefreshCw size={20} /> },
   { name: "PDF Insight", path: "/pdf-insight", icon: <FileSpreadsheet size={20} /> },
 ];
 

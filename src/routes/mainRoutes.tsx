@@ -3,7 +3,6 @@ import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import DashboardPage from '@/pages/DashboardPage';
 import AIToolsHub from '@/pages/ai/AIToolsHub';
-import AIVisionPage from '@/pages/ai/AIVisionPage';
 import CRMDashboard from '@/pages/modules/CRM';
 import ProjectManagement from '@/pages/modules/ProjectManagement';
 import WorkflowPage from '@/pages/modules/Workflow';
@@ -21,14 +20,6 @@ const mainRoutes: RouteObject[] = [
   {
     path: '/ai-tools',
     element: <AIToolsHub />,
-  },
-  {
-    path: '/ai-vision',
-    element: <AIVisionPage />,
-  },
-  {
-    path: '/vision',
-    element: <AIVisionPage />,
   },
   {
     path: '/crm',
