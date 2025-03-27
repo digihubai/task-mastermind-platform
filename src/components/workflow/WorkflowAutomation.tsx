@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { 
   Zap, ArrowDownUp, MessageSquare, Mail, Phone, Users, 
-  Database, FileText, Webhook, Bot, Copy, Calendar, Clock 
+  Database, FileText, Bot, Copy, Calendar, Clock 
 } from "lucide-react";
+import { Webhook } from "@/components/ui/custom-icons";
 
 interface WorkflowNodeProps {
   type: string;
