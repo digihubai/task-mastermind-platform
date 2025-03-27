@@ -3,22 +3,17 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { SidebarItemType } from "@/types/sidebar";
 
 interface SidebarItemProps {
-  item: {
-    title: string;
-    href: string;
-    icon: React.ReactNode;
-    badge?: string;
-    subItems?: SidebarItemProps['item'][];
-  };
+  item: SidebarItemType;
   level?: number;
   collapsed: boolean;
   isMobile: boolean;
   isActive: boolean;
   isExpanded: boolean;
   toggleSection: (sectionName: string) => void;
-  renderMenuItem: (item: SidebarItemProps['item'], level?: number, parentExpanded?: boolean) => React.ReactNode;
+  renderMenuItem: (item: SidebarItemType, level?: number, parentExpanded?: boolean) => React.ReactNode;
 }
 
 const SidebarItem: React.FC<SidebarItemProps> = ({

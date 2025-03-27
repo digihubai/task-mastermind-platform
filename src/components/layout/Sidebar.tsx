@@ -1,16 +1,14 @@
 
 import React, { useEffect, useState, useCallback } from "react";
-import { useLocation } from "react-router-dom";
-import { Users } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSidebarControl } from "@/hooks/use-sidebar-control";
+import { useSidebarNavigation } from "@/hooks/use-sidebar-navigation";
 import SidebarLogo from "./sidebar/SidebarLogo";
 import SidebarItem from "./sidebar/SidebarItem";
 import SidebarMenuSection from "./sidebar/SidebarMenuSection";
 import SidebarMobileOverlay from "./sidebar/SidebarMobileOverlay";
 import SidebarUserProfile from "./sidebar/SidebarUserProfile";
 import SidebarResizeHandler from "./sidebar/SidebarResizeHandler";
-import { sidebarSections } from "./sidebar/SidebarNavData";
 
 // Constants for sidebar width
 const DEFAULT_SIDEBAR_WIDTH = 272; // 17rem
@@ -27,43 +25,19 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar }) => {
   // Access more sidebar controls for potential future enhancements
   const { theme } = useSidebarControl();
-  const location = useLocation();
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
   
-  // Initialize expanded sections based on current route
-  useEffect(() => {
-    const newExpandedSections: Record<string, boolean> = {};
-    
-    // Auto-expand sections based on the current path
-    sidebarSections.forEach(section => {
-      section.items.forEach(item => {
-        if (item.subItems && location.pathname.startsWith(item.href)) {
-          newExpandedSections[item.title] = true;
-          
-          // Also expand nested subsections
-          item.subItems.forEach(subItem => {
-            if (subItem.subItems && location.pathname.startsWith(subItem.href)) {
-              newExpandedSections[subItem.title] = true;
-            }
-          });
-        }
-      });
-    });
-    
-    setExpandedSections(prev => ({
-      ...prev,
-      ...newExpandedSections
-    }));
-  }, [location.pathname]);
+  // Use our custom hook for navigation logic
+  const { 
+    expandedSections, 
+    toggleSection, 
+    isPathActive, 
+    isExactPathActive,
+    getNavigationData 
+  } = useSidebarNavigation();
   
-  // Toggle section expansion
-  const toggleSection = (sectionName: string) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [sectionName]: !prev[sectionName]
-    }));
-  };
+  // Get sidebar sections data
+  const sidebarSections = getNavigationData();
   
   // Handle sidebar resize
   const handleResize = useCallback((newWidth: number) => {
@@ -98,7 +72,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, isMobile, toggleSidebar })
 
   // Render nested menu items
   const renderMenuItem = (item: any, level = 0, parentExpanded = true) => {
-    const isActive = location.pathname === item.href;
+    const isActive = isExactPathActive(item.href);
     const isExpanded = expandedSections[item.title];
     const showItem = level === 0 || parentExpanded;
     
