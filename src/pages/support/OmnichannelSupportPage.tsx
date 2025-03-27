@@ -25,7 +25,19 @@ const mockTickets: SupportTicket[] = [
     userId: "user-789",
     department: "billing",
     tags: ["billing", "payment"],
-    messages: []
+    messages: [
+      {
+        id: "msg-1",
+        ticketId: "ticket-003",
+        content: "I noticed I was charged twice this month for my subscription. Could you please check and refund the extra payment?",
+        createdAt: "2023-04-11T08:20:00Z",
+        userId: "user-789",
+        senderId: "user-789",
+        senderType: "customer",
+        isInternal: false,
+        isRead: true
+      }
+    ]
   },
   {
     id: "ticket-004",
@@ -39,7 +51,19 @@ const mockTickets: SupportTicket[] = [
     userId: "user-101",
     department: "general",
     tags: ["feature-request", "languages"],
-    messages: []
+    messages: [
+      {
+        id: "msg-2",
+        ticketId: "ticket-004",
+        content: "I would like to request support for multiple languages in the chatbot. Our customers are international.",
+        createdAt: "2023-04-10T15:10:00Z",
+        userId: "user-101",
+        senderId: "user-101",
+        senderType: "customer",
+        isInternal: false,
+        isRead: true
+      }
+    ]
   }
 ];
 
@@ -49,6 +73,11 @@ const OmnichannelSupportPage: React.FC = () => {
 
   const handleNewTicket = () => {
     navigate('/support/tickets');
+  };
+
+  const handleViewTicket = (ticket: SupportTicket) => {
+    // Pass selected ticket to the tickets page
+    navigate('/support/tickets', { state: { selectedTicketId: ticket.id } });
   };
 
   return (
@@ -97,7 +126,7 @@ const OmnichannelSupportPage: React.FC = () => {
               <CardContent>
                 <TicketList 
                   tickets={mockTickets} 
-                  onViewTicket={(ticket) => navigate('/support/tickets')}
+                  onViewTicket={handleViewTicket}
                 />
               </CardContent>
             </Card>

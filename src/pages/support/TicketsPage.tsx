@@ -2,11 +2,12 @@
 import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Search } from "lucide-react";
+import { PlusCircle, Search, ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TicketList } from "@/components/support/TicketList";
+import { TicketDetails } from "@/components/support/TicketDetails";
 import { NewTicketForm } from "@/components/support/NewTicketForm";
 import { SupportTicket } from "@/types/support";
 import { useToast } from "@/hooks/use-toast";
@@ -26,7 +27,30 @@ const mockTickets: SupportTicket[] = [
     assignedTo: "agent-456",
     department: "technical",
     tags: ["chatbot", "setup"],
-    messages: []
+    messages: [
+      {
+        id: "msg-1",
+        ticketId: "ticket-001",
+        content: "I've been trying to set up the chatbot following your documentation, but it's not showing up on my site.",
+        createdAt: "2023-04-10T14:30:00Z",
+        userId: "user-123",
+        senderId: "user-123",
+        senderType: "customer",
+        isInternal: false,
+        isRead: true
+      },
+      {
+        id: "msg-2",
+        ticketId: "ticket-001",
+        content: "Could you tell me which browser and website you're using? I'll check the compatibility issues.",
+        createdAt: "2023-04-11T09:15:00Z",
+        userId: "agent-456",
+        senderId: "agent-456",
+        senderType: "agent",
+        isInternal: false,
+        isRead: true
+      }
+    ]
   },
   {
     id: "ticket-002",
@@ -40,7 +64,19 @@ const mockTickets: SupportTicket[] = [
     userId: "user-456",
     department: "technical",
     tags: ["api", "integration"],
-    messages: []
+    messages: [
+      {
+        id: "msg-3",
+        ticketId: "ticket-002",
+        content: "I'm trying to integrate your API with our custom CRM. Do you have any specific requirements?",
+        createdAt: "2023-04-12T10:45:00Z",
+        userId: "user-456",
+        senderId: "user-456",
+        senderType: "customer",
+        isInternal: false,
+        isRead: true
+      }
+    ]
   },
   {
     id: "ticket-003",
@@ -54,7 +90,19 @@ const mockTickets: SupportTicket[] = [
     userId: "user-789",
     department: "billing",
     tags: ["billing", "payment"],
-    messages: []
+    messages: [
+      {
+        id: "msg-4",
+        ticketId: "ticket-003",
+        content: "I noticed I was charged twice this month for my subscription. Could you please check and refund the extra payment?",
+        createdAt: "2023-04-11T08:20:00Z",
+        userId: "user-789",
+        senderId: "user-789",
+        senderType: "customer",
+        isInternal: false,
+        isRead: true
+      }
+    ]
   }
 ];
 
@@ -64,6 +112,7 @@ const TicketsPage: React.FC = () => {
   const [showNewTicketForm, setShowNewTicketForm] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
 
   const handleCreateTicket = (newTicket: Partial<SupportTicket>) => {
     const ticket: SupportTicket = {
@@ -86,6 +135,70 @@ const TicketsPage: React.FC = () => {
     });
   };
 
+  const handleTicketClick = (ticket: SupportTicket) => {
+    setSelectedTicket(ticket);
+  };
+
+  const handleBackToList = () => {
+    setSelectedTicket(null);
+  };
+
+  const handleSendReply = (message: string) => {
+    if (!selectedTicket || !message.trim()) return;
+
+    const newMessage = {
+      id: `msg-${Date.now()}`,
+      ticketId: selectedTicket.id,
+      content: message,
+      createdAt: new Date().toISOString(),
+      userId: 'agent-current',
+      senderId: 'agent-current',
+      senderType: 'agent',
+      isInternal: false,
+      isRead: true
+    };
+
+    const updatedTicket = {
+      ...selectedTicket,
+      messages: [...selectedTicket.messages, newMessage],
+      updatedAt: new Date().toISOString()
+    };
+
+    const updatedTickets = tickets.map(ticket => 
+      ticket.id === selectedTicket.id ? updatedTicket : ticket
+    );
+
+    setTickets(updatedTickets);
+    setSelectedTicket(updatedTicket);
+    
+    toast({
+      title: "Reply sent",
+      description: "Your response has been added to the ticket."
+    });
+  };
+
+  const handleUpdateTicket = (ticketId: string, updateData: Partial<SupportTicket>) => {
+    const updatedTickets = tickets.map(ticket => {
+      if (ticket.id === ticketId) {
+        const updatedTicket = { 
+          ...ticket, 
+          ...updateData,
+          updatedAt: new Date().toISOString()
+        };
+        setSelectedTicket(updatedTicket);
+        return updatedTicket;
+      }
+      return ticket;
+    });
+    
+    setTickets(updatedTickets);
+    
+    toast({
+      title: "Ticket updated",
+      description: `Ticket ${updateData.status || updateData.priority ? 'status' : 'details'} has been updated.`
+    });
+  };
+
   const filteredTickets = tickets.filter(ticket => {
     // Filter by status
     if (activeTab !== 'all' && ticket.status !== activeTab) return false;
@@ -98,6 +211,28 @@ const TicketsPage: React.FC = () => {
     
     return true;
   });
+
+  // If a ticket is selected, show the ticket details view
+  if (selectedTicket) {
+    return (
+      <AppLayout showModuleName moduleName="Support Tickets">
+        <div className="space-y-6">
+          <Button variant="ghost" onClick={handleBackToList} className="flex items-center">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to tickets
+          </Button>
+          
+          <div className="bg-background rounded-lg p-6 border">
+            <TicketDetails 
+              ticket={selectedTicket}
+              onReply={handleSendReply}
+              onUpdateTicket={handleUpdateTicket}
+            />
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout showModuleName moduleName="Support Tickets">
@@ -144,7 +279,10 @@ const TicketsPage: React.FC = () => {
                     <CardTitle>All Tickets ({filteredTickets.length})</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <TicketList tickets={filteredTickets} />
+                    <TicketList 
+                      tickets={filteredTickets} 
+                      onViewTicket={handleTicketClick}
+                    />
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -155,7 +293,10 @@ const TicketsPage: React.FC = () => {
                     <CardTitle>Open Tickets ({filteredTickets.length})</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <TicketList tickets={filteredTickets} />
+                    <TicketList 
+                      tickets={filteredTickets}
+                      onViewTicket={handleTicketClick}
+                    />
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -166,7 +307,10 @@ const TicketsPage: React.FC = () => {
                     <CardTitle>In Progress ({filteredTickets.length})</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <TicketList tickets={filteredTickets} />
+                    <TicketList 
+                      tickets={filteredTickets}
+                      onViewTicket={handleTicketClick}
+                    />
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -177,7 +321,10 @@ const TicketsPage: React.FC = () => {
                     <CardTitle>Resolved Tickets ({filteredTickets.length})</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <TicketList tickets={filteredTickets} />
+                    <TicketList 
+                      tickets={filteredTickets}
+                      onViewTicket={handleTicketClick}
+                    />
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -188,7 +335,10 @@ const TicketsPage: React.FC = () => {
                     <CardTitle>Closed Tickets ({filteredTickets.length})</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <TicketList tickets={filteredTickets} />
+                    <TicketList 
+                      tickets={filteredTickets}
+                      onViewTicket={handleTicketClick}
+                    />
                   </CardContent>
                 </Card>
               </TabsContent>

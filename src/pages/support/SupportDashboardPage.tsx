@@ -26,7 +26,19 @@ const recentTickets: SupportTicket[] = [
     assignedTo: "agent-456",
     department: "technical",
     tags: ["chatbot", "setup"],
-    messages: []
+    messages: [
+      {
+        id: "msg-1",
+        ticketId: "ticket-001",
+        content: "I've been trying to set up the chatbot following your documentation, but it's not showing up on my site.",
+        createdAt: "2023-04-10T14:30:00Z",
+        userId: "user-123",
+        senderId: "user-123",
+        senderType: "customer",
+        isInternal: false,
+        isRead: true
+      }
+    ]
   },
   {
     id: "ticket-002",
@@ -40,7 +52,19 @@ const recentTickets: SupportTicket[] = [
     userId: "user-456",
     department: "technical",
     tags: ["api", "integration"],
-    messages: []
+    messages: [
+      {
+        id: "msg-2",
+        ticketId: "ticket-002",
+        content: "I'm trying to integrate your API with our custom CRM. Do you have any specific requirements?",
+        createdAt: "2023-04-12T10:45:00Z",
+        userId: "user-456",
+        senderId: "user-456",
+        senderType: "customer",
+        isInternal: false,
+        isRead: true
+      }
+    ]
   }
 ];
 
@@ -48,12 +72,13 @@ const SupportDashboardPage = () => {
   const [activeTab, setActiveTab] = useState<string>("overview");
   const navigate = useNavigate();
 
-  const handleViewAllTickets = () => {
-    navigate('/support/tickets');
+  const handleViewTicket = (ticket: SupportTicket) => {
+    // Navigate to tickets page with the selected ticket
+    navigate('/support/tickets', { state: { selectedTicketId: ticket.id } });
   };
 
   const handleNewTicket = () => {
-    navigate('/support/tickets');
+    navigate('/support/tickets', { state: { showNewTicketForm: true } });
   };
 
   return (
@@ -97,7 +122,7 @@ const SupportDashboardPage = () => {
               <Card className="col-span-1">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Recent Tickets</CardTitle>
-                  <Button variant="link" size="sm" onClick={handleViewAllTickets}>
+                  <Button variant="link" size="sm" onClick={() => navigate('/support/tickets')}>
                     View all
                   </Button>
                 </CardHeader>
@@ -105,7 +130,7 @@ const SupportDashboardPage = () => {
                   {recentTickets.length > 0 ? (
                     <TicketList 
                       tickets={recentTickets} 
-                      onViewTicket={(ticket) => navigate('/support/tickets')}
+                      onViewTicket={handleViewTicket}
                     />
                   ) : (
                     <p className="text-sm text-muted-foreground">
@@ -120,9 +145,18 @@ const SupportDashboardPage = () => {
                   <CardTitle>Team Performance</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Team performance metrics will be displayed here.
-                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-muted/20 p-4 rounded-md">
+                      <h3 className="text-sm font-medium">Resolution Rate</h3>
+                      <p className="text-2xl font-bold mt-2">87%</p>
+                      <p className="text-xs text-muted-foreground mt-1">+5% from last month</p>
+                    </div>
+                    <div className="bg-muted/20 p-4 rounded-md">
+                      <h3 className="text-sm font-medium">Avg. Response Time</h3>
+                      <p className="text-2xl font-bold mt-2">3.2h</p>
+                      <p className="text-xs text-muted-foreground mt-1">-10% from last month</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -132,14 +166,14 @@ const SupportDashboardPage = () => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>All Support Tickets</CardTitle>
-                <Button size="sm" onClick={handleViewAllTickets}>
+                <Button size="sm" onClick={() => navigate('/support/tickets')}>
                   View all tickets
                 </Button>
               </CardHeader>
               <CardContent>
                 <TicketList 
                   tickets={recentTickets} 
-                  onViewTicket={(ticket) => navigate('/support/tickets')}
+                  onViewTicket={handleViewTicket}
                 />
               </CardContent>
             </Card>
