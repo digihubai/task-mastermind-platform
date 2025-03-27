@@ -1,4 +1,3 @@
-
 import React from "react";
 import { RouteObject, Navigate } from "react-router-dom";
 import DashboardPage from "@/pages/DashboardPage";
@@ -29,7 +28,7 @@ import automationRoutes from "@/routes/automationRoutes";
 import Workflow from "@/pages/modules/Workflow";
 import CampaignsPage from "@/pages/marketing/CampaignsPage";
 import SocialMediaPage from "@/pages/marketing/SocialMediaPage";
-import { FinanceDashboard } from "@/pages/finance/FinanceDashboard";
+import FinanceDashboard from "@/pages/finance/FinanceDashboard";
 
 // Main application routes
 const routes: RouteObject[] = [
