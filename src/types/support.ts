@@ -1,4 +1,3 @@
-
 export interface SupportTicket {
   id: string;
   subject: string;
@@ -112,6 +111,7 @@ export interface TeamGroup {
   createdAt: string;
   createdBy?: string;
   updatedAt?: string;
+  isActive?: boolean;
 }
 
 export interface TeamMessage {
