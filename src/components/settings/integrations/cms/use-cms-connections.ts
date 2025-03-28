@@ -1,46 +1,87 @@
 
 import { useState } from 'react';
-import { useToast } from "@/hooks/use-toast";
-import { cmsPlatforms } from './cms-platforms-data';
+import { useToast } from '@/hooks/use-toast';
 
-export const useCMSConnections = (onConnect?: (platform: string) => void) => {
+export function useCmsConnections() {
   const { toast } = useToast();
   const [connecting, setConnecting] = useState<string | null>(null);
-  
-  // Generate initial URLs state from platforms
-  const initialUrls: Record<string, string> = {};
-  cmsPlatforms.forEach(platform => {
-    initialUrls[platform.id] = "";
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<'all' | 'cms' | 'ecommerce'>('all');
+
+  const [connected, setConnected] = useState<{[key: string]: boolean}>({
+    wordpress: false,
+    shopify: false,
+    webflow: false,
+    wix: false,
+    wixecommerce: false,
+    squarespace: false,
+    drupal: false,
+    joomla: false,
+    magento: false,
+    woocommerce: false,
+    bigcommerce: false,
+    hubspot: false,
+    prestashop: false,
+    ghost: false,
+    contentful: false
   });
   
-  // Generate initial connected state from platforms
-  const initialConnected: Record<string, boolean> = {};
-  cmsPlatforms.forEach(platform => {
-    initialConnected[platform.id] = false;
+  const [websites, setWebsites] = useState<{[key: string]: string}>({
+    wordpress: "",
+    shopify: "",
+    webflow: "",
+    wix: "",
+    wixecommerce: "",
+    squarespace: "",
+    drupal: "",
+    joomla: "",
+    magento: "",
+    woocommerce: "",
+    bigcommerce: "",
+    hubspot: "",
+    prestashop: "",
+    ghost: "",
+    contentful: ""
   });
-  
-  const [urls, setUrls] = useState<Record<string, string>>(initialUrls);
-  const [connected, setConnected] = useState<Record<string, boolean>>(initialConnected);
 
   const handleInputChange = (platform: string, value: string) => {
-    setUrls(prev => ({ ...prev, [platform]: value }));
+    setWebsites(prev => ({ ...prev, [platform]: value }));
+  };
+
+  const getPlatformName = (platform: string): string => {
+    const platformNames: {[key: string]: string} = {
+      wordpress: "WordPress",
+      shopify: "Shopify",
+      webflow: "Webflow",
+      wix: "Wix",
+      wixecommerce: "Wix eCommerce",
+      squarespace: "Squarespace",
+      drupal: "Drupal",
+      joomla: "Joomla",
+      magento: "Magento",
+      woocommerce: "WooCommerce",
+      bigcommerce: "BigCommerce",
+      hubspot: "HubSpot CMS",
+      prestashop: "PrestaShop",
+      ghost: "Ghost CMS",
+      contentful: "Contentful"
+    };
+    return platformNames[platform] || platform;
   };
 
   const handleConnect = (platform: string) => {
     if (connected[platform]) {
       toast({
         title: "Already Connected",
-        description: `Your ${platform.charAt(0).toUpperCase() + platform.slice(1)} site is already connected.`,
+        description: `Your ${getPlatformName(platform)} site is already connected.`,
       });
       return;
     }
 
-    // Validate URL
-    const url = urls[platform];
-    if (!url) {
+    if (!websites[platform]) {
       toast({
-        title: "URL Required",
-        description: `Please enter your ${platform.charAt(0).toUpperCase() + platform.slice(1)} site URL.`,
+        title: "Website URL Required",
+        description: `Please enter your ${getPlatformName(platform)} website URL.`,
         variant: "destructive",
       });
       return;
@@ -54,30 +95,30 @@ export const useCMSConnections = (onConnect?: (platform: string) => void) => {
       setConnected({...connected, [platform]: true});
       toast({
         title: "Connection Successful",
-        description: `Your ${platform.charAt(0).toUpperCase() + platform.slice(1)} site has been connected successfully.`,
+        description: `Your ${getPlatformName(platform)} site has been connected successfully.`,
       });
-      
-      if (onConnect) {
-        onConnect(platform);
-      }
     }, 1500);
   };
 
   const handleDisconnect = (platform: string) => {
     setConnected({...connected, [platform]: false});
-    setUrls(prev => ({ ...prev, [platform]: "" }));
+    setWebsites(prev => ({ ...prev, [platform]: "" }));
     toast({
       title: "Disconnected",
-      description: `Your ${platform.charAt(0).toUpperCase() + platform.slice(1)} site has been disconnected.`,
+      description: `Your ${getPlatformName(platform)} site has been disconnected.`,
     });
   };
 
   return {
-    urls,
-    connected,
     connecting,
+    searchQuery,
+    filterType,
+    connected,
+    websites,
     handleInputChange,
     handleConnect,
-    handleDisconnect
+    handleDisconnect,
+    setSearchQuery,
+    setFilterType
   };
-};
+}

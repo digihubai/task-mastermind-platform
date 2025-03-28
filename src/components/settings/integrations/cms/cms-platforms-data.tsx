@@ -121,7 +121,6 @@ export const cmsPlatforms: CMSPlatform[] = [
     textColor: "text-blue-600",
     type: 'ecommerce'
   },
-  // New CMS Platforms
   {
     id: "drupal",
     name: "Drupal",

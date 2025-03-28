@@ -4,21 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Check, X, Loader2, ArrowRight } from "lucide-react";
-
-interface CMSCardProps {
-  platform: string;
-  name: string;
-  description: string;
-  icon: React.ReactNode;
-  backgroundColor: string;
-  textColor: string;
-  url: string;
-  connected: boolean;
-  connecting: boolean;
-  onInputChange: (value: string) => void;
-  onConnect: () => void;
-  onDisconnect: () => void;
-}
+import { CMSCardProps } from './types';
 
 const CMSCard: React.FC<CMSCardProps> = ({
   platform,

@@ -1,123 +1,33 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { FileText } from "lucide-react";
 import { IntegrationProps } from './types';
 import SEOIntegrationSettings from '@/components/seo/SEOIntegrationSettings';
 import CMSFilter from './cms/CMSFilter';
 import CMSGrid from './cms/CMSGrid';
+import { useCmsConnections } from './cms/use-cms-connections';
 
 const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
-  const { toast } = useToast();
-  const [connecting, setConnecting] = useState<string | null>(null);
-  const [filterType, setFilterType] = useState<'all' | 'cms' | 'ecommerce'>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const {
+    connecting,
+    searchQuery,
+    filterType,
+    connected,
+    websites,
+    handleInputChange,
+    handleConnect,
+    handleDisconnect,
+    setSearchQuery,
+    setFilterType
+  } = useCmsConnections();
   
-  const [connected, setConnected] = useState<{[key: string]: boolean}>({
-    wordpress: false,
-    shopify: false,
-    webflow: false,
-    wix: false,
-    wixecommerce: false,
-    squarespace: false,
-    drupal: false,
-    joomla: false,
-    magento: false,
-    woocommerce: false,
-    bigcommerce: false,
-    hubspot: false,
-    prestashop: false,
-    ghost: false,
-    contentful: false
-  });
-  
-  const [websites, setWebsites] = useState<{[key: string]: string}>({
-    wordpress: "",
-    shopify: "",
-    webflow: "",
-    wix: "",
-    wixecommerce: "",
-    squarespace: "",
-    drupal: "",
-    joomla: "",
-    magento: "",
-    woocommerce: "",
-    bigcommerce: "",
-    hubspot: "",
-    prestashop: "",
-    ghost: "",
-    contentful: ""
-  });
-
-  const handleInputChange = (platform: string, value: string) => {
-    setWebsites(prev => ({ ...prev, [platform]: value }));
-  };
-
-  const handleConnect = (platform: string) => {
-    if (connected[platform]) {
-      toast({
-        title: "Already Connected",
-        description: `Your ${getPlatformName(platform)} site is already connected.`,
-      });
-      return;
+  // Call the parent onConnect if provided
+  const handleConnectWithCallback = (platform: string) => {
+    handleConnect(platform);
+    if (onConnect) {
+      onConnect(platform);
     }
-
-    if (!websites[platform]) {
-      toast({
-        title: "Website URL Required",
-        description: `Please enter your ${getPlatformName(platform)} website URL.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setConnecting(platform);
-    
-    // Simulate connection process
-    setTimeout(() => {
-      setConnecting(null);
-      setConnected({...connected, [platform]: true});
-      toast({
-        title: "Connection Successful",
-        description: `Your ${getPlatformName(platform)} site has been connected successfully.`,
-      });
-      
-      if (onConnect) {
-        onConnect(platform);
-      }
-    }, 1500);
-  };
-
-  const handleDisconnect = (platform: string) => {
-    setConnected({...connected, [platform]: false});
-    setWebsites(prev => ({ ...prev, [platform]: "" }));
-    toast({
-      title: "Disconnected",
-      description: `Your ${getPlatformName(platform)} site has been disconnected.`,
-    });
-  };
-
-  const getPlatformName = (platform: string): string => {
-    const platformNames: {[key: string]: string} = {
-      wordpress: "WordPress",
-      shopify: "Shopify",
-      webflow: "Webflow",
-      wix: "Wix",
-      wixecommerce: "Wix eCommerce",
-      squarespace: "Squarespace",
-      drupal: "Drupal",
-      joomla: "Joomla",
-      magento: "Magento",
-      woocommerce: "WooCommerce",
-      bigcommerce: "BigCommerce",
-      hubspot: "HubSpot CMS",
-      prestashop: "PrestaShop",
-      ghost: "Ghost CMS",
-      contentful: "Contentful"
-    };
-    return platformNames[platform] || platform;
   };
 
   return (
@@ -141,7 +51,7 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
         connected={connected}
         connecting={connecting}
         onInputChange={handleInputChange}
-        onConnect={handleConnect}
+        onConnect={handleConnectWithCallback}
         onDisconnect={handleDisconnect}
         filter={filterType}
         searchQuery={searchQuery}

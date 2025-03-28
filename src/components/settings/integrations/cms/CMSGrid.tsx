@@ -2,17 +2,7 @@
 import React from 'react';
 import CMSCard from './CMSCard';
 import { cmsPlatforms, CMSPlatform } from './cms-platforms-data';
-
-interface CMSGridProps {
-  urls: Record<string, string>;
-  connected: Record<string, boolean>;
-  connecting: string | null;
-  onInputChange: (platform: string, value: string) => void;
-  onConnect: (platform: string) => void;
-  onDisconnect: (platform: string) => void;
-  filter?: 'all' | 'cms' | 'ecommerce';
-  searchQuery?: string;
-}
+import { CMSGridProps } from './types';
 
 const CMSGrid: React.FC<CMSGridProps> = ({
   urls,

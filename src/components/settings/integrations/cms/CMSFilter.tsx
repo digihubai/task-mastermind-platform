@@ -3,13 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Globe, ShoppingCart, Search } from "lucide-react";
-
-interface CMSFilterProps {
-  filter: 'all' | 'cms' | 'ecommerce';
-  searchQuery: string;
-  onFilterChange: (filter: 'all' | 'cms' | 'ecommerce') => void;
-  onSearchChange: (query: string) => void;
-}
+import { CMSFilterProps } from './types';
 
 const CMSFilter: React.FC<CMSFilterProps> = ({ 
   filter, 
