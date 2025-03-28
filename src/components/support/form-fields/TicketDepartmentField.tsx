@@ -21,10 +21,15 @@ export const TicketDepartmentField: React.FC<TicketDepartmentFieldProps> = ({
   onChange,
   availableDepartments = ["Support", "Sales", "Billing", "Product", "Technical"]
 }) => {
-  // Store and use lowercase values for consistent comparison
   const handleChange = (newValue: string) => {
-    onChange(newValue.toLowerCase());
+    // Store the value exactly as provided without converting to lowercase
+    // This will preserve the display format while ensuring consistent comparison
+    onChange(newValue);
   };
+  
+  // Debug the departments
+  console.log('Available departments in field:', availableDepartments);
+  console.log('Current department value:', value);
   
   return (
     <div>
@@ -37,8 +42,8 @@ export const TicketDepartmentField: React.FC<TicketDepartmentFieldProps> = ({
           <SelectGroup>
             {availableDepartments.map((department) => (
               <SelectItem 
-                key={department.toLowerCase()} 
-                value={department.toLowerCase()}
+                key={department} 
+                value={department}
               >
                 {department}
               </SelectItem>

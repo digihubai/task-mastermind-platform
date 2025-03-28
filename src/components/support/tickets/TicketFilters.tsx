@@ -80,10 +80,10 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
   const hasActiveFilters = !!(searchQuery || priorityFilter || categoryFilter || departmentFilter || agentFilter);
 
   // Debug logging to help diagnose filter issues
-  console.log('Available categories:', categories);
-  console.log('Available departments:', departments);
-  console.log('Current categoryFilter:', categoryFilter);
-  console.log('Current departmentFilter:', departmentFilter);
+  console.log('TicketFilters - Available categories:', categories);
+  console.log('TicketFilters - Available departments:', departments);
+  console.log('TicketFilters - Current categoryFilter:', categoryFilter);
+  console.log('TicketFilters - Current departmentFilter:', departmentFilter);
 
   return (
     <>
@@ -176,7 +176,7 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((category) => (
-                    <SelectItem key={category.toLowerCase()} value={category.toLowerCase()}>{category}</SelectItem>
+                    <SelectItem key={category} value={category}>{category}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -194,7 +194,7 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
                 <SelectContent>
                   <SelectItem value="all">All Departments</SelectItem>
                   {departments.map((department) => (
-                    <SelectItem key={department.toLowerCase()} value={department.toLowerCase()}>{department}</SelectItem>
+                    <SelectItem key={department} value={department}>{department}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

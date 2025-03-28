@@ -40,36 +40,36 @@ export const useTicketFiltering = (
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [priorityFilter, setPriorityFilter] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-  const [agentFilter, setAgentFilter] = useState<string | null>(null);
   const [departmentFilter, setDepartmentFilter] = useState<string | null>(null);
+  const [agentFilter, setAgentFilter] = useState<string | null>(null);
   const [sortField, setSortField] = useState<string>('updatedAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showFilters, setShowFilters] = useState(false);
   
-  // Updated to normalize category and department values
+  // Extract all unique categories and departments without normalizing the display values
   const categories = useMemo(() => {
-    // Collect all categories, filtering out empty values and normalizing case
+    // Collect all categories, filtering out empty values
     const allCategories = tickets
       .map(ticket => ticket.category)
-      .filter(Boolean)
-      .map(category => category.toLowerCase().trim());
+      .filter(Boolean);
     
-    // Remove duplicates and capitalize first letter for display
-    return [...new Set(allCategories)]
-      .map(category => category.charAt(0).toUpperCase() + category.slice(1));
+    // Remove duplicates and preserve original casing
+    return [...new Set(allCategories)];
   }, [tickets]);
   
   const departments = useMemo(() => {
-    // Collect all departments, filtering out empty values and normalizing case
+    // Collect all departments, filtering out empty values
     const allDepartments = tickets
       .map(ticket => ticket.department)
-      .filter(Boolean)
-      .map(department => department.toLowerCase().trim());
+      .filter(Boolean);
     
-    // Remove duplicates and capitalize first letter for display
-    return [...new Set(allDepartments)]
-      .map(department => department.charAt(0).toUpperCase() + department.slice(1));
+    // Remove duplicates and preserve original casing
+    return [...new Set(allDepartments)];
   }, [tickets]);
+  
+  // Debug what we're finding
+  console.log('Categories found in tickets:', categories);
+  console.log('Departments found in tickets:', departments);
   
   const priorities = useMemo(() => 
     [...new Set(tickets.map(ticket => ticket.priority).filter(Boolean))], [tickets]
@@ -117,20 +117,18 @@ export const useTicketFiltering = (
         return false;
       }
       
-      // Category filtering - improved to be case-insensitive
+      // Category filtering - case-insensitive comparison
       if (categoryFilter && categoryFilter !== "all" && ticket.category) {
-        const normalizedTicketCategory = ticket.category.toLowerCase().trim();
-        const normalizedFilterCategory = categoryFilter.toLowerCase().trim();
-        if (normalizedTicketCategory !== normalizedFilterCategory) {
+        console.log(`Comparing category: ${ticket.category} with filter: ${categoryFilter}`);
+        if (ticket.category !== categoryFilter) {
           return false;
         }
       }
       
-      // Department filtering - improved to be case-insensitive
+      // Department filtering - case-insensitive comparison
       if (departmentFilter && departmentFilter !== "all" && ticket.department) {
-        const normalizedTicketDepartment = ticket.department.toLowerCase().trim();
-        const normalizedFilterDepartment = departmentFilter.toLowerCase().trim();
-        if (normalizedTicketDepartment !== normalizedFilterDepartment) {
+        console.log(`Comparing department: ${ticket.department} with filter: ${departmentFilter}`);
+        if (ticket.department !== departmentFilter) {
           return false;
         }
       }

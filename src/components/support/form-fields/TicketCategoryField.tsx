@@ -21,10 +21,15 @@ export const TicketCategoryField: React.FC<TicketCategoryFieldProps> = ({
   onChange,
   availableCategories = ["General", "Technical", "Billing", "Feature Request"]
 }) => {
-  // Store and use lowercase values for consistent comparison
   const handleChange = (newValue: string) => {
-    onChange(newValue.toLowerCase());
+    // Store the value exactly as provided without converting to lowercase
+    // This will preserve the display format while ensuring consistent comparison
+    onChange(newValue);
   };
+  
+  // Debug the categories
+  console.log('Available categories in field:', availableCategories);
+  console.log('Current category value:', value);
   
   return (
     <div>
@@ -37,8 +42,8 @@ export const TicketCategoryField: React.FC<TicketCategoryFieldProps> = ({
           <SelectGroup>
             {availableCategories.map((category) => (
               <SelectItem 
-                key={category.toLowerCase()} 
-                value={category.toLowerCase()}
+                key={category} 
+                value={category}
               >
                 {category}
               </SelectItem>
