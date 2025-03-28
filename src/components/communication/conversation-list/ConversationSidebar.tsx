@@ -57,12 +57,17 @@ const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
   const visibleChannels = channels.slice(0, 4);
   const dropdownChannels = channels.slice(4);
 
+  const handleNewConversation = () => {
+    // In a real application, this would open a form to create a new conversation
+    console.log("Creating new conversation");
+  };
+
   return (
     <Card className="h-full">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg">Conversations</CardTitle>
-          <Button size="sm" variant="outline">
+          <Button size="sm" variant="outline" onClick={handleNewConversation}>
             <Plus size={16} className="mr-1" />
             New
           </Button>
@@ -76,7 +81,9 @@ const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
         </div>
         <ConversationFilter 
           filterStatus={filterStatus} 
-          onFilterChange={onFilterChange} 
+          onFilterChange={onFilterChange}
+          activeTab={activeTab}
+          onTabChange={onTabChange}
         />
       </CardHeader>
       
