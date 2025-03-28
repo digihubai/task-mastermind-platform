@@ -46,13 +46,30 @@ export const useTicketFiltering = (
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showFilters, setShowFilters] = useState(false);
   
-  const categories = useMemo(() => 
-    [...new Set(tickets.map(ticket => ticket.category).filter(Boolean))], [tickets]
-  );
+  // Updated to normalize category and department values
+  const categories = useMemo(() => {
+    // Collect all categories, filtering out empty values and normalizing case
+    const allCategories = tickets
+      .map(ticket => ticket.category)
+      .filter(Boolean)
+      .map(category => category.toLowerCase().trim());
+    
+    // Remove duplicates and capitalize first letter for display
+    return [...new Set(allCategories)]
+      .map(category => category.charAt(0).toUpperCase() + category.slice(1));
+  }, [tickets]);
   
-  const departments = useMemo(() => 
-    [...new Set(tickets.map(ticket => ticket.department).filter(Boolean))], [tickets]
-  );
+  const departments = useMemo(() => {
+    // Collect all departments, filtering out empty values and normalizing case
+    const allDepartments = tickets
+      .map(ticket => ticket.department)
+      .filter(Boolean)
+      .map(department => department.toLowerCase().trim());
+    
+    // Remove duplicates and capitalize first letter for display
+    return [...new Set(allDepartments)]
+      .map(department => department.charAt(0).toUpperCase() + department.slice(1));
+  }, [tickets]);
   
   const priorities = useMemo(() => 
     [...new Set(tickets.map(ticket => ticket.priority).filter(Boolean))], [tickets]
@@ -80,6 +97,7 @@ export const useTicketFiltering = (
 
   const filteredTickets = useMemo(() => {
     return tickets.filter(ticket => {
+      // Search filtering
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const subjectMatch = ticket.subject.toLowerCase().includes(query);
@@ -89,36 +107,42 @@ export const useTicketFiltering = (
         }
       }
       
+      // Status filtering
       if (activeTab !== 'all' && ticket.status !== activeTab) {
         return false;
       }
       
+      // Priority filtering
       if (priorityFilter && priorityFilter !== "all" && ticket.priority !== priorityFilter) {
         return false;
       }
       
-      // Fixed category filter to properly compare lowercase values
-      if (categoryFilter && categoryFilter !== "all") {
-        // Compare lowercase values to make matching case-insensitive
-        if (ticket.category?.toLowerCase() !== categoryFilter.toLowerCase()) {
+      // Category filtering - improved to be case-insensitive
+      if (categoryFilter && categoryFilter !== "all" && ticket.category) {
+        const normalizedTicketCategory = ticket.category.toLowerCase().trim();
+        const normalizedFilterCategory = categoryFilter.toLowerCase().trim();
+        if (normalizedTicketCategory !== normalizedFilterCategory) {
           return false;
         }
       }
       
-      // Fixed department filter to properly compare lowercase values
-      if (departmentFilter && departmentFilter !== "all") {
-        // Compare lowercase values to make matching case-insensitive
-        if (ticket.department?.toLowerCase() !== departmentFilter.toLowerCase()) {
+      // Department filtering - improved to be case-insensitive
+      if (departmentFilter && departmentFilter !== "all" && ticket.department) {
+        const normalizedTicketDepartment = ticket.department.toLowerCase().trim();
+        const normalizedFilterDepartment = departmentFilter.toLowerCase().trim();
+        if (normalizedTicketDepartment !== normalizedFilterDepartment) {
           return false;
         }
       }
       
+      // Agent filtering
       if (agentFilter && agentFilter !== "all" && ticket.assignedTo !== agentFilter) {
         return false;
       }
       
       return true;
     }).sort((a, b) => {
+      // Sorting logic
       if (!(sortField in a) || !(sortField in b)) {
         return 0;
       }

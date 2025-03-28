@@ -21,6 +21,12 @@ export const TicketStatusTabs: React.FC<TicketStatusTabsProps> = ({
   allTicketsCount,
   onViewTicket
 }) => {
+  // Get counts of tickets by status
+  const getStatusCount = (status: string): number => {
+    if (status === 'all') return allTicketsCount;
+    return filteredTickets.filter(ticket => ticket.status === status).length;
+  };
+
   return (
     <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
       <TabsList>
@@ -54,12 +60,15 @@ export const TicketStatusTabs: React.FC<TicketStatusTabsProps> = ({
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle>Open Tickets ({filteredTickets.length})</CardTitle>
+              <CardTitle>Open Tickets ({getStatusCount('open')})</CardTitle>
+              {filteredTickets.length !== getStatusCount('open') && (
+                <Badge variant="outline">Filtered</Badge>
+              )}
             </div>
           </CardHeader>
           <CardContent>
             <TicketList 
-              tickets={filteredTickets}
+              tickets={filteredTickets.filter(ticket => ticket.status === 'open')}
               onViewTicket={onViewTicket}
             />
           </CardContent>
@@ -70,12 +79,15 @@ export const TicketStatusTabs: React.FC<TicketStatusTabsProps> = ({
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle>In Progress ({filteredTickets.length})</CardTitle>
+              <CardTitle>In Progress ({getStatusCount('in_progress')})</CardTitle>
+              {filteredTickets.length !== getStatusCount('in_progress') && (
+                <Badge variant="outline">Filtered</Badge>
+              )}
             </div>
           </CardHeader>
           <CardContent>
             <TicketList 
-              tickets={filteredTickets}
+              tickets={filteredTickets.filter(ticket => ticket.status === 'in_progress')}
               onViewTicket={onViewTicket}
             />
           </CardContent>
@@ -86,12 +98,15 @@ export const TicketStatusTabs: React.FC<TicketStatusTabsProps> = ({
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle>Resolved Tickets ({filteredTickets.length})</CardTitle>
+              <CardTitle>Resolved Tickets ({getStatusCount('resolved')})</CardTitle>
+              {filteredTickets.length !== getStatusCount('resolved') && (
+                <Badge variant="outline">Filtered</Badge>
+              )}
             </div>
           </CardHeader>
           <CardContent>
             <TicketList 
-              tickets={filteredTickets}
+              tickets={filteredTickets.filter(ticket => ticket.status === 'resolved')}
               onViewTicket={onViewTicket}
             />
           </CardContent>
@@ -102,12 +117,15 @@ export const TicketStatusTabs: React.FC<TicketStatusTabsProps> = ({
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle>Closed Tickets ({filteredTickets.length})</CardTitle>
+              <CardTitle>Closed Tickets ({getStatusCount('closed')})</CardTitle>
+              {filteredTickets.length !== getStatusCount('closed') && (
+                <Badge variant="outline">Filtered</Badge>
+              )}
             </div>
           </CardHeader>
           <CardContent>
             <TicketList 
-              tickets={filteredTickets}
+              tickets={filteredTickets.filter(ticket => ticket.status === 'closed')}
               onViewTicket={onViewTicket}
             />
           </CardContent>

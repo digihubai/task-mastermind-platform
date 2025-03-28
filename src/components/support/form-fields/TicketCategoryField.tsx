@@ -1,12 +1,13 @@
 
-import React from "react";
+import React from 'react';
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 
 interface TicketCategoryFieldProps {
@@ -15,33 +16,32 @@ interface TicketCategoryFieldProps {
   availableCategories?: string[];
 }
 
-export const TicketCategoryField: React.FC<TicketCategoryFieldProps> = ({ 
-  value, 
+export const TicketCategoryField: React.FC<TicketCategoryFieldProps> = ({
+  value,
   onChange,
   availableCategories = ["General", "Technical", "Billing", "Feature Request"]
 }) => {
-  // Map categories to consistent format - preserve original label but lowercase value for comparison
-  const categories = availableCategories.map(cat => ({ 
-    value: cat.toLowerCase(), 
-    label: cat 
-  }));
-
+  // Store and use lowercase values for consistent comparison
+  const handleChange = (newValue: string) => {
+    onChange(newValue.toLowerCase());
+  };
+  
   return (
     <div>
-      <label htmlFor="category" className="block text-sm font-medium mb-1">
-        Category
-      </label>
-      <Select 
-        value={value} 
-        onValueChange={onChange}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select category" />
+      <Label htmlFor="category">Category</Label>
+      <Select value={value} onValueChange={handleChange}>
+        <SelectTrigger id="category" className="mt-1">
+          <SelectValue placeholder="Select a category" />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {categories.map(category => (
-              <SelectItem key={category.value} value={category.value}>{category.label}</SelectItem>
+            {availableCategories.map((category) => (
+              <SelectItem 
+                key={category.toLowerCase()} 
+                value={category.toLowerCase()}
+              >
+                {category}
+              </SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>

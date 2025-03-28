@@ -1,12 +1,13 @@
 
-import React from "react";
+import React from 'react';
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 
 interface TicketDepartmentFieldProps {
@@ -15,33 +16,32 @@ interface TicketDepartmentFieldProps {
   availableDepartments?: string[];
 }
 
-export const TicketDepartmentField: React.FC<TicketDepartmentFieldProps> = ({ 
-  value, 
+export const TicketDepartmentField: React.FC<TicketDepartmentFieldProps> = ({
+  value,
   onChange,
   availableDepartments = ["Support", "Sales", "Billing", "Product", "Technical"]
 }) => {
-  // Map departments to consistent format - preserve original label but lowercase value for comparison
-  const departments = availableDepartments.map(dept => ({ 
-    value: dept.toLowerCase(), 
-    label: dept 
-  }));
-
+  // Store and use lowercase values for consistent comparison
+  const handleChange = (newValue: string) => {
+    onChange(newValue.toLowerCase());
+  };
+  
   return (
     <div>
-      <label htmlFor="department" className="block text-sm font-medium mb-1">
-        Department
-      </label>
-      <Select 
-        value={value} 
-        onValueChange={onChange}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select department" />
+      <Label htmlFor="department">Department</Label>
+      <Select value={value} onValueChange={handleChange}>
+        <SelectTrigger id="department" className="mt-1">
+          <SelectValue placeholder="Select a department" />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {departments.map(dept => (
-              <SelectItem key={dept.value} value={dept.value}>{dept.label}</SelectItem>
+            {availableDepartments.map((department) => (
+              <SelectItem 
+                key={department.toLowerCase()} 
+                value={department.toLowerCase()}
+              >
+                {department}
+              </SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>

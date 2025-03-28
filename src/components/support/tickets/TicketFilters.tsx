@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Filter, ArrowUp, ArrowDown } from "lucide-react";
+import { Filter, ArrowUp, ArrowDown, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -79,6 +79,12 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
 
   const hasActiveFilters = !!(searchQuery || priorityFilter || categoryFilter || departmentFilter || agentFilter);
 
+  // Debug logging to help diagnose filter issues
+  console.log('Available categories:', categories);
+  console.log('Available departments:', departments);
+  console.log('Current categoryFilter:', categoryFilter);
+  console.log('Current departmentFilter:', departmentFilter);
+
   return (
     <>
       <div className="flex flex-col md:flex-row gap-4 items-start">
@@ -143,8 +149,8 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             <div>
               <label className="block text-sm font-medium mb-1">Priority</label>
               <Select 
-                value={priorityFilter || ""} 
-                onValueChange={(value) => setPriorityFilter(value || null)}
+                value={priorityFilter || ""}
+                onValueChange={(value) => setPriorityFilter(value === "all" ? null : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All Priorities" />
@@ -161,8 +167,8 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             <div>
               <label className="block text-sm font-medium mb-1">Category</label>
               <Select 
-                value={categoryFilter || ""} 
-                onValueChange={(value) => setCategoryFilter(value || null)}
+                value={categoryFilter || ""}
+                onValueChange={(value) => setCategoryFilter(value === "all" ? null : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All Categories" />
@@ -170,7 +176,7 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((category) => (
-                    <SelectItem key={category} value={category}>{category}</SelectItem>
+                    <SelectItem key={category.toLowerCase()} value={category.toLowerCase()}>{category}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -179,8 +185,8 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             <div>
               <label className="block text-sm font-medium mb-1">Department</label>
               <Select 
-                value={departmentFilter || ""} 
-                onValueChange={(value) => setDepartmentFilter(value || null)}
+                value={departmentFilter || ""}
+                onValueChange={(value) => setDepartmentFilter(value === "all" ? null : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All Departments" />
@@ -188,7 +194,7 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
                 <SelectContent>
                   <SelectItem value="all">All Departments</SelectItem>
                   {departments.map((department) => (
-                    <SelectItem key={department} value={department}>{department}</SelectItem>
+                    <SelectItem key={department.toLowerCase()} value={department.toLowerCase()}>{department}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -197,8 +203,8 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             <div>
               <label className="block text-sm font-medium mb-1">Assigned Agent</label>
               <Select 
-                value={agentFilter || ""} 
-                onValueChange={(value) => setAgentFilter(value || null)}
+                value={agentFilter || ""}
+                onValueChange={(value) => setAgentFilter(value === "all" ? null : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All Agents" />
@@ -217,6 +223,3 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
     </>
   );
 };
-
-// Add missing Search icon from Lucide
-import { Search } from "lucide-react";
