@@ -23,6 +23,7 @@ interface ChatbotConfigViewProps {
     color: string;
     avatar: string;
     footerLink: string;
+    personality: string;
   };
   setNewChatbotInfo: (info: any) => void;
   handleNextStep: () => void;
