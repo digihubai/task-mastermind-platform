@@ -15,6 +15,8 @@ export interface Conversation {
   assignedToHumanAt?: string;
   assignedHumanAgent?: string;
   customerId: string; // Added customerId to link conversations across channels
+  csatScore?: number; // Customer satisfaction score (0-100)
+  csatSubmitted?: boolean; // Whether the customer submitted a CSAT survey
 }
 
 export interface Message {
@@ -25,7 +27,7 @@ export interface Message {
   channel: string; // Must match the conversation channel to properly filter messages
   isRead?: boolean;
   customerId: string; // Added customerId to link messages to conversations
-  conversationId?: string; // Adding this to fix the error
+  conversationId: string; // Adding this to fix the error
   attachments?: Array<{
     type: string;
     url: string;
@@ -39,6 +41,8 @@ export interface AIAssistantConfig {
   model: 'gpt-4o' | 'gpt-4o-mini' | 'claude-3' | 'gemini';
   autoAssign: boolean;
   autoAssignThreshold: number;
+  enableCSAT: boolean;
+  csatThreshold: number;
   enabledChannels: {
     website: boolean;
     email: boolean;
@@ -47,6 +51,11 @@ export interface AIAssistantConfig {
     telegram: boolean;
     slack: boolean;
     sms: boolean;
+    instagram: boolean;
+    twitter: boolean;
+    viber: boolean;
+    line: boolean;
+    wechat: boolean;
   };
 }
 
@@ -79,4 +88,26 @@ export interface CustomerProfile {
   timezone: string;
   conversationId: string;
   userId: string;
+}
+
+export interface SavedReply {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  tags: string[];
+  lastUsed?: string;
+  usageCount?: number;
+  isFavorite?: boolean;
+}
+
+export interface CSATSurvey {
+  id: string;
+  conversationId: string;
+  customerId: string;
+  score: number; // 0-100
+  wasResolved: boolean;
+  wouldRecommend: boolean;
+  comments?: string;
+  submittedAt: string;
 }

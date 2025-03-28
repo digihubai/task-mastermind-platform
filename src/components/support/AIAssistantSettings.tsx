@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import GeneralSettings from "./ai-settings/GeneralSettings";
 import HumanHandoffSettings from "./ai-settings/HumanHandoffSettings";
 import ChannelSettings from "./ai-settings/ChannelSettings";
+import CSATSettings from "./ai-settings/CSATSettings";
 
 interface AIAssistantSettingsProps {
   onClose: () => void;
@@ -19,6 +20,8 @@ const AIAssistantSettings: React.FC<AIAssistantSettingsProps> = ({ onClose }) =>
   const [enableAutoAssign, setEnableAutoAssign] = useState(true);
   const [autoAssignThreshold, setAutoAssignThreshold] = useState("3");
   const [model, setModel] = useState("gpt-4o");
+  const [enableCSAT, setEnableCSAT] = useState(true);
+  const [csatThreshold, setCsatThreshold] = useState(70);
   const [channels, setChannels] = useState({
     website: true,
     email: true,
@@ -27,6 +30,11 @@ const AIAssistantSettings: React.FC<AIAssistantSettingsProps> = ({ onClose }) =>
     telegram: false,
     slack: false,
     sms: false,
+    instagram: false,
+    twitter: false,
+    viber: false,
+    line: false,
+    wechat: false,
   });
 
   const handleSave = () => {
@@ -73,6 +81,15 @@ const AIAssistantSettings: React.FC<AIAssistantSettingsProps> = ({ onClose }) =>
         <ChannelSettings 
           channels={channels}
           setChannels={setChannels}
+        />
+
+        <Separator />
+
+        <CSATSettings
+          enableCSAT={enableCSAT}
+          setEnableCSAT={setEnableCSAT}
+          csatThreshold={csatThreshold}
+          setCsatThreshold={setCsatThreshold}
         />
       </CardContent>
       

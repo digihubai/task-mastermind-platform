@@ -11,6 +11,11 @@ interface Channels {
   telegram: boolean;
   slack: boolean;
   sms: boolean;
+  instagram: boolean;
+  twitter: boolean;
+  viber: boolean;
+  line: boolean;
+  wechat: boolean;
 }
 
 interface ChannelSettingsProps {
@@ -89,6 +94,51 @@ const ChannelSettings: React.FC<ChannelSettingsProps> = ({ channels, setChannels
             id="sms" 
             checked={channels.sms} 
             onCheckedChange={handleChannelChange("sms")} 
+          />
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <Label htmlFor="instagram">Instagram</Label>
+          <Switch 
+            id="instagram" 
+            checked={channels.instagram || false} 
+            onCheckedChange={handleChannelChange("instagram")} 
+          />
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <Label htmlFor="twitter">Twitter/X</Label>
+          <Switch 
+            id="twitter" 
+            checked={channels.twitter || false} 
+            onCheckedChange={handleChannelChange("twitter")} 
+          />
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <Label htmlFor="viber">Viber</Label>
+          <Switch 
+            id="viber" 
+            checked={channels.viber || false} 
+            onCheckedChange={handleChannelChange("viber")} 
+          />
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <Label htmlFor="line">LINE</Label>
+          <Switch 
+            id="line" 
+            checked={channels.line || false} 
+            onCheckedChange={handleChannelChange("line")} 
+          />
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <Label htmlFor="wechat">WeChat</Label>
+          <Switch 
+            id="wechat" 
+            checked={channels.wechat || false} 
+            onCheckedChange={handleChannelChange("wechat")} 
           />
         </div>
       </div>
