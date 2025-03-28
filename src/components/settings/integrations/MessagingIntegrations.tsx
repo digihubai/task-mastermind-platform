@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,14 +35,25 @@ const MessagingIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
     twitter: "",
     telegram: "",
     slack: "",
-    email: "",
     twilio: "",
     viber: "",
     line: "",
   });
 
+  const [emailConfig, setEmailConfig] = useState({
+    host: "",
+    port: "587",
+    username: "",
+    password: "",
+    secure: false
+  });
+
   const handleInputChange = (service: string, value: string) => {
     setApiKeys(prev => ({ ...prev, [service]: value }));
+  };
+
+  const handleEmailConfigChange = (field: keyof typeof emailConfig, value: string | boolean) => {
+    setEmailConfig(prev => ({ ...prev, [field]: value }));
   };
 
   const handleConnect = (service: string) => {
@@ -55,7 +65,19 @@ const MessagingIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
       return;
     }
 
-    if (!apiKeys[service]) {
+    // For email, check SMTP configuration
+    if (service === "email") {
+      if (!emailConfig.host || !emailConfig.username || !emailConfig.password) {
+        toast({
+          title: "SMTP Configuration Required",
+          description: `Please enter your SMTP server details.`,
+          variant: "destructive",
+        });
+        return;
+      }
+    } 
+    // For other services, check API key
+    else if (!apiKeys[service]) {
       toast({
         title: "API Key Required",
         description: `Please enter your ${getServiceName(service)} API key or credentials.`,
@@ -83,7 +105,19 @@ const MessagingIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
 
   const handleDisconnect = (service: string) => {
     setConnected({...connected, [service]: false});
-    setApiKeys(prev => ({ ...prev, [service]: "" }));
+    
+    if (service === "email") {
+      setEmailConfig({
+        host: "",
+        port: "587",
+        username: "",
+        password: "",
+        secure: false
+      });
+    } else {
+      setApiKeys(prev => ({ ...prev, [service]: "" }));
+    }
+    
     toast({
       title: "Disconnected",
       description: `Your ${getServiceName(service)} account has been disconnected.`,
@@ -143,12 +177,56 @@ const MessagingIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
         </div>
       ) : (
         <>
-          <Input
-            placeholder={`${name} API Key`}
-            className="mb-3"
-            value={apiKeys[service]}
-            onChange={(e) => handleInputChange(service, e.target.value)}
-          />
+          {/* Special case for email - show SMTP fields */}
+          {service === "email" ? (
+            <div className="space-y-2">
+              <Input
+                placeholder="SMTP Server (e.g. smtp.gmail.com)"
+                className="mb-2"
+                value={emailConfig.host}
+                onChange={(e) => handleEmailConfigChange('host', e.target.value)}
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <Input
+                  placeholder="Port (e.g. 587)"
+                  value={emailConfig.port}
+                  onChange={(e) => handleEmailConfigChange('port', e.target.value)}
+                />
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="checkbox" 
+                    id="secure-connection" 
+                    checked={emailConfig.secure}
+                    onChange={(e) => handleEmailConfigChange('secure', e.target.checked)} 
+                  />
+                  <label htmlFor="secure-connection" className="text-xs">SSL/TLS</label>
+                </div>
+              </div>
+              <Input
+                placeholder="Username/Email"
+                className="mb-2 mt-2"
+                value={emailConfig.username}
+                onChange={(e) => handleEmailConfigChange('username', e.target.value)}
+              />
+              <Input
+                placeholder="Password"
+                type="password"
+                className="mb-3"
+                value={emailConfig.password}
+                onChange={(e) => handleEmailConfigChange('password', e.target.value)}
+              />
+            </div>
+          ) : (
+            // API key field for other services
+            <Input
+              placeholder={`${name} API Key`}
+              className="mb-3"
+              value={apiKeys[service]}
+              onChange={(e) => handleInputChange(service, e.target.value)}
+              type={service === "twilio" || service === "viber" || service === "line" ? "password" : "text"}
+            />
+          )}
+          
           <Button 
             variant="outline" 
             size="sm" 
