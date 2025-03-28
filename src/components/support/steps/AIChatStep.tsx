@@ -10,12 +10,16 @@ interface AIChatStepProps {
   };
   onSwitchToForm: () => void;
   onEditContactInfo: () => void;
+  assistantName?: string;
+  showBookingButton?: boolean;
 }
 
 export const AIChatStep: React.FC<AIChatStepProps> = ({
   customerInfo,
   onSwitchToForm,
   onEditContactInfo,
+  assistantName = "Support AI",
+  showBookingButton = true,
 }) => {
   return (
     <div className="space-y-4">
@@ -35,9 +39,9 @@ export const AIChatStep: React.FC<AIChatStepProps> = ({
       
       <div className="h-[400px]">
         <ChatInterface 
-          title="Support AI"
+          title={assistantName}
           config={{
-            initialMessage: `Hello ${customerInfo.name}! I'm your AI support assistant. How can I help you today?`,
+            initialMessage: `Hello ${customerInfo.name}! I'm your ${assistantName} assistant. How can I help you today?`,
             modelName: "gpt-4o",
             maxTokens: 1000,
             temperature: 0.7
@@ -50,11 +54,13 @@ export const AIChatStep: React.FC<AIChatStepProps> = ({
         <Button variant="outline" onClick={onSwitchToForm}>
           Create Support Ticket
         </Button>
-        <div>
-          <Button>
-            Book a Meeting
-          </Button>
-        </div>
+        {showBookingButton && (
+          <div>
+            <Button>
+              Book a Meeting
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

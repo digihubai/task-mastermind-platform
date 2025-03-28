@@ -13,6 +13,8 @@ interface TicketDetailsStepProps {
   onEditContactInfo: () => void;
   onSubmit: (ticketData: Partial<SupportTicket>) => void;
   onCancel: () => void;
+  availableCategories?: string[];
+  availableDepartments?: string[];
 }
 
 export const TicketDetailsStep: React.FC<TicketDetailsStepProps> = ({
@@ -20,6 +22,8 @@ export const TicketDetailsStep: React.FC<TicketDetailsStepProps> = ({
   onEditContactInfo,
   onSubmit,
   onCancel,
+  availableCategories,
+  availableDepartments
 }) => {
   return (
     <>
@@ -52,6 +56,8 @@ export const TicketDetailsStep: React.FC<TicketDetailsStepProps> = ({
         onSubmit={onSubmit}
         onCancel={onCancel}
         isCustomer={true}
+        availableCategories={availableCategories}
+        availableDepartments={availableDepartments}
       />
     </>
   );

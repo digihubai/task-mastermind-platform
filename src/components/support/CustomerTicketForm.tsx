@@ -11,12 +11,20 @@ interface CustomerTicketFormProps {
   onSubmitSuccess?: () => void;
   departmentId?: string;
   compact?: boolean;
+  assistantName?: string;
+  showBookingButton?: boolean;
+  availableCategories?: string[];
+  availableDepartments?: string[];
 }
 
 export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({ 
   onSubmitSuccess,
   departmentId,
-  compact = false
+  compact = false,
+  assistantName = "Support AI",
+  showBookingButton = true,
+  availableCategories = ["Technical", "Billing", "General", "Feature Request"],
+  availableDepartments = ["Customer Support", "Technical Support", "Billing", "Sales"]
 }) => {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
@@ -113,6 +121,8 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
           customerInfo={customerInfo}
           onSwitchToForm={handleSwitchToForm}
           onEditContactInfo={() => setStep('contact')}
+          assistantName={assistantName}
+          showBookingButton={showBookingButton}
         />
       </div>
     );
@@ -125,6 +135,8 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
         onEditContactInfo={() => setStep('contact')}
         onSubmit={handleSubmit}
         onCancel={() => setStep('contact')}
+        availableCategories={availableCategories}
+        availableDepartments={availableDepartments}
       />
     </div>
   );

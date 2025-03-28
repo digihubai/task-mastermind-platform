@@ -9,6 +9,7 @@ import GeneralSettings from "./ai-settings/GeneralSettings";
 import HumanHandoffSettings from "./ai-settings/HumanHandoffSettings";
 import ChannelSettings from "./ai-settings/ChannelSettings";
 import CSATSettings from "./ai-settings/CSATSettings";
+import BookingSettings from "./ai-settings/BookingSettings";
 
 interface AIAssistantSettingsProps {
   onClose: () => void;
@@ -22,6 +23,8 @@ const AIAssistantSettings: React.FC<AIAssistantSettingsProps> = ({ onClose }) =>
   const [model, setModel] = useState("gpt-4o");
   const [enableCSAT, setEnableCSAT] = useState(true);
   const [csatThreshold, setCsatThreshold] = useState(70);
+  const [enableBookingButton, setEnableBookingButton] = useState(true);
+  const [hasCalendarIntegration, setHasCalendarIntegration] = useState(false);
   const [channels, setChannels] = useState({
     website: true,
     email: true,
@@ -78,6 +81,15 @@ const AIAssistantSettings: React.FC<AIAssistantSettingsProps> = ({ onClose }) =>
 
         <Separator />
 
+        <BookingSettings
+          enableBookingButton={enableBookingButton}
+          setEnableBookingButton={setEnableBookingButton}
+          hasCalendarIntegration={hasCalendarIntegration}
+          setHasCalendarIntegration={setHasCalendarIntegration}
+        />
+
+        <Separator />
+
         <ChannelSettings 
           channels={channels}
           setChannels={setChannels}
@@ -95,10 +107,18 @@ const AIAssistantSettings: React.FC<AIAssistantSettingsProps> = ({ onClose }) =>
       
       <CardFooter className="flex justify-end space-x-2">
         <Button variant="outline" onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSave}>
+        <Button 
+          onClick={handleSave}
+          disabled={enableBookingButton && !hasCalendarIntegration}
+        >
           <Save className="h-4 w-4 mr-2" />
           Save Changes
         </Button>
+        {enableBookingButton && !hasCalendarIntegration && (
+          <p className="text-xs text-destructive absolute -bottom-6 right-0">
+            Calendar integration required when booking is enabled
+          </p>
+        )}
       </CardFooter>
     </Card>
   );
