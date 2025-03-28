@@ -55,6 +55,22 @@ const permissionMap: PermissionMap = {
   }
 };
 
+// Dummy credentials for testing
+export const dummyCredentials = {
+  super_admin: {
+    email: 'superadmin@digihub.com',
+    password: 'superadmin123'
+  },
+  admin: {
+    email: 'admin@digihub.com',
+    password: 'admin123'
+  },
+  user: {
+    email: 'user@digihub.com',
+    password: 'user123'
+  }
+};
+
 export const useRoleBasedSettings = () => {
   const { user, profile } = useAuth();
   const [userRole, setUserRole] = useState<UserRole>('user');
@@ -101,7 +117,8 @@ export const useRoleBasedSettings = () => {
     userRole,
     availableSettings,
     hasAccess,
-    loading
+    loading,
+    dummyCredentials
   };
 };
 

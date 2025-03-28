@@ -33,7 +33,7 @@ const RoleBasedSettings: React.FC<RoleBasedSettingsProps> = ({ defaultTab = 'gen
   const [activeTab, setActiveTab] = React.useState(defaultTab);
   const { userRole, hasAccess } = useRoleBasedSettings();
   
-  // Mock data for settings
+  // Get data for settings from our hooks
   const { featureCategories, handleToggleFeature, handleDeleteFeature, handleAddFeature } = useFeatureCategories();
   const { 
     pricingPlans, 

@@ -3,22 +3,26 @@ import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Mail, MessageCircle } from "lucide-react";
-import EmailIntegration from "./messaging/EmailIntegration";
-import TwilioIntegration from "./messaging/TwilioIntegration";
-import WhatsAppIntegration from "./messaging/WhatsAppIntegration";
-import MessengerIntegration from "./messaging/MessengerIntegration";
-import SMSIntegration from "./messaging/SMSIntegration";
-import ViberIntegration from "./messaging/ViberIntegration";
-import LineIntegration from "./messaging/LineIntegration";
-import InstagramIntegration from "./messaging/InstagramIntegration";
-import TwitterIntegration from "./messaging/TwitterIntegration";
-import LiveChatIntegration from "./messaging/LiveChatIntegration";
-import { useMessagingService } from "./messaging/utils";
+import EmailIntegration from "./integrations/messaging/EmailIntegration";
+import TwilioIntegration from "./integrations/messaging/TwilioIntegration";
+import WhatsAppIntegration from "./integrations/messaging/WhatsAppIntegration";
+import MessengerIntegration from "./integrations/messaging/MessengerIntegration";
+import SMSIntegration from "./integrations/messaging/SMSIntegration";
+import ViberIntegration from "./integrations/messaging/ViberIntegration";
+import LineIntegration from "./integrations/messaging/LineIntegration";
+import InstagramIntegration from "./integrations/messaging/InstagramIntegration";
+import TwitterIntegration from "./integrations/messaging/TwitterIntegration";
+import LiveChatIntegration from "./integrations/messaging/LiveChatIntegration";
+import { useMessagingService } from "./integrations/messaging/utils";
 
-const MessagingIntegrations = ({ onConnect }) => {
+interface MessagingIntegrationsProps {
+  onConnect?: (service: string) => void;
+}
+
+const MessagingIntegrations: React.FC<MessagingIntegrationsProps> = ({ onConnect }) => {
   const [activeTab, setActiveTab] = useState("messaging");
-  const [connecting, setConnecting] = useState(null);
-  const [connected, setConnected] = useState({
+  const [connecting, setConnecting] = useState<string | null>(null);
+  const [connected, setConnected] = useState<Record<string, boolean>>({
     whatsapp: false,
     messenger: false,
     twitter: false,
@@ -35,7 +39,7 @@ const MessagingIntegrations = ({ onConnect }) => {
 
   const { simulateConnection, handleDisconnect } = useMessagingService();
 
-  const handleConnect = (service) => {
+  const handleConnect = (service: string) => {
     simulateConnection(service, setConnecting, setConnected, connected, onConnect);
   };
 
