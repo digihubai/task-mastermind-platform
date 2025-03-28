@@ -19,6 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import SEOIntegrations from "@/components/seo/SEOIntegrations";
 
 const MarketingSEOPage = () => {
   const { toast } = useToast();
