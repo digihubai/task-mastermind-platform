@@ -2,24 +2,35 @@
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Globe, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 import { IntegrationProps } from './types';
 import SEOIntegrationSettings from '@/components/seo/SEOIntegrationSettings';
+import CMSFilter from './cms/CMSFilter';
+import CMSGrid from './cms/CMSGrid';
 
 const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
   const { toast } = useToast();
   const [connecting, setConnecting] = useState<string | null>(null);
+  const [filterType, setFilterType] = useState<'all' | 'cms' | 'ecommerce'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  
   const [connected, setConnected] = useState<{[key: string]: boolean}>({
     wordpress: false,
     shopify: false,
     webflow: false,
     wix: false,
+    wixecommerce: false,
     squarespace: false,
     drupal: false,
     joomla: false,
     magento: false,
+    woocommerce: false,
+    bigcommerce: false,
+    hubspot: false,
+    prestashop: false,
+    ghost: false,
+    contentful: false
   });
   
   const [websites, setWebsites] = useState<{[key: string]: string}>({
@@ -27,77 +38,87 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
     shopify: "",
     webflow: "",
     wix: "",
+    wixecommerce: "",
     squarespace: "",
     drupal: "",
     joomla: "",
     magento: "",
+    woocommerce: "",
+    bigcommerce: "",
+    hubspot: "",
+    prestashop: "",
+    ghost: "",
+    contentful: ""
   });
 
-  const handleInputChange = (cms: string, value: string) => {
-    setWebsites(prev => ({ ...prev, [cms]: value }));
+  const handleInputChange = (platform: string, value: string) => {
+    setWebsites(prev => ({ ...prev, [platform]: value }));
   };
 
-  const handleConnect = (cms: string) => {
-    if (connected[cms]) {
+  const handleConnect = (platform: string) => {
+    if (connected[platform]) {
       toast({
         title: "Already Connected",
-        description: `Your ${getCMSName(cms)} site is already connected.`,
+        description: `Your ${getPlatformName(platform)} site is already connected.`,
       });
       return;
     }
 
-    if (!websites[cms]) {
+    if (!websites[platform]) {
       toast({
         title: "Website URL Required",
-        description: `Please enter your ${getCMSName(cms)} website URL.`,
+        description: `Please enter your ${getPlatformName(platform)} website URL.`,
         variant: "destructive",
       });
       return;
     }
 
-    setConnecting(cms);
+    setConnecting(platform);
     
     // Simulate connection process
     setTimeout(() => {
       setConnecting(null);
-      setConnected({...connected, [cms]: true});
+      setConnected({...connected, [platform]: true});
       toast({
         title: "Connection Successful",
-        description: `Your ${getCMSName(cms)} site has been connected successfully.`,
+        description: `Your ${getPlatformName(platform)} site has been connected successfully.`,
       });
       
       if (onConnect) {
-        onConnect(cms);
+        onConnect(platform);
       }
     }, 1500);
   };
 
-  const handleDisconnect = (cms: string) => {
-    setConnected({...connected, [cms]: false});
-    setWebsites(prev => ({ ...prev, [cms]: "" }));
+  const handleDisconnect = (platform: string) => {
+    setConnected({...connected, [platform]: false});
+    setWebsites(prev => ({ ...prev, [platform]: "" }));
     toast({
       title: "Disconnected",
-      description: `Your ${getCMSName(cms)} site has been disconnected.`,
+      description: `Your ${getPlatformName(platform)} site has been disconnected.`,
     });
   };
 
-  const getCMSName = (cms: string): string => {
-    const cmsNames: {[key: string]: string} = {
+  const getPlatformName = (platform: string): string => {
+    const platformNames: {[key: string]: string} = {
       wordpress: "WordPress",
       shopify: "Shopify",
       webflow: "Webflow",
       wix: "Wix",
+      wixecommerce: "Wix eCommerce",
       squarespace: "Squarespace",
       drupal: "Drupal",
       joomla: "Joomla",
       magento: "Magento",
+      woocommerce: "WooCommerce",
+      bigcommerce: "BigCommerce",
+      hubspot: "HubSpot CMS",
+      prestashop: "PrestaShop",
+      ghost: "Ghost CMS",
+      contentful: "Contentful"
     };
-    return cmsNames[cms] || cms;
+    return platformNames[platform] || platform;
   };
-
-  // Filter to show only top CMS platforms on initial view
-  const topCmsPlatforms = ["wordpress", "shopify", "webflow"];
-  const otherCmsPlatforms = Object.keys(websites).filter(cms => !topCmsPlatforms.includes(cms));
 
   return (
     <div className="space-y-6">
@@ -108,117 +129,24 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
         </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {topCmsPlatforms.map(cms => (
-          <Card key={cms} className="p-5 border">
-            <div className="flex items-center gap-3 mb-4">
-              <div className={cms === "wordpress" 
-                ? "bg-blue-100 p-2 rounded-full" 
-                : cms === "shopify" 
-                ? "bg-green-100 p-2 rounded-full" 
-                : "bg-purple-100 p-2 rounded-full"
-              }>
-                <Globe className={`h-5 w-5 ${cms === "wordpress" 
-                  ? "text-blue-600" 
-                  : cms === "shopify" 
-                  ? "text-green-600" 
-                  : "text-purple-600"}`} 
-                />
-              </div>
-              <div>
-                <h4 className="font-medium">{getCMSName(cms)}</h4>
-                <p className="text-xs text-muted-foreground">
-                  Connect your {getCMSName(cms)} site
-                </p>
-              </div>
-            </div>
-            
-            {connected[cms] ? (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-green-600 font-medium">Connected</span>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleDisconnect(cms)}
-                  >
-                    Disconnect
-                  </Button>
-                </div>
-                <p className="text-xs truncate">{websites[cms]}</p>
-              </div>
-            ) : (
-              <>
-                <Input
-                  placeholder="Enter your site URL"
-                  className="mb-3"
-                  value={websites[cms]}
-                  onChange={(e) => handleInputChange(cms, e.target.value)}
-                />
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full"
-                  onClick={() => handleConnect(cms)}
-                  disabled={connecting === cms}
-                >
-                  {connecting === cms ? "Connecting..." : "Connect"}
-                </Button>
-              </>
-            )}
-          </Card>
-        ))}
-      </div>
+      <CMSFilter 
+        filter={filterType}
+        searchQuery={searchQuery}
+        onFilterChange={setFilterType}
+        onSearchChange={setSearchQuery}
+      />
       
-      <h3 className="text-lg font-medium mt-8">Additional CMS Platforms</h3>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {otherCmsPlatforms.map(cms => (
-          <Card key={cms} className="p-4 border">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="bg-gray-100 p-2 rounded-full">
-                <Globe className="h-4 w-4 text-gray-600" />
-              </div>
-              <h4 className="font-medium text-sm">{getCMSName(cms)}</h4>
-            </div>
-            
-            {connected[cms] ? (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-green-600 font-medium">Connected</span>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => handleDisconnect(cms)}
-                  >
-                    Disconnect
-                  </Button>
-                </div>
-                <p className="text-xs truncate">{websites[cms]}</p>
-              </div>
-            ) : (
-              <>
-                <Input
-                  placeholder="Enter your site URL"
-                  className="mb-2 text-xs"
-                  size={1}
-                  value={websites[cms]}
-                  onChange={(e) => handleInputChange(cms, e.target.value)}
-                />
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full text-xs"
-                  onClick={() => handleConnect(cms)}
-                  disabled={connecting === cms}
-                >
-                  {connecting === cms ? "Connecting..." : "Connect"}
-                </Button>
-              </>
-            )}
-          </Card>
-        ))}
-      </div>
-
+      <CMSGrid 
+        urls={websites}
+        connected={connected}
+        connecting={connecting}
+        onInputChange={handleInputChange}
+        onConnect={handleConnect}
+        onDisconnect={handleDisconnect}
+        filter={filterType}
+        searchQuery={searchQuery}
+      />
+      
       <Card className="p-5 border mt-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="bg-amber-100 p-2 rounded-full">
@@ -256,14 +184,6 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
         </div>
       </Card>
       
-      <div className="border border-dashed border-border p-6 rounded-lg flex items-center justify-center">
-        <img 
-          src="/lovable-uploads/51068ff4-8d7f-4ab7-9a51-8916cd8545b6.png" 
-          alt="SEO Integration Settings" 
-          className="max-w-full" 
-        />
-      </div>
-
       <SEOIntegrationSettings />
     </div>
   );
