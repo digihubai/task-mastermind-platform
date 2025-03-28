@@ -1,5 +1,7 @@
 
 export interface MessagingServiceProps {
+  connected?: boolean;
+  connecting?: string | null;
   onConnect?: (id: string) => void;
   onDisconnect?: (id: string) => void;
 }

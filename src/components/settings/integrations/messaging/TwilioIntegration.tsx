@@ -9,11 +9,15 @@ import { useToast } from "@/hooks/use-toast";
 import { MessagingServiceProps, NumberSearchParams, PhoneNumber } from './types';
 import { useMessagingService } from './utils';
 
-const TwilioIntegration: React.FC<MessagingServiceProps> = ({ onConnect, onDisconnect }) => {
+const TwilioIntegration: React.FC<MessagingServiceProps> = ({ 
+  connected = false, 
+  connecting = null, 
+  onConnect, 
+  onDisconnect 
+}) => {
   const { toast } = useToast();
   const [apiKey, setApiKey] = useState<string>("");
-  const [connecting, setConnecting] = useState<string | null>(null);
-  const [connected, setConnected] = useState<{[key: string]: boolean}>({ twilio: false });
+  const [internalConnected, setInternalConnected] = useState<{[key: string]: boolean}>({ twilio: connected });
   const { simulateConnection, handleDisconnect } = useMessagingService();
   
   // Phone number purchasing states
@@ -32,7 +36,7 @@ const TwilioIntegration: React.FC<MessagingServiceProps> = ({ onConnect, onDisco
   };
 
   const handleConnect = () => {
-    if (connected.twilio) {
+    if (internalConnected.twilio) {
       toast({
         title: "Already Connected",
         description: "Your Twilio account is already connected.",
@@ -54,14 +58,13 @@ const TwilioIntegration: React.FC<MessagingServiceProps> = ({ onConnect, onDisco
   };
 
   const handleTwilioDisconnect = () => {
-    handleDisconnect('twilio', setConnected, connected);
-    setApiKey("");
-    setShowPhoneSearch(false);
-    setSearchedNumbers([]);
-    
     if (onDisconnect) {
       onDisconnect('twilio');
     }
+    handleDisconnect('twilio', setInternalConnected, internalConnected);
+    setApiKey("");
+    setShowPhoneSearch(false);
+    setSearchedNumbers([]);
   };
 
   // Function to search for available phone numbers
@@ -111,14 +114,14 @@ const TwilioIntegration: React.FC<MessagingServiceProps> = ({ onConnect, onDisco
     icon: <Phone className="h-5 w-5 text-red-600" />,
     backgroundColor: "bg-red-100",
     textColor: "text-red-600",
-    connected: connected.twilio
+    connected: internalConnected.twilio || connected
   };
 
   return (
     <MessagingServiceCard 
       service={twilioService}
       connecting={connecting}
-      onConnect={handleConnect}
+      onConnect={onConnect ? () => onConnect("twilio") : handleConnect}
       onDisconnect={handleTwilioDisconnect}
     >
       {twilioService.connected && (

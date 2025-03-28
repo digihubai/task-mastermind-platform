@@ -8,10 +8,15 @@ import { useToast } from "@/hooks/use-toast";
 import { EmailConfig, MessagingServiceProps } from './types';
 import { useMessagingService } from './utils';
 
-const EmailIntegration: React.FC<MessagingServiceProps> = ({ onConnect, onDisconnect }) => {
+const EmailIntegration: React.FC<MessagingServiceProps> = ({ 
+  connected = false, 
+  connecting = null, 
+  onConnect, 
+  onDisconnect 
+}) => {
   const { toast } = useToast();
-  const [connecting, setConnecting] = useState<string | null>(null);
-  const [connected, setConnected] = useState<{[key: string]: boolean}>({ email: false });
+  const [internalConnecting, setInternalConnecting] = useState<string | null>(null);
+  const [internalConnected, setInternalConnected] = useState<{[key: string]: boolean}>({ email: connected });
   const { simulateConnection, handleDisconnect } = useMessagingService();
   
   const [emailConfig, setEmailConfig] = useState<EmailConfig>({
@@ -27,7 +32,7 @@ const EmailIntegration: React.FC<MessagingServiceProps> = ({ onConnect, onDiscon
   };
 
   const handleConnect = () => {
-    if (connected.email) {
+    if (internalConnected.email) {
       toast({
         title: "Already Connected",
         description: "Your Email is already connected.",
@@ -44,17 +49,24 @@ const EmailIntegration: React.FC<MessagingServiceProps> = ({ onConnect, onDiscon
       return;
     }
 
-    simulateConnection(
-      'email', 
-      setConnecting, 
-      setConnected, 
-      connected, 
-      onConnect
-    );
+    if (onConnect) {
+      onConnect('email');
+    } else {
+      simulateConnection(
+        'email', 
+        setInternalConnecting, 
+        setInternalConnected, 
+        internalConnected
+      );
+    }
   };
 
   const handleEmailDisconnect = () => {
-    handleDisconnect('email', setConnected, connected);
+    if (onDisconnect) {
+      onDisconnect('email');
+    }
+    
+    handleDisconnect('email', setInternalConnected, internalConnected);
     setEmailConfig({
       host: "",
       port: "587",
@@ -62,10 +74,6 @@ const EmailIntegration: React.FC<MessagingServiceProps> = ({ onConnect, onDiscon
       password: "",
       secure: false
     });
-    
-    if (onDisconnect) {
-      onDisconnect('email');
-    }
   };
 
   const emailService = {
@@ -75,13 +83,13 @@ const EmailIntegration: React.FC<MessagingServiceProps> = ({ onConnect, onDiscon
     icon: <Mail className="h-5 w-5 text-amber-600" />,
     backgroundColor: "bg-amber-100",
     textColor: "text-amber-600",
-    connected: connected.email
+    connected: internalConnected.email || connected
   };
 
   return (
     <MessagingServiceCard 
       service={emailService}
-      connecting={connecting}
+      connecting={connecting || internalConnecting}
       onConnect={handleConnect}
       onDisconnect={handleEmailDisconnect}
     >
