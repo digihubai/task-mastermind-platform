@@ -1,9 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Plus, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface CSATSettingsProps {
   enableCSAT: boolean;
@@ -12,12 +15,44 @@ interface CSATSettingsProps {
   setCsatThreshold: (threshold: number) => void;
 }
 
+interface SurveyQuestion {
+  id: string;
+  text: string;
+  enabled: boolean;
+}
+
 const CSATSettings: React.FC<CSATSettingsProps> = ({ 
   enableCSAT, 
   setEnableCSAT, 
   csatThreshold,
   setCsatThreshold
 }) => {
+  const [questions, setQuestions] = useState<SurveyQuestion[]>([
+    { id: "q1", text: "How would you rate your experience?", enabled: true },
+    { id: "q2", text: "Was your issue resolved?", enabled: true },
+    { id: "q3", text: "Would you recommend our service?", enabled: true },
+    { id: "q4", text: "Any additional comments?", enabled: false }
+  ]);
+  const [newQuestion, setNewQuestion] = useState("");
+
+  const toggleQuestion = (id: string) => {
+    setQuestions(questions.map(q => 
+      q.id === id ? { ...q, enabled: !q.enabled } : q
+    ));
+  };
+
+  const addQuestion = () => {
+    if (!newQuestion.trim()) return;
+    
+    const newId = `q${questions.length + 1}`;
+    setQuestions([...questions, { id: newId, text: newQuestion, enabled: true }]);
+    setNewQuestion("");
+  };
+
+  const removeQuestion = (id: string) => {
+    setQuestions(questions.filter(q => q.id !== id));
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -60,23 +95,56 @@ const CSATSettings: React.FC<CSATSettingsProps> = ({
           </div>
           
           <div className="space-y-2">
-            <Label>Survey Questions</Label>
+            <div className="flex justify-between items-center mb-2">
+              <Label>Survey Questions</Label>
+              <Badge variant="outline" className="text-xs">
+                {questions.filter(q => q.enabled).length} Active
+              </Badge>
+            </div>
+            
             <div className="space-y-2 border rounded-md p-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">How would you rate your experience?</span>
-                <Switch defaultChecked={true} />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Was your issue resolved?</span>
-                <Switch defaultChecked={true} />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Would you recommend our service?</span>
-                <Switch defaultChecked={true} />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Any additional comments?</span>
-                <Switch defaultChecked={false} />
+              {questions.map((question) => (
+                <div key={question.id} className="flex items-center justify-between group">
+                  <div className="flex-1 mr-2">
+                    <Input 
+                      value={question.text} 
+                      onChange={(e) => {
+                        setQuestions(questions.map(q => 
+                          q.id === question.id ? { ...q, text: e.target.value } : q
+                        ));
+                      }}
+                      className="text-sm"
+                    />
+                  </div>
+                  <div className="flex items-center">
+                    <Switch 
+                      checked={question.enabled} 
+                      onCheckedChange={() => toggleQuestion(question.id)}
+                      className="mr-2"
+                    />
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => removeQuestion(question.id)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              
+              <div className="flex items-center gap-2 mt-4">
+                <Input
+                  placeholder="Add a new survey question..."
+                  value={newQuestion}
+                  onChange={(e) => setNewQuestion(e.target.value)}
+                  className="text-sm"
+                />
+                <Button onClick={addQuestion} disabled={!newQuestion.trim()} size="sm">
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add
+                </Button>
               </div>
             </div>
           </div>

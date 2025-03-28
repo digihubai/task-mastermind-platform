@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,9 +12,14 @@ import {
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
-  DropdownMenuTrigger 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 
 interface ConversationDetailProps {
   selectedConversation: Conversation | undefined;
@@ -30,7 +36,9 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
   onAssignToHuman,
   onViewProfile
 }) => {
-  const [satisfaction, setSatisfaction] = useState<number | null>(null);
+  const [satisfactionScore, setSatisfactionScore] = useState<number>(85);
+  const [isUpdateSatisfactionDialogOpen, setIsUpdateSatisfactionDialogOpen] = useState(false);
+  const { toast } = useToast();
   
   if (!selectedConversation) {
     return (
@@ -49,8 +57,25 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
   const handleSendMessage = (messageText: string) => {
     onSendMessage(messageText);
   };
-
-  const satisfactionPercentage = satisfaction !== null ? satisfaction : 85;
+  
+  const handleResolveConversation = () => {
+    toast({
+      title: "Conversation resolved",
+      description: "The conversation has been marked as resolved."
+    });
+  };
+  
+  const handleUpdateSatisfaction = () => {
+    setIsUpdateSatisfactionDialogOpen(true);
+  };
+  
+  const handleSaveSatisfactionUpdate = () => {
+    toast({
+      title: "Satisfaction score updated",
+      description: `Customer satisfaction score has been updated to ${satisfactionScore}%.`
+    });
+    setIsUpdateSatisfactionDialogOpen(false);
+  };
 
   const conversationMessages = messages.filter(
     message => message.customerId === selectedConversation.customerId
@@ -79,7 +104,7 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
               <div className="flex items-center text-xs text-muted-foreground gap-2">
                 <span>Customer ID: {selectedConversation.customerId}</span>
                 <span>•</span>
-                <span>CSAT: {satisfactionPercentage}%</span>
+                <span>CSAT: {satisfactionScore}%</span>
               </div>
             </div>
           </div>
@@ -95,15 +120,16 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => onAssignToHuman()}>
+                <DropdownMenuItem onSelect={onAssignToHuman}>
                   <User className="h-4 w-4 mr-2" />
                   Assign to human
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onSelect={handleResolveConversation}>
                   <ThumbsUp className="h-4 w-4 mr-2" />
                   Mark as resolved
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleUpdateSatisfaction}>
                   <UserRound className="h-4 w-4 mr-2" />
                   Update satisfaction
                 </DropdownMenuItem>
@@ -127,6 +153,63 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
           <MessageInput onSendMessage={handleSendMessage} />
         </div>
       </CardContent>
+      
+      {/* Update Satisfaction Dialog */}
+      <Dialog open={isUpdateSatisfactionDialogOpen} onOpenChange={setIsUpdateSatisfactionDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Update Customer Satisfaction Score</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <Label>Satisfaction Score: {satisfactionScore}%</Label>
+              </div>
+              <Slider
+                value={[satisfactionScore]}
+                min={0}
+                max={100}
+                step={1}
+                onValueChange={(value) => setSatisfactionScore(value[0])}
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Unsatisfied</span>
+                <span>Very Satisfied</span>
+              </div>
+            </div>
+            
+            <div>
+              <p className="text-sm font-medium mb-2">Feedback Source:</p>
+              <div className="flex items-center space-x-2">
+                <input 
+                  type="radio" 
+                  id="agent-input" 
+                  name="feedback-source"
+                  defaultChecked
+                />
+                <label htmlFor="agent-input" className="text-sm">Agent Input</label>
+              </div>
+              <div className="flex items-center space-x-2 mt-1">
+                <input 
+                  type="radio" 
+                  id="csat-survey" 
+                  name="feedback-source" 
+                />
+                <label htmlFor="csat-survey" className="text-sm">CSAT Survey</label>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsUpdateSatisfactionDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSaveSatisfactionUpdate}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

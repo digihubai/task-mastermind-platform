@@ -73,6 +73,27 @@ const CustomerProfileDetails: React.FC<CustomerProfileDetailsProps> = ({ profile
     }, 500);
   };
 
+  const handleEmailClick = () => {
+    toast({
+      title: 'Email action triggered',
+      description: `Preparing to send an email to ${profile.email}`,
+    });
+  };
+
+  const handleCallClick = () => {
+    toast({
+      title: 'Call action triggered',
+      description: `Initiating a call to ${profile.phone}`,
+    });
+  };
+
+  const handleMessageClick = () => {
+    toast({
+      title: 'Message action triggered',
+      description: `Opening messaging interface for ${profile.name}`,
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
@@ -92,15 +113,15 @@ const CustomerProfileDetails: React.FC<CustomerProfileDetailsProps> = ({ profile
       </div>
       
       <div className="flex gap-2">
-        <Button size="sm" className="flex-1">
+        <Button size="sm" className="flex-1" onClick={handleEmailClick}>
           <Mail className="mr-2 h-4 w-4" />
           Email
         </Button>
-        <Button size="sm" className="flex-1">
+        <Button size="sm" className="flex-1" onClick={handleCallClick}>
           <Phone className="mr-2 h-4 w-4" />
           Call
         </Button>
-        <Button size="sm" className="flex-1">
+        <Button size="sm" className="flex-1" onClick={handleMessageClick}>
           <Send className="mr-2 h-4 w-4" />
           Message
         </Button>
