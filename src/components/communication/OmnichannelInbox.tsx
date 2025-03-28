@@ -52,9 +52,9 @@ const OmnichannelInbox: React.FC<OmnichannelInboxProps> = ({ onAssignToHuman }) 
     // Update conversation status
     const updatedConversations = conversations.map(conversation => {
       if (conversation.id === selectedConversationId) {
-        const updatedConversation = {
+        const updatedConversation: Conversation = {
           ...conversation,
-          assignmentStatus: 'waiting_for_human' as 'waiting_for_human', // Type assertion to fix error
+          assignmentStatus: 'waiting_for_human',
           assignedToHumanAt: new Date().toISOString(),
           assignedHumanAgent: availableAgent ? availableAgent.name : undefined,
           agent: availableAgent ? availableAgent.name : 'Waiting for human',

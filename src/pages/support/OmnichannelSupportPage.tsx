@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -97,17 +98,45 @@ const OmnichannelSupportPage: React.FC = () => {
     });
   };
   
-  const handleAssignToHuman = () => {
-    const updatedAssignments = mockConversations.filter(conv => 
-      conv.assignmentStatus === 'waiting_for_human' || 
-      conv.assignmentStatus === 'assigned_to_human'
+  const handleAssignToHuman = (assignedConversation: Conversation) => {
+    // Find and update the conversation in the human assigned list
+    const existingIndex = humanAssignedConversations.findIndex(
+      c => c.id === assignedConversation.id
     );
     
-    setHumanAssignedConversations(updatedAssignments);
+    if (existingIndex >= 0) {
+      // Update existing conversation
+      const updatedAssignments = [...humanAssignedConversations];
+      updatedAssignments[existingIndex] = assignedConversation;
+      setHumanAssignedConversations(updatedAssignments);
+    } else {
+      // Add new conversation to the list
+      setHumanAssignedConversations([...humanAssignedConversations, assignedConversation]);
+    }
     
     toast({
-      title: "Assigned to human agent",
-      description: "The conversation has been assigned to the next available human agent"
+      title: assignedConversation.assignedHumanAgent 
+        ? `Assigned to ${assignedConversation.assignedHumanAgent}` 
+        : "Added to human queue",
+      description: assignedConversation.assignedHumanAgent 
+        ? `Conversation from ${assignedConversation.name} has been assigned to ${assignedConversation.assignedHumanAgent}` 
+        : `Conversation from ${assignedConversation.name} is waiting for the next available human agent`
+    });
+  };
+  
+  const handleTakeOverConversation = (conversationId: string) => {
+    // In a real app, this would update the backend
+    setHumanAssignedConversations(
+      humanAssignedConversations.map(conv => 
+        conv.id === conversationId 
+          ? {...conv, assignmentStatus: 'assigned_to_human', agent: 'Current User'} 
+          : conv
+      )
+    );
+    
+    toast({
+      title: "Conversation taken over",
+      description: "You are now handling this conversation"
     });
   };
 
@@ -170,24 +199,59 @@ const OmnichannelSupportPage: React.FC = () => {
                     {humanAssignedConversations.length > 0 ? (
                       <div className="space-y-4">
                         {humanAssignedConversations.map(conv => (
-                          <Card key={conv.id} className="p-4 border-l-4 border-l-amber-500">
-                            <div className="flex justify-between">
-                              <div>
-                                <h3 className="font-medium">{conv.name}</h3>
-                                <p className="text-sm text-muted-foreground">{conv.message}</p>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge variant="outline" className="text-xs">
-                                    {conv.channel}
-                                  </Badge>
-                                  <Badge variant="outline" className="text-xs bg-amber-50 text-amber-800">
-                                    {conv.assignmentStatus === 'waiting_for_human' 
-                                      ? 'Waiting for human' 
-                                      : 'Assigned to human'}
-                                  </Badge>
+                          <Card key={conv.id} className={`p-4 border-l-4 ${
+                            conv.assignmentStatus === 'assigned_to_human' 
+                              ? 'border-l-green-500' 
+                              : 'border-l-amber-500'
+                          }`}>
+                            <div className="flex justify-between items-start">
+                              <div className="space-y-2">
+                                <div>
+                                  <h3 className="font-medium flex items-center gap-2">
+                                    {conv.name}
+                                    <Badge variant="outline" className="text-xs">
+                                      {conv.channel}
+                                    </Badge>
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground">{conv.message}</p>
+                                </div>
+                                
+                                <div className="flex flex-wrap gap-2 items-center">
+                                  {conv.assignmentStatus === 'waiting_for_human' ? (
+                                    <Badge variant="outline" className="text-xs bg-amber-50 text-amber-800">
+                                      Waiting for human
+                                    </Badge>
+                                  ) : (
+                                    <Badge variant="outline" className="text-xs bg-green-50 text-green-800">
+                                      Assigned to {conv.assignedHumanAgent || 'human'}
+                                    </Badge>
+                                  )}
+                                  
+                                  {/* Show assignment information clearly */}
+                                  {conv.assignedHumanAgent && (
+                                    <span className="text-xs bg-slate-100 px-2 py-1 rounded-md">
+                                      Agent: <span className="font-medium">{conv.assignedHumanAgent}</span>
+                                    </span>
+                                  )}
+                                  
+                                  {conv.assignedToHumanAt && (
+                                    <span className="text-xs text-slate-500">
+                                      Assigned {new Date(conv.assignedToHumanAt).toLocaleTimeString()}
+                                    </span>
+                                  )}
                                 </div>
                               </div>
+                              
                               <div>
-                                <Button size="sm">Take Over</Button>
+                                <Button 
+                                  size="sm" 
+                                  onClick={() => handleTakeOverConversation(conv.id)}
+                                  disabled={conv.assignmentStatus === 'assigned_to_human' && conv.assignedHumanAgent === 'Current User'}
+                                >
+                                  {conv.assignmentStatus === 'assigned_to_human' && conv.assignedHumanAgent === 'Current User'
+                                    ? 'Currently Handling'
+                                    : 'Take Over'}
+                                </Button>
                               </div>
                             </div>
                           </Card>

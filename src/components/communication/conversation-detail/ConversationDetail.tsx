@@ -23,9 +23,10 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
   onSendMessage,
   onAssignToHuman
 }) => {
-  // Filter messages for the selected conversation
+  // Filter messages for the selected conversation by customer ID instead of just channel
+  // This allows us to show messages from all channels for the same customer
   const conversationMessages = selectedConversation 
-    ? messages.filter(m => m.channel === selectedConversation.channel) 
+    ? messages.filter(m => m.customerId === selectedConversation.customerId) 
     : [];
     
   const showQueueInfo = selectedConversation?.assignmentStatus === 'waiting_for_human';
