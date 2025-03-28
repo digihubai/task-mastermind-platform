@@ -4,6 +4,7 @@ import SidebarMenuItem from "./SidebarMenuItem";
 import {
   dashboardSection,
   automationSection,
+  analyticsSection,
   aiToolsSection,
   coreModulesSection,
   settingsSection
@@ -42,7 +43,7 @@ export const settingsItems = [
 export const sidebarSections: SidebarSectionType[] = [
   dashboardSection,
   automationSection,
-  // Removed analyticsSection reference
+  analyticsSection,
   aiToolsSection,
   coreModulesSection,
   settingsSection
@@ -80,7 +81,15 @@ export const SidebarNavData = () => {
         isExactPathActive={isExactPathActive}
       />
       
-      {/* Removed Analytics SidebarMenuItem */}
+      <SidebarMenuItem
+        key="analytics"  
+        section={analyticsSection}
+        pathname={pathname}
+        expandedSections={expandedSections}
+        toggleSection={toggleSection}
+        isPathActive={isPathActive}
+        isExactPathActive={isExactPathActive}
+      />
       
       <SidebarMenuItem
         key="aitools" 

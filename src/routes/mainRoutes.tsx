@@ -17,6 +17,7 @@ import TicketsPage from '@/pages/support/TicketsPage';
 import CallCenterPage from '@/pages/support/CallCenterPage';
 import InboundCallsPage from '@/pages/support/InboundCallsPage';
 import OutboundCallsPage from '@/pages/support/OutboundCallsPage';
+import AnalyticsDashboard from '@/pages/analytics/AnalyticsDashboard';
 
 const mainRoutes: RouteObject[] = [
   {
@@ -62,6 +63,23 @@ const mainRoutes: RouteObject[] = [
   {
     path: '/settings/integrations',
     element: <SettingsIntegrationsPage />,
+  },
+  // Analytics routes
+  {
+    path: '/analytics',
+    element: <AnalyticsDashboard />,
+  },
+  {
+    path: '/analytics/reports',
+    element: <AnalyticsDashboard />,
+  },
+  {
+    path: '/analytics/performance',
+    element: <AnalyticsDashboard />,
+  },
+  {
+    path: '/analytics/customer-insights',
+    element: <AnalyticsDashboard />,
   },
   // Finance routes are still defined but not shown in the sidebar
 ];
