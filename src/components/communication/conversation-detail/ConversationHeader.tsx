@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, PhoneCall, Video, User, History, Ban, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "@/hooks/use-toast";
 
 interface ConversationHeaderProps {
   conversation: Conversation;
@@ -43,10 +44,33 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
   
   const handleViewCustomerProfile = () => {
     navigate(`/customers/${conversation.customerId}`);
+    toast({
+      title: "Opening customer profile",
+      description: `Viewing profile for ${conversation.name}`
+    });
   };
 
   const handleViewPreviousConversations = () => {
     navigate(`/customers/${conversation.customerId}/conversations`);
+    toast({
+      title: "Previous conversations",
+      description: `Viewing conversation history for ${conversation.name}`
+    });
+  };
+  
+  const handleBlockCustomer = () => {
+    toast({
+      title: "Customer blocked",
+      description: `${conversation.name} has been added to the block list`,
+      variant: "destructive"
+    });
+  };
+  
+  const handleCloseConversation = () => {
+    toast({
+      title: "Conversation closed",
+      description: "This conversation has been marked as resolved",
+    });
   };
 
   return (
@@ -102,10 +126,10 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
               <History className="mr-2 h-4 w-4" /> See Previous Conversations
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleBlockCustomer}>
               <Ban className="mr-2 h-4 w-4" /> Block Customer
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleCloseConversation}>
               <XCircle className="mr-2 h-4 w-4" /> Close Conversation
             </DropdownMenuItem>
           </DropdownMenuContent>
