@@ -8,6 +8,7 @@ import InboundCallsPage from '@/pages/support/InboundCallsPage';
 import OutboundCallsPage from '@/pages/support/OutboundCallsPage';
 import TicketsPage from '@/pages/support/TicketsPage';
 import CustomerSupportPage from '@/pages/support/CustomerSupportPage';
+import EmbedTicketPage from '@/pages/support/EmbedTicketPage';
 
 const supportRoutes: RouteObject[] = [
   {
@@ -41,6 +42,14 @@ const supportRoutes: RouteObject[] = [
   {
     path: '/support/customer',
     element: <CustomerSupportPage />,
+  },
+  {
+    path: '/support/embed',
+    element: <EmbedTicketPage />,
+  },
+  {
+    path: '/support/ticket-form',
+    element: <EmbeddableTicketForm />,
   },
 ];
 

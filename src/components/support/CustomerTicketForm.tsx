@@ -6,23 +6,29 @@ import { SupportTicket } from "@/types/support";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { ChatInterface } from '@/components/chatbot/ChatInterface';
 
 interface CustomerTicketFormProps {
   onSubmitSuccess?: () => void;
+  departmentId?: string;
+  compact?: boolean;
 }
 
 export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({ 
-  onSubmitSuccess 
+  onSubmitSuccess,
+  departmentId,
+  compact = false
 }) => {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
-  const [step, setStep] = useState<'contact' | 'details'>('contact');
+  const [step, setStep] = useState<'contact' | 'details' | 'ai-chat'>('contact');
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
     email: '',
     phone: '',
     company: '',
   });
+  const [showAIChat, setShowAIChat] = useState(false);
   
   const handleCustomerInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -42,10 +48,21 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
       });
       return;
     }
-    setStep('details');
+    
+    // Optionally direct to AI chat first
+    if (showAIChat) {
+      setStep('ai-chat');
+    } else {
+      setStep('details');
+    }
   };
   
   const handleSubmit = (ticketData: Partial<SupportTicket>) => {
+    // Add department if provided in props
+    if (departmentId) {
+      ticketData.department = departmentId;
+    }
+    
     // Here you would typically make an API call to submit the ticket with customer info
     console.log('Customer ticket submitted:', { ...ticketData, customer: customerInfo });
     
@@ -65,11 +82,16 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
   const handleNewTicket = () => {
     setSubmitted(false);
     setStep('contact');
+    setShowAIChat(false);
+  };
+  
+  const handleSwitchToForm = () => {
+    setStep('details');
   };
   
   if (submitted) {
     return (
-      <Card className="max-w-2xl mx-auto">
+      <Card className={compact ? "max-w-md mx-auto" : "max-w-2xl mx-auto"}>
         <CardHeader>
           <CardTitle>Request Submitted</CardTitle>
           <CardDescription>Thank you for contacting support</CardDescription>
@@ -92,7 +114,7 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
   
   if (step === 'contact') {
     return (
-      <div className="max-w-2xl mx-auto">
+      <div className={compact ? "max-w-md mx-auto" : "max-w-2xl mx-auto"}>
         <Card className="mb-4">
           <CardHeader>
             <CardTitle>Contact Support</CardTitle>
@@ -151,9 +173,22 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
                 />
               </div>
               
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="useAI"
+                  checked={showAIChat}
+                  onChange={() => setShowAIChat(!showAIChat)}
+                  className="rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                <label htmlFor="useAI" className="text-sm">
+                  Try AI support first (recommended)
+                </label>
+              </div>
+              
               <div className="flex justify-end">
                 <Button type="submit">
-                  Continue to Support Request
+                  {showAIChat ? "Continue to AI Support" : "Continue to Support Request"}
                 </Button>
               </div>
             </form>
@@ -163,8 +198,60 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
     );
   }
   
+  if (step === 'ai-chat') {
+    return (
+      <div className={compact ? "max-w-md mx-auto" : "max-w-2xl mx-auto"}>
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle>AI Support Assistant</CardTitle>
+            <CardDescription>Our AI can help solve common issues instantly</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="font-medium">{customerInfo.name}</p>
+                <p className="text-sm text-muted-foreground">{customerInfo.email}</p>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setStep('contact')}
+              >
+                Edit Contact Info
+              </Button>
+            </div>
+            
+            <div className="h-[400px]">
+              <ChatInterface 
+                title="Support AI"
+                config={{
+                  initialMessage: `Hello ${customerInfo.name}! I'm your AI support assistant. How can I help you today?`,
+                  modelName: "gpt-4o",
+                  maxTokens: 1000,
+                  temperature: 0.7
+                }}
+                variant="embedded"
+              />
+            </div>
+            
+            <div className="flex justify-between mt-4">
+              <Button variant="outline" onClick={handleSwitchToForm}>
+                Create Support Ticket
+              </Button>
+              <div>
+                <Button>
+                  Book a Meeting
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className={compact ? "max-w-md mx-auto" : "max-w-2xl mx-auto"}>
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>Contact Support</CardTitle>
