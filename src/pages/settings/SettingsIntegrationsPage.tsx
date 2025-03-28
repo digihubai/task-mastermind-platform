@@ -31,6 +31,17 @@ const SettingsIntegrationsPage = () => {
     // This could be expanded to use context or state management
     // to share connection status across components
   };
+  
+  // Track when a messaging platform is connected
+  const handleMessagingConnect = (platformId: string) => {
+    console.log(`Messaging platform connected: ${platformId}`);
+    
+    // If Twilio is connected, we could redirect to the phone numbers page
+    if (platformId === 'twilio') {
+      console.log('Twilio connected - phone number management is available');
+      // This could be expanded to show a notification or change UI state
+    }
+  };
 
   return (
     <AppLayout>
@@ -59,7 +70,7 @@ const SettingsIntegrationsPage = () => {
           </TabsContent>
           
           <TabsContent value="messaging" className="space-y-4">
-            <MessagingIntegrations />
+            <MessagingIntegrations onConnect={handleMessagingConnect} />
           </TabsContent>
           
           <TabsContent value="api" className="space-y-4">
