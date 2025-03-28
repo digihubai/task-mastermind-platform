@@ -72,14 +72,14 @@ const AnalyticsDashboard = () => {
                 <>
                   <MetricsCard
                     title="Total Page Views"
-                    value={summary.totalPageViews}
+                    value={summary.totalPageViews.toString()}
                     change="8.2%"
                     trend="up"
                     icon={<BarChart size={20} />}
                   />
                   <MetricsCard
                     title="Unique Visitors"
-                    value={summary.totalVisitors}
+                    value={summary.totalVisitors.toString()}
                     change="4.1%"
                     trend="up"
                     icon={<LineChart size={20} />}
@@ -93,7 +93,7 @@ const AnalyticsDashboard = () => {
                   />
                   <MetricsCard
                     title="Conversions"
-                    value={summary.totalConversions}
+                    value={summary.totalConversions.toString()}
                     change="12.6%"
                     trend="up"
                     icon={<LineChart size={20} />}
