@@ -38,6 +38,7 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
 }) => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [hexInputValue, setHexInputValue] = useState(chatbotInfo.color);
   
   const handleNavigateToIntegrations = () => {
     navigate('/settings/integrations', { state: { activeTab: 'messaging' } });
@@ -54,6 +55,23 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
       console.log("File selected:", e.target.files[0].name);
       // In a real implementation, you would upload this file to a server
       // and get back a URL to store in chatbotInfo.logo
+    }
+  };
+  
+  const handleHexInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setHexInputValue(value);
+  };
+  
+  const handleHexInputSave = () => {
+    // Validate hex code format
+    const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+    if (hexRegex.test(hexInputValue)) {
+      updateInfo("color", hexInputValue);
+    } else if (hexInputValue.match(/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)) {
+      // If it's missing the # but is otherwise valid
+      updateInfo("color", `#${hexInputValue}`);
+      setHexInputValue(`#${hexInputValue}`);
     }
   };
   
@@ -235,10 +253,35 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
                     </div>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-3">
-                    <HexColorPicker
-                      color={chatbotInfo.color}
-                      onChange={(color) => updateInfo("color", color)}
-                    />
+                    <div className="space-y-3">
+                      <HexColorPicker
+                        color={chatbotInfo.color}
+                        onChange={(color) => {
+                          updateInfo("color", color);
+                          setHexInputValue(color);
+                        }}
+                      />
+                      
+                      <div className="flex mt-2 gap-2">
+                        <Input 
+                          value={hexInputValue}
+                          onChange={handleHexInputChange}
+                          placeholder="#RRGGBB"
+                          className="text-sm"
+                        />
+                        <Button 
+                          size="sm" 
+                          onClick={handleHexInputSave}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                      
+                      <div 
+                        className="w-full h-8 rounded"
+                        style={{ backgroundColor: chatbotInfo.color }}
+                      />
+                    </div>
                   </PopoverContent>
                 </Popover>
               ) : (
@@ -318,6 +361,9 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
       {/* Position Selection */}
       <div>
         <Label>Message Position</Label>
+        <p className="text-sm text-muted-foreground mb-2">
+          Choose where the AI message bubbles will appear. User messages are always on the right.
+        </p>
         <div className="grid grid-cols-2 gap-4 mt-4">
           <div 
             className={`border rounded-lg p-6 flex flex-col items-center justify-between gap-2 cursor-pointer relative ${
@@ -355,6 +401,9 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
             )}
           </div>
         </div>
+        <p className="text-xs text-muted-foreground mt-2">
+          This setting controls where the AI assistant's messages appear in the chat. Left shows AI messages on the left side (traditional style), while Right shows AI messages on the right side with user messages.
+        </p>
       </div>
     </div>
   );

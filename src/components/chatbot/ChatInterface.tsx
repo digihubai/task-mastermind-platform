@@ -156,30 +156,41 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
       
       <div className="chat-messages p-4 h-[calc(100%-110px)] overflow-y-auto flex flex-col gap-3">
-        {messages.map((msg, index) => (
-          <div key={index} className={`message ${msg.isBot ? 'bot' : 'user'} animate-fade-in`}>
-            <div 
-              className={`message-bubble p-3 rounded-lg inline-block max-w-[80%] ${
-                msg.isBot 
-                  ? 'bg-muted text-left ml-0 border border-border/30 shadow-sm' 
-                  : 'text-primary-foreground text-right ml-auto shadow-sm'
-              }`}
-              style={{ backgroundColor: msg.isBot ? undefined : accentColor, 
-                       marginLeft: msg.isBot ? 0 : 'auto',
-                       marginRight: msg.isBot ? 'auto' : 0,
-                     }}
-            >
-              {msg.text}
-            </div>
-            
-            {/* Display timestamp if enabled */}
-            {showDateTime && (
-              <div className={`text-xs text-muted-foreground mt-1 ${msg.isBot ? 'text-left' : 'text-right'}`}>
-                {formatFullDate(msg.timestamp)}
+        {messages.map((msg, index) => {
+          // Determine alignment based on message type AND position setting
+          const isUserMessage = !msg.isBot;
+          
+          // For user messages: always on the right
+          // For bot messages: depends on position setting
+          const shouldAlignRight = isUserMessage || (msg.isBot && position === "right");
+          const shouldAlignLeft = !isUserMessage && position === "left";
+          
+          return (
+            <div key={index} className={`message ${msg.isBot ? 'bot' : 'user'} animate-fade-in`}>
+              <div 
+                className={`message-bubble p-3 rounded-lg inline-block max-w-[80%] ${
+                  shouldAlignRight 
+                    ? 'text-primary-foreground text-right ml-auto shadow-sm' 
+                    : 'bg-muted text-left ml-0 border border-border/30 shadow-sm'
+                }`}
+                style={{ 
+                  backgroundColor: shouldAlignRight ? accentColor : undefined, 
+                  marginLeft: shouldAlignRight ? 'auto' : 0,
+                  marginRight: shouldAlignRight ? 0 : 'auto',
+                }}
+              >
+                {msg.text}
               </div>
-            )}
-          </div>
-        ))}
+              
+              {/* Display timestamp if enabled */}
+              {showDateTime && (
+                <div className={`text-xs text-muted-foreground mt-1 ${shouldAlignRight ? 'text-right' : 'text-left'}`}>
+                  {formatFullDate(msg.timestamp)}
+                </div>
+              )}
+            </div>
+          );
+        })}
         <div ref={messagesEndRef} />
       </div>
       
