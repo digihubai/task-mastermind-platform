@@ -35,72 +35,122 @@ const SEOOutlineStep: React.FC<SEOOutlineStepProps> = ({ seoData, onDataChange, 
       const mockOutlines = [
         `# ${seoData.selectedTitle || "AI Chatbots Guide"}
 ## Introduction to AI Chatbots
-## The Evolution of Conversational AI
-## Benefits of AI-Powered Customer Support
+- What are AI chatbots and how they work
+- Evolution of conversational AI technology
+- Current market landscape
 
-# Key Features of Modern AI Chatbots
-## Natural Language Processing
-## Machine Learning Capabilities
-## Integration Options
+## Key Benefits for Businesses
+- Customer service automation and cost savings
+- 24/7 availability and instant responses
+- Personalized customer experiences
+- Data collection and analytics opportunities
 
-# Implementing AI Chatbots in Your Business
-## Choosing the Right Solution
-## Training Your Chatbot
-## Measuring Success
+## Popular AI Chatbot Platforms
+- Overview of leading solutions
+- Comparison of features and capabilities
+- Pricing models and implementation costs
 
-# Future Trends in AI Conversation
-## Voice-Based Interfaces
-## Multimodal AI
-## Ethical Considerations
+## Implementation Strategies
+- Determining your chatbot needs
+- Integration with existing systems
+- Training your AI chatbot effectively
+- Measuring success and ROI
 
-# Conclusion`,
+## Best Practices for Chatbot Design
+- Conversational design principles
+- Handling edge cases and fallbacks
+- Balancing automation with human support
+
+## Future Trends in Chatbot Technology
+- Advancements in natural language processing
+- Multimodal interaction capabilities
+- Industry-specific applications
+
+## Conclusion`,
         
         `# ${seoData.selectedTitle || "Understanding AI Assistant Technology"}
-## The Rise of Digital Assistants
-## Technical Foundations of AI Dialogue
-## Market Overview
+## The Evolution of Conversational AI
+- Historical development of chatbots
+- Breakthroughs in natural language processing
+- Shift from rule-based to AI-powered systems
 
-# Benefits for Businesses and Users
-## Customer Service Improvements
-## Operational Efficiency
-## User Experience Enhancement
+## Core Components of Modern Chatbots
+- Natural Language Understanding (NLU)
+- Dialog management systems
+- Machine learning and training mechanisms
+- Response generation techniques
 
-# Implementation Strategies
-## Choosing the Right Platform
-## Integration Challenges
-## Best Practices
+## Business Applications Across Industries
+- Retail and e-commerce use cases
+- Financial services implementations
+- Healthcare chatbot applications
+- Travel and hospitality solutions
 
-# Case Studies
-## Retail Applications
-## Healthcare Uses
-## Financial Services
+## Technical Implementation Guide
+- Choosing the right technology stack
+- API integrations and connectors
+- Security and compliance considerations
+- Scaling your chatbot infrastructure
 
-# Conclusion and Future Outlook`,
+## Optimizing User Experience
+- Creating intuitive conversation flows
+- Personality development for chatbots
+- Handling errors and misunderstandings
+- User feedback incorporation
+
+## Measuring Chatbot Performance
+- Key performance indicators
+- Conversation analytics tools
+- A/B testing methodologies
+- Continuous improvement strategies
+
+## Future Outlook and Innovations
+- Emerging technologies in the space
+- Predicted market developments
+- Preparing for the next generation of AI assistants`,
 
         `# ${seoData.selectedTitle || "Complete Guide to Conversational AI"}
-## What is Conversational AI?
-## History and Development Timeline
-## Current State of the Technology
+## Getting Started with AI Chatbots
+- Defining your chatbot strategy
+- Setting realistic goals and expectations
+- Building your initial use cases
+- Resource planning and team requirements
 
-# Core Components and Technologies
-## Machine Learning Models
-## Natural Language Understanding
-## Dialogue Management Systems
+## Technical Foundation
+- Overview of chatbot architectures
+- Language models and their capabilities
+- Intent recognition and entity extraction
+- Knowledge base development
 
-# Business Applications
-## Customer Support Automation
-## Sales and Marketing Uses
-## Internal Enterprise Applications
+## Development and Deployment Process
+- Design and prototyping best practices
+- Development workflows and tools
+- Testing methodologies
+- Deployment and monitoring strategies
 
-# Implementation Guide
-## Planning Your AI Strategy
-## Development and Training
-## Deployment and Optimization
+## Enhancing Capabilities Over Time
+- From basic to advanced conversations
+- Adding multimedia and rich interactions
+- Context awareness and memory features
+- Personality and tone consistency
 
-# Performance Metrics and Analytics
-## Key Success Indicators
-## ROI Measurement
-## Continuous Improvement Methods`
+## Integration with Business Systems
+- CRM integration strategies
+- E-commerce platform connections
+- Help desk and support ticket systems
+- Marketing automation possibilities
+
+## Analytics and Continuous Improvement
+- Understanding conversation data
+- Identifying bottlenecks and issues
+- User satisfaction measurement
+- Iterative refinement process
+
+## Case Studies and Success Stories
+- Real-world implementation examples
+- Challenges overcome
+- Measurable business results
+- Lessons learned`
       ];
       setGeneratedOutlines(mockOutlines);
       if (!selectedOutline && mockOutlines.length > 0) {
