@@ -55,6 +55,15 @@ const ConversationFilter: React.FC<ConversationFilterProps> = ({
           </Button>
         </div>
       </div>
+      
+      {/* Channel tabs - uncommenting if needed */}
+      {/* <Tabs value={activeTab} onValueChange={onTabChange}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="email">Email</TabsTrigger>
+          <TabsTrigger value="chat">Chat</TabsTrigger>
+        </TabsList>
+      </Tabs> */}
     </div>
   );
 };

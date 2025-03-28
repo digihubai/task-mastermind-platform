@@ -2,21 +2,22 @@
 import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import OmnichannelInbox from '@/components/communication/OmnichannelInbox';
-import SupportStats from '@/components/support/SupportStats';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { PlusCircle, Settings, Users, UserCog } from "lucide-react";
-import { useNavigate } from 'react-router-dom';
-import { TicketList } from '@/components/support/TicketList';
-import { SupportTicket } from '@/types/support';
 import { toast } from "@/hooks/use-toast";
 import AIAssistantSettings from '@/components/support/AIAssistantSettings';
 import { mockConversations } from '@/components/communication/mock-data';
 import { Conversation } from '@/types/omnichannel';
-import { Badge } from "@/components/ui/badge";
-import IntegrationStatus from '@/components/communication/IntegrationStatus';
+import { SupportTicket } from '@/types/support';
+import { useNavigate } from 'react-router-dom';
 
+// Import our new components
+import OmnichannelHeader from '@/components/support/omnichannel/OmnichannelHeader';
+import OmnichannelDashboard from '@/components/support/omnichannel/OmnichannelDashboard';
+import OmnichannelInboxTab from '@/components/support/omnichannel/OmnichannelInboxTab';
+import HumanAssignmentsTab from '@/components/support/omnichannel/HumanAssignmentsTab';
+import RecentTicketsTab from '@/components/support/omnichannel/RecentTicketsTab';
+import AnalyticsTab from '@/components/support/omnichannel/AnalyticsTab';
+
+// Mock ticket data
 const mockTickets: SupportTicket[] = [
   {
     id: "ticket-003",
@@ -140,37 +141,16 @@ const OmnichannelSupportPage: React.FC = () => {
   return (
     <AppLayout showModuleName moduleName="Omnichannel Support">
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-semibold">Omnichannel Support</h1>
-          
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setShowSettings(!showSettings)}>
-              <Settings className="mr-2 h-4 w-4" />
-              AI Settings
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/support/tickets')}>
-              <Users className="mr-2 h-4 w-4" />
-              All Tickets
-            </Button>
-            <Button onClick={handleNewTicket}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              New Ticket
-            </Button>
-          </div>
-        </div>
+        <OmnichannelHeader 
+          onSettingsClick={() => setShowSettings(!showSettings)} 
+          onNewTicket={handleNewTicket}
+        />
         
         {showSettings ? (
           <AIAssistantSettings onClose={() => setShowSettings(false)} />
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="md:col-span-3">
-                <SupportStats />
-              </div>
-              <div className="md:col-span-1">
-                <IntegrationStatus />
-              </div>
-            </div>
+            <OmnichannelDashboard />
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
               <div className="border-b">
@@ -190,142 +170,22 @@ const OmnichannelSupportPage: React.FC = () => {
               </div>
               
               <TabsContent value="inbox" className="mt-6 h-[calc(100vh-26rem)]">
-                <OmnichannelInbox onAssignToHuman={handleAssignToHuman} />
+                <OmnichannelInboxTab onAssignToHuman={handleAssignToHuman} />
               </TabsContent>
               
               <TabsContent value="human-inbox" className="mt-6 h-[calc(100vh-26rem)]">
-                <Card className="h-full">
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <UserCog className="h-5 w-5 mr-2" />
-                      Human Agent Assignments
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {humanAssignedConversations.length > 0 ? (
-                      <div className="space-y-4">
-                        {humanAssignedConversations.map(conv => (
-                          <Card key={conv.id} className={`p-4 border-l-4 ${
-                            conv.assignmentStatus === 'assigned_to_human' 
-                              ? 'border-l-green-500' 
-                              : 'border-l-amber-500'
-                          }`}>
-                            <div className="flex justify-between items-start">
-                              <div className="space-y-2">
-                                <div>
-                                  <h3 className="font-medium flex items-center gap-2">
-                                    {conv.name}
-                                    <Badge variant="outline" className="text-xs">
-                                      {conv.channel}
-                                    </Badge>
-                                  </h3>
-                                  <p className="text-sm text-muted-foreground">{conv.message}</p>
-                                </div>
-                                
-                                <div className="flex flex-wrap gap-2 items-center">
-                                  {conv.assignmentStatus === 'waiting_for_human' ? (
-                                    <Badge variant="outline" className="text-xs bg-amber-50 text-amber-800">
-                                      Waiting for human
-                                    </Badge>
-                                  ) : (
-                                    <Badge variant="outline" className="text-xs bg-green-50 text-green-800">
-                                      Assigned to {conv.assignedHumanAgent || 'human'}
-                                    </Badge>
-                                  )}
-                                  
-                                  {conv.assignedHumanAgent && (
-                                    <span className="text-xs bg-slate-100 px-2 py-1 rounded-md">
-                                      Agent: <span className="font-medium">{conv.assignedHumanAgent}</span>
-                                    </span>
-                                  )}
-                                  
-                                  {conv.assignedToHumanAt && (
-                                    <span className="text-xs text-slate-500">
-                                      Assigned {new Date(conv.assignedToHumanAt).toLocaleTimeString()}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              <div>
-                                <Button 
-                                  size="sm" 
-                                  onClick={() => handleTakeOverConversation(conv.id)}
-                                  disabled={conv.assignmentStatus === 'assigned_to_human' && conv.assignedHumanAgent === 'Current User'}
-                                >
-                                  {conv.assignmentStatus === 'assigned_to_human' && conv.assignedHumanAgent === 'Current User'
-                                    ? 'Currently Handling'
-                                    : 'Take Over'}
-                                </Button>
-                              </div>
-                            </div>
-                          </Card>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <UserCog className="h-10 w-10 mx-auto mb-3 opacity-20" />
-                        <p>No conversations currently assigned to human agents</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                <HumanAssignmentsTab 
+                  conversations={humanAssignedConversations} 
+                  onTakeOverConversation={handleTakeOverConversation}
+                />
               </TabsContent>
               
               <TabsContent value="tickets" className="mt-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>Recent Tickets</CardTitle>
-                    <Button variant="outline" size="sm" onClick={() => navigate('/support/tickets')}>
-                      View all tickets
-                    </Button>
-                  </CardHeader>
-                  <CardContent>
-                    <TicketList 
-                      tickets={mockTickets} 
-                      onViewTicket={handleViewTicket}
-                    />
-                  </CardContent>
-                </Card>
+                <RecentTicketsTab tickets={mockTickets} onViewTicket={handleViewTicket} />
               </TabsContent>
               
               <TabsContent value="analytics" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Support Analytics</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <Card>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-sm font-medium">Total Conversations</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-2xl font-bold">245</div>
-                          <p className="text-xs text-muted-foreground">+12% from last month</p>
-                        </CardContent>
-                      </Card>
-                      <Card>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-sm font-medium">Average Response Time</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-2xl font-bold">4.3 min</div>
-                          <p className="text-xs text-muted-foreground">-8% from last month</p>
-                        </CardContent>
-                      </Card>
-                      <Card>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-sm font-medium">Customer Satisfaction</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-2xl font-bold">92%</div>
-                          <p className="text-xs text-muted-foreground">+3% from last month</p>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </CardContent>
-                </Card>
+                <AnalyticsTab />
               </TabsContent>
             </Tabs>
           </>
