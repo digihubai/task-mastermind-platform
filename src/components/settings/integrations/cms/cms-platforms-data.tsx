@@ -120,5 +120,33 @@ export const cmsPlatforms: CMSPlatform[] = [
     backgroundColor: "bg-blue-100",
     textColor: "text-blue-600",
     type: 'ecommerce'
+  },
+  // New CMS Platforms
+  {
+    id: "drupal",
+    name: "Drupal",
+    description: "Connect your Drupal site",
+    icon: <Globe className="h-5 w-5 text-blue-700" />,
+    backgroundColor: "bg-blue-100",
+    textColor: "text-blue-700",
+    type: 'cms'
+  },
+  {
+    id: "ghost",
+    name: "Ghost CMS",
+    description: "Connect your Ghost blog",
+    icon: <FileText className="h-5 w-5 text-gray-700" />,
+    backgroundColor: "bg-gray-100",
+    textColor: "text-gray-700",
+    type: 'cms'
+  },
+  {
+    id: "contentful",
+    name: "Contentful",
+    description: "Connect your Contentful workspace",
+    icon: <FileText className="h-5 w-5 text-cyan-600" />,
+    backgroundColor: "bg-cyan-100",
+    textColor: "text-cyan-600",
+    type: 'cms'
   }
 ];
