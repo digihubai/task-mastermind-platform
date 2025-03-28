@@ -24,7 +24,8 @@ const ChatbotPage = () => {
     color: "#2196F3",
     avatar: "avatar1",
     footerLink: "https://digihub.ai",
-    personality: "ai-assistant"
+    personality: "ai-assistant",
+    logo: "" // Add logo field to store uploaded logo URL
   });
   
   const activeChatbots = [
