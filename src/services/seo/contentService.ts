@@ -108,10 +108,15 @@ In today's digital landscape, ${formattedTopic} has become increasingly importan
 
 `;
 
+  // Add image after introduction if available
+  if (images && images.length > 0) {
+    content += `\n![${formattedTopic} image](${images[0]})\n\n`;
+  }
+
   // Add outline content if available
   if (outline && outline.sections) {
     content += Object.entries(outline.sections).map(([key, section]: [string, any]) => {
-      return `## ${section.title}
+      let sectionContent = `## ${section.title}
 
 ${section.content || `This section explores the critical aspects of ${section.title} and how it relates to ${formattedTopic}. By understanding these principles, you can develop more effective strategies for your business.`}
 
@@ -121,6 +126,16 @@ ${section.subsections ? section.subsections.map((subsection: any) => {
 ${subsection.content || `${subsection.title} is a crucial component of ${formattedTopic} strategy that can significantly impact your results. Companies that excel in this area typically see higher engagement rates and better ROI.`}
 `;
 }).join('\n') : ''}`;
+
+      // Add an image to a random section if available
+      if (images && images.length > 1 && Math.random() > 0.5) {
+        const imageIndex = Math.floor(Math.random() * (images.length - 1)) + 1;
+        if (images[imageIndex]) {
+          sectionContent += `\n![${section.title} visualization](${images[imageIndex]})\n\n`;
+        }
+      }
+
+      return sectionContent;
     }).join('\n\n');
   }
 

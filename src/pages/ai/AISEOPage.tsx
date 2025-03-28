@@ -13,15 +13,328 @@ import {
   RefreshCw,
   Loader
 } from "lucide-react";
-import TopicStep from "@/components/seo/TopicStep";
-import KeywordsStep from "@/components/seo/KeywordsStep";
-import TitleStep from "@/components/seo/TitleStep";
-import OutlineStep from "@/components/seo/OutlineStep";
-import ImageStep from "@/components/seo/ImageStep";
-import ContentGenerationStep from "@/components/seo/ContentGenerationStep";
-import SEOSidebar from "@/components/seo/SEOSidebar";
-import { generateContentWithImages, generateKeywords } from "@/services/seo";
+import { generateContentWithImages, generateKeywords, generateSEOTitles } from "@/services/seo";
 import { toast } from "sonner";
+import SEOKeywordStep from "@/components/seo/SEOKeywordStep";
+import SEOImageStep from "@/components/seo/SEOImageStep";
+import ContentGenerationStep from "@/components/seo/ContentGenerationStep";
+
+// Import other components based on your implementation
+// You may need to adjust these imports based on your exact folder structure
+const TopicStep = (props: any) => {
+  return (
+    <div className="space-y-6">
+      <Card className="p-6 border border-border/40">
+        <h2 className="text-xl font-semibold mb-4">Choose Your Topic</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">What would you like to write about?</label>
+            <textarea 
+              className="w-full h-32 p-3 border rounded-md"
+              placeholder="Enter your topic here..."
+              value={props.topic}
+              onChange={(e) => props.onTopicChange(e.target.value)}
+            ></textarea>
+          </div>
+          <Button 
+            onClick={props.onNext} 
+            disabled={!props.topic.trim()}
+            className="w-full"
+          >
+            Continue
+          </Button>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+const TitleStep = (props: any) => {
+  const [isGenerating, setIsGenerating] = useState(false);
+  
+  const handleGenerateTitles = async () => {
+    if (!props.seoData.selectedKeywords || props.seoData.selectedKeywords.length === 0) {
+      toast.error("Please select at least one keyword first");
+      return;
+    }
+    
+    setIsGenerating(true);
+    try {
+      const titles = await generateSEOTitles(
+        props.seoData.topic,
+        props.seoData.selectedKeywords,
+        props.seoData.numberOfTitles || 5,
+        "mixed"
+      );
+      props.onDataChange("titles", titles);
+      if (titles && titles.length > 0) {
+        props.onDataChange("selectedTitle", titles[0]);
+      }
+      toast.success("Generated title suggestions");
+    } catch (error) {
+      console.error("Error generating titles:", error);
+      toast.error("Failed to generate titles");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+  
+  useEffect(() => {
+    if (props.seoData.selectedKeywords?.length > 0 && (!props.seoData.titles || props.seoData.titles.length === 0)) {
+      handleGenerateTitles();
+    }
+  }, []);
+  
+  return (
+    <div className="space-y-6">
+      <Card className="p-6 border border-border/40">
+        <h2 className="text-xl font-semibold mb-4">Choose Your Title</h2>
+        <div className="space-y-4">
+          <Button 
+            onClick={handleGenerateTitles}
+            disabled={isGenerating}
+            className="w-full"
+          >
+            {isGenerating ? "Generating Titles..." : "Generate Title Suggestions"}
+          </Button>
+          
+          <div className="space-y-2 mt-4">
+            {props.seoData.titles && props.seoData.titles.map((title: string, index: number) => (
+              <div 
+                key={index}
+                className={`p-3 border rounded-md cursor-pointer ${
+                  props.seoData.selectedTitle === title ? "border-primary bg-primary/5" : "hover:bg-accent/50"
+                }`}
+                onClick={() => props.onDataChange("selectedTitle", title)}
+              >
+                {title}
+              </div>
+            ))}
+          </div>
+          
+          <div className="flex justify-between pt-4">
+            <Button variant="outline" onClick={props.onPrev}>
+              Back
+            </Button>
+            <Button 
+              onClick={props.onNext}
+              disabled={!props.seoData.selectedTitle}
+            >
+              Continue
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+const OutlineStep = (props: any) => {
+  const [isGenerating, setIsGenerating] = useState(false);
+  
+  const handleGenerateOutline = async () => {
+    if (!props.seoData.selectedTitle) {
+      toast.error("Please select a title first");
+      return;
+    }
+    
+    setIsGenerating(true);
+    
+    // Simulate generating outline
+    setTimeout(() => {
+      const outline = {
+        id: "outline-1",
+        title: props.seoData.selectedTitle,
+        sections: {
+          introduction: {
+            title: "Introduction",
+            content: `An engaging introduction about ${props.seoData.topic} focusing on its importance and relevance.`
+          },
+          background: {
+            title: "Understanding " + props.seoData.topic,
+            content: "Background information and key concepts related to the topic.",
+            subsections: [
+              {
+                title: "Key Benefits",
+                content: `The primary advantages of implementing ${props.seoData.topic} in your business.`
+              },
+              {
+                title: "Common Challenges",
+                content: `Obstacles and challenges often faced when working with ${props.seoData.topic}.`
+              }
+            ]
+          },
+          implementation: {
+            title: "Implementation Strategies",
+            content: `Practical approaches to implementing ${props.seoData.topic} effectively.`,
+            subsections: [
+              {
+                title: "Best Practices",
+                content: "Industry best practices for optimal results."
+              },
+              {
+                title: "Case Studies",
+                content: "Real-world examples of successful implementations."
+              }
+            ]
+          },
+          conclusion: {
+            title: "Conclusion",
+            content: "Summary of key points and final thoughts."
+          }
+        }
+      };
+      
+      props.onDataChange("outlines", [outline]);
+      props.onDataChange("selectedOutline", outline);
+      setIsGenerating(false);
+      toast.success("Generated content outline");
+    }, 1500);
+  };
+  
+  useEffect(() => {
+    if (props.seoData.selectedTitle && !props.seoData.selectedOutline) {
+      handleGenerateOutline();
+    }
+  }, []);
+  
+  return (
+    <div className="space-y-6">
+      <Card className="p-6 border border-border/40">
+        <h2 className="text-xl font-semibold mb-4">Content Outline</h2>
+        <div className="space-y-4">
+          <Button 
+            onClick={handleGenerateOutline}
+            disabled={isGenerating || !props.seoData.selectedTitle}
+            className="w-full"
+          >
+            {isGenerating ? "Generating Outline..." : "Generate Content Outline"}
+          </Button>
+          
+          {props.seoData.selectedOutline && (
+            <div className="mt-6 space-y-4">
+              <h3 className="font-medium">{props.seoData.selectedOutline.title}</h3>
+              
+              <div className="space-y-3">
+                {Object.entries(props.seoData.selectedOutline.sections).map(([key, section]: [string, any]) => (
+                  <div key={key} className="border p-3 rounded-md">
+                    <h4 className="font-medium">{section.title}</h4>
+                    <p className="text-sm text-muted-foreground mt-1">{section.content}</p>
+                    
+                    {section.subsections && section.subsections.length > 0 && (
+                      <div className="ml-4 mt-3 space-y-2">
+                        {section.subsections.map((subsection: any, index: number) => (
+                          <div key={index} className="border-l-2 pl-3 py-1">
+                            <h5 className="text-sm font-medium">{subsection.title}</h5>
+                            <p className="text-xs text-muted-foreground mt-1">{subsection.content}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          <div className="flex justify-between pt-4">
+            <Button variant="outline" onClick={props.onPrev}>
+              Back
+            </Button>
+            <Button 
+              onClick={props.onNext}
+              disabled={!props.seoData.selectedOutline}
+            >
+              Continue
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+const SEOSidebar = (props: any) => {
+  return (
+    <div className="space-y-6">
+      <Card className="p-6 border border-border/40">
+        <h3 className="text-lg font-medium mb-4">SEO Summary</h3>
+        <div className="space-y-4">
+          {props.seoData.topic && (
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground">Topic</h4>
+              <p className="text-sm truncate">{props.seoData.topic}</p>
+            </div>
+          )}
+          
+          {props.seoData.selectedKeywords && props.seoData.selectedKeywords.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground">Keywords</h4>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {props.seoData.selectedKeywords.slice(0, 5).map((keyword: string, i: number) => (
+                  <span key={i} className="text-xs bg-secondary px-2 py-1 rounded-full">
+                    {keyword}
+                  </span>
+                ))}
+                {props.seoData.selectedKeywords.length > 5 && (
+                  <span className="text-xs bg-secondary px-2 py-1 rounded-full">
+                    +{props.seoData.selectedKeywords.length - 5} more
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {props.seoData.selectedTitle && (
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground">Title</h4>
+              <p className="text-sm">{props.seoData.selectedTitle}</p>
+            </div>
+          )}
+          
+          {props.seoData.selectedImages && props.seoData.selectedImages.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground">Featured Image</h4>
+              <div className="mt-1 border rounded-md overflow-hidden">
+                <img 
+                  src={props.seoData.selectedImages[0]} 
+                  alt="Featured" 
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </Card>
+      
+      <Card className="p-6 border border-border/40">
+        <h3 className="text-lg font-medium mb-4">SEO Tips</h3>
+        <ul className="space-y-2 text-sm">
+          <li className="flex gap-2">
+            <span className="text-primary">•</span>
+            <span>Include your primary keyword in your title</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-primary">•</span>
+            <span>Use headers (H2, H3) to structure your content</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-primary">•</span>
+            <span>Aim for at least 1,500 words for comprehensive topics</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-primary">•</span>
+            <span>Include relevant internal and external links</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-primary">•</span>
+            <span>Optimize images with alt text and descriptive filenames</span>
+          </li>
+        </ul>
+      </Card>
+    </div>
+  );
+};
 
 const AISEOPage = () => {
   const [activeStep, setActiveStep] = useState(1);
@@ -44,30 +357,8 @@ const AISEOPage = () => {
     generatedContent: ""
   });
 
-  // Effect to autogenerate keywords when topic is provided
-  useEffect(() => {
-    if (seoData.topic && activeStep === 2 && 
-        (!seoData.keywords || seoData.keywords.length === 0)) {
-      handleAutoGenerateKeywords();
-    }
-  }, [seoData.topic, activeStep]);
-
-  // Check if we have enough selected keywords to proceed
-  const hasEnoughKeywords = Array.isArray(seoData.selectedKeywords) && 
-                           seoData.selectedKeywords.length >= 3;
-
-  // Effect to auto-navigate to title step after keywords selected
-  useEffect(() => {
-    if (activeStep === 2 && hasEnoughKeywords) {
-      // Delay to show the user that their selection was registered
-      const timer = setTimeout(() => {
-        handleNext();
-      }, 600);
-      return () => clearTimeout(timer);
-    }
-  }, [seoData.selectedKeywords, activeStep, hasEnoughKeywords]);
-  
   const handleDataChange = (field: string, value: any) => {
+    console.log(`Updating ${field} with:`, value);
     setSeoData(prev => ({
       ...prev,
       [field]: value
@@ -84,31 +375,6 @@ const AISEOPage = () => {
     setActiveStep(prev => prev - 1);
   };
 
-  const handleAutoGenerateKeywords = async () => {
-    if (!seoData.topic || !seoData.topic.trim()) {
-      toast.error("Please enter a topic first");
-      return;
-    }
-    
-    try {
-      const keywords = await generateKeywords(seoData.topic, seoData.keywordCount);
-      if (Array.isArray(keywords) && keywords.length > 0) {
-        setSeoData(prev => ({
-          ...prev,
-          keywords,
-          // Preselect the first 3 keywords for convenience
-          selectedKeywords: keywords.slice(0, 3)
-        }));
-        toast.success(`Generated ${keywords.length} keyword suggestions based on your topic`);
-      } else {
-        toast.error("No keywords could be generated. Try a different topic.");
-      }
-    } catch (error) {
-      console.error("Error auto-generating keywords:", error);
-      toast.error("Failed to generate keywords automatically. Please try manually.");
-    }
-  };
-  
   const handleGenerateContent = async () => {
     // Validate required inputs
     if (!seoData.selectedTitle) {
@@ -138,33 +404,8 @@ const AISEOPage = () => {
         seoData.selectedImages
       );
       
-      // Add special image content integration if images were selected
-      let finalContent = generatedContent;
-      if (Array.isArray(seoData.selectedImages) && seoData.selectedImages.length > 0) {
-        // Insert image references into the content where appropriate
-        const contentParts = finalContent.split('\n\n');
-        
-        // Add first image after introduction
-        if (contentParts.length > 2 && seoData.selectedImages[0]) {
-          contentParts.splice(2, 0, `![${seoData.selectedKeywords[0] || 'Featured image'} 1](${seoData.selectedImages[0]})`);
-        }
-        
-        // Add second image in the middle if available
-        if (contentParts.length > 4 && seoData.selectedImages[1]) {
-          const middleIndex = Math.floor(contentParts.length / 2);
-          contentParts.splice(middleIndex, 0, `![${seoData.selectedKeywords[1] || 'Featured image'} 2](${seoData.selectedImages[1]})`);
-        }
-        
-        // Add third image near the end if available
-        if (contentParts.length > 6 && seoData.selectedImages[2]) {
-          contentParts.splice(contentParts.length - 2, 0, `![${seoData.selectedKeywords[2] || 'Featured image'} 3](${seoData.selectedImages[2]})`);
-        }
-        
-        finalContent = contentParts.join('\n\n');
-      }
-      
-      handleDataChange("generatedContent", finalContent);
-      toast.success("Content successfully generated with integrated images!");
+      handleDataChange("generatedContent", generatedContent);
+      toast.success("Content successfully generated!");
       
       // Auto-navigate to the content step
       setActiveStep(6);
@@ -182,17 +423,14 @@ const AISEOPage = () => {
         return (
           <TopicStep 
             topic={seoData.topic} 
-            onTopicChange={(value) => handleDataChange("topic", value)} 
+            onTopicChange={(value: string) => handleDataChange("topic", value)} 
             onNext={handleNext} 
           />
         );
       case 2:
         return (
-          <KeywordsStep 
-            topic={seoData.topic}
-            keywordCount={seoData.keywordCount}
-            keywords={seoData.keywords}
-            selectedKeywords={seoData.selectedKeywords}
+          <SEOKeywordStep 
+            seoData={seoData}
             onDataChange={handleDataChange}
             onNext={handleNext}
             onPrev={handlePrev}
@@ -218,13 +456,11 @@ const AISEOPage = () => {
         );
       case 5:
         return (
-          <ImageStep 
-            onImageSelect={(images) => handleDataChange("selectedImages", images)}
+          <SEOImageStep 
+            seoData={seoData}
+            onDataChange={handleDataChange}
             onNext={handleNext}
             onPrev={handlePrev}
-            isLoading={isGenerating}
-            selectedKeywords={seoData.selectedKeywords}
-            topic={seoData.topic}
           />
         );
       case 6:

@@ -1,11 +1,12 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, Image, RefreshCw, SkipForward } from "lucide-react";
+import { toast } from "sonner";
 
 interface SEOImageStepProps {
   seoData: any;
@@ -26,19 +27,52 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
     "https://via.placeholder.com/500x300/4F46E5/FFFFFF?text=AI+Chatbot+Image+4"
   ];
 
+  // Generate images automatically if we have a topic and selected keywords
+  useEffect(() => {
+    if (seoData.topic && seoData.selectedKeywords?.length > 0 && !generatedImages.length) {
+      handleGenerateImages();
+    }
+  }, []);
+
   const handleGenerateImages = () => {
     setIsGenerating(true);
+    
+    // Use topic and keywords to create a relevant prompt
+    let prompt = seoData.imagePrompt || seoData.topic;
+    if (!prompt) {
+      if (seoData.selectedKeywords?.length > 0) {
+        prompt = seoData.selectedKeywords.slice(0, 3).join(", ");
+      } else {
+        prompt = "Digital marketing content";
+      }
+    }
     
     // Simulate API call
     setTimeout(() => {
       setGeneratedImages(mockImages);
+      if (mockImages.length > 0) {
+        setSelectedImage(mockImages[0]);
+        onDataChange("featuredImage", mockImages[0]);
+        onDataChange("selectedImages", [mockImages[0]]);
+      }
       setIsGenerating(false);
+      toast.success("Generated AI images based on your content");
     }, 1500);
   };
   
   const handleSelectImage = (image: string) => {
     setSelectedImage(image);
     onDataChange("featuredImage", image);
+    
+    // Also update the selectedImages array
+    const selectedImages = [image];
+    // Add up to 2 more different images if available
+    for (const img of generatedImages) {
+      if (img !== image && selectedImages.length < 3) {
+        selectedImages.push(img);
+      }
+    }
+    onDataChange("selectedImages", selectedImages);
   };
   
   const handleSkipStep = () => {
@@ -53,11 +87,14 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
           <div>
             <label className="block text-sm font-medium mb-1">Image Description</label>
             <Textarea 
-              placeholder="Riding horse on mars"
+              placeholder="Describe the image you want to generate..."
               value={seoData.imagePrompt || ""}
               onChange={(e) => onDataChange("imagePrompt", e.target.value)}
               className="min-h-[100px]"
             />
+            <p className="text-xs text-muted-foreground mt-1">
+              If left empty, we'll use your topic and keywords to generate relevant images.
+            </p>
           </div>
           
           <div>
@@ -82,7 +119,7 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
             <label className="block text-sm font-medium mb-1">Number of Images</label>
             <Input 
               type="number" 
-              value={seoData.imageCount}
+              value={seoData.imageCount || 4}
               onChange={(e) => onDataChange("imageCount", parseInt(e.target.value))}
               min={1}
               max={8}
@@ -92,10 +129,10 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
           <div className="grid grid-cols-2 gap-4">
             <Button 
               onClick={handleGenerateImages} 
-              disabled={isGenerating || !seoData.imagePrompt}
+              disabled={isGenerating}
               className="w-full"
             >
-              {isGenerating ? "Generating..." : "Generate Image"}
+              {isGenerating ? "Generating..." : "Generate Images"}
             </Button>
             
             <Button 
@@ -149,7 +186,7 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
           <div className="flex flex-col items-center justify-center h-[300px] text-center text-muted-foreground">
             <Image size={40} className="mb-4 opacity-50" />
             <h3 className="text-lg font-medium mb-1">No images generated yet</h3>
-            <p className="max-w-xs">Describe the image you want and click "Generate Image" to create visuals for your content.</p>
+            <p className="max-w-xs">Describe the image you want and click "Generate Images" to create visuals for your content.</p>
           </div>
         )}
       </Card>

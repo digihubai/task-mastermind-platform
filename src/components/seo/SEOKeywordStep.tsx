@@ -1,11 +1,13 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronRight, Search, Info } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { generateKeywords } from "@/services/seo";
+import { toast } from "sonner";
 
 interface SEOKeywordStepProps {
   seoData: any;
@@ -17,25 +19,35 @@ interface SEOKeywordStepProps {
 const SEOKeywordStep: React.FC<SEOKeywordStepProps> = ({ seoData, onDataChange, onNext, onPrev }) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleGenerateKeywords = () => {
+  // Auto-generate keywords when component loads if none exist
+  useEffect(() => {
+    if (seoData.topic && (!seoData.keywords || seoData.keywords.length === 0)) {
+      handleGenerateKeywords();
+    }
+  }, []);
+
+  const handleGenerateKeywords = async () => {
     if (!seoData.topic.trim()) {
+      toast.error("Please enter a topic first");
       return;
     }
     
     setIsGenerating(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      const mockKeywords = ["assistant", "dialogue", "interface", "response", "automation", 
-                          "conversation", "intelligence", "technology", "support", "queries", 
-                          "chatbot", "ai", "language"];
-      onDataChange("keywords", mockKeywords);
+    try {
+      const keywords = await generateKeywords(seoData.topic, seoData.keywordCount || 10);
+      onDataChange("keywords", keywords);
+      toast.success(`Generated ${keywords.length} keyword suggestions`);
+    } catch (error) {
+      console.error("Error generating keywords:", error);
+      toast.error("Failed to generate keywords. Please try again.");
+    } finally {
       setIsGenerating(false);
-    }, 1500);
+    }
   };
   
   const handleKeywordSelect = (keyword: string) => {
-    const selectedKeywords = [...seoData.selectedKeywords];
+    const selectedKeywords = [...(seoData.selectedKeywords || [])];
     if (selectedKeywords.includes(keyword)) {
       onDataChange("selectedKeywords", selectedKeywords.filter(k => k !== keyword));
     } else {
@@ -52,7 +64,7 @@ const SEOKeywordStep: React.FC<SEOKeywordStepProps> = ({ seoData, onDataChange, 
             <label className="block text-sm font-medium mb-1">What is this article about?</label>
             <Textarea 
               placeholder="Describe your article topic in detail..."
-              value={seoData.topic}
+              value={seoData.topic || ""}
               onChange={(e) => onDataChange("topic", e.target.value)}
               className="min-h-[120px]"
             />
@@ -62,7 +74,7 @@ const SEOKeywordStep: React.FC<SEOKeywordStepProps> = ({ seoData, onDataChange, 
             <label className="block text-sm font-medium mb-1">Number of Keywords</label>
             <Input 
               type="number" 
-              value={seoData.keywordCount}
+              value={seoData.keywordCount || 10}
               onChange={(e) => onDataChange("keywordCount", parseInt(e.target.value))}
               min={5}
               max={20}
@@ -71,7 +83,7 @@ const SEOKeywordStep: React.FC<SEOKeywordStepProps> = ({ seoData, onDataChange, 
           
           <Button 
             onClick={handleGenerateKeywords} 
-            disabled={!seoData.topic.trim() || isGenerating}
+            disabled={!seoData.topic?.trim() || isGenerating}
             className="w-full"
           >
             {isGenerating ? "Generating Keywords..." : "Generate Keywords"}
@@ -110,7 +122,7 @@ const SEOKeywordStep: React.FC<SEOKeywordStepProps> = ({ seoData, onDataChange, 
       <Card className="p-6 border border-border/40">
         <h2 className="text-xl font-semibold mb-4">2. Select Keywords</h2>
         
-        {seoData.keywords.length > 0 ? (
+        {Array.isArray(seoData.keywords) && seoData.keywords.length > 0 ? (
           <>
             <p className="text-sm text-muted-foreground mb-4">
               Select relevant keywords for your content. Selected keywords will receive more emphasis.
@@ -121,7 +133,7 @@ const SEOKeywordStep: React.FC<SEOKeywordStepProps> = ({ seoData, onDataChange, 
                 <button
                   key={index}
                   className={`px-3 py-1.5 rounded-full text-sm ${
-                    seoData.selectedKeywords.includes(keyword)
+                    (seoData.selectedKeywords || []).includes(keyword)
                     ? "bg-primary text-white"
                     : "bg-secondary hover:bg-secondary/80"
                   }`}
@@ -135,7 +147,7 @@ const SEOKeywordStep: React.FC<SEOKeywordStepProps> = ({ seoData, onDataChange, 
             <div className="mt-auto pt-4">
               <Button 
                 onClick={onNext} 
-                disabled={seoData.selectedKeywords.length === 0}
+                disabled={(seoData.selectedKeywords || []).length === 0}
                 className="w-full flex justify-between items-center"
               >
                 <span>Continue to Title</span>
