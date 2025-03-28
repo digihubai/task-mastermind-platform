@@ -17,19 +17,21 @@ export const NewTicketSection: React.FC<NewTicketSectionProps> = ({
   onCreateTicket
 }) => {
   return (
-    <div className="flex justify-between items-center">
-      <h1 className="text-3xl font-semibold">Support Tickets</h1>
-      <Button onClick={() => setShowNewTicketForm(true)}>
-        <PlusCircle className="mr-2 h-4 w-4" />
-        Create Internal Ticket
-      </Button>
-      
-      {showNewTicketForm && (
+    <>
+      {showNewTicketForm ? (
         <NewTicketForm 
           onSubmit={onCreateTicket} 
           onCancel={() => setShowNewTicketForm(false)} 
         />
+      ) : (
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-semibold">Support Tickets</h1>
+          <Button onClick={() => setShowNewTicketForm(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create Internal Ticket
+          </Button>
+        </div>
       )}
-    </div>
+    </>
   );
 };

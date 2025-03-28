@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
+import { Search, Filter, ArrowDown, ArrowUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Filter, ArrowUp, ArrowDown, Search } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -25,13 +25,13 @@ interface TicketFiltersProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   priorityFilter: string | null;
-  setPriorityFilter: (priority: string | null) => void;
+  setPriorityFilter: (filter: string | null) => void;
   categoryFilter: string | null;
-  setCategoryFilter: (category: string | null) => void;
+  setCategoryFilter: (filter: string | null) => void;
   departmentFilter: string | null;
-  setDepartmentFilter: (department: string | null) => void;
+  setDepartmentFilter: (filter: string | null) => void;
   agentFilter: string | null;
-  setAgentFilter: (agent: string | null) => void;
+  setAgentFilter: (filter: string | null) => void;
   sortField: string;
   setSortField: (field: string) => void;
   sortOrder: 'asc' | 'desc';
@@ -42,7 +42,8 @@ interface TicketFiltersProps {
   categories: string[];
   departments: string[];
   priorities: string[];
-  assignedAgents: Array<{ id: string; name: string }>;
+  assignedAgents: Array<{ id: string, name: string }>;
+  toggleSortOrder?: (field: string) => void;
 }
 
 export const TicketFilters: React.FC<TicketFiltersProps> = ({
@@ -57,34 +58,25 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
   agentFilter,
   setAgentFilter,
   sortField,
-  setSortField,
   sortOrder,
-  setSortOrder,
   showFilters,
   setShowFilters,
   clearFilters,
   categories,
   departments,
   priorities,
-  assignedAgents
+  assignedAgents,
+  toggleSortOrder
 }) => {
-  const toggleSortOrder = (field: string) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('desc');
-    }
-  };
-
-  const hasActiveFilters = !!(searchQuery || priorityFilter || categoryFilter || departmentFilter || agentFilter);
-
-  // Debug logging to help diagnose filter issues
-  console.log('TicketFilters - Available categories:', categories);
-  console.log('TicketFilters - Available departments:', departments);
-  console.log('TicketFilters - Current categoryFilter:', categoryFilter);
-  console.log('TicketFilters - Current departmentFilter:', departmentFilter);
-
+  
+  const hasActiveFilters = !!(priorityFilter || categoryFilter || departmentFilter || agentFilter);
+  
+  // Debug what categories and departments are available
+  console.log('Available categories in filters:', categories);
+  console.log('Available departments in filters:', departments);
+  console.log('Current category filter:', categoryFilter);
+  console.log('Current department filter:', departmentFilter);
+  
   return (
     <>
       <div className="flex flex-col md:flex-row gap-4 items-start">
@@ -105,9 +97,7 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className="h-4 w-4" />
-            Filters {(priorityFilter || categoryFilter || departmentFilter || agentFilter) && 
-              <Badge className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center">!</Badge>
-            }
+            Filters {hasActiveFilters && <Badge className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center">!</Badge>}
           </Button>
           
           <DropdownMenu>
@@ -120,22 +110,22 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             <DropdownMenuContent>
               <DropdownMenuLabel>Sort by</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => toggleSortOrder('updatedAt')}>
+              <DropdownMenuItem onClick={() => toggleSortOrder && toggleSortOrder('updatedAt')}>
                 Last Updated {sortField === 'updatedAt' && (sortOrder === 'asc' ? '↑' : '↓')}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toggleSortOrder('createdAt')}>
+              <DropdownMenuItem onClick={() => toggleSortOrder && toggleSortOrder('createdAt')}>
                 Date Created {sortField === 'createdAt' && (sortOrder === 'asc' ? '↑' : '↓')}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toggleSortOrder('priority')}>
+              <DropdownMenuItem onClick={() => toggleSortOrder && toggleSortOrder('priority')}>
                 Priority {sortField === 'priority' && (sortOrder === 'asc' ? '↑' : '↓')}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toggleSortOrder('status')}>
+              <DropdownMenuItem onClick={() => toggleSortOrder && toggleSortOrder('status')}>
                 Status {sortField === 'status' && (sortOrder === 'asc' ? '↑' : '↓')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           
-          {hasActiveFilters && (
+          {(searchQuery || priorityFilter || categoryFilter || departmentFilter || agentFilter) && (
             <Button variant="ghost" onClick={clearFilters}>
               Clear
             </Button>
@@ -149,7 +139,7 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             <div>
               <label className="block text-sm font-medium mb-1">Priority</label>
               <Select 
-                value={priorityFilter || ""}
+                value={priorityFilter || ""} 
                 onValueChange={(value) => setPriorityFilter(value === "all" ? null : value)}
               >
                 <SelectTrigger>
@@ -167,7 +157,7 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             <div>
               <label className="block text-sm font-medium mb-1">Category</label>
               <Select 
-                value={categoryFilter || ""}
+                value={categoryFilter || ""} 
                 onValueChange={(value) => setCategoryFilter(value === "all" ? null : value)}
               >
                 <SelectTrigger>
@@ -185,7 +175,7 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             <div>
               <label className="block text-sm font-medium mb-1">Department</label>
               <Select 
-                value={departmentFilter || ""}
+                value={departmentFilter || ""} 
                 onValueChange={(value) => setDepartmentFilter(value === "all" ? null : value)}
               >
                 <SelectTrigger>
@@ -203,7 +193,7 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             <div>
               <label className="block text-sm font-medium mb-1">Assigned Agent</label>
               <Select 
-                value={agentFilter || ""}
+                value={agentFilter || ""} 
                 onValueChange={(value) => setAgentFilter(value === "all" ? null : value)}
               >
                 <SelectTrigger>

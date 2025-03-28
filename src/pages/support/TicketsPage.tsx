@@ -1,35 +1,16 @@
-
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Search, ArrowLeft, Filter, ArrowDown, ArrowUp } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TicketList } from "@/components/support/TicketList";
-import { TicketDetails } from "@/components/support/TicketDetails";
-import { NewTicketForm } from "@/components/support/NewTicketForm";
-import { QueueManagement } from "@/components/support/QueueManagement";
 import { SupportTicket } from "@/types/support";
 import { useToast } from "@/hooks/use-toast";
+import { TicketDetails } from "@/components/support/TicketDetails";
+import { TicketStatusTabs } from "@/components/support/tickets/TicketStatusTabs";
+import { TicketFilters } from "@/components/support/tickets/TicketFilters";
+import { NewTicketSection } from "@/components/support/tickets/NewTicketSection";
+import { useTicketFiltering } from "@/hooks/useTicketFiltering";
 import { mockQueues } from "@/components/support/mock-data/queues";
 import { mockAgents } from "@/components/support/mock-data/agents";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 
 const mockTickets: SupportTicket[] = [
   {
@@ -128,43 +109,11 @@ const TicketsPage: React.FC = () => {
   const { toast } = useToast();
   const [tickets, setTickets] = useState<SupportTicket[]>(mockTickets);
   const [showNewTicketForm, setShowNewTicketForm] = useState(false);
-  const [activeTab, setActiveTab] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
   const [dashboardTab, setDashboardTab] = useState('tickets');
-
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const [priorityFilter, setPriorityFilter] = useState<string | null>(null);
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-  const [agentFilter, setAgentFilter] = useState<string | null>(null);
-  const [departmentFilter, setDepartmentFilter] = useState<string | null>(null);
-  const [sortField, setSortField] = useState<string>('updatedAt');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [showFilters, setShowFilters] = useState(false);
-
-  const categories = useMemo(() => 
-    [...new Set(tickets.map(ticket => ticket.category).filter(Boolean))], [tickets]
-  );
   
-  const departments = useMemo(() => 
-    [...new Set(tickets.map(ticket => ticket.department).filter(Boolean))], [tickets]
-  );
+  const filteringProps = useTicketFiltering(tickets, mockAgents);
   
-  const priorities = useMemo(() => 
-    [...new Set(tickets.map(ticket => ticket.priority).filter(Boolean))], [tickets]
-  );
-
-  const assignedAgents = useMemo(() => {
-    const agentIds = [...new Set(tickets
-      .filter(ticket => ticket.assignedTo)
-      .map(ticket => ticket.assignedTo as string))];
-      
-    return agentIds.map(id => {
-      const agent = mockAgents.find(a => a.id === id);
-      return { id, name: agent ? agent.name : 'Unknown' };
-    });
-  }, [tickets]);
-
   const handleCreateTicket = (newTicket: Partial<SupportTicket>) => {
     const ticket: SupportTicket = {
       ...newTicket,
@@ -250,101 +199,6 @@ const TicketsPage: React.FC = () => {
     });
   };
 
-  const toggleSortOrder = (field: string) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('desc');
-    }
-  };
-
-  const clearFilters = () => {
-    setSearchQuery('');
-    setStatusFilter(null);
-    setPriorityFilter(null);
-    setCategoryFilter(null);
-    setAgentFilter(null);
-    setDepartmentFilter(null);
-  };
-
-  const filteredTickets = useMemo(() => {
-    return tickets.filter(ticket => {
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        const subjectMatch = ticket.subject.toLowerCase().includes(query);
-        const descriptionMatch = ticket.description.toLowerCase().includes(query);
-        if (!subjectMatch && !descriptionMatch) {
-          return false;
-        }
-      }
-      
-      if (activeTab !== 'all' && ticket.status !== activeTab) {
-        return false;
-      }
-      
-      if (priorityFilter && priorityFilter !== "all" && ticket.priority !== priorityFilter) {
-        return false;
-      }
-      
-      // Fixed category filter to properly compare lowercase values
-      if (categoryFilter && categoryFilter !== "all") {
-        // Compare lowercase values to make matching case-insensitive
-        if (ticket.category?.toLowerCase() !== categoryFilter.toLowerCase()) {
-          return false;
-        }
-      }
-      
-      // Fixed department filter to properly compare lowercase values
-      if (departmentFilter && departmentFilter !== "all") {
-        // Compare lowercase values to make matching case-insensitive
-        if (ticket.department?.toLowerCase() !== departmentFilter.toLowerCase()) {
-          return false;
-        }
-      }
-      
-      if (agentFilter && agentFilter !== "all" && ticket.assignedTo !== agentFilter) {
-        return false;
-      }
-      
-      return true;
-    }).sort((a, b) => {
-      if (!(sortField in a) || !(sortField in b)) {
-        return 0;
-      }
-      
-      if (sortField === 'createdAt' || sortField === 'updatedAt') {
-        const dateA = new Date(a[sortField as keyof SupportTicket] as string).getTime();
-        const dateB = new Date(b[sortField as keyof SupportTicket] as string).getTime();
-        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-      }
-      
-      if (sortField === 'priority') {
-        const priorityValues = { 'low': 1, 'medium': 2, 'high': 3, 'urgent': 4 };
-        const priorityA = priorityValues[a.priority as keyof typeof priorityValues] || 0;
-        const priorityB = priorityValues[b.priority as keyof typeof priorityValues] || 0;
-        return sortOrder === 'asc' ? priorityA - priorityB : priorityB - priorityA;
-      }
-      
-      const valueA = String(a[sortField as keyof SupportTicket]);
-      const valueB = String(b[sortField as keyof SupportTicket]);
-      
-      return sortOrder === 'asc' 
-        ? valueA.localeCompare(valueB)
-        : valueB.localeCompare(valueA);
-    });
-  }, [
-    tickets, 
-    searchQuery, 
-    activeTab, 
-    priorityFilter, 
-    categoryFilter, 
-    departmentFilter, 
-    agentFilter,
-    sortField,
-    sortOrder
-  ]);
-
   if (selectedTicket) {
     return (
       <AppLayout showModuleName moduleName="Support Tickets">
@@ -369,270 +223,46 @@ const TicketsPage: React.FC = () => {
   return (
     <AppLayout showModuleName moduleName="Support Tickets">
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-semibold">Support Tickets</h1>
-          <Button onClick={() => setShowNewTicketForm(true)}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Create Internal Ticket
-          </Button>
-        </div>
+        <NewTicketSection 
+          showNewTicketForm={showNewTicketForm}
+          setShowNewTicketForm={setShowNewTicketForm}
+          onCreateTicket={handleCreateTicket}
+        />
 
-        {showNewTicketForm ? (
-          <NewTicketForm 
-            onSubmit={handleCreateTicket} 
-            onCancel={() => setShowNewTicketForm(false)} 
-          />
-        ) : (
+        {!showNewTicketForm && (
           <>
-            <Tabs defaultValue="tickets" value={dashboardTab} onValueChange={setDashboardTab}>
-              <TabsList>
-                <TabsTrigger value="tickets">Tickets</TabsTrigger>
-                <TabsTrigger value="queues">Queues & Agents</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="tickets" className="mt-6 space-y-6">
-                <div className="flex flex-col md:flex-row gap-4 items-start">
-                  <div className="relative w-full md:max-w-sm">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search tickets..."
-                      className="pl-8"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      className="flex items-center gap-2"
-                      onClick={() => setShowFilters(!showFilters)}
-                    >
-                      <Filter className="h-4 w-4" />
-                      Filters {(priorityFilter || categoryFilter || departmentFilter || agentFilter) && <Badge className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center">!</Badge>}
-                    </Button>
-                    
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="flex items-center gap-2">
-                          Sort by
-                          {sortOrder === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => toggleSortOrder('updatedAt')}>
-                          Last Updated {sortField === 'updatedAt' && (sortOrder === 'asc' ? '↑' : '↓')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toggleSortOrder('createdAt')}>
-                          Date Created {sortField === 'createdAt' && (sortOrder === 'asc' ? '↑' : '↓')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toggleSortOrder('priority')}>
-                          Priority {sortField === 'priority' && (sortOrder === 'asc' ? '↑' : '↓')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toggleSortOrder('status')}>
-                          Status {sortField === 'status' && (sortOrder === 'asc' ? '↑' : '↓')}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    
-                    {(searchQuery || statusFilter || priorityFilter || categoryFilter || departmentFilter || agentFilter) && (
-                      <Button variant="ghost" onClick={clearFilters}>
-                        Clear
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                
-                {showFilters && (
-                  <Card className="p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Priority</label>
-                        <Select 
-                          value={priorityFilter || ""} 
-                          onValueChange={(value) => setPriorityFilter(value || null)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="All Priorities" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Priorities</SelectItem>
-                            {priorities.map((priority) => (
-                              <SelectItem key={priority} value={priority}>{priority}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Category</label>
-                        <Select 
-                          value={categoryFilter || ""} 
-                          onValueChange={(value) => setCategoryFilter(value || null)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="All Categories" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Categories</SelectItem>
-                            {categories.map((category) => (
-                              <SelectItem key={category} value={category}>{category}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Department</label>
-                        <Select 
-                          value={departmentFilter || ""} 
-                          onValueChange={(value) => setDepartmentFilter(value || null)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="All Departments" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Departments</SelectItem>
-                            {departments.map((department) => (
-                              <SelectItem key={department} value={department}>{department}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Assigned Agent</label>
-                        <Select 
-                          value={agentFilter || ""} 
-                          onValueChange={(value) => setAgentFilter(value || null)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="All Agents" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Agents</SelectItem>
-                            {assignedAgents.map((agent) => (
-                              <SelectItem key={agent.id} value={agent.id}>{agent.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </Card>
-                )}
-                
-                <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList>
-                    <TabsTrigger value="all">All Tickets</TabsTrigger>
-                    <TabsTrigger value="open">Open</TabsTrigger>
-                    <TabsTrigger value="in_progress">In Progress</TabsTrigger>
-                    <TabsTrigger value="resolved">Resolved</TabsTrigger>
-                    <TabsTrigger value="closed">Closed</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="all" className="mt-6">
-                    <Card>
-                      <CardHeader>
-                        <div className="flex justify-between items-center">
-                          <CardTitle>All Tickets ({filteredTickets.length})</CardTitle>
-                          {filteredTickets.length !== tickets.length && (
-                            <Badge variant="outline">Filtered</Badge>
-                          )}
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <TicketList 
-                          tickets={filteredTickets} 
-                          onViewTicket={handleTicketClick}
-                        />
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-                  
-                  <TabsContent value="open" className="mt-6">
-                    <Card>
-                      <CardHeader>
-                        <div className="flex justify-between items-center">
-                          <CardTitle>Open Tickets ({filteredTickets.length})</CardTitle>
-                          {filteredTickets.length !== tickets.filter(t => t.status === 'open').length && (
-                            <Badge variant="outline">Filtered</Badge>
-                          )}
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <TicketList 
-                          tickets={filteredTickets}
-                          onViewTicket={handleTicketClick}
-                        />
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-                  
-                  <TabsContent value="in_progress" className="mt-6">
-                    <Card>
-                      <CardHeader>
-                        <div className="flex justify-between items-center">
-                          <CardTitle>In Progress ({filteredTickets.length})</CardTitle>
-                          {filteredTickets.length !== tickets.filter(t => t.status === 'in_progress').length && (
-                            <Badge variant="outline">Filtered</Badge>
-                          )}
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <TicketList 
-                          tickets={filteredTickets}
-                          onViewTicket={handleTicketClick}
-                        />
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-                  
-                  <TabsContent value="resolved" className="mt-6">
-                    <Card>
-                      <CardHeader>
-                        <div className="flex justify-between items-center">
-                          <CardTitle>Resolved Tickets ({filteredTickets.length})</CardTitle>
-                          {filteredTickets.length !== tickets.filter(t => t.status === 'resolved').length && (
-                            <Badge variant="outline">Filtered</Badge>
-                          )}
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <TicketList 
-                          tickets={filteredTickets}
-                          onViewTicket={handleTicketClick}
-                        />
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-                  
-                  <TabsContent value="closed" className="mt-6">
-                    <Card>
-                      <CardHeader>
-                        <div className="flex justify-between items-center">
-                          <CardTitle>Closed Tickets ({filteredTickets.length})</CardTitle>
-                          {filteredTickets.length !== tickets.filter(t => t.status === 'closed').length && (
-                            <Badge variant="outline">Filtered</Badge>
-                          )}
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <TicketList 
-                          tickets={filteredTickets}
-                          onViewTicket={handleTicketClick}
-                        />
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-                </Tabs>
-              </TabsContent>
-              
-              <TabsContent value="queues" className="mt-6">
-                <QueueManagement queues={mockQueues} agents={mockAgents} />
-              </TabsContent>
-            </Tabs>
+            <TicketFilters
+              searchQuery={filteringProps.searchQuery}
+              setSearchQuery={filteringProps.setSearchQuery}
+              priorityFilter={filteringProps.priorityFilter}
+              setPriorityFilter={filteringProps.setPriorityFilter}
+              categoryFilter={filteringProps.categoryFilter}
+              setCategoryFilter={filteringProps.setCategoryFilter}
+              departmentFilter={filteringProps.departmentFilter}
+              setDepartmentFilter={filteringProps.setDepartmentFilter}
+              agentFilter={filteringProps.agentFilter}
+              setAgentFilter={filteringProps.setAgentFilter}
+              sortField={filteringProps.sortField}
+              setSortField={filteringProps.setSortField}
+              sortOrder={filteringProps.sortOrder}
+              setSortOrder={filteringProps.setSortOrder}
+              showFilters={filteringProps.showFilters}
+              setShowFilters={filteringProps.setShowFilters}
+              clearFilters={filteringProps.clearFilters}
+              categories={filteringProps.categories}
+              departments={filteringProps.departments}
+              priorities={filteringProps.priorities}
+              assignedAgents={filteringProps.assignedAgents}
+              toggleSortOrder={filteringProps.toggleSortOrder}
+            />
+            
+            <TicketStatusTabs
+              activeTab={filteringProps.activeTab}
+              setActiveTab={filteringProps.setActiveTab}
+              filteredTickets={filteringProps.filteredTickets}
+              allTicketsCount={tickets.length}
+              onViewTicket={handleTicketClick}
+            />
           </>
         )}
       </div>
