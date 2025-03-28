@@ -8,24 +8,44 @@ export const generateKeywords = async (topic: string, count: number = 10) => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 500));
   
+  // Process the topic to handle spacing issues
+  const processedTopic = topic.trim().toLowerCase();
+  
   // Check if topic includes "AI chatbot" and return more specific keywords
-  if (topic.toLowerCase().includes("ai chatbot")) {
+  if (processedTopic.includes("ai chatbot") || processedTopic.includes("ai") || processedTopic.includes("chatbot")) {
     return [
       "ai chatbot", "conversational ai", "chatbot development", 
       "natural language processing", "customer service automation",
       "ai assistant", "chatbot platform", "virtual assistant",
       "chat automation", "machine learning chatbot", "nlp technology",
-      "enterprise chatbot"
+      "enterprise chatbot", "ai solutions", "customer experience", 
+      "chatbot integration", "intelligent assistant", "digital transformation"
     ].slice(0, count);
   }
   
-  // For demonstration, return dummy keywords
-  return [
-    "digital marketing", "content strategy", "SEO optimization", 
-    "keyword research", "search rankings", "meta descriptions",
-    "backlink strategy", "on-page SEO", "technical SEO", 
-    "content marketing", "SEO tools", "Google algorithm"
+  // For other topics, generate more relevant keywords
+  const topicWords = processedTopic.split(/\s+/);
+  const generatedKeywords = [
+    processedTopic,
+    ...topicWords,
+    `${processedTopic} guide`,
+    `${processedTopic} software`,
+    `${processedTopic} solutions`,
+    `${processedTopic} best practices`,
+    `${processedTopic} strategies`,
+    `${processedTopic} tools`,
+    `${processedTopic} platform`,
+    `${processedTopic} service`,
+    `${processedTopic} technology`,
+    `${processedTopic} trends`,
+    `${processedTopic} benefits`,
+    `${processedTopic} implementation`,
+    `best ${processedTopic} tools`,
+    `how to use ${processedTopic}`,
+    `${processedTopic} examples`
   ].slice(0, count);
+  
+  return generatedKeywords;
 };
 
 /**

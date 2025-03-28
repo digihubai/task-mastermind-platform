@@ -27,14 +27,23 @@ const TitleStep: React.FC<TitleStepProps> = ({
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackText, setFeedbackText] = useState("");
   
-  // Auto-generate titles on component mount if none exist
+  // Auto-generate titles on component mount if topic and keywords exist but no titles
   useEffect(() => {
-    if (seoData.titles.length === 0 && seoData.selectedKeywords.length > 0) {
+    const hasKeywords = Array.isArray(seoData.selectedKeywords) && seoData.selectedKeywords.length > 0;
+    const hasTopic = seoData.topic && seoData.topic.trim().length > 0;
+    
+    if ((!seoData.titles || seoData.titles.length === 0) && hasKeywords && hasTopic) {
       handleGenerateTitles();
     }
   }, []);
   
   const handleGenerateTitles = async () => {
+    // Validate that we have keywords selected
+    if (!Array.isArray(seoData.selectedKeywords) || seoData.selectedKeywords.length === 0) {
+      toast.error("Please select at least one keyword first");
+      return;
+    }
+    
     setIsGenerating(true);
     
     try {
@@ -42,64 +51,19 @@ const TitleStep: React.FC<TitleStepProps> = ({
       const generatedTitles = await generateSEOTitles(
         seoData.topic,
         seoData.selectedKeywords,
-        seoData.numberOfTitles,
+        seoData.numberOfTitles || 5,
         titleType
       );
-
-      // For demo, let's improve the titles based on the type
-      let enhancedTitles = [];
-      
-      if (seoData.topic.toLowerCase().includes("ai chatbot")) {
-        switch (titleType) {
-          case "howto":
-            enhancedTitles = [
-              "How to Build an AI Chatbot in 7 Simple Steps",
-              "How to Implement Conversational AI for Better Customer Experience",
-              "How to Increase ROI by 47% with AI-Powered Customer Support",
-              "How to Choose the Right NLP Framework for Your Chatbot",
-              "How to Design an AI Chatbot That Customers Actually Love"
-            ];
-            break;
-          case "listicle":
-            enhancedTitles = [
-              "10 Game-Changing AI Chatbot Features Your Business Needs in 2023",
-              "7 Ways AI Chatbots Are Revolutionizing Customer Service",
-              "5 Enterprise-Grade Chatbot Platforms Worth Investing In",
-              "12 AI Chatbot Metrics That Actually Matter for Business Growth",
-              "8 Common Mistakes Companies Make When Implementing Chatbots"
-            ];
-            break;
-          case "question":
-            enhancedTitles = [
-              "Can AI Chatbots Really Replace Human Customer Service Agents?",
-              "Why Are AI Chatbots Transforming Business Communication?",
-              "What Makes a Chatbot Truly Intelligent in 2023?",
-              "Is Your Business Ready for an AI-Powered Conversational Interface?",
-              "When Should You Invest in Custom NLP for Your Chatbot?"
-            ];
-            break;
-          default: // mixed
-            enhancedTitles = [
-              "10 Ways AI Chatbots Are Revolutionizing Customer Support",
-              "How to Implement an AI Chatbot That Boosts Conversions by 35%",
-              "The Ultimate Guide to Building Enterprise-Grade Conversational AI",
-              "Why 73% of Businesses Are Switching to AI-Powered Support Solutions",
-              "5 Critical Features Your AI Chatbot Must Have to Succeed"
-            ];
-        }
-      } else {
-        enhancedTitles = generatedTitles;
-      }
       
       // Update titles array
-      onDataChange("titles", enhancedTitles);
+      onDataChange("titles", generatedTitles);
       
       // Select the first title by default if none is selected
       if (!seoData.selectedTitle) {
-        onDataChange("selectedTitle", enhancedTitles[0]);
+        onDataChange("selectedTitle", generatedTitles[0]);
       }
       
-      toast.success(`Generated ${enhancedTitles.length} title options`);
+      toast.success(`Generated ${generatedTitles.length} title options`);
     } catch (error) {
       console.error("Error generating titles:", error);
       toast.error("Failed to generate titles. Please try again.");
@@ -168,7 +132,7 @@ const TitleStep: React.FC<TitleStepProps> = ({
               variant="outline" 
               size="sm" 
               onClick={handleGenerateTitles}
-              disabled={isGenerating}
+              disabled={isGenerating || !seoData.selectedKeywords || seoData.selectedKeywords.length === 0}
               className="gap-2"
             >
               {isGenerating ? (
@@ -194,7 +158,7 @@ const TitleStep: React.FC<TitleStepProps> = ({
               We're creating titles that include your selected keywords and are optimized for search engines.
             </p>
           </div>
-        ) : seoData.titles.length > 0 ? (
+        ) : Array.isArray(seoData.titles) && seoData.titles.length > 0 ? (
           <div className="space-y-3">
             {seoData.titles.map((title: string, index: number) => (
               <div
@@ -217,7 +181,11 @@ const TitleStep: React.FC<TitleStepProps> = ({
             <p className="text-muted-foreground max-w-md">
               Click "Regenerate Titles" to create SEO-optimized title options based on your topic and keywords.
             </p>
-            <Button className="mt-4" onClick={handleGenerateTitles}>
+            <Button 
+              className="mt-4" 
+              onClick={handleGenerateTitles}
+              disabled={!seoData.selectedKeywords || seoData.selectedKeywords.length === 0}
+            >
               Generate Titles Now
             </Button>
           </div>

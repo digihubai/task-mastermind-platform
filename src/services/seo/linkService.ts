@@ -1,107 +1,111 @@
 
 /**
- * Fetches related external links
+ * Fetches internal links for SEO content
  */
-export const fetchRelatedExternalLinks = async (topic: string, keywords: string[]): Promise<Array<{title: string, url: string}>> => {
+export const fetchInternalLinks = async () => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 600));
   
-  // Return mock external links related to the topic and keywords
+  // Return mock internal links
   return [
-    { 
-      title: "The Complete Guide to SEO",
-      url: "https://example.com/complete-seo-guide" 
-    },
-    { 
-      title: `Top ${topic} Resources for 2023`,
-      url: "https://example.com/top-resources" 
-    },
-    { 
-      title: `${keywords[0] || topic} Best Practices`,
-      url: "https://example.com/best-practices" 
-    },
-    { 
-      title: `How to Implement ${topic} Strategies`,
-      url: "https://example.com/implementation-strategies" 
-    },
-    { 
-      title: `${keywords[1] || topic} Case Studies`,
-      url: "https://example.com/case-studies" 
-    }
+    { title: "AI Chatbot Development Guide", url: "/blog/ai-chatbot-development-guide" },
+    { title: "Conversational AI Implementation", url: "/blog/conversational-ai-implementation" },
+    { title: "Customer Service Automation", url: "/blog/customer-service-automation" },
+    { title: "Machine Learning for Chatbots", url: "/blog/machine-learning-chatbots" },
+    { title: "NLP Technology Overview", url: "/blog/nlp-technology-overview" },
+    { title: "Digital Marketing Strategy", url: "/blog/digital-marketing-strategy" },
+    { title: "Content Optimization Guide", url: "/blog/content-optimization-guide" }
   ];
 };
 
 /**
- * Fetches internal links from the user's site
+ * Fetches related external links based on topic and keywords
  */
-export const fetchInternalLinks = async (): Promise<Array<{title: string, url: string}>> => {
+export const fetchRelatedExternalLinks = async (topic: string, keywords: string[] = []) => {
   // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 400));
+  await new Promise(resolve => setTimeout(resolve, 700));
   
-  // Return mock internal links from the user's site
-  return [
-    { 
-      title: "Content Marketing Strategy",
-      url: "/blog/content-marketing-strategy" 
-    },
-    { 
-      title: "SEO for Beginners",
-      url: "/blog/seo-beginners-guide" 
-    },
-    { 
-      title: "Technical SEO Checklist",
-      url: "/blog/technical-seo-checklist" 
-    },
-    { 
-      title: "Keyword Research Guide",
-      url: "/blog/keyword-research-guide" 
-    },
-    { 
-      title: "On-Page SEO Techniques",
-      url: "/blog/on-page-seo-techniques" 
-    }
+  // Process inputs
+  const processedTopic = topic.toLowerCase().trim();
+  const processedKeywords = keywords.map(k => k.toLowerCase().trim());
+  
+  // Default external links
+  const defaultLinks = [
+    { title: "The Ultimate Guide to SEO", url: "https://example.com/seo-guide" },
+    { title: "Content Marketing Best Practices", url: "https://example.com/content-marketing" },
+    { title: "Digital Marketing Statistics 2023", url: "https://example.com/marketing-stats" },
+    { title: "Search Engine Optimization Tips", url: "https://example.com/seo-tips" }
   ];
+  
+  // AI chatbot specific links
+  const aiChatbotLinks = [
+    { title: "Building Conversational AI", url: "https://example.com/conversational-ai" },
+    { title: "NLP Research Papers", url: "https://example.com/nlp-research" },
+    { title: "Chatbot Optimization Guide", url: "https://example.com/chatbot-optimization" },
+    { title: "Customer Service Automation Case Studies", url: "https://example.com/automation-case-studies" },
+    { title: "AI Assistant Development", url: "https://example.com/ai-assistant-development" }
+  ];
+  
+  // Check if topic or keywords relate to AI chatbots
+  const isAIChatbotRelated = 
+    processedTopic.includes("ai chatbot") || 
+    processedTopic.includes("chatbot") ||
+    processedKeywords.some(k => k.includes("ai") || k.includes("chatbot") || k.includes("assistant"));
+  
+  return isAIChatbotRelated ? aiChatbotLinks : defaultLinks;
 };
 
 /**
- * Inserts links into content
+ * Insert links into content for SEO
  */
-export const insertLinksIntoContent = (content: string, links: Array<{title: string, url: string}>, isExternal: boolean): string => {
-  if (!links || links.length === 0) return content;
-  
-  // Convert content to paragraphs
-  const paragraphs = content.split('\n\n');
-  
-  // Process only paragraphs that are not headings and don't already have links
-  const processableParagraphs = paragraphs
-    .filter(p => !p.startsWith('#') && !p.startsWith('-') && !p.startsWith('1.') && !p.includes(']('))
-    .slice(0, Math.min(links.length, 5)); // Limit to 5 paragraphs or less
-  
-  if (processableParagraphs.length === 0) return content;
-  
-  // For each usable paragraph, insert a link
-  let modifiedContent = content;
-  for (let i = 0; i < Math.min(processableParagraphs.length, links.length); i++) {
-    const paragraph = processableParagraphs[i];
-    const link = links[i];
-    
-    // Find a suitable place to insert the link (after a sentence)
-    const sentences = paragraph.split('. ');
-    if (sentences.length < 2) continue;
-    
-    const sentenceIndex = Math.floor(sentences.length / 2); // Insert in the middle
-    const linkText = isExternal ? 
-      `${sentences[sentenceIndex]}. [Learn more about ${link.title}](${link.url}).` : 
-      `${sentences[sentenceIndex]}. [Check out our guide on ${link.title}](${link.url}).`;
-    
-    const modifiedParagraph = [
-      ...sentences.slice(0, sentenceIndex),
-      linkText,
-      ...sentences.slice(sentenceIndex + 1)
-    ].join('. ');
-    
-    modifiedContent = modifiedContent.replace(paragraph, modifiedParagraph);
+export const insertLinksIntoContent = (content: string, links: Array<{title: string, url: string}>, isExternal: boolean) => {
+  if (!content || !Array.isArray(links) || links.length === 0) {
+    return content;
   }
   
-  return modifiedContent;
+  let updatedContent = content;
+  
+  links.forEach(link => {
+    const linkText = link.title;
+    // Extract words from the link title to look for in the content
+    const linkWords = linkText.toLowerCase().split(/\s+/).filter(word => word.length > 4);
+    
+    // For each significant word in the link title
+    for (const word of linkWords) {
+      // Find if this word exists in the content
+      const regex = new RegExp(`\\b${word}\\b`, 'i');
+      const match = updatedContent.match(regex);
+      
+      if (match && match.index !== undefined) {
+        // Get the sentence containing the match
+        const sentenceStart = updatedContent.lastIndexOf('.', match.index) + 1;
+        const sentenceEnd = updatedContent.indexOf('.', match.index + 1);
+        const sentence = updatedContent.substring(sentenceStart, sentenceEnd + 1);
+        
+        // Don't add link if the sentence already contains a link
+        if (sentence.includes('<a href')) {
+          continue;
+        }
+        
+        // Get context around the matched word
+        const startIndex = match.index;
+        const endIndex = startIndex + word.length;
+        const contextBefore = updatedContent.substring(0, startIndex);
+        const matchedWord = updatedContent.substring(startIndex, endIndex);
+        const contextAfter = updatedContent.substring(endIndex);
+        
+        // Create the link with appropriate attributes
+        const externalAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+        const linkedText = `<a href="${link.url}"${externalAttrs}>${matchedWord}</a>`;
+        
+        // Replace the original text with the linked version
+        updatedContent = contextBefore + linkedText + contextAfter;
+        
+        // Only add one link per link object
+        break;
+      }
+    }
+  });
+  
+  return updatedContent;
 };

@@ -46,21 +46,26 @@ const AISEOPage = () => {
 
   // Effect to autogenerate keywords when topic is provided
   useEffect(() => {
-    if (seoData.topic && activeStep === 2 && seoData.keywords.length === 0) {
+    if (seoData.topic && activeStep === 2 && 
+        (!seoData.keywords || seoData.keywords.length === 0)) {
       handleAutoGenerateKeywords();
     }
   }, [seoData.topic, activeStep]);
 
+  // Check if we have enough selected keywords to proceed
+  const hasEnoughKeywords = Array.isArray(seoData.selectedKeywords) && 
+                           seoData.selectedKeywords.length >= 3;
+
   // Effect to auto-navigate to title step after keywords selected
   useEffect(() => {
-    if (activeStep === 2 && seoData.selectedKeywords.length >= 3) {
+    if (activeStep === 2 && hasEnoughKeywords) {
       // Delay to show the user that their selection was registered
       const timer = setTimeout(() => {
         handleNext();
       }, 600);
       return () => clearTimeout(timer);
     }
-  }, [seoData.selectedKeywords, activeStep]);
+  }, [seoData.selectedKeywords, activeStep, hasEnoughKeywords]);
   
   const handleDataChange = (field: string, value: any) => {
     setSeoData(prev => ({
@@ -80,17 +85,23 @@ const AISEOPage = () => {
   };
 
   const handleAutoGenerateKeywords = async () => {
-    if (!seoData.topic.trim()) return;
+    if (!seoData.topic || !seoData.topic.trim()) {
+      toast.error("Please enter a topic first");
+      return;
+    }
     
     try {
       const keywords = await generateKeywords(seoData.topic, seoData.keywordCount);
-      if (keywords && keywords.length > 0) {
+      if (Array.isArray(keywords) && keywords.length > 0) {
         setSeoData(prev => ({
           ...prev,
           keywords,
+          // Preselect the first 3 keywords for convenience
           selectedKeywords: keywords.slice(0, 3)
         }));
         toast.success(`Generated ${keywords.length} keyword suggestions based on your topic`);
+      } else {
+        toast.error("No keywords could be generated. Try a different topic.");
       }
     } catch (error) {
       console.error("Error auto-generating keywords:", error);
@@ -99,6 +110,22 @@ const AISEOPage = () => {
   };
   
   const handleGenerateContent = async () => {
+    // Validate required inputs
+    if (!seoData.selectedTitle) {
+      toast.error("Please select a title first");
+      return;
+    }
+    
+    if (!seoData.selectedOutline) {
+      toast.error("Please select an outline first");
+      return;
+    }
+    
+    if (!Array.isArray(seoData.selectedKeywords) || seoData.selectedKeywords.length === 0) {
+      toast.error("Please select at least one keyword");
+      return;
+    }
+    
     setIsGenerating(true);
     
     try {
@@ -113,7 +140,7 @@ const AISEOPage = () => {
       
       // Add special image content integration if images were selected
       let finalContent = generatedContent;
-      if (seoData.selectedImages && seoData.selectedImages.length > 0) {
+      if (Array.isArray(seoData.selectedImages) && seoData.selectedImages.length > 0) {
         // Insert image references into the content where appropriate
         const contentParts = finalContent.split('\n\n');
         
@@ -138,6 +165,9 @@ const AISEOPage = () => {
       
       handleDataChange("generatedContent", finalContent);
       toast.success("Content successfully generated with integrated images!");
+      
+      // Auto-navigate to the content step
+      setActiveStep(6);
     } catch (error) {
       console.error("Error generating content:", error);
       toast.error("Failed to generate content. Please try again.");

@@ -3,38 +3,56 @@
  * Generates mock SEO content for previewing purposes
  */
 export const generateMockSEOContent = (topic: string, keywords: string[]) => {
-  // Generate mock SEO content for previewing purposes
-  const keywordText = keywords.length > 0 ? ` focusing on ${keywords.join(", ")}` : "";
+  // Process the topic for better formatting
+  const processedTopic = topic.trim();
+  const formattedTopic = processedTopic.charAt(0).toUpperCase() + processedTopic.slice(1).toLowerCase();
   
-  return `# ${topic.charAt(0).toUpperCase() + topic.slice(1)}
+  // Format keywords properly
+  const formattedKeywords = keywords.map(k => k.trim()).filter(k => k.length > 0);
+  const keywordText = formattedKeywords.length > 0 ? ` focusing on ${formattedKeywords.join(", ")}` : "";
+  
+  // Generate current year for relevance
+  const currentYear = new Date().getFullYear();
+  
+  return `# ${formattedTopic}
 
 ## Introduction
 
-This comprehensive guide covers everything you need to know about ${topic}${keywordText}. We'll explore the latest trends, best practices, and expert strategies to help you succeed.
+This comprehensive guide covers everything you need to know about ${formattedTopic}${keywordText}. We'll explore the latest trends, best practices, and expert strategies to help you succeed in ${currentYear} and beyond.
 
-## Why ${topic} Matters
+## Why ${formattedTopic} Matters
 
-In today's digital landscape, ${topic} has become increasingly important for businesses of all sizes. Understanding how to leverage ${topic} effectively can lead to improved results and competitive advantage.
+In today's digital landscape, ${formattedTopic} has become increasingly important for businesses of all sizes. Understanding how to leverage ${formattedTopic} effectively can lead to improved results and competitive advantage.
 
-## Key Strategies for ${topic}
+## Key Strategies for ${formattedTopic}
 
 1. **Research and Planning**: Start with thorough research to understand your audience and competition.
-2. **Implementation**: Follow best practices when implementing your ${topic} strategy.
+2. **Implementation**: Follow best practices when implementing your ${formattedTopic} strategy.
 3. **Optimization**: Continuously test and refine your approach based on performance data.
-4. **Measurement**: Track key metrics to evaluate the success of your ${topic} initiatives.
+4. **Measurement**: Track key metrics to evaluate the success of your ${formattedTopic} initiatives.
 
 ## Advanced Techniques
 
-For those looking to take their ${topic} efforts to the next level, consider these advanced techniques:
+For those looking to take their ${formattedTopic} efforts to the next level, consider these advanced techniques:
 
 - Leverage AI and automation tools
 - Implement cross-channel strategies
 - Focus on user experience optimization
 - Develop comprehensive analytics frameworks
 
+## Case Studies: ${formattedTopic} Success Stories
+
+### Company A: 200% Growth in 6 Months
+
+Company A implemented a comprehensive ${formattedTopic} strategy that resulted in a 200% increase in conversion rates within just 6 months. Their approach focused on user experience optimization and data-driven decision making.
+
+### Company B: Market Leader in ${currentYear}
+
+By prioritizing ${formattedTopic}, Company B established themselves as a market leader in their industry. Their innovative approach to ${formattedKeywords[0] || formattedTopic} set them apart from competitors.
+
 ## Conclusion
 
-Mastering ${topic} requires ongoing education, experimentation, and adaptation. By following the strategies outlined in this guide, you'll be well-positioned to achieve your goals and drive meaningful results.
+Mastering ${formattedTopic} requires ongoing education, experimentation, and adaptation. By following the strategies outlined in this guide, you'll be well-positioned to achieve your goals and drive meaningful results.
 
 `;
 };
@@ -71,49 +89,78 @@ export const generateContentWithImages = async (
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 2000));
   
-  // Generate mock content based on the input parameters
-  const content = `# ${title}
+  // Clean up and format inputs
+  const cleanTopic = topic.trim();
+  const formattedTopic = cleanTopic.charAt(0).toUpperCase() + cleanTopic.slice(1).toLowerCase();
+  const formattedKeywords = keywords.map(k => k.trim()).filter(k => k.length > 0);
+  const currentYear = new Date().getFullYear();
+  
+  // Generate a more comprehensive and professional content based on the input parameters
+  let content = `# ${title || formattedTopic}
 
 ## Introduction
 
-This comprehensive guide covers everything you need to know about ${topic} focusing on ${keywords.join(", ")}. We'll explore the latest trends, best practices, and expert strategies to help you succeed.
+This comprehensive guide covers everything you need to know about ${formattedTopic} focusing on ${formattedKeywords.join(", ")}. We'll explore the latest trends, best practices, and expert strategies to help you succeed in ${currentYear}.
 
-## Why ${topic} Matters
+## Why ${formattedTopic} Matters
 
-In today's digital landscape, ${topic} has become increasingly important for businesses of all sizes. Understanding how to leverage ${topic} effectively can lead to improved results and competitive advantage.
+In today's digital landscape, ${formattedTopic} has become increasingly important for businesses of all sizes. Understanding how to leverage ${formattedTopic} effectively can lead to improved results and competitive advantage.
 
-${outline ? Object.entries(outline.sections).map(([key, section]: [string, any]) => {
-  return `## ${section.title}
+`;
 
-${section.content || `This section discusses the important aspects of ${section.title} and how it relates to ${topic}.`}
+  // Add outline content if available
+  if (outline && outline.sections) {
+    content += Object.entries(outline.sections).map(([key, section]: [string, any]) => {
+      return `## ${section.title}
+
+${section.content || `This section explores the critical aspects of ${section.title} and how it relates to ${formattedTopic}. By understanding these principles, you can develop more effective strategies for your business.`}
 
 ${section.subsections ? section.subsections.map((subsection: any) => {
   return `### ${subsection.title}
 
-${subsection.content || `${subsection.title} is a crucial component of ${topic} strategy that can significantly impact your results.`}
+${subsection.content || `${subsection.title} is a crucial component of ${formattedTopic} strategy that can significantly impact your results. Companies that excel in this area typically see higher engagement rates and better ROI.`}
 `;
 }).join('\n') : ''}`;
-}).join('\n\n') : ''}
+    }).join('\n\n');
+  }
 
-## Best Practices for ${topic}
+  // Add more substantive content
+  content += `
+## Best Practices for ${formattedTopic}
 
-1. **Research and Planning**: Start with thorough research to understand your audience and competition.
-2. **Implementation**: Follow best practices when implementing your ${topic} strategy.
-3. **Optimization**: Continuously test and refine your approach based on performance data.
-4. **Measurement**: Track key metrics to evaluate the success of your ${topic} initiatives.
+1. **Research and Planning**: Start with thorough research to understand your audience and competition. This foundation will guide all your future decisions.
 
-## Advanced Techniques for ${topic}
+2. **Implementation**: Follow best practices when implementing your ${formattedTopic} strategy, ensuring alignment with your overall business objectives.
 
-For those looking to take their ${topic} efforts to the next level, consider these advanced techniques:
+3. **Optimization**: Continuously test and refine your approach based on performance data. The most successful organizations treat optimization as an ongoing process, not a one-time event.
 
-- Leverage AI and automation tools
-- Implement cross-channel strategies
-- Focus on user experience optimization
-- Develop comprehensive analytics frameworks
+4. **Measurement**: Track key metrics to evaluate the success of your ${formattedTopic} initiatives. Establish KPIs that directly connect to your business goals.
+
+## Advanced Techniques for ${formattedTopic}
+
+For those looking to take their ${formattedTopic} efforts to the next level, consider these advanced techniques:
+
+- **Leverage AI and automation tools**: Artificial intelligence can analyze patterns and predict outcomes that would be impossible for humans to identify manually.
+
+- **Implement cross-channel strategies**: Ensure consistency and synergy across all your digital touchpoints.
+
+- **Focus on user experience optimization**: User satisfaction remains the ultimate goal of any effective ${formattedTopic} strategy.
+
+- **Develop comprehensive analytics frameworks**: Data-driven decision making separates industry leaders from followers.
+
+## Case Studies: Success Stories
+
+### Enterprise Implementation
+
+A Fortune 500 company implemented a comprehensive ${formattedTopic} strategy that resulted in a 43% increase in conversion rates within just three months. Their approach focused on personalization and data-driven decision making.
+
+### Small Business Growth
+
+A boutique agency specializing in ${formattedKeywords[0] || formattedTopic} saw their client base grow by 78% after implementing the strategies outlined in this guide. Their success demonstrates that these techniques work for organizations of all sizes.
 
 ## Conclusion
 
-Mastering ${topic} requires ongoing education, experimentation, and adaptation. By following the strategies outlined in this guide, you'll be well-positioned to achieve your goals and drive meaningful results.
+Mastering ${formattedTopic} requires ongoing education, experimentation, and adaptation. By following the strategies outlined in this guide, you'll be well-positioned to achieve your goals and drive meaningful results in ${currentYear} and beyond.
 
 `;
 
