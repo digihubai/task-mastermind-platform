@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Phone, Loader2, Search, Plus, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PhoneIcon, PlusCircle } from "lucide-react";
 import MessagingServiceCard from './MessagingServiceCard';
 import { useToast } from "@/hooks/use-toast";
-import { MessagingServiceProps, NumberSearchParams, PhoneNumber } from './types';
+import { MessagingServiceProps, PhoneNumber, NumberSearchParams } from './types';
 import { useMessagingService } from './utils';
 
 const TwilioIntegration: React.FC<MessagingServiceProps> = ({ 
@@ -16,102 +16,132 @@ const TwilioIntegration: React.FC<MessagingServiceProps> = ({
   onDisconnect 
 }) => {
   const { toast } = useToast();
-  const [apiKey, setApiKey] = useState<string>("");
+  const [internalConnecting, setInternalConnecting] = useState<string | null>(null);
   const [internalConnected, setInternalConnected] = useState<{[key: string]: boolean}>({ twilio: connected });
   const { simulateConnection, handleDisconnect } = useMessagingService();
+
+  const [accountSid, setAccountSid] = useState("");
+  const [authToken, setAuthToken] = useState("");
+  const [showPhoneNumbers, setShowPhoneNumbers] = useState(false);
   
-  // Phone number purchasing states
-  const [showPhoneSearch, setShowPhoneSearch] = useState<boolean>(false);
-  const [searchingNumbers, setSearchingNumbers] = useState<boolean>(false);
-  const [searchedNumbers, setSearchedNumbers] = useState<PhoneNumber[]>([]);
-  const [purchasingNumber, setPurchasingNumber] = useState<string | null>(null);
-  const [numberSearchParams, setNumberSearchParams] = useState<NumberSearchParams>({
+  // For phone number search
+  const [searchParams, setSearchParams] = useState<NumberSearchParams>({
     country: "US",
     areaCode: "",
     type: "local"
   });
-
-  const handleInputChange = (value: string) => {
-    setApiKey(value);
+  
+  // Mock phone numbers that would be returned from Twilio API
+  const [availablePhoneNumbers, setAvailablePhoneNumbers] = useState<PhoneNumber[]>([
+    {
+      id: "PN1",
+      number: "+1 (415) 555-1234",
+      capabilities: ["voice", "SMS"],
+      region: "San Francisco, CA",
+      monthlyPrice: 1.00
+    },
+    {
+      id: "PN2",
+      number: "+1 (415) 555-5678",
+      capabilities: ["voice", "SMS", "MMS"],
+      region: "San Francisco, CA",
+      monthlyPrice: 2.00
+    },
+    {
+      id: "PN3",
+      number: "+1 (212) 555-1212",
+      capabilities: ["voice", "SMS", "MMS", "fax"],
+      region: "New York, NY",
+      monthlyPrice: 2.50
+    }
+  ]);
+  
+  // Numbers actually purchased and owned by the account
+  const [ownedPhoneNumbers, setOwnedPhoneNumbers] = useState<PhoneNumber[]>([]);
+  
+  const handleSearchParamChange = (param: keyof NumberSearchParams, value: string) => {
+    setSearchParams(prev => ({ ...prev, [param]: value }));
+  };
+  
+  const handleSearchNumbers = () => {
+    // In a real implementation, this would make an API call to Twilio
+    toast({
+      title: "Phone numbers found",
+      description: `Found ${availablePhoneNumbers.length} numbers matching your criteria.`,
+    });
+    
+    // For the demo, we're just showing the mock numbers
+    setShowPhoneNumbers(true);
+  };
+  
+  const handlePurchaseNumber = (number: PhoneNumber) => {
+    // In a real implementation, this would make an API call to Twilio
+    setOwnedPhoneNumbers(prev => [...prev, number]);
+    
+    toast({
+      title: "Phone number purchased",
+      description: `Successfully purchased ${number.number}`,
+    });
+  };
+  
+  const handleReleaseNumber = (numberId: string) => {
+    // In a real implementation, this would make an API call to Twilio
+    setOwnedPhoneNumbers(prev => prev.filter(n => n.id !== numberId));
+    
+    toast({
+      title: "Phone number released",
+      description: "Phone number has been released and is no longer associated with your account.",
+    });
   };
 
   const handleConnect = () => {
     if (internalConnected.twilio) {
       toast({
         title: "Already Connected",
-        description: "Your Twilio account is already connected.",
+        description: "Twilio is already connected.",
       });
       return;
     }
-    
-    if (!apiKey) {
+
+    if (!accountSid || !authToken) {
       toast({
-        title: "API Key Required",
-        description: "Please enter your Twilio API key or credentials.",
+        title: "Missing Credentials",
+        description: "Please enter your Twilio Account SID and Auth Token.",
         variant: "destructive",
       });
       return;
     }
-    
-    // Show phone number search interface
-    setShowPhoneSearch(true);
+
+    if (onConnect) {
+      onConnect('twilio');
+    } else {
+      simulateConnection(
+        'twilio', 
+        setInternalConnecting, 
+        setInternalConnected, 
+        internalConnected
+      );
+    }
   };
 
   const handleTwilioDisconnect = () => {
     if (onDisconnect) {
       onDisconnect('twilio');
+    } else {
+      handleDisconnect('twilio', setInternalConnected, internalConnected);
     }
-    handleDisconnect('twilio', setInternalConnected, internalConnected);
-    setApiKey("");
-    setShowPhoneSearch(false);
-    setSearchedNumbers([]);
-  };
-
-  // Function to search for available phone numbers
-  const searchPhoneNumbers = () => {
-    setSearchingNumbers(true);
     
-    // Simulate API call to search for numbers
-    setTimeout(() => {
-      // Mock data for available phone numbers
-      const mockNumbers = [
-        { id: '1', number: '+1 (555) 123-4567', capabilities: ['voice', 'sms'], region: 'US - New York', monthlyPrice: 1.00 },
-        { id: '2', number: '+1 (555) 234-5678', capabilities: ['voice', 'sms', 'mms'], region: 'US - California', monthlyPrice: 1.00 },
-        { id: '3', number: '+1 (555) 345-6789', capabilities: ['voice'], region: 'US - Texas', monthlyPrice: 1.00 },
-        { id: '4', number: '+1 (555) 456-7890', capabilities: ['voice', 'sms'], region: 'US - Illinois', monthlyPrice: 1.00 },
-      ];
-      
-      setSearchedNumbers(mockNumbers);
-      setSearchingNumbers(false);
-    }, 1500);
-  };
-  
-  // Function to purchase a phone number
-  const purchasePhoneNumber = (numberId: string) => {
-    setPurchasingNumber(numberId);
-    
-    // Simulate purchasing process
-    setTimeout(() => {
-      setPurchasingNumber(null);
-      setShowPhoneSearch(false);
-      setConnected({...connected, ['twilio']: true});
-      
-      toast({
-        title: "Phone Number Purchased",
-        description: "Your phone number has been successfully purchased and added to your Twilio account.",
-      });
-      
-      if (onConnect) {
-        onConnect('twilio');
-      }
-    }, 2000);
+    setAccountSid("");
+    setAuthToken("");
+    setShowPhoneNumbers(false);
+    setOwnedPhoneNumbers([]);
   };
 
   const twilioService = {
     id: "twilio",
     name: "Twilio",
-    description: "Connect Twilio for SMS and voice calls",
-    icon: <Phone className="h-5 w-5 text-red-600" />,
+    description: "SMS, voice and video with Twilio",
+    icon: <PhoneIcon className="h-5 w-5 text-red-600" />,
     backgroundColor: "bg-red-100",
     textColor: "text-red-600",
     connected: internalConnected.twilio || connected
@@ -120,174 +150,134 @@ const TwilioIntegration: React.FC<MessagingServiceProps> = ({
   return (
     <MessagingServiceCard 
       service={twilioService}
-      connecting={connecting}
-      onConnect={onConnect ? () => onConnect("twilio") : handleConnect}
+      connecting={connecting || internalConnecting}
+      onConnect={handleConnect}
       onDisconnect={handleTwilioDisconnect}
     >
-      {twilioService.connected && (
-        <Button 
-          variant="default"
-          size="sm"
-          className="w-full mt-2 mb-3"
-          onClick={() => window.location.href = "/phone/numbers"}
-        >
-          <Phone className="mr-2 h-4 w-4" />
-          Manage Phone Numbers
-        </Button>
-      )}
-      
-      {showPhoneSearch ? (
-        <div className="space-y-4">
-          <div className="p-3 border rounded-md bg-muted/30">
-            <h5 className="font-medium text-sm mb-2">Find a Phone Number</h5>
-            
-            <div className="space-y-2 mb-3">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <Label htmlFor="number-country" className="text-xs">Country</Label>
-                  <select 
-                    id="number-country"
-                    className="w-full p-2 text-xs border rounded-md bg-background"
-                    value={numberSearchParams.country}
-                    onChange={(e) => setNumberSearchParams({...numberSearchParams, country: e.target.value})}
-                  >
-                    <option value="US">United States</option>
-                    <option value="CA">Canada</option>
-                    <option value="GB">United Kingdom</option>
-                    <option value="AU">Australia</option>
-                  </select>
-                </div>
-                <div>
-                  <Label htmlFor="number-type" className="text-xs">Type</Label>
-                  <select 
-                    id="number-type"
-                    className="w-full p-2 text-xs border rounded-md bg-background"
-                    value={numberSearchParams.type}
-                    onChange={(e) => setNumberSearchParams({...numberSearchParams, type: e.target.value})}
-                  >
-                    <option value="local">Local</option>
-                    <option value="toll-free">Toll-Free</option>
-                    <option value="mobile">Mobile</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="area-code" className="text-xs">Area Code (optional)</Label>
-                <Input
-                  id="area-code"
-                  placeholder="e.g. 212"
-                  className="text-xs"
-                  value={numberSearchParams.areaCode}
-                  onChange={(e) => setNumberSearchParams({...numberSearchParams, areaCode: e.target.value})}
-                />
-              </div>
-            </div>
-            
-            <div className="flex justify-between gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-xs"
-                onClick={() => setShowPhoneSearch(false)}
-              >
-                Cancel
-              </Button>
-              <Button 
-                variant="default" 
-                size="sm" 
-                className="text-xs"
-                onClick={searchPhoneNumbers}
-                disabled={searchingNumbers}
-              >
-                {searchingNumbers ? (
-                  <>
-                    <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                    Searching...
-                  </>
-                ) : (
-                  <>
-                    <Search className="mr-1 h-3 w-3" />
-                    Search Numbers
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-          
-          {searchedNumbers.length > 0 && (
-            <div>
-              <h5 className="font-medium text-xs mb-2">Available Numbers</h5>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {searchedNumbers.map((number) => (
-                  <div key={number.id} className="p-2 border rounded-md flex justify-between items-center">
-                    <div>
-                      <p className="text-xs font-medium">{number.number}</p>
-                      <div className="flex gap-1 items-center mt-1">
-                        <span className="text-xs text-muted-foreground">{number.region}</span>
-                        <span className="text-xs text-muted-foreground">•</span>
-                        <span className="text-xs text-muted-foreground">${number.monthlyPrice.toFixed(2)}/mo</span>
-                      </div>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      className="h-7 text-xs"
-                      onClick={() => purchasePhoneNumber(number.id)}
-                      disabled={!!purchasingNumber}
-                    >
-                      {purchasingNumber === number.id ? (
-                        <>
-                          <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                          Purchasing...
-                        </>
-                      ) : (
-                        "Purchase"
-                      )}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          <div className="border-t pt-3">
-            <Input
-              placeholder="Twilio API Key"
-              className="mb-3"
-              value={apiKey}
-              onChange={(e) => handleInputChange(e.target.value)}
-              type="password"
-            />
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="w-full"
-              onClick={() => simulateConnection(
-                'twilio', 
-                setConnecting, 
-                setConnected, 
-                connected, 
-                onConnect
-              )}
-            >
-              I already have a Twilio account
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <Input
-            placeholder="Twilio API Key"
-            className="mb-1"
-            value={apiKey}
-            onChange={(e) => handleInputChange(e.target.value)}
-            type="password"
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="account-sid">Account SID</Label>
+          <Input 
+            id="account-sid"
+            value={accountSid}
+            onChange={(e) => setAccountSid(e.target.value)}
+            placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
           />
-          <p className="text-xs text-muted-foreground mb-1">
-            Connect your Twilio account to enable SMS and voice functionality.
-          </p>
+          
+          <Label htmlFor="auth-token">Auth Token</Label>
+          <Input 
+            id="auth-token"
+            type="password"
+            value={authToken}
+            onChange={(e) => setAuthToken(e.target.value)}
+            placeholder="Enter your auth token"
+          />
         </div>
-      )}
+        
+        {(internalConnected.twilio || connected) && (
+          <div className="mt-4 border-t pt-4">
+            <div className="mb-4">
+              <h3 className="font-medium mb-2">Phone Numbers</h3>
+              {ownedPhoneNumbers.length > 0 ? (
+                <div className="space-y-2">
+                  {ownedPhoneNumbers.map(number => (
+                    <div key={number.id} className="flex items-center justify-between p-3 border rounded-md">
+                      <div>
+                        <p className="font-medium">{number.number}</p>
+                        <p className="text-xs text-gray-500">{number.capabilities.join(", ")}</p>
+                      </div>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={() => handleReleaseNumber(number.id)}
+                      >
+                        Release
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">No phone numbers in your account yet.</p>
+              )}
+            </div>
+            
+            <div>
+              <Button 
+                onClick={() => setShowPhoneNumbers(!showPhoneNumbers)} 
+                variant="outline"
+                className="w-full flex items-center justify-center"
+              >
+                <PlusCircle className="h-4 w-4 mr-2" />
+                {showPhoneNumbers ? "Hide Available Numbers" : "Search for Phone Numbers"}
+              </Button>
+              
+              {showPhoneNumbers && (
+                <div className="mt-4 space-y-4">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label htmlFor="country">Country</Label>
+                      <select 
+                        id="country"
+                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        value={searchParams.country}
+                        onChange={(e) => handleSearchParamChange("country", e.target.value)}
+                      >
+                        <option value="US">United States</option>
+                        <option value="CA">Canada</option>
+                        <option value="GB">United Kingdom</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="areaCode">Area Code</Label>
+                      <Input 
+                        id="areaCode"
+                        value={searchParams.areaCode}
+                        onChange={(e) => handleSearchParamChange("areaCode", e.target.value)}
+                        placeholder="e.g. 415"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="type">Number Type</Label>
+                    <select 
+                      id="type"
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      value={searchParams.type}
+                      onChange={(e) => handleSearchParamChange("type", e.target.value)}
+                    >
+                      <option value="local">Local</option>
+                      <option value="tollfree">Toll Free</option>
+                      <option value="mobile">Mobile</option>
+                    </select>
+                  </div>
+                  
+                  <Button onClick={handleSearchNumbers} className="w-full">Search</Button>
+                  
+                  <div className="space-y-2">
+                    {availablePhoneNumbers.map(number => (
+                      <div key={number.id} className="flex items-center justify-between p-3 border rounded-md">
+                        <div>
+                          <p className="font-medium">{number.number}</p>
+                          <p className="text-xs text-gray-500">{number.region} • ${number.monthlyPrice.toFixed(2)}/month</p>
+                          <p className="text-xs text-gray-500">Capabilities: {number.capabilities.join(", ")}</p>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          onClick={() => handlePurchaseNumber(number)}
+                        >
+                          Buy
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </MessagingServiceCard>
   );
 };

@@ -3,24 +3,22 @@ import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Mail, MessageCircle } from "lucide-react";
-import {
-  EmailIntegration,
-  TwilioIntegration,
-  WhatsAppIntegration,
-  MessengerIntegration,
-  SMSIntegration,
-  ViberIntegration,
-  LineIntegration,
-  InstagramIntegration,
-  TwitterIntegration,
-  LiveChatIntegration,
-  useMessagingService
-} from '@/components/settings/integrations/messaging';
+import EmailIntegration from "./messaging/EmailIntegration";
+import TwilioIntegration from "./messaging/TwilioIntegration";
+import WhatsAppIntegration from "./messaging/WhatsAppIntegration";
+import MessengerIntegration from "./messaging/MessengerIntegration";
+import SMSIntegration from "./messaging/SMSIntegration";
+import ViberIntegration from "./messaging/ViberIntegration";
+import LineIntegration from "./messaging/LineIntegration";
+import InstagramIntegration from "./messaging/InstagramIntegration";
+import TwitterIntegration from "./messaging/TwitterIntegration";
+import LiveChatIntegration from "./messaging/LiveChatIntegration";
+import { useMessagingService } from "./messaging/utils";
 
-const MessagingIntegrations: React.FC<{ onConnect?: (id: string) => void }> = ({ onConnect }) => {
+const MessagingIntegrations = ({ onConnect }) => {
   const [activeTab, setActiveTab] = useState("messaging");
-  const [connecting, setConnecting] = useState<string | null>(null);
-  const [connected, setConnected] = useState<{[key: string]: boolean}>({
+  const [connecting, setConnecting] = useState(null);
+  const [connected, setConnected] = useState({
     whatsapp: false,
     messenger: false,
     twitter: false,
@@ -37,7 +35,7 @@ const MessagingIntegrations: React.FC<{ onConnect?: (id: string) => void }> = ({
 
   const { simulateConnection, handleDisconnect } = useMessagingService();
 
-  const handleConnect = (service: string) => {
+  const handleConnect = (service) => {
     simulateConnection(service, setConnecting, setConnected, connected, onConnect);
   };
 
@@ -45,7 +43,7 @@ const MessagingIntegrations: React.FC<{ onConnect?: (id: string) => void }> = ({
     <div className="space-y-6">
       <Card className="p-6 border border-border/40">
         <h2 className="text-2xl font-semibold mb-6">Communication Integrations</h2>
-
+        
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="messaging" className="flex items-center">
@@ -57,10 +55,10 @@ const MessagingIntegrations: React.FC<{ onConnect?: (id: string) => void }> = ({
               Email
             </TabsTrigger>
           </TabsList>
-
+          
           <TabsContent value="messaging" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <LiveChatIntegration 
+              <LiveChatIntegration
                 connected={connected.livechat}
                 connecting={connecting}
                 onConnect={handleConnect}
@@ -124,9 +122,9 @@ const MessagingIntegrations: React.FC<{ onConnect?: (id: string) => void }> = ({
               />
             </div>
           </TabsContent>
-
+          
           <TabsContent value="email" className="space-y-6">
-            <EmailIntegration 
+            <EmailIntegration
               connected={connected.email}
               connecting={connecting}
               onConnect={handleConnect}
