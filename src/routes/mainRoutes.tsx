@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import DashboardPage from '@/pages/DashboardPage';
@@ -62,6 +63,7 @@ const mainRoutes: RouteObject[] = [
     path: '/settings/integrations',
     element: <SettingsIntegrationsPage />,
   },
+  // Finance routes are still defined but not shown in the sidebar
 ];
 
 export default mainRoutes;

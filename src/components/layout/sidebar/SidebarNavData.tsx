@@ -4,7 +4,6 @@ import SidebarMenuItem from "./SidebarMenuItem";
 import {
   dashboardSection,
   automationSection,
-  analyticsSection,
   aiToolsSection,
   coreModulesSection,
   settingsSection
@@ -16,7 +15,7 @@ import { useSidebarNavigation } from "@/hooks/use-sidebar-navigation";
 // Export these items for MainSidebar.tsx
 export const userMenuItems = [
   { name: "Dashboard", path: "/dashboard", icon: "dashboard" },
-  { name: "Analytics", path: "/analytics", icon: "bar_chart" }
+  // Removed Analytics item
 ];
 
 export const marketingItems = [
@@ -43,7 +42,7 @@ export const settingsItems = [
 export const sidebarSections: SidebarSectionType[] = [
   dashboardSection,
   automationSection,
-  analyticsSection,
+  // Removed analyticsSection reference
   aiToolsSection,
   coreModulesSection,
   settingsSection
@@ -81,15 +80,7 @@ export const SidebarNavData = () => {
         isExactPathActive={isExactPathActive}
       />
       
-      <SidebarMenuItem
-        key="analytics"  
-        section={analyticsSection}
-        pathname={pathname}
-        expandedSections={expandedSections}
-        toggleSection={toggleSection}
-        isPathActive={isPathActive}
-        isExactPathActive={isExactPathActive}
-      />
+      {/* Removed Analytics SidebarMenuItem */}
       
       <SidebarMenuItem
         key="aitools" 

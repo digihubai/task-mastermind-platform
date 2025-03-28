@@ -46,7 +46,7 @@ const SettingsIntegrationsPage = () => {
           <TabsList className="mb-4 flex flex-wrap">
             <TabsTrigger value="cms">Website & CMS</TabsTrigger>
             <TabsTrigger value="seo-analytics">SEO Analytics</TabsTrigger>
-            <TabsTrigger value="messaging">Messaging</TabsTrigger>
+            <TabsTrigger value="messaging">Communication</TabsTrigger>
             <TabsTrigger value="api">API Connections</TabsTrigger>
           </TabsList>
           

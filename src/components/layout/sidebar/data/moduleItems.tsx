@@ -91,16 +91,12 @@ export const coreModulesSection = {
         }
       ],
     },
-    {
-      title: "Finance",
-      href: "/finance",
-      icon: <Calculator size={20} />,
-    },
-    {
-      title: "Analytics",
-      href: "/analytics",
-      icon: <BarChart2 size={20} />,
-    }
+    // Finance department hidden for now
+    // {
+    //   title: "Finance",
+    //   href: "/finance",
+    //   icon: <Calculator size={20} />,
+    // },
   ] as SidebarItemType[],
 };
 
