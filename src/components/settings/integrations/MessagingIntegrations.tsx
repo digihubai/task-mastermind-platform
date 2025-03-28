@@ -15,7 +15,7 @@ import {
   TwitterIntegration,
   LiveChatIntegration,
   useMessagingService
-} from './integrations/messaging';
+} from '@/components/settings/integrations/messaging';
 
 const MessagingIntegrations: React.FC<{ onConnect?: (id: string) => void }> = ({ onConnect }) => {
   const [activeTab, setActiveTab] = useState("messaging");
