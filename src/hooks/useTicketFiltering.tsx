@@ -74,7 +74,13 @@ export const useTicketFiltering = (
     console.log('Departments found in useTicketFiltering:', departments);
     console.log('Current category filter:', categoryFilter);
     console.log('Current department filter:', departmentFilter);
-  }, [categories, departments, categoryFilter, departmentFilter]);
+    
+    // Log each ticket for debugging
+    console.log('All tickets with their categories and departments:');
+    tickets.forEach((ticket, index) => {
+      console.log(`Ticket ${index + 1}: category="${ticket.category}", department="${ticket.department}"`);
+    });
+  }, [categories, departments, categoryFilter, departmentFilter, tickets]);
   
   const priorities = useMemo(() => 
     [...new Set(tickets.map(ticket => ticket.priority).filter(Boolean))], [tickets]

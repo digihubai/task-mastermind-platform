@@ -27,6 +27,13 @@ export const TicketCategoryField: React.FC<TicketCategoryFieldProps> = ({
     console.log('Current category value:', value);
   }, [availableCategories, value]);
   
+  // Ensure we have a valid value (in case the selected value is not in the available options)
+  useEffect(() => {
+    if (availableCategories.length > 0 && !availableCategories.includes(value)) {
+      onChange(availableCategories[0]);
+    }
+  }, [availableCategories, value, onChange]);
+  
   return (
     <div>
       <Label htmlFor="category">Category</Label>

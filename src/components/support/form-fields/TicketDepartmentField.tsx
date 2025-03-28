@@ -27,6 +27,13 @@ export const TicketDepartmentField: React.FC<TicketDepartmentFieldProps> = ({
     console.log('Current department value:', value);
   }, [availableDepartments, value]);
   
+  // Ensure we have a valid value (in case the selected value is not in the available options)
+  useEffect(() => {
+    if (availableDepartments.length > 0 && !availableDepartments.includes(value)) {
+      onChange(availableDepartments[0]);
+    }
+  }, [availableDepartments, value, onChange]);
+  
   return (
     <div>
       <Label htmlFor="department">Department</Label>

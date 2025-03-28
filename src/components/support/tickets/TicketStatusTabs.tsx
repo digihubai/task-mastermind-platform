@@ -43,6 +43,11 @@ export const TicketStatusTabs: React.FC<TicketStatusTabsProps> = ({
     const uniqueDepartments = [...new Set(filteredTickets.map(t => t.department))];
     console.log('Unique categories in filtered tickets:', uniqueCategories);
     console.log('Unique departments in filtered tickets:', uniqueDepartments);
+    
+    // Log each ticket's category and department
+    filteredTickets.forEach((ticket, index) => {
+      console.log(`Filtered ticket ${index + 1}: id=${ticket.id}, category="${ticket.category}", department="${ticket.department}"`);
+    });
   }, [filteredTickets, activeTab]);
 
   return (
