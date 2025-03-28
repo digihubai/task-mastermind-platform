@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { SupportTicket } from "@/types/support";
 import { useToast } from "@/hooks/use-toast";
@@ -19,6 +20,13 @@ interface CustomerTicketFormProps {
     phone?: boolean;
     company?: boolean;
   };
+  optionalFields?: {
+    orderNumber?: boolean;
+    urgencyLevel?: boolean;
+    preferredContact?: boolean;
+    bestTimeToReach?: boolean;
+    custom?: {[key: string]: boolean};
+  };
 }
 
 export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({ 
@@ -30,7 +38,8 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
   availableCategories = ["Technical", "Billing", "General", "Feature Request"],
   availableDepartments = ["Customer Support", "Technical Support", "Billing", "Sales"],
   showAiSupportOption = true,
-  requiredFields = { phone: false, company: false }
+  requiredFields = { phone: false, company: false },
+  optionalFields = { orderNumber: false, urgencyLevel: true, preferredContact: false, bestTimeToReach: false, custom: {} }
 }) => {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
@@ -146,6 +155,7 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
         availableCategories={availableCategories}
         availableDepartments={availableDepartments}
         requiredFields={requiredFields}
+        optionalFields={optionalFields}
       />
     </div>
   );
