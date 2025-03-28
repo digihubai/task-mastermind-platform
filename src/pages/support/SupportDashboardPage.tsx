@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import SupportStats from "@/components/support/SupportStats";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, TicketIcon, MessageSquare, Phone, Users } from "lucide-react";
+import { PlusCircle, TicketIcon, MessageSquare, Phone, Users, ExternalLink } from "lucide-react";
 import OmnichannelInbox from "@/components/communication/OmnichannelInbox";
 import { useNavigate } from 'react-router-dom';
 import { TicketList } from "@/components/support/TicketList";
@@ -95,6 +95,10 @@ const SupportDashboardPage = () => {
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-semibold">Support Dashboard</h1>
           <div className="flex gap-3">
+            <Button variant="outline" onClick={() => navigate('/support/embed')}>
+              <ExternalLink className="mr-2 h-4 w-4" />
+              Embed Form
+            </Button>
             <Button variant="outline" onClick={() => navigate('/support/tickets')}>
               <Users className="mr-2 h-4 w-4" />
               All Tickets
