@@ -78,6 +78,33 @@ export const TicketDetailsStep: React.FC<TicketDetailsStepProps> = ({
     e.preventDefault();
 
     const fileNames = files ? Array.from(files).map(file => file.name) : [];
+    
+    // Build metadata object only with fields that are enabled
+    const metadata: Record<string, any> = {};
+    
+    if (optionalFields.orderNumber) {
+      metadata.orderNumber = orderNumber;
+    }
+    
+    if (optionalFields.urgencyLevel) {
+      metadata.urgencyLevel = urgencyLevel;
+    }
+    
+    if (optionalFields.preferredContact) {
+      metadata.preferredContact = preferredContact;
+    }
+    
+    if (optionalFields.bestTimeToReach) {
+      metadata.bestTimeToReach = bestTimeToReach;
+    }
+    
+    if (Object.keys(optionalFields.custom || {}).length > 0) {
+      metadata.customFields = customFields;
+    }
+    
+    if (fileNames.length > 0) {
+      metadata.attachments = fileNames;
+    }
 
     onSubmit({
       subject,
@@ -86,14 +113,7 @@ export const TicketDetailsStep: React.FC<TicketDetailsStepProps> = ({
       category,
       department,
       status: "new",
-      metadata: {
-        orderNumber: optionalFields.orderNumber ? orderNumber : undefined,
-        urgencyLevel: optionalFields.urgencyLevel ? urgencyLevel : undefined,
-        preferredContact: optionalFields.preferredContact ? preferredContact : undefined,
-        bestTimeToReach: optionalFields.bestTimeToReach ? bestTimeToReach : undefined,
-        customFields: Object.keys(optionalFields.custom || {}).length > 0 ? customFields : undefined,
-        attachments: fileNames.length > 0 ? fileNames : undefined
-      }
+      metadata: Object.keys(metadata).length > 0 ? metadata : undefined
     });
   };
 
@@ -150,18 +170,21 @@ export const TicketDetailsStep: React.FC<TicketDetailsStepProps> = ({
         )}
         
         {/* Custom Fields */}
-        <TicketCustomFields
-          customFields={customFields}
-          optionalFields={optionalFields}
-          onChange={handleCustomFieldChange}
-        />
+        {Object.keys(optionalFields.custom || {}).length > 0 && (
+          <TicketCustomFields
+            customFields={customFields}
+            optionalFields={optionalFields}
+            onChange={handleCustomFieldChange}
+          />
+        )}
         
+        {/* Required Description Field */}
         <TicketDescriptionField 
           value={description} 
           onChange={(e) => setDescription(e.target.value)} 
         />
         
-        {/* File Attachments */}
+        {/* File Attachments - Always show this field */}
         <TicketAttachmentField
           files={files}
           onChange={handleFileChange}

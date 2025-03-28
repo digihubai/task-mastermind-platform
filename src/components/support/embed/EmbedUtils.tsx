@@ -12,7 +12,17 @@ export const createEmbeddableTicketForm = () => {
       js=d.createElement(s),fjs=d.getElementsByTagName(s)[0];
       js.id=o;js.src=f;js.async=1;fjs.parentNode.insertBefore(js,fjs);
     }(window,document,'script','dh','https://your-app-domain.com/embed.js'));
-    dh('init', { selector: '#digihub-support-form' });
+    dh('init', { 
+      selector: '#digihub-support-form',
+      theme: 'auto',
+      requiredFields: { phone: false, company: false },
+      optionalFields: { 
+        orderNumber: false,
+        urgencyLevel: true, 
+        preferredContact: false, 
+        bestTimeToReach: false
+      }
+    });
   `;
   return script;
 };

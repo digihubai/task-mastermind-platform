@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,17 @@ interface FormCustomizationInterfaceProps {
 export const FormCustomizationInterface: React.FC<FormCustomizationInterfaceProps> = ({ settings, onSettingsChange }) => {
   const [customFields, setCustomFields] = useState<string[]>([]);
   const [newCustomField, setNewCustomField] = useState('');
+  
+  // Initialize custom fields from settings
+  useEffect(() => {
+    if (settings.optionalFields?.custom) {
+      const fieldNames = Object.keys(settings.optionalFields.custom).map(key => {
+        // Convert field_name back to "Field Name" format
+        return key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+      });
+      setCustomFields(fieldNames);
+    }
+  }, []);
   
   const handleChange = (key: keyof EmbeddableTicketFormProps, value: any) => {
     onSettingsChange({ ...settings, [key]: value });
@@ -181,7 +192,7 @@ export const FormCustomizationInterface: React.FC<FormCustomizationInterfaceProp
             <div className="flex items-center space-x-2">
               <Switch
                 id="urgency-level-field"
-                checked={settings.optionalFields?.urgencyLevel || false}
+                checked={settings.optionalFields?.urgencyLevel !== false}
                 onCheckedChange={(checked) => toggleOptionalField('urgencyLevel', checked)}
               />
               <Label htmlFor="urgency-level-field">Urgency Level</Label>

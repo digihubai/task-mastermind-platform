@@ -13,9 +13,13 @@ export const TicketCustomFields: React.FC<TicketCustomFieldsProps> = ({
   optionalFields,
   onChange
 }) => {
+  if (!optionalFields.custom || Object.keys(optionalFields.custom).length === 0) {
+    return null;
+  }
+
   return (
     <>
-      {optionalFields.custom && Object.keys(optionalFields.custom).map(key => {
+      {Object.keys(optionalFields.custom).map(key => {
         if (optionalFields.custom && optionalFields.custom[key]) {
           const fieldName = key.replace(/_/g, ' ');
           const displayName = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
@@ -27,7 +31,7 @@ export const TicketCustomFields: React.FC<TicketCustomFieldsProps> = ({
               </label>
               <Input
                 id={key}
-                placeholder={`Enter ${displayName}`}
+                placeholder={`Enter ${displayName.toLowerCase()}`}
                 value={customFields[key] || ''}
                 onChange={(e) => onChange(key, e.target.value)}
               />
