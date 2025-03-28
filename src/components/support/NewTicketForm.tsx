@@ -46,6 +46,29 @@ export const NewTicketForm: React.FC<NewTicketFormProps> = ({
     onSubmit(formData);
   };
   
+  // Enhanced categories
+  const categories = [
+    { value: "general", label: "General" },
+    { value: "account", label: "Account" },
+    { value: "billing", label: "Billing" },
+    { value: "technical", label: "Technical" },
+    { value: "feature", label: "Feature Request" },
+    { value: "bug", label: "Bug Report" },
+    { value: "integration", label: "Integration" },
+    { value: "security", label: "Security" }
+  ];
+
+  // Enhanced departments
+  const departments = [
+    { value: "Support", label: "Support" },
+    { value: "Sales", label: "Sales" },
+    { value: "Billing", label: "Billing" },
+    { value: "Product", label: "Product" },
+    { value: "Technical", label: "Technical" },
+    { value: "Engineering", label: "Engineering" },
+    { value: "Customer Success", label: "Customer Success" }
+  ];
+  
   return (
     <Card>
       <CardHeader>
@@ -99,6 +122,7 @@ export const NewTicketForm: React.FC<NewTicketFormProps> = ({
                     <SelectItem value="low">Low</SelectItem>
                     <SelectItem value="medium">Medium</SelectItem>
                     <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -117,11 +141,9 @@ export const NewTicketForm: React.FC<NewTicketFormProps> = ({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="general">General</SelectItem>
-                    <SelectItem value="account">Account</SelectItem>
-                    <SelectItem value="billing">Billing</SelectItem>
-                    <SelectItem value="technical">Technical</SelectItem>
-                    <SelectItem value="feature">Feature Request</SelectItem>
+                    {categories.map(category => (
+                      <SelectItem key={category.value} value={category.value}>{category.label}</SelectItem>
+                    ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -142,11 +164,9 @@ export const NewTicketForm: React.FC<NewTicketFormProps> = ({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="Support">Support</SelectItem>
-                    <SelectItem value="Sales">Sales</SelectItem>
-                    <SelectItem value="Billing">Billing</SelectItem>
-                    <SelectItem value="Product">Product</SelectItem>
-                    <SelectItem value="Technical">Technical</SelectItem>
+                    {departments.map(dept => (
+                      <SelectItem key={dept.value} value={dept.value}>{dept.label}</SelectItem>
+                    ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>

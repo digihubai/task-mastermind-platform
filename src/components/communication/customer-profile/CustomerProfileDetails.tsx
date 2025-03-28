@@ -1,9 +1,11 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { CustomerProfile } from '@/types/omnichannel';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import {
   Clock,
   Mail,
@@ -21,7 +23,8 @@ import {
   Link as LinkIcon,
   Send,
   Tag,
-  User
+  User,
+  CheckCircle
 } from 'lucide-react';
 
 interface ProfileDetailItemProps {
@@ -49,6 +52,27 @@ interface CustomerProfileDetailsProps {
 }
 
 const CustomerProfileDetails: React.FC<CustomerProfileDetailsProps> = ({ profile }) => {
+  const { toast } = useToast();
+  const [notes, setNotes] = useState<string>('');
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [savedNotes, setSavedNotes] = useState<string>('');
+  
+  const handleSaveNotes = () => {
+    setIsSaving(true);
+    
+    // In a real application, you would save the notes to your backend
+    setTimeout(() => {
+      setSavedNotes(notes);
+      setIsSaving(false);
+      
+      toast({
+        title: 'Notes saved',
+        description: 'Customer notes have been saved successfully.',
+        variant: 'default'
+      });
+    }, 500);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
@@ -137,9 +161,26 @@ const CustomerProfileDetails: React.FC<CustomerProfileDetailsProps> = ({ profile
         <textarea 
           className="w-full min-h-[100px] px-3 py-2 text-sm rounded-md border border-input bg-background" 
           placeholder="Add notes about this customer..."
+          value={notes || savedNotes}
+          onChange={(e) => setNotes(e.target.value)}
         />
         <div className="flex justify-end">
-          <Button size="sm">Save Notes</Button>
+          <Button 
+            size="sm" 
+            onClick={handleSaveNotes} 
+            disabled={isSaving || (!notes && !savedNotes)}
+          >
+            {isSaving ? (
+              <span className="flex items-center">
+                <span className="mr-2">Saving...</span>
+              </span>
+            ) : (
+              <span className="flex items-center">
+                {savedNotes && notes === savedNotes && <CheckCircle className="mr-2 h-3 w-3" />}
+                Save Notes
+              </span>
+            )}
+          </Button>
         </div>
       </div>
     </div>

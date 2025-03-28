@@ -7,6 +7,7 @@ import SupportDashboardPage from '@/pages/support/SupportDashboardPage';
 import InboundCallsPage from '@/pages/support/InboundCallsPage';
 import OutboundCallsPage from '@/pages/support/OutboundCallsPage';
 import TicketsPage from '@/pages/support/TicketsPage';
+import CustomerSupportPage from '@/pages/support/CustomerSupportPage';
 
 const supportRoutes: RouteObject[] = [
   {
@@ -36,6 +37,10 @@ const supportRoutes: RouteObject[] = [
   {
     path: '/support/tickets',
     element: <TicketsPage />,
+  },
+  {
+    path: '/support/customer',
+    element: <CustomerSupportPage />,
   },
 ];
 
