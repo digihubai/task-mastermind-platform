@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,119 +12,176 @@ import {
   Check,
   X,
   Loader2,
-  Link
+  Link,
+  Search,
+  BarChart3,
+  Code
 } from "lucide-react";
 
-const SEOIntegrations = () => {
+interface SEOIntegrationsProps {
+  useCmsConnections?: boolean;
+}
+
+const SEOIntegrations: React.FC<SEOIntegrationsProps> = ({ useCmsConnections = false }) => {
   const { toast } = useToast();
-  const [connecting, setConnecting] = useState<string | null>(null);
-  const [wordpressUrl, setWordpressUrl] = useState("");
-  const [shopifyUrl, setShopifyUrl] = useState("");
-  const [wixUrl, setWixUrl] = useState("");
   
-  const [connected, setConnected] = useState<{[key: string]: boolean}>({
-    wordpress: false,
-    shopify: false,
-    wix: false
+  const [seoTools, setSeoTools] = useState({
+    googleSearchConsole: {
+      connected: false,
+      connecting: false,
+      siteUrl: ""
+    },
+    semrush: {
+      connected: false,
+      connecting: false,
+      apiKey: ""
+    },
+    ahrefs: {
+      connected: false,
+      connecting: false,
+      apiKey: ""
+    },
+    screamingFrog: {
+      connected: false,
+      connecting: false,
+      apiKey: ""
+    }
   });
 
-  const handleConnect = (platform: string) => {
-    if (connected[platform]) {
+  const handleConnectSEOTool = (tool: keyof typeof seoTools) => {
+    const toolConfig = seoTools[tool];
+    
+    // Validate input
+    let validationField = tool === 'googleSearchConsole' ? 'siteUrl' : 'apiKey';
+    if (!toolConfig[validationField as keyof typeof toolConfig]) {
       toast({
-        title: "Already Connected",
-        description: `Your ${platform.charAt(0).toUpperCase() + platform.slice(1)} account is already connected.`,
-      });
-      return;
-    }
-
-    // Validate URL
-    let url = "";
-    switch (platform) {
-      case "wordpress":
-        url = wordpressUrl;
-        break;
-      case "shopify":
-        url = shopifyUrl;
-        break;
-      case "wix":
-        url = wixUrl;
-        break;
-    }
-
-    if (!url) {
-      toast({
-        title: "URL Required",
-        description: `Please enter your ${platform.charAt(0).toUpperCase() + platform.slice(1)} site URL.`,
+        title: "Input Required",
+        description: `Please enter your ${tool === 'googleSearchConsole' ? 'site URL' : 'API key'}.`,
         variant: "destructive",
       });
       return;
     }
 
-    setConnecting(platform);
-    
-    // Simulate connection process
+    // Set connecting state
+    setSeoTools(prev => ({
+      ...prev,
+      [tool]: {
+        ...prev[tool],
+        connecting: true
+      }
+    }));
+
+    // Simulate API connection
     setTimeout(() => {
-      setConnecting(null);
-      setConnected({...connected, [platform]: true});
+      setSeoTools(prev => ({
+        ...prev,
+        [tool]: {
+          ...prev[tool],
+          connecting: false,
+          connected: true
+        }
+      }));
+
       toast({
         title: "Connection Successful",
-        description: `Your ${platform.charAt(0).toUpperCase() + platform.slice(1)} site has been connected successfully.`,
+        description: `Your ${tool} integration is now active.`
       });
-    }, 2000);
+    }, 1500);
   };
 
-  const handleDisconnect = (platform: string) => {
-    setConnected({...connected, [platform]: false});
+  const handleDisconnectSEOTool = (tool: keyof typeof seoTools) => {
+    setSeoTools(prev => ({
+      ...prev,
+      [tool]: {
+        ...prev[tool],
+        connected: false,
+        siteUrl: "",
+        apiKey: ""
+      }
+    }));
+
     toast({
       title: "Disconnected",
-      description: `Your ${platform.charAt(0).toUpperCase() + platform.slice(1)} site has been disconnected.`,
+      description: `Your ${tool} integration has been removed.`
     });
+  };
 
-    // Reset URL
-    switch (platform) {
-      case "wordpress":
-        setWordpressUrl("");
-        break;
-      case "shopify":
-        setShopifyUrl("");
-        break;
-      case "wix":
-        setWixUrl("");
-        break;
-    }
+  const handleInputChange = (tool: keyof typeof seoTools, value: string) => {
+    const field = tool === 'googleSearchConsole' ? 'siteUrl' : 'apiKey';
+    
+    setSeoTools(prev => ({
+      ...prev,
+      [tool]: {
+        ...prev[tool],
+        [field]: value
+      }
+    }));
   };
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold">SEO Platform Integrations</h2>
+      <h2 className="text-xl font-semibold">SEO Tools Integration</h2>
       <p className="text-sm text-muted-foreground">
-        Connect your websites to optimize SEO performance, analyze rankings, and automatically push SEO improvements
+        Connect SEO tools to analyze your website performance and optimize your content
       </p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-5 border">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="bg-blue-100 p-2 rounded-full">
-              <Globe className="h-5 w-5 text-blue-600" />
+
+      {useCmsConnections && (
+        <Card className="p-5 border mb-6 bg-muted/50">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="bg-primary/10 p-2 rounded-full">
+              <Code className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h4 className="font-medium">WordPress</h4>
-              <p className="text-xs text-muted-foreground">Connect for SEO optimization</p>
+              <h4 className="font-medium">CMS Connections</h4>
+              <p className="text-xs text-muted-foreground">
+                Use your website connections from the Website & CMS tab for SEO optimization
+              </p>
+            </div>
+          </div>
+          <p className="text-sm">
+            Any CMS platforms you've connected in the Website & CMS tab will automatically be available 
+            for SEO optimization. No need to reconnect them here.
+          </p>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="mt-3"
+            onClick={() => {
+              document.querySelector('[data-value="cms"]')?.dispatchEvent(
+                new MouseEvent('click', { bubbles: true })
+              );
+            }}
+          >
+            <Globe className="mr-2 h-4 w-4" />
+            Manage Website Connections
+          </Button>
+        </Card>
+      )}
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="p-5 border">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-red-100 p-2 rounded-full">
+              <Search className="h-5 w-5 text-red-600" />
+            </div>
+            <div>
+              <h4 className="font-medium">Google Search Console</h4>
+              <p className="text-xs text-muted-foreground">Connect for ranking data</p>
             </div>
           </div>
           
-          {connected.wordpress ? (
+          {seoTools.googleSearchConsole.connected ? (
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
                 <Check className="h-4 w-4 text-green-600" />
                 <span>Connected</span>
               </div>
-              <p className="text-xs truncate">{wordpressUrl}</p>
+              <p className="text-xs truncate">{seoTools.googleSearchConsole.siteUrl}</p>
               <Button 
                 variant="outline" 
                 size="sm" 
                 className="w-full"
-                onClick={() => handleDisconnect("wordpress")}
+                onClick={() => handleDisconnectSEOTool('googleSearchConsole')}
               >
                 <X className="mr-2 h-4 w-4" />
                 Disconnect
@@ -132,19 +190,19 @@ const SEOIntegrations = () => {
           ) : (
             <>
               <Input
-                placeholder="https://your-wordpress-site.com"
+                placeholder="https://yourdomain.com"
                 className="mb-3"
-                value={wordpressUrl}
-                onChange={(e) => setWordpressUrl(e.target.value)}
+                value={seoTools.googleSearchConsole.siteUrl}
+                onChange={(e) => handleInputChange('googleSearchConsole', e.target.value)}
               />
               <Button 
                 variant="outline" 
                 size="sm" 
                 className="w-full"
-                onClick={() => handleConnect("wordpress")}
-                disabled={connecting === "wordpress"}
+                onClick={() => handleConnectSEOTool('googleSearchConsole')}
+                disabled={seoTools.googleSearchConsole.connecting}
               >
-                {connecting === "wordpress" ? (
+                {seoTools.googleSearchConsole.connecting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Connecting...
@@ -162,26 +220,26 @@ const SEOIntegrations = () => {
         <Card className="p-5 border">
           <div className="flex items-center gap-3 mb-4">
             <div className="bg-green-100 p-2 rounded-full">
-              <FileText className="h-5 w-5 text-green-600" />
+              <BarChart3 className="h-5 w-5 text-green-600" />
             </div>
             <div>
-              <h4 className="font-medium">Shopify</h4>
-              <p className="text-xs text-muted-foreground">Connect for product SEO</p>
+              <h4 className="font-medium">SEMrush</h4>
+              <p className="text-xs text-muted-foreground">Connect for keyword research</p>
             </div>
           </div>
           
-          {connected.shopify ? (
+          {seoTools.semrush.connected ? (
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
                 <Check className="h-4 w-4 text-green-600" />
                 <span>Connected</span>
               </div>
-              <p className="text-xs truncate">{shopifyUrl}</p>
+              <p className="text-xs truncate">API Key: ••••••{seoTools.semrush.apiKey.slice(-4)}</p>
               <Button 
                 variant="outline" 
                 size="sm" 
                 className="w-full"
-                onClick={() => handleDisconnect("shopify")}
+                onClick={() => handleDisconnectSEOTool('semrush')}
               >
                 <X className="mr-2 h-4 w-4" />
                 Disconnect
@@ -190,19 +248,20 @@ const SEOIntegrations = () => {
           ) : (
             <>
               <Input
-                placeholder="https://your-store.myshopify.com"
+                placeholder="Enter your SEMrush API key"
                 className="mb-3"
-                value={shopifyUrl}
-                onChange={(e) => setShopifyUrl(e.target.value)}
+                value={seoTools.semrush.apiKey}
+                onChange={(e) => handleInputChange('semrush', e.target.value)}
+                type="password"
               />
               <Button 
                 variant="outline" 
                 size="sm" 
                 className="w-full"
-                onClick={() => handleConnect("shopify")}
-                disabled={connecting === "shopify"}
+                onClick={() => handleConnectSEOTool('semrush')}
+                disabled={seoTools.semrush.connecting}
               >
-                {connecting === "shopify" ? (
+                {seoTools.semrush.connecting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Connecting...
@@ -219,27 +278,27 @@ const SEOIntegrations = () => {
         
         <Card className="p-5 border">
           <div className="flex items-center gap-3 mb-4">
-            <div className="bg-purple-100 p-2 rounded-full">
-              <Settings className="h-5 w-5 text-purple-600" />
+            <div className="bg-blue-100 p-2 rounded-full">
+              <Link className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <h4 className="font-medium">Wix</h4>
-              <p className="text-xs text-muted-foreground">Connect for SEO analysis</p>
+              <h4 className="font-medium">Ahrefs</h4>
+              <p className="text-xs text-muted-foreground">Connect for backlink data</p>
             </div>
           </div>
           
-          {connected.wix ? (
+          {seoTools.ahrefs.connected ? (
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
                 <Check className="h-4 w-4 text-green-600" />
                 <span>Connected</span>
               </div>
-              <p className="text-xs truncate">{wixUrl}</p>
+              <p className="text-xs truncate">API Key: ••••••{seoTools.ahrefs.apiKey.slice(-4)}</p>
               <Button 
                 variant="outline" 
                 size="sm" 
                 className="w-full"
-                onClick={() => handleDisconnect("wix")}
+                onClick={() => handleDisconnectSEOTool('ahrefs')}
               >
                 <X className="mr-2 h-4 w-4" />
                 Disconnect
@@ -248,19 +307,79 @@ const SEOIntegrations = () => {
           ) : (
             <>
               <Input
-                placeholder="https://your-username.wixsite.com"
+                placeholder="Enter your Ahrefs API key"
                 className="mb-3"
-                value={wixUrl}
-                onChange={(e) => setWixUrl(e.target.value)}
+                value={seoTools.ahrefs.apiKey}
+                onChange={(e) => handleInputChange('ahrefs', e.target.value)}
+                type="password"
               />
               <Button 
                 variant="outline" 
                 size="sm" 
                 className="w-full"
-                onClick={() => handleConnect("wix")}
-                disabled={connecting === "wix"}
+                onClick={() => handleConnectSEOTool('ahrefs')}
+                disabled={seoTools.ahrefs.connecting}
               >
-                {connecting === "wix" ? (
+                {seoTools.ahrefs.connecting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Connecting...
+                  </>
+                ) : (
+                  <>
+                    Connect <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </>
+          )}
+        </Card>
+
+        <Card className="p-5 border">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-purple-100 p-2 rounded-full">
+              <Globe className="h-5 w-5 text-purple-600" />
+            </div>
+            <div>
+              <h4 className="font-medium">Screaming Frog</h4>
+              <p className="text-xs text-muted-foreground">Connect for site audits</p>
+            </div>
+          </div>
+          
+          {seoTools.screamingFrog.connected ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm">
+                <Check className="h-4 w-4 text-green-600" />
+                <span>Connected</span>
+              </div>
+              <p className="text-xs truncate">API Key: ••••••{seoTools.screamingFrog.apiKey.slice(-4)}</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => handleDisconnectSEOTool('screamingFrog')}
+              >
+                <X className="mr-2 h-4 w-4" />
+                Disconnect
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Input
+                placeholder="Enter your Screaming Frog API key"
+                className="mb-3"
+                value={seoTools.screamingFrog.apiKey}
+                onChange={(e) => handleInputChange('screamingFrog', e.target.value)}
+                type="password"
+              />
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => handleConnectSEOTool('screamingFrog')}
+                disabled={seoTools.screamingFrog.connecting}
+              >
+                {seoTools.screamingFrog.connecting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Connecting...

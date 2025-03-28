@@ -26,6 +26,13 @@ import CMSIntegrations from "@/components/settings/integrations/CMSIntegrations"
 import SEOAnalyticsIntegrations from "@/components/settings/integrations/SEOAnalyticsIntegrations";
 
 const SettingsIntegrationsPage = () => {
+  // Track when a CMS platform is connected to inform other tabs
+  const handleCMSConnect = (platformId: string) => {
+    console.log(`CMS platform connected: ${platformId}`);
+    // This could be expanded to use context or state management
+    // to share connection status across components
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6 pb-8">
@@ -38,15 +45,15 @@ const SettingsIntegrationsPage = () => {
 
         <Tabs defaultValue="cms" className="w-full">
           <TabsList className="mb-4 flex flex-wrap">
-            <TabsTrigger value="cms">Website & E-commerce</TabsTrigger>
+            <TabsTrigger value="cms">Website & CMS</TabsTrigger>
             <TabsTrigger value="seo-analytics">SEO Analytics</TabsTrigger>
             <TabsTrigger value="messaging">Messaging</TabsTrigger>
-            <TabsTrigger value="seo-tools">SEO Optimization</TabsTrigger>
+            <TabsTrigger value="seo-tools">SEO Tools</TabsTrigger>
             <TabsTrigger value="api">API Connections</TabsTrigger>
           </TabsList>
           
           <TabsContent value="cms" className="space-y-4">
-            <CMSIntegrations />
+            <CMSIntegrations onConnect={handleCMSConnect} />
           </TabsContent>
           
           <TabsContent value="seo-analytics" className="space-y-4">
@@ -58,7 +65,7 @@ const SettingsIntegrationsPage = () => {
           </TabsContent>
           
           <TabsContent value="seo-tools" className="space-y-4">
-            <SEOIntegrations />
+            <SEOIntegrations useCmsConnections={true} />
           </TabsContent>
           
           <TabsContent value="api" className="space-y-4">

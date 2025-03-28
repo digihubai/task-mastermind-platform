@@ -21,9 +21,9 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Content Management Systems</h2>
+      <h2 className="text-xl font-semibold">Website & CMS Integrations</h2>
       <p className="text-sm text-muted-foreground">
-        Connect your website and e-commerce platforms for centralized content management and publishing
+        Connect your websites and e-commerce platforms to centralize content management and optimize for search engines
       </p>
       
       <CMSFilter 
