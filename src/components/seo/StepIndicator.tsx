@@ -8,7 +8,8 @@ import {
   BookOpen,
   FileEdit,
   Image as ImageIcon,
-  Link
+  Link,
+  ListChecks
 } from "lucide-react";
 
 interface StepIndicatorProps {
@@ -26,7 +27,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
     { step: 1, label: "Topic", icon: Search },
     { step: 2, label: "Keywords", icon: FileEdit },
     { step: 3, label: "Title", icon: BookOpen },
-    { step: 4, label: "Outline", icon: ArrowRight },
+    { step: 4, label: "Outline", icon: ListChecks },
     { step: 5, label: "Images", icon: ImageIcon },
     { step: 6, label: "Links", icon: Link },
     { step: 7, label: "Content", icon: Globe }
