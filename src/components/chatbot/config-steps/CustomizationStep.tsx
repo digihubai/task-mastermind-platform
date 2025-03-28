@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface CustomizationStepProps {
   chatbotInfo: {
@@ -23,6 +24,7 @@ interface CustomizationStepProps {
     color: string;
     avatar: string;
     footerLink: string;
+    personality: string;
   };
   setNewChatbotInfo: (info: any) => void;
 }
@@ -253,6 +255,35 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
               }
               placeholder="Hi, how can I help you?"
             />
+          </div>
+
+          <div>
+            <Label>Personality</Label>
+            <Select 
+              value={chatbotInfo.personality || "ai-assistant"}
+              onValueChange={(value) =>
+                setNewChatbotInfo({
+                  ...chatbotInfo,
+                  personality: value,
+                })
+              }
+            >
+              <SelectTrigger className="w-full mt-1.5">
+                <SelectValue placeholder="Select a personality" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="professional">Professional – Formal, precise</SelectItem>
+                <SelectItem value="friendly">Friendly – Warm, engaging</SelectItem>
+                <SelectItem value="humorous">Humorous – Witty, fun</SelectItem>
+                <SelectItem value="supportive">Supportive – Empathetic, patient</SelectItem>
+                <SelectItem value="technical">Technical – Detailed, expert-level</SelectItem>
+                <SelectItem value="casual">Casual – Relaxed, informal</SelectItem>
+                <SelectItem value="sales">Sales-Oriented – Persuasive</SelectItem>
+                <SelectItem value="ai-assistant">AI Assistant – Neutral, informative</SelectItem>
+                <SelectItem value="creative">Creative – Imaginative, expressive</SelectItem>
+                <SelectItem value="sassy">Sassy – Playful, sarcastic</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div>

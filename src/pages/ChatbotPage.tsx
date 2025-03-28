@@ -23,7 +23,8 @@ const ChatbotPage = () => {
     position: "right" as "left" | "right",
     color: "#2196F3",
     avatar: "avatar1",
-    footerLink: "https://digihub.ai"
+    footerLink: "https://digihub.ai",
+    personality: "ai-assistant"
   });
   
   const activeChatbots = [
