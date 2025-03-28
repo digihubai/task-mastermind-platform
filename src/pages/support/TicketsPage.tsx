@@ -1,8 +1,7 @@
-
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Search, ArrowLeft } from "lucide-react";
+import { PlusCircle, Search, ArrowLeft, Filter, ArrowDown, ArrowUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,8 +13,23 @@ import { SupportTicket } from "@/types/support";
 import { useToast } from "@/hooks/use-toast";
 import { mockQueues } from "@/components/support/mock-data/queues";
 import { mockAgents } from "@/components/support/mock-data/agents";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 
-// Mock data for tickets
 const mockTickets: SupportTicket[] = [
   {
     id: "ticket-001",
@@ -118,6 +132,38 @@ const TicketsPage: React.FC = () => {
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
   const [dashboardTab, setDashboardTab] = useState('tickets');
 
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [priorityFilter, setPriorityFilter] = useState<string | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [agentFilter, setAgentFilter] = useState<string | null>(null);
+  const [departmentFilter, setDepartmentFilter] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<string>('updatedAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [showFilters, setShowFilters] = useState(false);
+
+  const categories = useMemo(() => 
+    [...new Set(tickets.map(ticket => ticket.category))], [tickets]
+  );
+  
+  const departments = useMemo(() => 
+    [...new Set(tickets.map(ticket => ticket.department))], [tickets]
+  );
+  
+  const priorities = useMemo(() => 
+    [...new Set(tickets.map(ticket => ticket.priority))], [tickets]
+  );
+
+  const assignedAgents = useMemo(() => {
+    const agentIds = [...new Set(tickets
+      .filter(ticket => ticket.assignedTo)
+      .map(ticket => ticket.assignedTo as string))];
+      
+    return agentIds.map(id => {
+      const agent = mockAgents.find(a => a.id === id);
+      return { id, name: agent ? agent.name : 'Unknown' };
+    });
+  }, [tickets]);
+
   const handleCreateTicket = (newTicket: Partial<SupportTicket>) => {
     const ticket: SupportTicket = {
       ...newTicket,
@@ -203,20 +249,79 @@ const TicketsPage: React.FC = () => {
     });
   };
 
-  const filteredTickets = tickets.filter(ticket => {
-    // Filter by status
-    if (activeTab !== 'all' && ticket.status !== activeTab) return false;
-    
-    // Filter by search query
-    if (searchQuery && !ticket.subject.toLowerCase().includes(searchQuery.toLowerCase()) && 
-        !ticket.description.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
+  const toggleSortOrder = (field: string) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('desc');
     }
-    
-    return true;
-  });
+  };
 
-  // If a ticket is selected, show the ticket details view
+  const clearFilters = () => {
+    setSearchQuery('');
+    setStatusFilter(null);
+    setPriorityFilter(null);
+    setCategoryFilter(null);
+    setAgentFilter(null);
+    setDepartmentFilter(null);
+    setSortField('updatedAt');
+    setSortOrder('desc');
+  };
+
+  const filteredTickets = useMemo(() => {
+    return tickets.filter(ticket => {
+      if (searchQuery && !ticket.subject.toLowerCase().includes(searchQuery.toLowerCase()) && 
+          !ticket.description.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
+      
+      if (activeTab !== 'all' && ticket.status !== activeTab) {
+        return false;
+      }
+      
+      if (priorityFilter && ticket.priority !== priorityFilter) {
+        return false;
+      }
+      
+      if (categoryFilter && ticket.category !== categoryFilter) {
+        return false;
+      }
+      
+      if (departmentFilter && ticket.department !== departmentFilter) {
+        return false;
+      }
+      
+      if (agentFilter && ticket.assignedTo !== agentFilter) {
+        return false;
+      }
+      
+      return true;
+    }).sort((a, b) => {
+      let valueA: any = a[sortField as keyof SupportTicket];
+      let valueB: any = b[sortField as keyof SupportTicket];
+      
+      if (typeof valueA === 'string' && (sortField === 'createdAt' || sortField === 'updatedAt')) {
+        valueA = new Date(valueA).getTime();
+        valueB = new Date(valueB).getTime();
+      }
+      
+      if (valueA < valueB) return sortOrder === 'asc' ? -1 : 1;
+      if (valueA > valueB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [
+    tickets, 
+    searchQuery, 
+    activeTab, 
+    priorityFilter, 
+    categoryFilter, 
+    departmentFilter, 
+    agentFilter,
+    sortField,
+    sortOrder
+  ]);
+
   if (selectedTicket) {
     return (
       <AppLayout showModuleName moduleName="Support Tickets">
@@ -263,8 +368,8 @@ const TicketsPage: React.FC = () => {
               </TabsList>
               
               <TabsContent value="tickets" className="mt-6 space-y-6">
-                <div className="flex gap-4 items-center">
-                  <div className="relative flex-1 max-w-sm">
+                <div className="flex flex-col md:flex-row gap-4 items-start">
+                  <div className="relative w-full md:max-w-sm">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="Search tickets..."
@@ -273,7 +378,127 @@ const TicketsPage: React.FC = () => {
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
+                  
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-2"
+                      onClick={() => setShowFilters(!showFilters)}
+                    >
+                      <Filter className="h-4 w-4" />
+                      Filters {(priorityFilter || categoryFilter || departmentFilter || agentFilter) && <Badge className="ml-1 h-5 w-5 rounded-full p-0 flex items-center justify-center">!</Badge>}
+                    </Button>
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="flex items-center gap-2">
+                          Sort by
+                          {sortOrder === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => toggleSortOrder('updatedAt')}>
+                          Last Updated {sortField === 'updatedAt' && (sortOrder === 'asc' ? '↑' : '↓')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => toggleSortOrder('createdAt')}>
+                          Date Created {sortField === 'createdAt' && (sortOrder === 'asc' ? '↑' : '↓')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => toggleSortOrder('priority')}>
+                          Priority {sortField === 'priority' && (sortOrder === 'asc' ? '↑' : '↓')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => toggleSortOrder('status')}>
+                          Status {sortField === 'status' && (sortOrder === 'asc' ? '↑' : '↓')}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    
+                    {(searchQuery || statusFilter || priorityFilter || categoryFilter || departmentFilter || agentFilter) && (
+                      <Button variant="ghost" onClick={clearFilters}>
+                        Clear
+                      </Button>
+                    )}
+                  </div>
                 </div>
+                
+                {showFilters && (
+                  <Card className="p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Priority</label>
+                        <Select 
+                          value={priorityFilter || ''} 
+                          onValueChange={(value) => setPriorityFilter(value || null)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="All Priorities" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">All Priorities</SelectItem>
+                            {priorities.map((priority) => (
+                              <SelectItem key={priority} value={priority}>{priority}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Category</label>
+                        <Select 
+                          value={categoryFilter || ''} 
+                          onValueChange={(value) => setCategoryFilter(value || null)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="All Categories" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">All Categories</SelectItem>
+                            {categories.map((category) => (
+                              <SelectItem key={category} value={category}>{category}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Department</label>
+                        <Select 
+                          value={departmentFilter || ''} 
+                          onValueChange={(value) => setDepartmentFilter(value || null)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="All Departments" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">All Departments</SelectItem>
+                            {departments.map((department) => (
+                              <SelectItem key={department} value={department}>{department}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Assigned Agent</label>
+                        <Select 
+                          value={agentFilter || ''} 
+                          onValueChange={(value) => setAgentFilter(value || null)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="All Agents" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">All Agents</SelectItem>
+                            {assignedAgents.map((agent) => (
+                              <SelectItem key={agent.id} value={agent.id}>{agent.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </Card>
+                )}
                 
                 <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
                   <TabsList>
@@ -287,7 +512,12 @@ const TicketsPage: React.FC = () => {
                   <TabsContent value="all" className="mt-6">
                     <Card>
                       <CardHeader>
-                        <CardTitle>All Tickets ({filteredTickets.length})</CardTitle>
+                        <div className="flex justify-between items-center">
+                          <CardTitle>All Tickets ({filteredTickets.length})</CardTitle>
+                          {filteredTickets.length !== tickets.length && (
+                            <Badge variant="outline">Filtered</Badge>
+                          )}
+                        </div>
                       </CardHeader>
                       <CardContent>
                         <TicketList 
@@ -301,7 +531,12 @@ const TicketsPage: React.FC = () => {
                   <TabsContent value="open" className="mt-6">
                     <Card>
                       <CardHeader>
-                        <CardTitle>Open Tickets ({filteredTickets.length})</CardTitle>
+                        <div className="flex justify-between items-center">
+                          <CardTitle>Open Tickets ({filteredTickets.length})</CardTitle>
+                          {filteredTickets.length !== tickets.filter(t => t.status === 'open').length && (
+                            <Badge variant="outline">Filtered</Badge>
+                          )}
+                        </div>
                       </CardHeader>
                       <CardContent>
                         <TicketList 
@@ -315,7 +550,12 @@ const TicketsPage: React.FC = () => {
                   <TabsContent value="in_progress" className="mt-6">
                     <Card>
                       <CardHeader>
-                        <CardTitle>In Progress ({filteredTickets.length})</CardTitle>
+                        <div className="flex justify-between items-center">
+                          <CardTitle>In Progress ({filteredTickets.length})</CardTitle>
+                          {filteredTickets.length !== tickets.filter(t => t.status === 'in_progress').length && (
+                            <Badge variant="outline">Filtered</Badge>
+                          )}
+                        </div>
                       </CardHeader>
                       <CardContent>
                         <TicketList 
@@ -329,7 +569,12 @@ const TicketsPage: React.FC = () => {
                   <TabsContent value="resolved" className="mt-6">
                     <Card>
                       <CardHeader>
-                        <CardTitle>Resolved Tickets ({filteredTickets.length})</CardTitle>
+                        <div className="flex justify-between items-center">
+                          <CardTitle>Resolved Tickets ({filteredTickets.length})</CardTitle>
+                          {filteredTickets.length !== tickets.filter(t => t.status === 'resolved').length && (
+                            <Badge variant="outline">Filtered</Badge>
+                          )}
+                        </div>
                       </CardHeader>
                       <CardContent>
                         <TicketList 
@@ -343,7 +588,12 @@ const TicketsPage: React.FC = () => {
                   <TabsContent value="closed" className="mt-6">
                     <Card>
                       <CardHeader>
-                        <CardTitle>Closed Tickets ({filteredTickets.length})</CardTitle>
+                        <div className="flex justify-between items-center">
+                          <CardTitle>Closed Tickets ({filteredTickets.length})</CardTitle>
+                          {filteredTickets.length !== tickets.filter(t => t.status === 'closed').length && (
+                            <Badge variant="outline">Filtered</Badge>
+                          )}
+                        </div>
                       </CardHeader>
                       <CardContent>
                         <TicketList 
