@@ -7,6 +7,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -14,7 +16,7 @@ serve(async (req) => {
   }
 
   try {
-    const { topic, keywords, title, outline } = await req.json();
+    const { topic, keywords, title, outline, selectedImages } = await req.json();
     
     console.log("Generating content for:", { topic, title, keywordCount: keywords?.length });
     
@@ -28,11 +30,25 @@ serve(async (req) => {
       );
     }
 
-    // This is a simulation for now - in production, you would connect to OpenAI or another AI service
-    // Create a nicely formatted HTML content for SEO
-    const content = generateSEOContent(topic, keywords, title, outline);
+    let content;
     
-    console.log("Content generated successfully, content length:", content.length);
+    if (OPENAI_API_KEY) {
+      // Use OpenAI to generate content
+      try {
+        content = await generateOpenAIContent(topic, keywords, title, outline, selectedImages);
+        console.log("Content generated successfully with OpenAI, content length:", content.length);
+      } catch (aiError) {
+        console.error("Error generating content with OpenAI:", aiError);
+        // Fall back to template generation if OpenAI fails
+        content = generateTemplateContent(topic, keywords, title, outline);
+        console.log("Fallback content generated, content length:", content.length);
+      }
+    } else {
+      // Use template-based generation if OpenAI API key is not available
+      console.warn("OPENAI_API_KEY is not set. Using template-based content generation.");
+      content = generateTemplateContent(topic, keywords, title, outline);
+      console.log("Template-based content generated, content length:", content.length);
+    }
     
     return new Response(
       JSON.stringify({ content }),
@@ -49,14 +65,118 @@ serve(async (req) => {
   }
 });
 
-// Utility function to generate formatted SEO content
-function generateSEOContent(topic: string, keywords: string[], title: string, outline: string) {
+// Function to generate content using OpenAI
+async function generateOpenAIContent(topic, keywords, title, outline, selectedImages = []) {
+  console.log("Generating content with OpenAI for:", { topic, title });
+  
+  // Parse the outline if it's provided
+  let outlineSections = [];
+  if (outline) {
+    // Simple parsing of outline sections (assumes clean formatting)
+    outlineSections = outline.split(/\n+/).filter(line => line.trim().length > 0);
+  }
+  
+  // Create a detailed system prompt for the AI
+  const systemPrompt = `You are an expert SEO content writer who creates comprehensive, engaging, and well-structured content optimized for search engines.
+Your task is to write high-quality SEO content based on the provided title, topic, and keywords.
+Your content should follow SEO best practices:
+- Use the primary keyword in the introduction, conclusion, and several times throughout the body
+- Maintain a keyword density of 1-2%
+- Use secondary keywords naturally throughout the text
+- Create a logical structure with proper heading hierarchy (H1, H2, H3)
+- Write engaging, informative content that provides value to readers
+- Include relevant, naturally-placed internal and external links suggestions (marked as [LINK])
+- Keep paragraphs short and scannable (3-4 sentences max)
+- Use bullet points and numbered lists where appropriate
+- Include a compelling call-to-action in the conclusion
+
+Format your response as HTML with proper heading tags, paragraph tags, and list elements.`;
+
+  // Prepare the outline description
+  let outlineDescription = "";
+  if (outlineSections.length > 0) {
+    outlineDescription = "Follow this content outline structure:\n";
+    outlineSections.forEach((section, index) => {
+      outlineDescription += `${index + 1}. ${section.trim()}\n`;
+    });
+  }
+
+  // Prepare the image description
+  let imageDescription = "";
+  if (selectedImages && selectedImages.length > 0) {
+    imageDescription = `\nIncorporate these image descriptions in appropriate places in the content:\n`;
+    selectedImages.forEach((image, index) => {
+      imageDescription += `Image ${index + 1}: ${image.description || "Related to " + topic}\n`;
+    });
+    imageDescription += `Use [IMAGE:${index+1}] notation to indicate where images should be placed.`;
+  }
+
+  // Build the user prompt with all the details
+  const userPrompt = `Title: ${title}\n\n` +
+    `Topic: ${topic}\n\n` +
+    `Primary Keyword: ${keywords[0]}\n\n` +
+    `Secondary Keywords: ${keywords.slice(1).join(", ")}\n\n` +
+    outlineDescription + 
+    imageDescription +
+    `\n\nPlease generate a comprehensive, SEO-optimized HTML content of at least 1000 words.`;
+
+  // Call OpenAI API
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
+      temperature: 0.7,
+      max_tokens: 4000
+    })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(`OpenAI API error: ${error.error?.message || JSON.stringify(error)}`);
+  }
+
+  const data = await response.json();
+  let content = data.choices[0].message.content;
+
+  // Process the content to incorporate images
+  if (selectedImages && selectedImages.length > 0) {
+    selectedImages.forEach((image, index) => {
+      const imageTag = `<img src="${image.url}" alt="${image.description || topic}" class="my-6 rounded-lg mx-auto max-w-full" />`;
+      const imageMarker = `[IMAGE:${index+1}]`;
+      
+      if (content.includes(imageMarker)) {
+        content = content.replace(imageMarker, imageTag);
+      } else if (index === 0) {
+        // If no image placement markers, place the first image after the first heading
+        const firstHeadingEnd = content.indexOf('</h1>');
+        if (firstHeadingEnd !== -1) {
+          content = content.slice(0, firstHeadingEnd + 5) + 
+                   `\n${imageTag}\n` + 
+                   content.slice(firstHeadingEnd + 5);
+        }
+      }
+    });
+  }
+
+  return content;
+}
+
+// Template-based content generation function as fallback
+function generateTemplateContent(topic, keywords, title, outline) {
   // Format keywords for better text generation
   const primaryKeyword = keywords[0] || topic;
   const secondaryKeywords = keywords.slice(1, 5);
   
   // Parse the outline if it's provided
-  let outlineSections: string[] = [];
+  let outlineSections = [];
   if (outline) {
     // Simple parsing of outline sections (assumes clean formatting)
     outlineSections = outline.split(/\n+/).filter(line => line.trim().length > 0);

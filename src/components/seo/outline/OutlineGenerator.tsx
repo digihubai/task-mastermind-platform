@@ -82,7 +82,7 @@ const OutlineGenerator: React.FC<OutlineGeneratorProps> = ({
               <div>
                 <Label className="text-sm font-medium">Outline Style</Label>
                 <Select 
-                  defaultValue={seoData.outlineStyle || "comprehensive"}
+                  value={seoData.outlineStyle || "comprehensive"}
                   onValueChange={(value) => onDataChange("outlineStyle", value)}
                 >
                   <SelectTrigger className="w-full mt-1">
@@ -101,7 +101,7 @@ const OutlineGenerator: React.FC<OutlineGeneratorProps> = ({
               <div>
                 <Label className="text-sm font-medium">Audience Level</Label>
                 <Select 
-                  defaultValue={seoData.audienceLevel || "intermediate"}
+                  value={seoData.audienceLevel || "intermediate"}
                   onValueChange={(value) => onDataChange("audienceLevel", value)}
                 >
                   <SelectTrigger className="w-full mt-1">

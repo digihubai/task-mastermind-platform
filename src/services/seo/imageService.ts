@@ -49,11 +49,13 @@ export const searchStockPhotos = async (
   }
 };
 
-// For generating AI images
+// For generating AI images using our Supabase edge function
 export const generateAIImages = async (
   prompt: string,
   count: number = 4,
-  size: 'square' | 'landscape' | 'portrait' | 'widescreen' = 'square'
+  size: 'square' | 'landscape' | 'portrait' | 'widescreen' = 'square',
+  topic?: string,
+  keywords?: string[]
 ) => {
   console.log(`Generating ${count} AI images with prompt: ${prompt}`);
   
@@ -71,7 +73,9 @@ export const generateAIImages = async (
       body: JSON.stringify({ 
         prompt, 
         count,
-        size
+        size,
+        topic,
+        keywords
       }),
     });
     
