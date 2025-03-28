@@ -1,6 +1,6 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,262 +14,131 @@ serve(async (req) => {
   }
 
   try {
-    // Get request body
-    const { topic, keywords, title, outline, images, internalLinks, externalLinks } = await req.json();
+    const { topic, keywords, title, outline } = await req.json();
     
-    // Validate inputs
-    if (!topic) {
+    console.log("Generating content for:", { topic, title, keywordCount: keywords?.length });
+    
+    if (!topic || !title || !keywords || keywords.length === 0) {
       return new Response(
-        JSON.stringify({ error: 'Topic is required' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+        JSON.stringify({ 
+          error: "Missing required fields", 
+          details: "Topic, title, and keywords are required" 
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       );
     }
 
-    // Process inputs to ensure they're formatted correctly
-    const cleanTopic = topic.trim();
-    const formattedTopic = cleanTopic.charAt(0).toUpperCase() + cleanTopic.slice(1).toLowerCase();
-    const formattedKeywords = keywords ? keywords.filter(k => k && k.trim().length > 0) : [];
-    const currentYear = new Date().getFullYear();
-
-    // In a real implementation, you would call an AI model API here
-    // For this example, we'll return enhanced mock data
-    const seoContent = generateEnhancedSEOContent(formattedTopic, formattedKeywords, title, outline, images, internalLinks, externalLinks);
+    // This is a simulation for now - in production, you would connect to OpenAI or another AI service
+    // Create a nicely formatted HTML content for SEO
+    const content = generateSEOContent(topic, keywords, title, outline);
     
-    // Create a response with the generated content
+    console.log("Content generated successfully, content length:", content.length);
+    
     return new Response(
-      JSON.stringify({ 
-        content: seoContent,
-        metadata: {
-          wordCount: seoContent.split(/\s+/).length,
-          keywordDensity: calculateKeywordDensity(seoContent, formattedKeywords),
-          readabilityScore: 85, // Mock score
-          seoScore: 92 // Enhanced mock score
-        }
-      }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      JSON.stringify({ content }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
+    
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error in generate-seo-content function:", error);
+    
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }
 });
 
-// Enhanced helper function to generate mock SEO content
-function generateEnhancedSEOContent(
-  topic, 
-  keywords = [], 
-  title = "", 
-  outline = null, 
-  images = [],
-  internalLinks = [],
-  externalLinks = []
-): string {
-  const formattedKeywords = keywords.length > 0 ? keywords.join(', ') : 'SEO, optimization';
-  const currentYear = new Date().getFullYear();
-  const contentTitle = title || `Complete Guide to ${topic} in ${currentYear}`;
+// Utility function to generate formatted SEO content
+function generateSEOContent(topic: string, keywords: string[], title: string, outline: string) {
+  // Format keywords for better text generation
+  const primaryKeyword = keywords[0] || topic;
+  const secondaryKeywords = keywords.slice(1, 5);
   
-  let content = `# ${contentTitle}
-
-## Introduction
-In this comprehensive guide, we'll explore everything you need to know about ${topic}. 
-This guide covers the essential aspects of ${formattedKeywords}, with strategies that have proven effective in ${currentYear}.
-
-`;
-
-  // Add first image if available
-  if (images && images.length > 0) {
-    content += `![${topic} overview image](${images[0]})\n\n`;
-  }
-
-  content += `## Understanding ${topic}
-${topic} has become increasingly important in today's digital landscape. 
-As more businesses focus on online presence, implementing effective strategies for ${formattedKeywords} is crucial for success and competitive advantage.
-
-`;
-
-  // Add outline-based content if available
+  // Parse the outline if it's provided
+  let outlineSections: string[] = [];
   if (outline) {
-    if (typeof outline === 'object' && outline.sections) {
-      Object.entries(outline.sections).forEach(([key, section]: [string, any]) => {
-        content += `## ${section.title}\n\n`;
-        content += `${section.content || `This section explores key aspects of ${section.title} and its significant impact on ${topic} strategy. Understanding these elements is critical for achieving optimal results.`}\n\n`;
-        
-        if (section.subsections && section.subsections.length > 0) {
-          section.subsections.forEach((subsection: any) => {
-            content += `### ${subsection.title}\n\n`;
-            content += `${subsection.content || `${subsection.title} represents a crucial component of effective ${topic} strategy. Organizations that master this element typically see superior performance metrics and stronger market positioning.`}\n\n`;
-          });
-        }
-      });
-    } else if (typeof outline === 'string') {
-      // Parse string outline
-      const outlineLines = outline.split('\n').filter(line => line.trim());
-      
-      let currentMainSection = null;
-      
-      for (let i = 0; i < outlineLines.length; i++) {
-        const line = outlineLines[i].trim();
-        
-        if (line.startsWith('# ')) {
-          // Main title (skip)
-          continue;
-        } else if (line.startsWith('## ')) {
-          // Main section
-          currentMainSection = line.replace('## ', '');
-          content += `## ${currentMainSection}\n\n`;
-          content += `This section explores key aspects of ${currentMainSection} and how it relates to ${topic}. Understanding these principles will help you develop more effective strategies.\n\n`;
-          
-          // Add image to some sections if available
-          if (images && images.length > 1 && Math.random() > 0.7) {
-            const imageIndex = Math.floor(Math.random() * (images.length - 1)) + 1;
-            if (images[imageIndex]) {
-              content += `![${currentMainSection} visualization](${images[imageIndex]})\n\n`;
-            }
-          }
-        } else if (line.startsWith('### ') && currentMainSection) {
-          // Subsection
-          const subsection = line.replace('### ', '');
-          content += `### ${subsection}\n\n`;
-          content += `${subsection} is a crucial component of ${currentMainSection} that can significantly impact your ${topic} results. Companies that excel in this area typically see higher engagement rates and better ROI.\n\n`;
-        }
-      }
-    }
+    // Simple parsing of outline sections (assumes clean formatting)
+    outlineSections = outline.split(/\n+/).filter(line => line.trim().length > 0);
   } else {
-    // Add default sections if no outline provided
-    content += `## Best Practices for ${topic}
-When implementing ${topic} strategies, consider these best practices:
-1. Research your target audience thoroughly to understand their needs and preferences
-2. Create high-quality content that addresses specific user questions and pain points
-3. Optimize your content for search engines without sacrificing readability or user experience
-4. Build a strong backlink profile with reputable websites in your industry
-5. Regularly monitor and adjust your strategy based on performance data and market changes
+    // Generate some default sections if no outline is provided
+    outlineSections = [
+      "Introduction to " + topic,
+      "Benefits of " + topic,
+      "How to implement " + topic,
+      primaryKeyword + " best practices",
+      "Case studies",
+      "Conclusion"
+    ];
+  }
 
-## Key Metrics to Track
-To measure the success of your ${topic} efforts, track these metrics:
-- Organic traffic growth over time
-- Keyword rankings for primary and secondary terms
-- Conversion rates from organic search visitors
-- Bounce rate and engagement metrics
-- Time on page and scroll depth
-- Backlink quality and quantity
+  // Start building the content
+  let content = `<h1>${title}</h1>
 
-## Advanced ${topic} Strategies
-For those looking to take their ${topic} to the next level:
-- Implement structured data markup to enhance search visibility
-- Create comprehensive topic clusters to demonstrate authority
-- Develop a mobile-first approach for all content
-- Optimize for voice search and featured snippets
-- Focus on Core Web Vitals and technical performance metrics
+<p>Welcome to our comprehensive guide on ${topic}. This article provides in-depth information about ${primaryKeyword} and explores how ${secondaryKeywords.join(", ")} can benefit your business. Our expert insights will help you implement effective strategies and achieve better results.</p>
 
 `;
 
-    // Add second image if available
-    if (images && images.length > 1) {
-      content += `![${topic} strategies visualization](${images[1]})\n\n`;
+  // Add introduction section
+  content += `<h2>Introduction to ${topic}</h2>
+
+<p>Understanding ${primaryKeyword} is crucial in today's competitive landscape. With the right approach to ${secondaryKeywords[0] || keywords[0]}, organizations can significantly improve their performance and achieve sustainable growth.</p>
+
+<p>Recent studies show that companies effectively implementing ${primaryKeyword} strategies see an average of 37% increase in relevant metrics and a 42% improvement in overall performance.</p>
+
+`;
+
+  // Generate content for each section in the outline
+  outlineSections.forEach((section, index) => {
+    if (index === 0) return; // Skip first section as we've already created the intro
+    
+    const keywordToUse = keywords[index % keywords.length] || primaryKeyword;
+    
+    content += `<h2>${section}</h2>
+
+<p>When it comes to ${section.toLowerCase()}, experts recommend focusing on ${keywordToUse} as a primary consideration. This approach ensures you'll achieve optimal results while maintaining efficiency.</p>
+
+`;
+
+    // Add subsections to longer sections
+    if (index % 2 === 0) {
+      content += `<h3>Key aspects of ${keywordToUse}</h3>
+
+<p>There are several important factors to consider when implementing ${keywordToUse} in your strategy:</p>
+
+<ul>
+  <li><strong>Data-driven decision making</strong>: Use analytics to inform your approach</li>
+  <li><strong>User-centric focus</strong>: Prioritize user needs and expectations</li>
+  <li><strong>Continuous improvement</strong>: Regularly evaluate and refine your methods</li>
+  <li><strong>Competitive analysis</strong>: Stay aware of industry trends and competitor strategies</li>
+</ul>
+
+`;
+    } else {
+      content += `<p>Industry leaders implementing ${keywordToUse} typically follow these steps:</p>
+
+<ol>
+  <li>Conduct a comprehensive assessment of current capabilities and opportunities</li>
+  <li>Develop a strategic roadmap with clear objectives and milestones</li>
+  <li>Implement solutions with cross-functional collaboration</li>
+  <li>Measure results against established KPIs and adjust as needed</li>
+</ol>
+
+<blockquote>
+  <p>"The most successful organizations don't just implement ${keywordToUse} as a one-time initiative; they integrate it into their operational DNA and continuously evolve their approach based on results and changing market conditions."</p>
+</blockquote>
+
+`;
     }
-  }
+  });
 
-  content += `## Case Studies: Real Results
-### Enterprise Implementation
-A Fortune 500 company implementing these ${topic} strategies saw a 67% increase in organic traffic and a 43% boost in conversion rates within just six months.
+  // Add a conclusion section
+  content += `<h2>Conclusion: Mastering ${topic}</h2>
 
-### Small Business Success
-A local business focusing on ${keywords[0] || topic} achieved first-page rankings for 80% of their target keywords, resulting in a 115% revenue increase year-over-year.
+<p>By implementing the strategies outlined in this guide, you'll be well-positioned to leverage ${primaryKeyword} for sustainable growth and competitive advantage. Remember that success requires consistent effort, data-driven decision making, and a willingness to adapt to changing market conditions.</p>
 
-## Conclusion
-${topic} continues to evolve, but the fundamentals remain constant: create value for users, optimize for search engines, and measure your results. By following the strategies outlined in this guide, you'll be well-positioned to succeed with ${formattedKeywords} in ${currentYear} and beyond.`;
-
-  // Insert links if available
-  if (internalLinks && internalLinks.length > 0) {
-    // Find keywords in the content and replace with links
-    internalLinks.forEach((link: any) => {
-      const linkText = link.title;
-      const linkWords = linkText.toLowerCase().split(/\s+/).filter((word: string) => word.length > 4);
-      
-      for (const word of linkWords) {
-        // Don't add link if already has one
-        if (!content.includes(`<a href`) && content.toLowerCase().includes(word.toLowerCase())) {
-          const regex = new RegExp(`\\b${word}\\b`, 'i');
-          const match = content.match(regex);
-          
-          if (match && match.index !== undefined) {
-            const originalWord = match[0];
-            content = content.substring(0, match.index) + 
-                     `<a href="${link.url}">${originalWord}</a>` + 
-                     content.substring(match.index + originalWord.length);
-            break;
-          }
-        }
-      }
-    });
-  }
-  
-  if (externalLinks && externalLinks.length > 0) {
-    // Add external links with proper attribution
-    externalLinks.forEach((link: any) => {
-      const linkText = link.title;
-      const linkWords = linkText.toLowerCase().split(/\s+/).filter((word: string) => word.length > 4);
-      
-      for (const word of linkWords) {
-        // Don't add link if already has one
-        if (!content.includes(`<a href="${link.url}"`) && content.toLowerCase().includes(word.toLowerCase())) {
-          const regex = new RegExp(`\\b${word}\\b`, 'i');
-          const match = content.match(regex);
-          
-          if (match && match.index !== undefined) {
-            const originalWord = match[0];
-            content = content.substring(0, match.index) + 
-                     `<a href="${link.url}" target="_blank" rel="noopener noreferrer">${originalWord}</a>` + 
-                     content.substring(match.index + originalWord.length);
-            break;
-          }
-        }
-      }
-    });
-  }
+<p>Start by focusing on the highest-impact areas for your specific business context, and gradually expand your efforts as you build momentum. With a strategic approach to ${secondaryKeywords.join(", ")}, you'll achieve exceptional results and position your organization for long-term success.</p>
+`;
 
   return content;
-}
-
-// Calculate keyword density
-function calculateKeywordDensity(content: string, keywords: string[]): Record<string, number> {
-  const result: Record<string, number> = {};
-  const words = content.toLowerCase().split(/\s+/);
-  const totalWords = words.length;
-  
-  for (const keyword of keywords) {
-    if (!keyword) continue;
-    
-    const keywordLower = keyword.toLowerCase();
-    let count = 0;
-    const keywordWords = keywordLower.split(/\s+/);
-    
-    // For multi-word keywords
-    if (keywordWords.length > 1) {
-      for (let i = 0; i <= words.length - keywordWords.length; i++) {
-        if (words.slice(i, i + keywordWords.length).join(' ') === keywordLower) {
-          count++;
-        }
-      }
-    } else {
-      // For single-word keywords
-      count = words.filter(word => word === keywordLower).length;
-    }
-    
-    result[keyword] = Number(((count / totalWords) * 100).toFixed(2));
-  }
-  
-  return result;
 }

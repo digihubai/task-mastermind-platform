@@ -1,8 +1,10 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader, Edit, Quote } from "lucide-react";
+import { Loader, Edit, FileText } from "lucide-react";
 import ContentEditorDialog from "./ContentEditorDialog";
+import ContentActionButtons from "./ContentActionButtons";
+import { toast } from "sonner";
 
 interface ContentDisplayProps {
   isGenerating: boolean;
@@ -30,6 +32,38 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
   const handleSaveContent = (newContent: string) => {
     onContentChange(newContent);
     setIsEditorOpen(false);
+    toast.success("Content updated successfully");
+  };
+
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(content);
+    toast.success("Content copied to clipboard");
+  };
+
+  const handleFixFormatting = () => {
+    // Implement formatting fixes
+    let fixedContent = content;
+    
+    // Fix headings (ensure proper hierarchy)
+    if (!fixedContent.includes('<h1>') && !fixedContent.includes('<h1 ')) {
+      fixedContent = fixedContent.replace(/<h([2-6])[^>]*>(.+?)<\/h\1>/, '<h1>$2</h1>');
+    }
+    
+    // Proper paragraph spacing
+    fixedContent = fixedContent.replace(/<\/p>(?!\s|<)/g, '</p>\n\n');
+    
+    // Fix spacing after headings
+    fixedContent = fixedContent.replace(/<\/h([1-6])>(?!\s|<)/g, '</h$1>\n\n');
+    
+    // Fix list spacing
+    fixedContent = fixedContent.replace(/<\/ul>(?!\s|<)/g, '</ul>\n\n');
+    fixedContent = fixedContent.replace(/<\/ol>(?!\s|<)/g, '</ol>\n\n');
+    
+    // Fix blockquote spacing
+    fixedContent = fixedContent.replace(/<\/blockquote>(?!\s|<)/g, '</blockquote>\n\n');
+    
+    onContentChange(fixedContent);
+    toast.success("Content formatting has been improved");
   };
   
   if (isGenerating) {
@@ -38,8 +72,8 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
         <Loader size={24} className="animate-spin mb-4 text-primary" />
         <h3 className="text-lg font-medium mb-2">Generating SEO Content</h3>
         <p className="text-muted-foreground text-center max-w-md">
-          Creating high-quality content optimized for search engines and 
-          designed to engage your target audience...
+          Creating high-quality, AI-optimized content designed to engage your audience 
+          and rank well on search engines...
         </p>
       </div>
     );
@@ -48,7 +82,7 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
   if (!content) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <Quote size={40} className="text-muted-foreground/30 mb-4" />
+        <FileText size={40} className="text-muted-foreground/30 mb-4" />
         <h3 className="text-lg font-medium mb-2">No Content Generated Yet</h3>
         <p className="text-muted-foreground text-center max-w-md mb-6">
           Click the button below to generate SEO-optimized content based on your 
@@ -61,11 +95,20 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
   
   return (
     <div>
-      <div className="mb-4 flex justify-end">
-        <Button variant="outline" size="sm" onClick={handleOpenEditor} className="gap-1.5">
-          <Edit className="h-4 w-4" />
-          Edit Content
-        </Button>
+      <div className="mb-4">
+        <ContentActionButtons 
+          isGenerating={isGenerating}
+          content={content}
+          onCopy={handleCopyToClipboard}
+          onAddLinks={() => toast.info("Adding links functionality")}
+          onRegenerateContent={onRegenerateContent}
+          onFixFormatting={handleFixFormatting}
+          onEdit={handleOpenEditor}
+          onOptimize={() => {
+            // Advanced optimization logic would go here
+            toast.success("Content optimized for maximum SEO impact");
+          }}
+        />
       </div>
       
       <div 

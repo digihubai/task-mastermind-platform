@@ -13,11 +13,20 @@ import {
   ListOrdered, 
   List, 
   Bold, 
-  Italic, 
-  Link
+  Italic,
+  Underline,
+  Link,
+  Image,
+  TextQuote,
+  Code,
+  Table,
+  Strikethrough,
+  Undo,
+  Redo
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 interface ContentEditorDialogProps {
   isOpen: boolean;
@@ -34,15 +43,51 @@ const ContentEditorDialog: React.FC<ContentEditorDialogProps> = ({
 }) => {
   const [editableContent, setEditableContent] = useState(content);
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
+  const [editHistory, setEditHistory] = useState<string[]>([content]);
+  const [historyIndex, setHistoryIndex] = useState(0);
   
   // Update editable content when the content prop changes
   useEffect(() => {
     setEditableContent(content);
+    setEditHistory([content]);
+    setHistoryIndex(0);
   }, [content]);
   
   // Handle save action
   const handleSave = () => {
     onSave(editableContent);
+  };
+
+  // Add to history
+  const addToHistory = (newContent: string) => {
+    // Only add to history if content has changed
+    if (editableContent !== newContent) {
+      const newHistory = editHistory.slice(0, historyIndex + 1);
+      newHistory.push(newContent);
+      
+      // Limit history to 50 items
+      if (newHistory.length > 50) {
+        newHistory.shift();
+      }
+      
+      setEditHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
+    }
+  };
+  
+  // Undo/Redo functions
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      setHistoryIndex(historyIndex - 1);
+      setEditableContent(editHistory[historyIndex - 1]);
+    }
+  };
+  
+  const handleRedo = () => {
+    if (historyIndex < editHistory.length - 1) {
+      setHistoryIndex(historyIndex + 1);
+      setEditableContent(editHistory[historyIndex + 1]);
+    }
   };
   
   // Fix common formatting issues automatically
@@ -92,6 +137,8 @@ const ContentEditorDialog: React.FC<ContentEditorDialogProps> = ({
       .replace(/(<[^\/][^>]*>)(<[^\/][^>]*>)/g, '$1\n$2');
     
     setEditableContent(fixedContent);
+    addToHistory(fixedContent);
+    toast.success("Content formatting has been fixed");
   };
   
   const insertFormatting = (tag: string, startAttribute = '', endTag?: string) => {
@@ -107,6 +154,7 @@ const ContentEditorDialog: React.FC<ContentEditorDialogProps> = ({
     
     const newContent = editableContent.substring(0, start) + formattedText + editableContent.substring(end);
     setEditableContent(newContent);
+    addToHistory(newContent);
     
     // Restore focus after state update
     setTimeout(() => {
@@ -114,11 +162,72 @@ const ContentEditorDialog: React.FC<ContentEditorDialogProps> = ({
       textArea.setSelectionRange(start + formattedText.length, start + formattedText.length);
     }, 0);
   };
+
+  // Insert an image
+  const insertImage = () => {
+    const imgUrl = window.prompt('Enter image URL', 'https://');
+    const imgAlt = window.prompt('Enter image alt text (for accessibility)', 'Image description');
+    
+    if (imgUrl) {
+      const imageTag = `<img src="${imgUrl}" alt="${imgAlt || 'Image'}" class="rounded-lg w-full my-4" />`;
+      
+      const textArea = document.getElementById('content-editor') as HTMLTextAreaElement;
+      if (!textArea) return;
+      
+      const cursorPos = textArea.selectionStart;
+      const newContent = editableContent.substring(0, cursorPos) + imageTag + editableContent.substring(cursorPos);
+      
+      setEditableContent(newContent);
+      addToHistory(newContent);
+      
+      // Set cursor position after the inserted image
+      setTimeout(() => {
+        textArea.focus();
+        textArea.setSelectionRange(cursorPos + imageTag.length, cursorPos + imageTag.length);
+      }, 0);
+    }
+  };
+  
+  // Insert a table
+  const insertTable = () => {
+    const rows = parseInt(window.prompt('Enter number of rows', '3') || '3', 10);
+    const cols = parseInt(window.prompt('Enter number of columns', '3') || '3', 10);
+    
+    let tableHtml = '<table class="w-full border-collapse my-4">\n';
+    
+    // Table header
+    tableHtml += '  <thead>\n    <tr>\n';
+    for (let j = 0; j < cols; j++) {
+      tableHtml += `      <th class="border border-gray-300 p-2">Header ${j+1}</th>\n`;
+    }
+    tableHtml += '    </tr>\n  </thead>\n';
+    
+    // Table body
+    tableHtml += '  <tbody>\n';
+    for (let i = 0; i < rows; i++) {
+      tableHtml += '    <tr>\n';
+      for (let j = 0; j < cols; j++) {
+        tableHtml += `      <td class="border border-gray-300 p-2">Cell ${i+1},${j+1}</td>\n`;
+      }
+      tableHtml += '    </tr>\n';
+    }
+    tableHtml += '  </tbody>\n';
+    tableHtml += '</table>';
+    
+    const textArea = document.getElementById('content-editor') as HTMLTextAreaElement;
+    if (!textArea) return;
+    
+    const cursorPos = textArea.selectionStart;
+    const newContent = editableContent.substring(0, cursorPos) + tableHtml + editableContent.substring(cursorPos);
+    
+    setEditableContent(newContent);
+    addToHistory(newContent);
+  };
   
   const renderPreview = () => {
     return (
       <div 
-        className="bg-white p-4 border rounded-md min-h-[400px] overflow-auto"
+        className="bg-white dark:bg-black p-4 border rounded-md min-h-[400px] overflow-auto prose dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: editableContent }}
       />
     );
@@ -141,98 +250,194 @@ const ContentEditorDialog: React.FC<ContentEditorDialogProps> = ({
         </div>
         
         <TabsContent value="edit" className="flex-1 flex flex-col">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
             <div className="flex flex-wrap gap-1">
               <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={() => insertFormatting('h1')}>
-                      <Heading1 size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Heading 1</TooltipContent>
-                </Tooltip>
+                <div className="flex gap-1 mr-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        onClick={handleUndo} 
+                        disabled={historyIndex <= 0}
+                      >
+                        <Undo size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Undo</TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        onClick={handleRedo}
+                        disabled={historyIndex >= editHistory.length - 1}
+                      >
+                        <Redo size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Redo</TooltipContent>
+                  </Tooltip>
+                </div>
                 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={() => insertFormatting('h2')}>
-                      <Heading2 size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Heading 2</TooltipContent>
-                </Tooltip>
+                <div className="flex gap-1 mr-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => insertFormatting('h1')}>
+                        <Heading1 size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Heading 1</TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => insertFormatting('h2')}>
+                        <Heading2 size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Heading 2</TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => insertFormatting('h3')}>
+                        <Heading3 size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Heading 3</TooltipContent>
+                  </Tooltip>
+                </div>
                 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={() => insertFormatting('h3')}>
-                      <Heading3 size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Heading 3</TooltipContent>
-                </Tooltip>
+                <div className="flex gap-1 mr-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => insertFormatting('p')}>
+                        <AlignLeft size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Paragraph</TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => insertFormatting('blockquote')}>
+                        <TextQuote size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Blockquote</TooltipContent>
+                  </Tooltip>
+                </div>
                 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={() => insertFormatting('p')}>
-                      <AlignLeft size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Paragraph</TooltipContent>
-                </Tooltip>
+                <div className="flex gap-1 mr-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => insertFormatting('strong')}>
+                        <Bold size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Bold</TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => insertFormatting('em')}>
+                        <Italic size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Italic</TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => insertFormatting('u')}>
+                        <Underline size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Underline</TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => insertFormatting('s')}>
+                        <Strikethrough size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Strikethrough</TooltipContent>
+                  </Tooltip>
+                </div>
                 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={() => insertFormatting('strong')}>
-                      <Bold size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Bold</TooltipContent>
-                </Tooltip>
+                <div className="flex gap-1 mr-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => {
+                        const url = window.prompt('Enter URL', 'https://');
+                        if (url) insertFormatting('a', ` href="${url}"`)
+                      }}>
+                        <Link size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Insert Link</TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={insertImage}>
+                        <Image size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Insert Image</TooltipContent>
+                  </Tooltip>
+                </div>
                 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={() => insertFormatting('em')}>
-                      <Italic size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Italic</TooltipContent>
-                </Tooltip>
+                <div className="flex gap-1 mr-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => {
+                        insertFormatting('ul', '', 'ul');
+                        insertFormatting('li', '', 'li');
+                      }}>
+                        <List size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Bullet List</TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => {
+                        insertFormatting('ol', '', 'ol');
+                        insertFormatting('li', '', 'li');
+                      }}>
+                        <ListOrdered size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Numbered List</TooltipContent>
+                  </Tooltip>
+                </div>
                 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={() => {
-                      const url = window.prompt('Enter URL', 'https://');
-                      if (url) insertFormatting('a', ` href="${url}"`)
-                    }}>
-                      <Link size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Insert Link</TooltipContent>
-                </Tooltip>
-                
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={() => {
-                      insertFormatting('ul', '', 'ul');
-                      insertFormatting('li', '', 'li');
-                    }}>
-                      <List size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Bullet List</TooltipContent>
-                </Tooltip>
-                
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" onClick={() => {
-                      insertFormatting('ol', '', 'ol');
-                      insertFormatting('li', '', 'li');
-                    }}>
-                      <ListOrdered size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Numbered List</TooltipContent>
-                </Tooltip>
+                <div className="flex gap-1">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={() => insertFormatting('code')}>
+                        <Code size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Inline Code</TooltipContent>
+                  </Tooltip>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="icon" onClick={insertTable}>
+                        <Table size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Insert Table</TooltipContent>
+                  </Tooltip>
+                </div>
               </TooltipProvider>
             </div>
             
@@ -245,7 +450,14 @@ const ContentEditorDialog: React.FC<ContentEditorDialogProps> = ({
           <textarea
             id="content-editor"
             value={editableContent}
-            onChange={(e) => setEditableContent(e.target.value)}
+            onChange={(e) => {
+              setEditableContent(e.target.value);
+              // Debounce adding to history to prevent too many history entries
+              clearTimeout((window as any).editHistoryTimeout);
+              (window as any).editHistoryTimeout = setTimeout(() => {
+                addToHistory(e.target.value);
+              }, 500);
+            }}
             className="flex-1 w-full p-4 border rounded-md font-mono text-sm resize-none min-h-[400px]"
             spellCheck={false}
           />

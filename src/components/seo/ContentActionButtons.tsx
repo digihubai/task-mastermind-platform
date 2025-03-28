@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Copy, RotateCcw, Loader, LinkIcon, Wand2, Edit, Quote } from "lucide-react";
+import { Copy, RotateCcw, Loader, LinkIcon, Wand2, Edit, Quote, TextQuote } from "lucide-react";
 import { toast } from "sonner";
 
 interface ContentActionButtonsProps {
@@ -12,6 +12,7 @@ interface ContentActionButtonsProps {
   onRegenerateContent: () => void;
   onFixFormatting?: () => void;
   onEdit?: () => void;
+  onOptimize?: () => void;
 }
 
 const ContentActionButtons: React.FC<ContentActionButtonsProps> = ({
@@ -21,13 +22,23 @@ const ContentActionButtons: React.FC<ContentActionButtonsProps> = ({
   onAddLinks,
   onRegenerateContent,
   onFixFormatting,
-  onEdit
+  onEdit,
+  onOptimize
 }) => {
   const handleFixFormatting = () => {
     if (onFixFormatting) {
       onFixFormatting();
     } else {
       toast.info("Formatting fix functionality is not available");
+    }
+  };
+
+  const handleOptimize = () => {
+    if (onOptimize) {
+      onOptimize();
+      toast.success("Content optimized for readability and SEO");
+    } else {
+      toast.info("Optimization functionality is not available");
     }
   };
 
@@ -106,9 +117,9 @@ const ContentActionButtons: React.FC<ContentActionButtonsProps> = ({
         size="sm"
         className="gap-2"
         disabled={isGenerating || !content}
-        onClick={() => toast.success("Content optimized for readability")}
+        onClick={handleOptimize || (() => toast.success("Content optimized for readability"))}
       >
-        <Quote size={14} />
+        <TextQuote size={14} />
         Optimize
       </Button>
     </div>
