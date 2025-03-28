@@ -21,7 +21,9 @@ export const createEmbeddableTicketForm = () => {
         urgencyLevel: true, 
         preferredContact: false, 
         bestTimeToReach: false
-      }
+      },
+      successTitle: 'Request Submitted',
+      successMessage: 'Thank you for contacting support'
     });
   `;
   return script;

@@ -7,18 +7,22 @@ interface SuccessStepProps {
   customerEmail: string;
   onNewTicket: () => void;
   compact?: boolean;
+  successTitle?: string;
+  successMessage?: string;
 }
 
 export const SuccessStep: React.FC<SuccessStepProps> = ({
   customerEmail,
   onNewTicket,
   compact = false,
+  successTitle = "Request Submitted",
+  successMessage = "Thank you for contacting support"
 }) => {
   return (
     <Card className={compact ? "max-w-md mx-auto" : "max-w-2xl mx-auto"}>
       <CardHeader>
-        <CardTitle>Request Submitted</CardTitle>
-        <CardDescription>Thank you for contacting support</CardDescription>
+        <CardTitle>{successTitle}</CardTitle>
+        <CardDescription>{successMessage}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <p>Your support request has been submitted successfully. Our team will review it and get back to you as soon as possible.</p>

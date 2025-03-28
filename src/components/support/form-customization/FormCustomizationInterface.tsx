@@ -118,6 +118,29 @@ export const FormCustomizationInterface: React.FC<FormCustomizationInterfaceProp
           />
         </div>
         
+        {/* Success Message Customization */}
+        <div>
+          <h4 className="font-medium text-sm mb-2">Success Message Customization</h4>
+          <div className="space-y-2">
+            <div>
+              <Label htmlFor="success-title">Success Title</Label>
+              <Input 
+                id="success-title"
+                value={settings.successTitle || 'Request Submitted'} 
+                onChange={(e) => handleChange('successTitle', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="success-message">Success Message</Label>
+              <Input 
+                id="success-message"
+                value={settings.successMessage || 'Thank you for contacting support'} 
+                onChange={(e) => handleChange('successMessage', e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+        
         <div className="flex items-center space-x-2">
           <Switch
             id="compact-mode"

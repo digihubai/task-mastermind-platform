@@ -15,6 +15,8 @@ const EmbedTicketPage = () => {
   const [formSettings, setFormSettings] = useState({
     customTitle: "Support Request",
     customDescription: "Submit a new support request and we'll get back to you as soon as possible.",
+    successTitle: "Request Submitted",
+    successMessage: "Thank you for contacting support",
     compact: false,
     theme: 'auto' as 'light' | 'dark' | 'auto',
     showAiSupportOption: true,
@@ -38,6 +40,8 @@ const EmbedTicketPage = () => {
     selector: '#digihub-support-form',
     title: "${formSettings.customTitle}",
     description: "${formSettings.customDescription}",
+    successTitle: "${formSettings.successTitle}",
+    successMessage: "${formSettings.successMessage}",
     compact: ${formSettings.compact},
     theme: "${formSettings.theme}",
     showAiSupport: ${formSettings.showAiSupportOption},
@@ -47,7 +51,7 @@ const EmbedTicketPage = () => {
   });
 </script>`;
 
-  const iframeCode = `<iframe src="${window.location.origin}/support/ticket-form?title=${encodeURIComponent(formSettings.customTitle)}&description=${encodeURIComponent(formSettings.customDescription)}&compact=${formSettings.compact}&theme=${formSettings.theme}" width="100%" height="600" frameborder="0"></iframe>`;
+  const iframeCode = `<iframe src="${window.location.origin}/support/ticket-form?title=${encodeURIComponent(formSettings.customTitle)}&description=${encodeURIComponent(formSettings.customDescription)}&successTitle=${encodeURIComponent(formSettings.successTitle)}&successMessage=${encodeURIComponent(formSettings.successMessage)}&compact=${formSettings.compact}&theme=${formSettings.theme}" width="100%" height="600" frameborder="0"></iframe>`;
   
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -135,7 +139,7 @@ const EmbedTicketPage = () => {
                     </div>
                     
                     <Button variant="outline" className="mt-4" asChild>
-                      <a href={`/support/ticket-form?title=${encodeURIComponent(formSettings.customTitle)}&description=${encodeURIComponent(formSettings.customDescription)}&compact=${formSettings.compact}&theme=${formSettings.theme}`} target="_blank">
+                      <a href={`/support/ticket-form?title=${encodeURIComponent(formSettings.customTitle)}&description=${encodeURIComponent(formSettings.customDescription)}&successTitle=${encodeURIComponent(formSettings.successTitle)}&successMessage=${encodeURIComponent(formSettings.successMessage)}&compact=${formSettings.compact}&theme=${formSettings.theme}`} target="_blank">
                         <ExternalLink className="h-4 w-4 mr-2" />
                         Open in new tab
                       </a>
