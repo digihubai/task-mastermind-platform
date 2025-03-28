@@ -20,7 +20,7 @@ import OutlineStep from "@/components/seo/OutlineStep";
 import ImageStep from "@/components/seo/ImageStep";
 import ContentGenerationStep from "@/components/seo/ContentGenerationStep";
 import SEOSidebar from "@/components/seo/SEOSidebar";
-import { generateContentWithImages, generateKeywords } from "@/services/seoService";
+import { generateContentWithImages, generateKeywords } from "@/services/seo";
 import { toast } from "sonner";
 
 const AISEOPage = () => {

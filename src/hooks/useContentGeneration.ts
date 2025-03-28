@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { fetchInternalLinks, fetchRelatedExternalLinks, insertLinksIntoContent } from "@/services/seoService";
+import { fetchInternalLinks, fetchRelatedExternalLinks, insertLinksIntoContent } from "@/services/seo";
 
 interface UseContentGenerationProps {
   seoData: any;
