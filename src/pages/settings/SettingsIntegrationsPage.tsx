@@ -1,9 +1,7 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
   Globe, 
@@ -23,8 +21,27 @@ import ApiKeysIntegrations from "@/components/settings/integrations/ApiKeysInteg
 import MessagingIntegrations from "@/components/settings/integrations/MessagingIntegrations";
 import CMSIntegrations from "@/components/settings/integrations/CMSIntegrations";
 import SEOAnalyticsIntegrations from "@/components/settings/integrations/SEOAnalyticsIntegrations";
+import { useLocation } from "react-router-dom";
+import { toast } from "sonner";
 
 const SettingsIntegrationsPage = () => {
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<string>("cms");
+  const [activePlatform, setActivePlatform] = useState<string | null>(null);
+  
+  // Set active tab based on location state
+  useEffect(() => {
+    if (location.state?.activeTab) {
+      setActiveTab(location.state.activeTab);
+    }
+    
+    if (location.state?.activePlatform) {
+      setActivePlatform(location.state.activePlatform);
+      // Show a toast notification about the integration
+      toast.info(`Opening ${location.state.activePlatform} integration settings`);
+    }
+  }, [location.state]);
+  
   // Track when a CMS platform is connected to inform other tabs
   const handleCMSConnect = (platformId: string) => {
     console.log(`CMS platform connected: ${platformId}`);
@@ -53,7 +70,7 @@ const SettingsIntegrationsPage = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="cms" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-4 flex flex-wrap">
             <TabsTrigger value="cms">Website & CMS</TabsTrigger>
             <TabsTrigger value="seo-analytics">SEO Analytics</TabsTrigger>
@@ -70,7 +87,10 @@ const SettingsIntegrationsPage = () => {
           </TabsContent>
           
           <TabsContent value="messaging" className="space-y-4">
-            <MessagingIntegrations onConnect={handleMessagingConnect} />
+            <MessagingIntegrations 
+              onConnect={handleMessagingConnect} 
+              activePlatform={activePlatform}
+            />
           </TabsContent>
           
           <TabsContent value="api" className="space-y-4">

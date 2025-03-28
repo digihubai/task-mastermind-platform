@@ -1,11 +1,13 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Smartphone, MessageCircle, ShoppingCart, Copy, Check } from "lucide-react";
+import { Smartphone, MessageCircle, ArrowRight, Copy, Check, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export const EmbedStep: React.FC = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   
   const copyCode = () => {
@@ -18,6 +20,16 @@ export const EmbedStep: React.FC = () => {
     });
     
     setTimeout(() => setCopied(false), 2000);
+  };
+  
+  const navigateToIntegration = (platform: string) => {
+    // Navigate to the integrations page with the messaging tab selected
+    navigate("/settings/integrations", { 
+      state: { 
+        activeTab: "messaging",
+        activePlatform: platform 
+      } 
+    });
   };
   
   return (
@@ -60,17 +72,29 @@ export const EmbedStep: React.FC = () => {
             Connect your chatbot to other platforms and services
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
-            <Button variant="outline" className="h-12 justify-start gap-2 hover:bg-secondary transition-colors">
-              <Smartphone size={18} className="text-violet-500" />
+            <Button 
+              variant="outline" 
+              className="h-12 justify-start gap-2 hover:bg-secondary transition-colors"
+              onClick={() => navigateToIntegration("whatsapp")}
+            >
+              <Smartphone size={18} className="text-green-500" />
               <span>WhatsApp</span>
             </Button>
-            <Button variant="outline" className="h-12 justify-start gap-2 hover:bg-secondary transition-colors">
+            <Button 
+              variant="outline" 
+              className="h-12 justify-start gap-2 hover:bg-secondary transition-colors"
+              onClick={() => navigateToIntegration("messenger")}
+            >
               <MessageCircle size={18} className="text-blue-500" />
               <span>Messenger</span>
             </Button>
-            <Button variant="outline" className="h-12 justify-start gap-2 hover:bg-secondary transition-colors">
-              <ShoppingCart size={18} className="text-green-500" />
-              <span>Shopify</span>
+            <Button 
+              variant="outline" 
+              className="h-12 justify-start gap-2 hover:bg-secondary transition-colors"
+              onClick={() => navigateToIntegration("other")}
+            >
+              <ExternalLink size={18} className="text-purple-500" />
+              <span>Other</span>
             </Button>
           </div>
         </div>
