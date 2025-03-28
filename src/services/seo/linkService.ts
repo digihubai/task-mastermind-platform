@@ -84,3 +84,53 @@ export const formatUrl = (url: string, maxLength: number = 40): string => {
   if (url.length <= maxLength) return url;
   return url.substring(0, maxLength - 3) + '...';
 };
+
+/**
+ * Inserts links into content at appropriate positions
+ * This is a simplified implementation that finds keywords and replaces them with links
+ */
+export const insertLinksIntoContent = (
+  content: string, 
+  links: Array<{title: string, url: string}>, 
+  isExternal: boolean = false
+): string => {
+  if (!content || !links || links.length === 0) return content;
+  
+  let updatedContent = content;
+  
+  // For each link, try to find a suitable place to insert it
+  links.forEach((link, index) => {
+    // Only insert a few links to avoid over-linking
+    if (index > 2) return;
+    
+    // Extract keywords from the link title to find in the content
+    const keywords = link.title
+      .toLowerCase()
+      .replace(/[^\w\s]/g, '')
+      .split(' ')
+      .filter(word => word.length > 4);
+    
+    // Try to find a match in the content
+    for (const keyword of keywords) {
+      // Skip short keywords
+      if (keyword.length < 5) continue;
+      
+      // Create regex to find the keyword (case insensitive, whole word)
+      const regex = new RegExp(`\\b${keyword}\\b`, 'i');
+      
+      // Check if the keyword exists and hasn't already been linked
+      if (regex.test(updatedContent) && !updatedContent.includes(`href="${link.url}"`)) {
+        // Replace the first occurrence with a linked version
+        updatedContent = updatedContent.replace(
+          regex, 
+          `<a href="${link.url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''}>${keyword}</a>`
+        );
+        
+        // Once we've inserted this link, break the loop
+        break;
+      }
+    }
+  });
+  
+  return updatedContent;
+};

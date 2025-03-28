@@ -5,4 +5,5 @@ export * from './keywordService';
 export * from './titleService';
 export * from './contentService';
 export * from './linkService';
+export * from './imageService';
 export * from './campaignService';
