@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import DashboardPage from '@/pages/DashboardPage';
@@ -62,35 +61,6 @@ const mainRoutes: RouteObject[] = [
   {
     path: '/settings/integrations',
     element: <SettingsIntegrationsPage />,
-  },
-  // Support routes
-  {
-    path: '/support',
-    element: <SupportDashboardPage />,
-  },
-  {
-    path: '/support/dashboard',
-    element: <SupportDashboardPage />,
-  },
-  {
-    path: '/support/call-center',
-    element: <CallCenterPage />,
-  },
-  {
-    path: '/support/call-center/inbound',
-    element: <InboundCallsPage />,
-  },
-  {
-    path: '/support/call-center/outbound',
-    element: <OutboundCallsPage />,
-  },
-  {
-    path: '/support/omnichannel',
-    element: <OmnichannelSupportPage />,
-  },
-  {
-    path: '/support/tickets',
-    element: <TicketsPage />,
   },
 ];
 

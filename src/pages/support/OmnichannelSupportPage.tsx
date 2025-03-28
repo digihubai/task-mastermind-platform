@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -172,19 +173,21 @@ const OmnichannelSupportPage: React.FC = () => {
             </div>
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-              <TabsList className="w-full max-w-md">
-                <TabsTrigger value="inbox" className="flex-1">Omnichannel Inbox</TabsTrigger>
-                <TabsTrigger value="human-inbox" className="flex-1">
-                  Human Inbox
-                  {humanAssignedConversations.length > 0 && (
-                    <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                      {humanAssignedConversations.length}
-                    </span>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="tickets" className="flex-1">Support Tickets</TabsTrigger>
-                <TabsTrigger value="analytics" className="flex-1">Analytics</TabsTrigger>
-              </TabsList>
+              <div className="border-b">
+                <TabsList className="w-full max-w-md">
+                  <TabsTrigger value="inbox" className="flex-1">Omnichannel Inbox</TabsTrigger>
+                  <TabsTrigger value="human-inbox" className="flex-1">
+                    Human Inbox
+                    {humanAssignedConversations.length > 0 && (
+                      <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                        {humanAssignedConversations.length}
+                      </span>
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger value="tickets" className="flex-1">Support Tickets</TabsTrigger>
+                  <TabsTrigger value="analytics" className="flex-1">Analytics</TabsTrigger>
+                </TabsList>
+              </div>
               
               <TabsContent value="inbox" className="mt-6 h-[calc(100vh-26rem)]">
                 <OmnichannelInbox onAssignToHuman={handleAssignToHuman} />

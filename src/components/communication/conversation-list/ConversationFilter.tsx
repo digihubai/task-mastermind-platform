@@ -1,82 +1,59 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ConversationFilterProps {
-  activeTab: string;
   filterStatus: string;
-  onTabChange: (tab: string) => void;
-  onFilterChange: (filter: string) => void;
+  onFilterChange: (value: string) => void;
+  activeTab: string;
+  onTabChange: (value: string) => void;
 }
 
 const ConversationFilter: React.FC<ConversationFilterProps> = ({
-  activeTab,
   filterStatus,
-  onTabChange,
-  onFilterChange
+  onFilterChange,
+  activeTab,
+  onTabChange
 }) => {
-  const [searchQuery, setSearchQuery] = React.useState("");
-  
-  const handleClearSearch = () => {
-    setSearchQuery("");
-  };
-
   return (
-    <div className="space-y-4">
-      <div className="relative">
-        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search conversations..."
-          className="pl-8 pr-8"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        {searchQuery && (
+    <div className="space-y-3 py-2">
+      {/* Status filter */}
+      <div>
+        <div className="flex flex-wrap gap-1">
           <Button
-            variant="ghost"
             size="sm"
-            className="absolute right-0 top-0 h-full px-3 py-0"
-            onClick={handleClearSearch}
+            variant={filterStatus === "all" ? "default" : "outline"}
+            className="h-7 text-xs"
+            onClick={() => onFilterChange("all")}
           >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Clear</span>
+            All
           </Button>
-        )}
-      </div>
-      
-      <div className="flex flex-col gap-2">
-        <Tabs defaultValue={activeTab} onValueChange={onTabChange}>
-          <TabsList className="grid grid-cols-4">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="email">Email</TabsTrigger>
-            <TabsTrigger value="chat">Chat</TabsTrigger>
-            <TabsTrigger value="voice">Voice</TabsTrigger>
-          </TabsList>
-          <div className="mt-2 grid grid-cols-4 gap-2">
-            <TabsTrigger value="sms" className="bg-muted/50 text-xs py-1 hover:bg-muted">SMS</TabsTrigger>
-            <TabsTrigger value="whatsapp" className="bg-muted/50 text-xs py-1 hover:bg-muted">WhatsApp</TabsTrigger>
-            <TabsTrigger value="messenger" className="bg-muted/50 text-xs py-1 hover:bg-muted">Messenger</TabsTrigger>
-            <TabsTrigger value="telegram" className="bg-muted/50 text-xs py-1 hover:bg-muted">Telegram</TabsTrigger>
-          </div>
-        </Tabs>
-        
-        <Select value={filterStatus} onValueChange={onFilterChange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="open">Open</SelectItem>
-            <SelectItem value="in-progress">In Progress</SelectItem>
-            <SelectItem value="waiting">Waiting</SelectItem>
-            <SelectItem value="resolved">Resolved</SelectItem>
-            <SelectItem value="closed">Closed</SelectItem>
-          </SelectContent>
-        </Select>
+          <Button
+            size="sm"
+            variant={filterStatus === "open" ? "default" : "outline"}
+            className="h-7 text-xs"
+            onClick={() => onFilterChange("open")}
+          >
+            Open
+          </Button>
+          <Button
+            size="sm"
+            variant={filterStatus === "pending" ? "default" : "outline"}
+            className="h-7 text-xs"
+            onClick={() => onFilterChange("pending")}
+          >
+            Pending
+          </Button>
+          <Button
+            size="sm"
+            variant={filterStatus === "resolved" ? "default" : "outline"}
+            className="h-7 text-xs"
+            onClick={() => onFilterChange("resolved")}
+          >
+            Resolved
+          </Button>
+        </div>
       </div>
     </div>
   );
