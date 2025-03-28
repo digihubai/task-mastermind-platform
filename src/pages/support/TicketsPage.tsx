@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -142,15 +143,15 @@ const TicketsPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const categories = useMemo(() => 
-    [...new Set(tickets.map(ticket => ticket.category))], [tickets]
+    [...new Set(tickets.map(ticket => ticket.category).filter(Boolean))], [tickets]
   );
   
   const departments = useMemo(() => 
-    [...new Set(tickets.map(ticket => ticket.department))], [tickets]
+    [...new Set(tickets.map(ticket => ticket.department).filter(Boolean))], [tickets]
   );
   
   const priorities = useMemo(() => 
-    [...new Set(tickets.map(ticket => ticket.priority))], [tickets]
+    [...new Set(tickets.map(ticket => ticket.priority).filter(Boolean))], [tickets]
   );
 
   const assignedAgents = useMemo(() => {
@@ -265,50 +266,67 @@ const TicketsPage: React.FC = () => {
     setCategoryFilter(null);
     setAgentFilter(null);
     setDepartmentFilter(null);
-    setSortField('updatedAt');
-    setSortOrder('desc');
   };
 
+  // Fixed filtering and sorting logic with proper type handling
   const filteredTickets = useMemo(() => {
     return tickets.filter(ticket => {
-      if (searchQuery && !ticket.subject.toLowerCase().includes(searchQuery.toLowerCase()) && 
-          !ticket.description.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return false;
+      // Text search filtering
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const subjectMatch = ticket.subject.toLowerCase().includes(query);
+        const descriptionMatch = ticket.description.toLowerCase().includes(query);
+        if (!subjectMatch && !descriptionMatch) {
+          return false;
+        }
       }
       
+      // Status filtering
       if (activeTab !== 'all' && ticket.status !== activeTab) {
         return false;
       }
       
+      // Priority filtering
       if (priorityFilter && ticket.priority !== priorityFilter) {
         return false;
       }
       
+      // Category filtering
       if (categoryFilter && ticket.category !== categoryFilter) {
         return false;
       }
       
+      // Department filtering
       if (departmentFilter && ticket.department !== departmentFilter) {
         return false;
       }
       
+      // Agent filtering
       if (agentFilter && ticket.assignedTo !== agentFilter) {
         return false;
       }
       
       return true;
     }).sort((a, b) => {
-      let valueA: any = a[sortField as keyof SupportTicket];
-      let valueB: any = b[sortField as keyof SupportTicket];
-      
-      if (typeof valueA === 'string' && (sortField === 'createdAt' || sortField === 'updatedAt')) {
-        valueA = new Date(valueA).getTime();
-        valueB = new Date(valueB).getTime();
+      // Make sure the field exists in both objects
+      if (!(sortField in a) || !(sortField in b)) {
+        return 0;
       }
       
-      if (valueA < valueB) return sortOrder === 'asc' ? -1 : 1;
-      if (valueA > valueB) return sortOrder === 'asc' ? 1 : -1;
-      return 0;
+      // Handle date fields
+      if (sortField === 'createdAt' || sortField === 'updatedAt') {
+        const dateA = new Date(a[sortField as keyof SupportTicket] as string).getTime();
+        const dateB = new Date(b[sortField as keyof SupportTicket] as string).getTime();
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+      
+      // Handle string fields
+      const valueA = String(a[sortField as keyof SupportTicket]);
+      const valueB = String(b[sortField as keyof SupportTicket]);
+      
+      return sortOrder === 'asc' 
+        ? valueA.localeCompare(valueB)
+        : valueB.localeCompare(valueA);
     });
   }, [
     tickets, 
@@ -428,7 +446,7 @@ const TicketsPage: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium mb-1">Priority</label>
                         <Select 
-                          value={priorityFilter || ''} 
+                          value={priorityFilter || ""} 
                           onValueChange={(value) => setPriorityFilter(value || null)}
                         >
                           <SelectTrigger>
@@ -446,7 +464,7 @@ const TicketsPage: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium mb-1">Category</label>
                         <Select 
-                          value={categoryFilter || ''} 
+                          value={categoryFilter || ""} 
                           onValueChange={(value) => setCategoryFilter(value || null)}
                         >
                           <SelectTrigger>
@@ -464,7 +482,7 @@ const TicketsPage: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium mb-1">Department</label>
                         <Select 
-                          value={departmentFilter || ''} 
+                          value={departmentFilter || ""} 
                           onValueChange={(value) => setDepartmentFilter(value || null)}
                         >
                           <SelectTrigger>
@@ -482,7 +500,7 @@ const TicketsPage: React.FC = () => {
                       <div>
                         <label className="block text-sm font-medium mb-1">Assigned Agent</label>
                         <Select 
-                          value={agentFilter || ''} 
+                          value={agentFilter || ""} 
                           onValueChange={(value) => setAgentFilter(value || null)}
                         >
                           <SelectTrigger>
