@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { SupportTicket } from "@/types/support";
 import { useToast } from "@/hooks/use-toast";
