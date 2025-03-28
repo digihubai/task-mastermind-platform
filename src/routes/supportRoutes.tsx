@@ -9,6 +9,7 @@ import OutboundCallsPage from '@/pages/support/OutboundCallsPage';
 import TicketsPage from '@/pages/support/TicketsPage';
 import CustomerSupportPage from '@/pages/support/CustomerSupportPage';
 import EmbedTicketPage from '@/pages/support/EmbedTicketPage';
+import EmbedChatbotPage from '@/pages/support/EmbedChatbotPage';
 import { EmbeddableTicketForm } from '@/components/support/EmbeddableTicketForm';
 
 const supportRoutes: RouteObject[] = [
@@ -47,6 +48,10 @@ const supportRoutes: RouteObject[] = [
   {
     path: '/support/embed',
     element: <EmbedTicketPage />,
+  },
+  {
+    path: '/support/embed-chatbot',
+    element: <EmbedChatbotPage />,
   },
   {
     path: '/support/ticket-form',

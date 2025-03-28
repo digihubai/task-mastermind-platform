@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Settings, Users, ExternalLink } from "lucide-react";
+import { PlusCircle, Settings, Users, ExternalLink, MessageSquare } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
 interface OmnichannelHeaderProps {
@@ -24,6 +24,10 @@ const OmnichannelHeader: React.FC<OmnichannelHeaderProps> = ({ onSettingsClick, 
         <Button variant="outline" onClick={() => navigate('/support/embed')}>
           <ExternalLink className="mr-2 h-4 w-4" />
           Embed Form
+        </Button>
+        <Button variant="outline" onClick={() => navigate('/support/embed-chatbot')}>
+          <MessageSquare className="mr-2 h-4 w-4" />
+          Embed AI Chatbot
         </Button>
         <Button variant="outline" onClick={() => navigate('/support/tickets')}>
           <Users className="mr-2 h-4 w-4" />
