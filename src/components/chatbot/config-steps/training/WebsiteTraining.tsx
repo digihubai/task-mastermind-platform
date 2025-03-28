@@ -10,12 +10,20 @@ interface WebsiteTrainingProps {
   onSkip: () => void;
 }
 
+interface Website {
+  id: string;
+  url: string;
+  depth: number;
+  trained: boolean;
+  selected?: boolean;
+}
+
 export const WebsiteTraining: React.FC<WebsiteTrainingProps> = ({ onSkip }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [crawlingDepth, setCrawlingDepth] = useState<number>(2);
-  const [savedWebsites, setSavedWebsites] = useState<Array<{id: string, url: string, depth: number, trained: boolean}>>([]);
+  const [savedWebsites, setSavedWebsites] = useState<Website[]>([]);
   
   const handleAddWebsite = () => {
     // Validate URL format
@@ -40,7 +48,8 @@ export const WebsiteTraining: React.FC<WebsiteTrainingProps> = ({ onSkip }) => {
         id: newWebsiteId,
         url: websiteUrl,
         depth: crawlingDepth,
-        trained: false
+        trained: false,
+        selected: false
       }]);
       
       // Reset input fields
@@ -160,7 +169,7 @@ export const WebsiteTraining: React.FC<WebsiteTrainingProps> = ({ onSkip }) => {
             {savedWebsites.map((website) => (
               <div key={website.id} className="flex items-center justify-between border rounded-md p-3">
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" className="h-4 w-4" checked={website.selected} />
+                  <input type="checkbox" className="h-4 w-4" checked={website.selected || false} />
                   <span>{website.url}</span>
                 </div>
                 <div className="flex items-center gap-2">

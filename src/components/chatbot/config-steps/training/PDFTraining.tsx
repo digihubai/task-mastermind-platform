@@ -8,10 +8,17 @@ interface PDFTrainingProps {
   onSkip: () => void;
 }
 
+interface UploadedFile {
+  id: string;
+  name: string;
+  trained: boolean;
+  selected?: boolean;
+}
+
 export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<Array<{id: string, name: string, trained: boolean}>>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -50,7 +57,8 @@ export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
       setUploadedFiles([...uploadedFiles, {
         id: Date.now().toString(),
         name: file.name,
-        trained: false
+        trained: false,
+        selected: false
       }]);
       
       toast({
@@ -138,7 +146,7 @@ export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
             {uploadedFiles.map((file) => (
               <div key={file.id} className="flex items-center justify-between border rounded-md p-3">
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" className="h-4 w-4" checked={file.selected} />
+                  <input type="checkbox" className="h-4 w-4" checked={file.selected || false} />
                   <span>{file.name}</span>
                 </div>
                 <div className="flex items-center gap-2">

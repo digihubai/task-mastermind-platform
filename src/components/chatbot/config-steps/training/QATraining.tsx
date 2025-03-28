@@ -11,12 +11,20 @@ interface QATrainingProps {
   onSkip: () => void;
 }
 
+interface QAPair {
+  id: string;
+  question: string;
+  answer: string;
+  trained: boolean;
+  selected?: boolean;
+}
+
 export const QATraining: React.FC<QATrainingProps> = ({ onSkip }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
-  const [savedQAPairs, setSavedQAPairs] = useState<Array<{id: string, question: string, answer: string, trained: boolean}>>([]);
+  const [savedQAPairs, setSavedQAPairs] = useState<QAPair[]>([]);
   
   const handleAddQA = () => {
     if (!question.trim()) {
@@ -49,7 +57,8 @@ export const QATraining: React.FC<QATrainingProps> = ({ onSkip }) => {
         id: newPairId,
         question: question,
         answer: answer,
-        trained: false
+        trained: false,
+        selected: false
       }]);
       
       // Reset input fields
@@ -155,7 +164,7 @@ export const QATraining: React.FC<QATrainingProps> = ({ onSkip }) => {
             {savedQAPairs.map((pair) => (
               <div key={pair.id} className="flex items-center justify-between border rounded-md p-3">
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" className="h-4 w-4" checked={pair.selected} />
+                  <input type="checkbox" className="h-4 w-4" checked={pair.selected || false} />
                   <span>{pair.question.length > 40 ? pair.question.substring(0, 40) + '...' : pair.question}</span>
                 </div>
                 <div className="flex items-center gap-2">

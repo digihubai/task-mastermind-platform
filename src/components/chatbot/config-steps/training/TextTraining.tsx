@@ -11,12 +11,19 @@ interface TextTrainingProps {
   onSkip: () => void;
 }
 
+interface SavedContent {
+  id: string;
+  title: string;
+  trained: boolean;
+  selected?: boolean;
+}
+
 export const TextTraining: React.FC<TextTrainingProps> = ({ onSkip }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [textContent, setTextContent] = useState("");
   const [title, setTitle] = useState("");
-  const [savedContents, setSavedContents] = useState<Array<{id: string, title: string, trained: boolean}>>([]);
+  const [savedContents, setSavedContents] = useState<SavedContent[]>([]);
   
   const handleAddText = () => {
     if (!title.trim()) {
@@ -48,7 +55,8 @@ export const TextTraining: React.FC<TextTrainingProps> = ({ onSkip }) => {
       setSavedContents([...savedContents, {
         id: newContentId,
         title: title,
-        trained: false
+        trained: false,
+        selected: false
       }]);
       
       // Reset input fields
@@ -154,7 +162,7 @@ export const TextTraining: React.FC<TextTrainingProps> = ({ onSkip }) => {
             {savedContents.map((content) => (
               <div key={content.id} className="flex items-center justify-between border rounded-md p-3">
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" className="h-4 w-4" checked={content.selected} />
+                  <input type="checkbox" className="h-4 w-4" checked={content.selected || false} />
                   <span>{content.title}</span>
                 </div>
                 <div className="flex items-center gap-2">
