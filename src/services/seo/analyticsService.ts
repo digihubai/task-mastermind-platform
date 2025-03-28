@@ -1,5 +1,5 @@
 
-import { SEOAnalytics } from './types';
+import type { SEOAnalytics } from './types';
 
 /**
  * Fetches SEO analytics data
@@ -23,5 +23,5 @@ export const fetchSEOAnalytics = async (): Promise<SEOAnalytics> => {
   };
 };
 
-// Re-export SEOAnalytics type for convenience
-export { SEOAnalytics };
+// Re-export the type properly
+export type { SEOAnalytics };

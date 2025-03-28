@@ -4,8 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Globe, Search, Link, ChevronDown, Loader, BarChart3 } from "lucide-react";
-import { fetchSEOAnalytics } from "@/services/seoService";
-import { SEOAnalytics as SEOAnalyticsType } from "@/services/seo/types";
+import { fetchSEOAnalytics } from "@/services/seo";
+import type { SEOAnalytics as SEOAnalyticsType } from "@/services/seo/types";
 
 const SEOAnalytics: React.FC = () => {
   const [analytics, setAnalytics] = useState<SEOAnalyticsType | null>(null);
