@@ -25,6 +25,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Conversation } from '@/types/omnichannel';
+import { useNavigate } from 'react-router-dom';
+import {
+  BrandWhatsapp,
+  BrandFacebook,
+  BrandTelegram,
+  BrandSlack
+} from '@/components/ui/custom-icons';
 
 interface ConversationHeaderProps {
   conversation: Conversation;
@@ -38,13 +45,13 @@ const getChannelIcon = (channel: string) => {
     case 'email':
       return <Mail className="h-4 w-4" />;
     case 'whatsapp':
-      return <MessageSquare className="h-4 w-4" />;
+      return <BrandWhatsapp className="h-4 w-4" />;
     case 'messenger':
-      return <MessagesSquare className="h-4 w-4" />;
+      return <BrandFacebook className="h-4 w-4" />;
     case 'telegram':
-      return <Link2 className="h-4 w-4" />;
+      return <BrandTelegram className="h-4 w-4" />;
     case 'slack':
-      return <MessageSquare className="h-4 w-4" />;
+      return <BrandSlack className="h-4 w-4" />;
     case 'sms':
       return <MessageSquare className="h-4 w-4" />;
     case 'voice':
@@ -85,6 +92,8 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
   conversation,
   onAssignToHuman 
 }) => {
+  const navigate = useNavigate();
+  
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -112,6 +121,10 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
     }
     return null;
   };
+  
+  const handleSettingsClick = () => {
+    navigate('/settings/integrations');
+  };
 
   return (
     <div className="flex justify-between items-center">
@@ -128,7 +141,8 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
           <div className="flex items-center mt-1">
             <Badge 
               variant="outline" 
-              className="mr-2 flex items-center gap-1 px-2 py-0.5 bg-secondary/50"
+              className="mr-2 flex items-center gap-1 px-2 py-0.5 bg-secondary/50 hover:bg-secondary cursor-pointer"
+              onClick={handleSettingsClick}
             >
               {getChannelIcon(conversation.channel)}
               <span className="text-xs">{getChannelName(conversation.channel)}</span>
@@ -159,11 +173,11 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSettingsClick}>
               <Phone className="h-4 w-4 mr-2" />
               Start Voice Call
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSettingsClick}>
               <Video className="h-4 w-4 mr-2" />
               Start Video Call
             </DropdownMenuItem>
@@ -173,6 +187,10 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
             <DropdownMenuSeparator />
             <DropdownMenuItem>Block Customer</DropdownMenuItem>
             <DropdownMenuItem>Close Conversation</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleSettingsClick}>
+              Manage Channel Integrations
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

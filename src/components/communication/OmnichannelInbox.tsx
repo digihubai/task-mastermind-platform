@@ -7,6 +7,7 @@ import { toast } from "@/hooks/use-toast";
 import { Conversation } from '@/types/omnichannel';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { InfoIcon } from 'lucide-react';
+import IntegrationStatus from './IntegrationStatus';
 
 interface OmnichannelInboxProps {
   onAssignToHuman?: (assignedConversation: Conversation) => void;
@@ -84,40 +85,47 @@ const OmnichannelInbox: React.FC<OmnichannelInboxProps> = ({ onAssignToHuman }) 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-[calc(100vh-400px)]">
-      {/* Conversation Sidebar */}
-      <div className="md:col-span-4 lg:col-span-3">
-        <ConversationSidebar
-          conversations={conversations}
-          filterStatus={filterStatus}
-          activeTab={activeTab}
-          selectedConversationId={selectedConversationId}
-          onTabChange={setActiveTab}
-          onFilterChange={setFilterStatus}
-          onSelectConversation={setSelectedConversationId}
-        />
+    <div className="space-y-6">
+      {/* Integration Status Component */}
+      <div className="md:col-span-12 mb-4">
+        <IntegrationStatus className="mb-4" />
       </div>
       
-      {/* Conversation Detail */}
-      <div className="md:col-span-8 lg:col-span-9 flex flex-col gap-4">
-        {selectedConversation?.assignmentStatus === 'waiting_for_human' && (
-          <Alert>
-            <InfoIcon className="h-4 w-4" />
-            <AlertDescription>
-              This conversation is waiting for a human agent to take over.
-              {selectedConversation.assignedHumanAgent && (
-                <span className="font-medium"> Assigned to {selectedConversation.assignedHumanAgent}.</span>
-              )}
-            </AlertDescription>
-          </Alert>
-        )}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-[calc(100vh-400px)]">
+        {/* Conversation Sidebar */}
+        <div className="md:col-span-4 lg:col-span-3">
+          <ConversationSidebar
+            conversations={conversations}
+            filterStatus={filterStatus}
+            activeTab={activeTab}
+            selectedConversationId={selectedConversationId}
+            onTabChange={setActiveTab}
+            onFilterChange={setFilterStatus}
+            onSelectConversation={setSelectedConversationId}
+          />
+        </div>
         
-        <ConversationDetail
-          selectedConversation={selectedConversation}
-          messages={mockMessages}
-          onSendMessage={handleSendMessage}
-          onAssignToHuman={handleAssignToHuman}
-        />
+        {/* Conversation Detail */}
+        <div className="md:col-span-8 lg:col-span-9 flex flex-col gap-4">
+          {selectedConversation?.assignmentStatus === 'waiting_for_human' && (
+            <Alert>
+              <InfoIcon className="h-4 w-4" />
+              <AlertDescription>
+                This conversation is waiting for a human agent to take over.
+                {selectedConversation.assignedHumanAgent && (
+                  <span className="font-medium"> Assigned to {selectedConversation.assignedHumanAgent}.</span>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          <ConversationDetail
+            selectedConversation={selectedConversation}
+            messages={mockMessages}
+            onSendMessage={handleSendMessage}
+            onAssignToHuman={handleAssignToHuman}
+          />
+        </div>
       </div>
     </div>
   );

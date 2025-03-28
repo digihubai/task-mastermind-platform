@@ -23,17 +23,20 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { savedReplies } from '../mock-data';
 import { toast } from "@/hooks/use-toast";
+import { useNavigate } from 'react-router-dom';
 
 interface MessageInputProps {
   onSendMessage: (message: string) => void;
+  channel?: string;
 }
 
-const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
+const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, channel = 'website' }) => {
   const [message, setMessage] = useState('');
   const [showSavedReplies, setShowSavedReplies] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const navigate = useNavigate();
 
   const handleSend = () => {
     if (message.trim()) {
@@ -72,37 +75,47 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
     }
   };
   
-  const handleStartVoiceCall = () => {
-    toast({
-      title: "Starting voice call",
-      description: "Initiating voice call with the customer...",
-    });
-    // In a real app, this would connect to a service like Twilio to initiate a call
-  };
-  
-  const handleStartVideoCall = () => {
-    toast({
-      title: "Starting video call",
-      description: "Initiating video call with the customer...",
-    });
-    // In a real app, this would connect to a video conferencing service
-  };
-  
-  const toggleVoiceRecording = () => {
-    if (isRecording) {
-      setIsRecording(false);
-      toast({
-        title: "Voice message recorded",
-        description: "Your voice message has been recorded and will be sent.",
-      });
-      // In a real app, this would process the voice recording and send it
+  const handleCommunicationAction = (type: 'voice' | 'video' | 'recording') => {
+    // Check if the selected channel supports this type of communication
+    const supportedChannels = {
+      voice: ['voice', 'whatsapp', 'telephone'],
+      video: ['video', 'whatsapp'],
+      recording: ['whatsapp', 'messenger', 'telegram']
+    };
+    
+    if (supportedChannels[type].includes(channel)) {
+      if (type === 'voice') {
+        toast({
+          title: "Starting voice call",
+          description: "Initiating voice call with the customer...",
+        });
+      } else if (type === 'video') {
+        toast({
+          title: "Starting video call",
+          description: "Initiating video call with the customer...",
+        });
+      } else if (type === 'recording') {
+        setIsRecording(!isRecording);
+        if (isRecording) {
+          toast({
+            title: "Voice message recorded",
+            description: "Your voice message has been recorded and will be sent.",
+          });
+        } else {
+          toast({
+            title: "Recording voice message",
+            description: "Speak now to record your message. Click again to stop recording.",
+          });
+        }
+      }
     } else {
-      setIsRecording(true);
+      // If the selected channel doesn't support this type of communication, redirect to integration settings
       toast({
-        title: "Recording voice message",
-        description: "Speak now to record your message. Click again to stop recording.",
+        title: "Integration required",
+        description: `This feature requires proper channel integration. Redirecting to settings...`,
+        variant: "destructive"
       });
-      // In a real app, this would start recording audio
+      navigate('/settings/integrations');
     }
   };
 
@@ -182,7 +195,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
             variant="ghost" 
             size="icon" 
             className={`text-muted-foreground ${isRecording ? 'text-red-500 bg-red-50 dark:bg-red-900/20' : ''}`}
-            onClick={toggleVoiceRecording}
+            onClick={() => handleCommunicationAction('recording')}
             title="Record voice message"
           >
             <Mic className="h-5 w-5" />
@@ -192,7 +205,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
             variant="ghost" 
             size="icon" 
             className="text-muted-foreground"
-            onClick={handleStartVoiceCall}
+            onClick={() => handleCommunicationAction('voice')}
             title="Start voice call"
           >
             <Phone className="h-5 w-5" />
@@ -202,7 +215,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
             variant="ghost" 
             size="icon" 
             className="text-muted-foreground"
-            onClick={handleStartVideoCall}
+            onClick={() => handleCommunicationAction('video')}
             title="Start video call"
           >
             <Video className="h-5 w-5" />
