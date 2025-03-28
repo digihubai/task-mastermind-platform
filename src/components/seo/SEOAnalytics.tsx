@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Globe, Search, Link, ChevronDown, Loader, BarChart3 } from "lucide-react";
-import { fetchSEOAnalytics } from "@/services/seo";
+import { fetchSEOAnalytics } from "@/services/seo/analyticsService";
 import type { SEOAnalytics as SEOAnalyticsType } from "@/services/seo/types";
 
 const SEOAnalytics: React.FC = () => {
