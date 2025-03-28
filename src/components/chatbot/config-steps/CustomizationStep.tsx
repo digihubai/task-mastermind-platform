@@ -1,13 +1,16 @@
 
-import React from "react";
-import { HexColorPicker } from "react-colorful";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { HexColorPicker } from "react-colorful";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface CustomizationStepProps {
   chatbotInfo: {
@@ -33,298 +36,294 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
   chatbotInfo,
   setNewChatbotInfo,
 }) => {
-  const handleColorChange = (color: string) => {
-    setNewChatbotInfo({
-      ...chatbotInfo,
-      color,
-    });
+  const [activeTab, setActiveTab] = useState("appearance");
+  const navigate = useNavigate();
+  
+  const handleNavigateToIntegrations = () => {
+    navigate('/settings/integrations', { state: { activeTab: 'messaging' } });
   };
 
-  const handlePositionChange = (position: "left" | "right") => {
-    setNewChatbotInfo({
-      ...chatbotInfo,
-      position,
-    });
+  const updateInfo = (key: string, value: any) => {
+    setNewChatbotInfo({ ...chatbotInfo, [key]: value });
   };
+  
+  const avatarOptions = [
+    { value: "avatar1", label: "Default" },
+    { value: "avatar2", label: "Purple" },
+    { value: "avatar3", label: "Green" },
+    { value: "avatar4", label: "Orange" },
+    { value: "avatar5", label: "Message" },
+  ];
 
-  const handleSwitchChange = (key: string, value: boolean) => {
-    setNewChatbotInfo({
-      ...chatbotInfo,
-      [key]: value,
-    });
-  };
-
-  const handleSliderChange = (value: number[]) => {
-    setNewChatbotInfo({
-      ...chatbotInfo,
-      triggerSize: value[0],
-    });
-  };
-
-  const handleAvatarChange = (avatar: string) => {
-    setNewChatbotInfo({
-      ...chatbotInfo,
-      avatar,
-    });
-  };
-
+  const personalityOptions = [
+    { value: "professional", label: "Professional – Formal and business-oriented" },
+    { value: "friendly", label: "Friendly – Warm and conversational" },
+    { value: "humorous", label: "Humorous – Witty and lighthearted" },
+    { value: "supportive", label: "Supportive – Empathetic and patient" },
+    { value: "technical", label: "Technical – Detailed and expert-level" },
+    { value: "casual", label: "Casual – Relaxed and informal" },
+    { value: "sales", label: "Sales-Oriented – Persuasive and proactive" },
+    { value: "ai-assistant", label: "AI Assistant – Neutral and informative" },
+    { value: "creative", label: "Creative – Imaginative and expressive" },
+    { value: "sassy", label: "Sassy – Playful and bold" },
+  ];
+  
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Customize Your Chatbot</h2>
-      <p className="text-muted-foreground">
-        Personalize the appearance and behavior of your chatbot.
-      </p>
-
-      <Tabs defaultValue="appearance" className="mt-6">
-        <TabsList className="mb-4 grid w-full grid-cols-3">
+    <div>
+      <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="bubble">Chat Bubble</TabsTrigger>
           <TabsTrigger value="behavior">Behavior</TabsTrigger>
+          <TabsTrigger value="integrations">Integrations</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="appearance" className="space-y-4">
+        <TabsContent value="appearance" className="space-y-6">
           <div>
-            <Label>Accent Color</Label>
-            <div className="flex items-center gap-4 mt-1.5">
+            <Label htmlFor="color">Chat Bubble Color</Label>
+            <div className="flex items-center mt-2">
               <Popover>
-                <PopoverTrigger>
-                  <div
-                    className="w-8 h-8 rounded-full border cursor-pointer"
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-[100px] h-[40px] border-2"
                     style={{ backgroundColor: chatbotInfo.color }}
-                  />
+                  >
+                    <span className="sr-only">Pick a color</span>
+                  </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-3">
                   <HexColorPicker
                     color={chatbotInfo.color}
-                    onChange={handleColorChange}
+                    onChange={(color) => updateInfo("color", color)}
                   />
                 </PopoverContent>
               </Popover>
               <Input
+                id="colorHex"
                 value={chatbotInfo.color}
-                onChange={(e) =>
-                  handleColorChange(e.target.value)
-                }
-                className="w-32"
+                onChange={(e) => updateInfo("color", e.target.value)}
+                className="w-[150px] ml-4"
               />
             </div>
           </div>
-
+          
           <div>
-            <Label>Avatar Style</Label>
-            <div className="grid grid-cols-5 gap-3 mt-1.5">
-              {['avatar1', 'avatar2', 'avatar3', 'avatar4', 'avatar5'].map((avatar) => (
-                <div
-                  key={avatar}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer transition-all ${
-                    chatbotInfo.avatar === avatar
-                      ? 'ring-2 ring-offset-2 ring-primary'
-                      : 'hover:scale-110'
-                  }`}
-                  style={{
-                    backgroundColor:
-                      avatar === 'avatar1'
-                        ? '#2196F3'
-                        : avatar === 'avatar2'
-                        ? '#9C27B0'
-                        : avatar === 'avatar3'
-                        ? '#4CAF50'
-                        : avatar === 'avatar4'
-                        ? '#FF9800'
-                        : '#00BCD4',
-                  }}
-                  onClick={() => handleAvatarChange(avatar)}
+            <Label htmlFor="avatar">Avatar Style</Label>
+            <div className="grid grid-cols-5 gap-2 mt-2">
+              {avatarOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  type="button"
+                  variant={chatbotInfo.avatar === option.value ? "default" : "outline"}
+                  className="relative h-20 w-full"
+                  onClick={() => updateInfo("avatar", option.value)}
                 >
-                  <span className="text-white text-xs">{avatar.slice(-1)}</span>
-                </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-xs">{option.label}</span>
+                  </div>
+                  {chatbotInfo.avatar === option.value && (
+                    <div className="absolute top-2 right-2">
+                      <Check className="h-4 w-4" />
+                    </div>
+                  )}
+                </Button>
               ))}
             </div>
           </div>
-
+          
           <div>
-            <Label>Show Branding</Label>
-            <div className="flex items-center gap-2 mt-1.5">
-              <Switch
-                checked={chatbotInfo.showLogo}
-                onCheckedChange={(checked) =>
-                  handleSwitchChange('showLogo', checked)
-                }
-              />
-              <span className="text-sm">
-                Show "Powered by DigiHub AI" in the chat
-              </span>
+            <Label htmlFor="position">Bubble Position</Label>
+            <div className="grid grid-cols-2 gap-4 mt-2">
+              <Button
+                variant={chatbotInfo.position === "left" ? "default" : "outline"}
+                className="relative"
+                onClick={() => updateInfo("position", "left")}
+              >
+                Left Side
+                {chatbotInfo.position === "left" && (
+                  <div className="absolute top-2 right-2">
+                    <Check className="h-4 w-4" />
+                  </div>
+                )}
+              </Button>
+              <Button
+                variant={chatbotInfo.position === "right" ? "default" : "outline"}
+                className="relative"
+                onClick={() => updateInfo("position", "right")}
+              >
+                Right Side
+                {chatbotInfo.position === "right" && (
+                  <div className="absolute top-2 right-2">
+                    <Check className="h-4 w-4" />
+                  </div>
+                )}
+              </Button>
             </div>
           </div>
-
+          
           <div>
-            <Label>Show Date & Time</Label>
-            <div className="flex items-center gap-2 mt-1.5">
-              <Switch
-                checked={chatbotInfo.showDateTime}
-                onCheckedChange={(checked) =>
-                  handleSwitchChange('showDateTime', checked)
-                }
-              />
-              <span className="text-sm">Display timestamps on messages</span>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="triggerSize">Bubble Size</Label>
+              <span className="text-sm text-muted-foreground">{chatbotInfo.triggerSize}px</span>
             </div>
+            <Slider
+              id="triggerSize"
+              min={40}
+              max={80}
+              step={5}
+              value={[chatbotInfo.triggerSize]}
+              onValueChange={(values) => updateInfo("triggerSize", values[0])}
+              className="mt-2"
+            />
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="transparentTrigger"
+              checked={chatbotInfo.transparentTrigger}
+              onCheckedChange={(checked) => updateInfo("transparentTrigger", checked)}
+            />
+            <Label htmlFor="transparentTrigger">Transparent Bubble</Label>
           </div>
         </TabsContent>
         
-        <TabsContent value="bubble" className="space-y-4">
+        <TabsContent value="behavior" className="space-y-6">
           <div>
-            <Label>Position</Label>
-            <div className="grid grid-cols-2 gap-3 mt-1.5">
-              <div
-                className={`border rounded-md p-3 flex items-center justify-center cursor-pointer ${
-                  chatbotInfo.position === 'left'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'hover:bg-muted'
-                }`}
-                onClick={() => handlePositionChange('left')}
-              >
-                <span>Left</span>
-              </div>
-              <div
-                className={`border rounded-md p-3 flex items-center justify-center cursor-pointer ${
-                  chatbotInfo.position === 'right'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'hover:bg-muted'
-                }`}
-                onClick={() => handlePositionChange('right')}
-              >
-                <span>Right</span>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <Label>Bubble Size: {chatbotInfo.triggerSize}px</Label>
-            <div className="mt-1.5">
-              <Slider
-                value={[chatbotInfo.triggerSize]}
-                min={40}
-                max={80}
-                step={4}
-                onValueChange={handleSliderChange}
-              />
-            </div>
-          </div>
-
-          <div>
-            <Label>Transparent Background</Label>
-            <div className="flex items-center gap-2 mt-1.5">
-              <Switch
-                checked={chatbotInfo.transparentTrigger}
-                onCheckedChange={(checked) =>
-                  handleSwitchChange('transparentTrigger', checked)
-                }
-              />
-              <span className="text-sm">
-                Use transparent background for chat bubble
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <Label>Bubble Message</Label>
+            <Label htmlFor="welcomeMessage">Welcome Message</Label>
             <Input
-              className="mt-1.5"
+              id="welcomeMessage"
+              value={chatbotInfo.welcomeMessage}
+              onChange={(e) => updateInfo("welcomeMessage", e.target.value)}
+              className="mt-2"
+              placeholder="Hello! How can I help you today?"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="bubbleMessage">Bubble Message</Label>
+            <Input
+              id="bubbleMessage"
               value={chatbotInfo.bubbleMessage}
-              onChange={(e) =>
-                setNewChatbotInfo({
-                  ...chatbotInfo,
-                  bubbleMessage: e.target.value,
-                })
-              }
+              onChange={(e) => updateInfo("bubbleMessage", e.target.value)}
+              className="mt-2"
               placeholder="Hey there, how can I help you?"
             />
           </div>
-        </TabsContent>
-        
-        <TabsContent value="behavior" className="space-y-4">
+          
           <div>
-            <Label>Welcome Message</Label>
+            <Label htmlFor="instructions">AI Instructions (Optional)</Label>
             <Input
-              className="mt-1.5"
-              value={chatbotInfo.welcomeMessage}
-              onChange={(e) =>
-                setNewChatbotInfo({
-                  ...chatbotInfo,
-                  welcomeMessage: e.target.value,
-                })
-              }
-              placeholder="Hi, how can I help you?"
+              id="instructions"
+              value={chatbotInfo.instructions}
+              onChange={(e) => updateInfo("instructions", e.target.value)}
+              className="mt-2"
+              placeholder="Instructions for the AI behavior"
             />
           </div>
-
+          
           <div>
-            <Label>Personality</Label>
+            <Label htmlFor="personality">Chatbot Personality</Label>
             <Select 
-              value={chatbotInfo.personality || "ai-assistant"}
-              onValueChange={(value) =>
-                setNewChatbotInfo({
-                  ...chatbotInfo,
-                  personality: value,
-                })
-              }
+              value={chatbotInfo.personality} 
+              onValueChange={(value) => updateInfo("personality", value)}
             >
-              <SelectTrigger className="w-full mt-1.5">
+              <SelectTrigger className="w-full mt-2">
                 <SelectValue placeholder="Select a personality" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="professional">Professional – Formal, precise</SelectItem>
-                <SelectItem value="friendly">Friendly – Warm, engaging</SelectItem>
-                <SelectItem value="humorous">Humorous – Witty, fun</SelectItem>
-                <SelectItem value="supportive">Supportive – Empathetic, patient</SelectItem>
-                <SelectItem value="technical">Technical – Detailed, expert-level</SelectItem>
-                <SelectItem value="casual">Casual – Relaxed, informal</SelectItem>
-                <SelectItem value="sales">Sales-Oriented – Persuasive</SelectItem>
-                <SelectItem value="ai-assistant">AI Assistant – Neutral, informative</SelectItem>
-                <SelectItem value="creative">Creative – Imaginative, expressive</SelectItem>
-                <SelectItem value="sassy">Sassy – Playful, sarcastic</SelectItem>
+                {personalityOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-
+          
           <div>
-            <Label>Language</Label>
-            <select
-              className="w-full p-2 border rounded-md mt-1.5"
-              value={chatbotInfo.language}
-              onChange={(e) =>
-                setNewChatbotInfo({
-                  ...chatbotInfo,
-                  language: e.target.value,
-                })
-              }
+            <Label htmlFor="language">Response Language</Label>
+            <Select 
+              value={chatbotInfo.language} 
+              onValueChange={(value) => updateInfo("language", value)}
             >
-              <option value="auto">Auto-detect</option>
-              <option value="en">English</option>
-              <option value="es">Spanish</option>
-              <option value="fr">French</option>
-              <option value="de">German</option>
-              <option value="it">Italian</option>
-              <option value="pt">Portuguese</option>
-              <option value="ru">Russian</option>
-              <option value="zh">Chinese</option>
-              <option value="ja">Japanese</option>
-              <option value="ko">Korean</option>
-            </select>
+              <SelectTrigger className="w-full mt-2">
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="auto">Auto-detect</SelectItem>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="es">Spanish</SelectItem>
+                <SelectItem value="fr">French</SelectItem>
+                <SelectItem value="de">German</SelectItem>
+                <SelectItem value="it">Italian</SelectItem>
+                <SelectItem value="pt">Portuguese</SelectItem>
+                <SelectItem value="ja">Japanese</SelectItem>
+                <SelectItem value="zh">Chinese</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-
-          <div>
-            <Label>Footer Link</Label>
-            <Input
-              className="mt-1.5"
-              value={chatbotInfo.footerLink}
-              onChange={(e) =>
-                setNewChatbotInfo({
-                  ...chatbotInfo,
-                  footerLink: e.target.value,
-                })
-              }
-              placeholder="https://yourdomain.com"
+          
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="showDateTime"
+              checked={chatbotInfo.showDateTime}
+              onCheckedChange={(checked) => updateInfo("showDateTime", checked)}
             />
+            <Label htmlFor="showDateTime">Show Message Timestamps</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="showLogo"
+              checked={chatbotInfo.showLogo}
+              onCheckedChange={(checked) => updateInfo("showLogo", checked)}
+            />
+            <Label htmlFor="showLogo">Show DigiHub Branding</Label>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="integrations" className="space-y-6">
+          <div className="bg-muted p-4 rounded-lg">
+            <h3 className="font-medium mb-2">Communication Channels</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Connect your chatbot to different communication channels like WhatsApp, SMS, or Facebook Messenger.
+            </p>
+            <Button 
+              variant="outline" 
+              className="w-full flex justify-between"
+              onClick={handleNavigateToIntegrations}
+            >
+              <span>Configure Communication Channels</span>
+              <ChevronRight size={16} />
+            </Button>
+          </div>
+          
+          <div className="bg-muted p-4 rounded-lg">
+            <h3 className="font-medium mb-2">Knowledge Bases</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Connect your chatbot to external knowledge sources like help docs, FAQs, or knowledge bases.
+            </p>
+            <Button variant="outline" className="w-full flex justify-between" disabled>
+              <span>Configure Knowledge Bases</span>
+              <ChevronRight size={16} />
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2">
+              This feature will be available soon.
+            </p>
+          </div>
+          
+          <div className="bg-muted p-4 rounded-lg">
+            <h3 className="font-medium mb-2">CRM Integrations</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Connect your chatbot to CRM platforms like Salesforce, HubSpot, or Zoho.
+            </p>
+            <Button variant="outline" className="w-full flex justify-between" disabled>
+              <span>Configure CRM Integrations</span>
+              <ChevronRight size={16} />
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2">
+              This feature will be available soon.
+            </p>
           </div>
         </TabsContent>
       </Tabs>

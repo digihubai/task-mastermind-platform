@@ -117,6 +117,7 @@ export const ChatbotConfigView: React.FC<ChatbotConfigViewProps> = ({
               transparentTrigger={newChatbotInfo.transparentTrigger}
               avatar={newChatbotInfo.avatar}
               position={newChatbotInfo.position}
+              showDateTime={newChatbotInfo.showDateTime}
             />
           </div>
         </div>

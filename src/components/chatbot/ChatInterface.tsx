@@ -21,6 +21,7 @@ interface ChatInterfaceProps {
   transparentTrigger?: boolean;
   avatar?: string;
   position?: "left" | "right";
+  showDateTime?: boolean;
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -33,10 +34,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   transparentTrigger = false,
   avatar = "avatar1",
   position = "right",
+  showDateTime = true,
 }) => {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<{ text: string; isBot: boolean }[]>([
-    { text: config.initialMessage || "Hello! How can I help you today?", isBot: true }
+  const [messages, setMessages] = useState<{ text: string; isBot: boolean; timestamp: Date }[]>([
+    { text: config.initialMessage || "Hello! How can I help you today?", isBot: true, timestamp: new Date() }
   ]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -49,11 +51,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     scrollToBottom();
   }, [messages]);
 
+  const formatMessageTime = (date: Date) => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
   const handleSendMessage = () => {
     if (!message.trim()) return;
     
-    // Add user message
-    setMessages([...messages, { text: message, isBot: false }]);
+    // Add user message with timestamp
+    setMessages([...messages, { text: message, isBot: false, timestamp: new Date() }]);
     
     // Simulate bot response with emoji
     setTimeout(() => {
@@ -66,7 +72,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       ];
       
       const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-      setMessages(prev => [...prev, { text: randomResponse, isBot: true }]);
+      setMessages(prev => [...prev, { 
+        text: randomResponse, 
+        isBot: true, 
+        timestamp: new Date() 
+      }]);
     }, 1000);
     
     setMessage("");
@@ -133,6 +143,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             >
               {msg.text}
             </div>
+            
+            {/* Display timestamp if enabled */}
+            {showDateTime && (
+              <div className={`text-xs text-muted-foreground mt-1 ${msg.isBot ? 'text-left' : 'text-right'}`}>
+                {formatMessageTime(msg.timestamp)}
+              </div>
+            )}
           </div>
         ))}
         <div ref={messagesEndRef} />
