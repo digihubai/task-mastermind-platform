@@ -1,11 +1,12 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { HexColorPicker } from "react-colorful";
+import { toast } from "sonner";
 
 interface ColorSelectionProps {
   selectedColor: string;
@@ -14,6 +15,11 @@ interface ColorSelectionProps {
 
 export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, updateInfo }) => {
   const [hexInputValue, setHexInputValue] = useState(selectedColor);
+  
+  // Sync the input value when the prop changes
+  useEffect(() => {
+    setHexInputValue(selectedColor);
+  }, [selectedColor]);
   
   const handleHexInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -25,11 +31,22 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
     const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
     if (hexRegex.test(hexInputValue)) {
       updateInfo("color", hexInputValue);
+      toast.success("Color updated successfully");
     } else if (hexInputValue.match(/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)) {
       // If it's missing the # but is otherwise valid
-      updateInfo("color", `#${hexInputValue}`);
-      setHexInputValue(`#${hexInputValue}`);
+      const colorWithHash = `#${hexInputValue}`;
+      updateInfo("color", colorWithHash);
+      setHexInputValue(colorWithHash);
+      toast.success("Color updated successfully");
+    } else {
+      toast.error("Invalid color format. Please use a valid hex code.");
     }
+  };
+  
+  // Handle direct color picker changes
+  const handleColorChange = (color: string) => {
+    setHexInputValue(color);
+    updateInfo("color", color);
   };
   
   // Define color options
@@ -51,7 +68,6 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
           <div 
             key={index}
             className="relative"
-            onClick={() => updateInfo("color", colorOption.value !== "custom" ? colorOption.value : selectedColor)}
           >
             {colorOption.value === "custom" ? (
               <Popover>
@@ -74,11 +90,8 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
                 <PopoverContent className="w-auto p-3">
                   <div className="space-y-3">
                     <HexColorPicker
-                      color={selectedColor}
-                      onChange={(color) => {
-                        updateInfo("color", color);
-                        setHexInputValue(color);
-                      }}
+                      color={hexInputValue}
+                      onChange={handleColorChange}
                     />
                     
                     <div className="flex mt-2 gap-2">
@@ -98,15 +111,19 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
                     
                     <div 
                       className="w-full h-8 rounded"
-                      style={{ backgroundColor: selectedColor }}
+                      style={{ backgroundColor: hexInputValue }}
                     />
                   </div>
                 </PopoverContent>
               </Popover>
             ) : (
               <div 
-                className="w-10 h-10 rounded-full cursor-pointer border border-muted"
+                className={`w-10 h-10 rounded-full cursor-pointer border ${selectedColor === colorOption.value ? 'border-primary border-2' : 'border-muted'}`}
                 style={{ backgroundColor: colorOption.value }}
+                onClick={() => {
+                  updateInfo("color", colorOption.value);
+                  toast.success(`Color updated to ${colorOption.label}`);
+                }}
               >
                 {selectedColor === colorOption.value && (
                   <div className="absolute inset-0 flex items-center justify-center text-white">
