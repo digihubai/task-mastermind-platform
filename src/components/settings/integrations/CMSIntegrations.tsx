@@ -15,12 +15,22 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
     wordpress: false,
     shopify: false,
     webflow: false,
+    wix: false,
+    squarespace: false,
+    drupal: false,
+    joomla: false,
+    magento: false,
   });
   
   const [websites, setWebsites] = useState<{[key: string]: string}>({
     wordpress: "",
     shopify: "",
     webflow: "",
+    wix: "",
+    squarespace: "",
+    drupal: "",
+    joomla: "",
+    magento: "",
   });
 
   const handleInputChange = (cms: string, value: string) => {
@@ -76,9 +86,18 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
       wordpress: "WordPress",
       shopify: "Shopify",
       webflow: "Webflow",
+      wix: "Wix",
+      squarespace: "Squarespace",
+      drupal: "Drupal",
+      joomla: "Joomla",
+      magento: "Magento",
     };
     return cmsNames[cms] || cms;
   };
+
+  // Filter to show only top CMS platforms on initial view
+  const topCmsPlatforms = ["wordpress", "shopify", "webflow"];
+  const otherCmsPlatforms = Object.keys(websites).filter(cms => !topCmsPlatforms.includes(cms));
 
   return (
     <div className="space-y-6">
@@ -90,7 +109,7 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {Object.keys(websites).map(cms => (
+        {topCmsPlatforms.map(cms => (
           <Card key={cms} className="p-5 border">
             <div className="flex items-center gap-3 mb-4">
               <div className={cms === "wordpress" 
@@ -140,6 +159,55 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
                   variant="outline" 
                   size="sm" 
                   className="w-full"
+                  onClick={() => handleConnect(cms)}
+                  disabled={connecting === cms}
+                >
+                  {connecting === cms ? "Connecting..." : "Connect"}
+                </Button>
+              </>
+            )}
+          </Card>
+        ))}
+      </div>
+      
+      <h3 className="text-lg font-medium mt-8">Additional CMS Platforms</h3>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {otherCmsPlatforms.map(cms => (
+          <Card key={cms} className="p-4 border">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="bg-gray-100 p-2 rounded-full">
+                <Globe className="h-4 w-4 text-gray-600" />
+              </div>
+              <h4 className="font-medium text-sm">{getCMSName(cms)}</h4>
+            </div>
+            
+            {connected[cms] ? (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-green-600 font-medium">Connected</span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleDisconnect(cms)}
+                  >
+                    Disconnect
+                  </Button>
+                </div>
+                <p className="text-xs truncate">{websites[cms]}</p>
+              </div>
+            ) : (
+              <>
+                <Input
+                  placeholder="Enter your site URL"
+                  className="mb-2 text-xs"
+                  size={1}
+                  value={websites[cms]}
+                  onChange={(e) => handleInputChange(cms, e.target.value)}
+                />
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full text-xs"
                   onClick={() => handleConnect(cms)}
                   disabled={connecting === cms}
                 >

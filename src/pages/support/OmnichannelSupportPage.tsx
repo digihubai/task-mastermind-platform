@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,7 +15,6 @@ import OmnichannelDashboard from '@/components/support/omnichannel/OmnichannelDa
 import OmnichannelInboxTab from '@/components/support/omnichannel/OmnichannelInboxTab';
 import HumanAssignmentsTab from '@/components/support/omnichannel/HumanAssignmentsTab';
 import RecentTicketsTab from '@/components/support/omnichannel/RecentTicketsTab';
-import AnalyticsTab from '@/components/support/omnichannel/AnalyticsTab';
 
 // Mock ticket data
 const mockTickets: SupportTicket[] = [
@@ -155,7 +155,6 @@ const OmnichannelSupportPage: React.FC = () => {
                     )}
                   </TabsTrigger>
                   <TabsTrigger value="tickets" className="flex-1">Support Tickets</TabsTrigger>
-                  <TabsTrigger value="analytics" className="flex-1">Analytics</TabsTrigger>
                 </TabsList>
               </div>
               
@@ -172,10 +171,6 @@ const OmnichannelSupportPage: React.FC = () => {
               
               <TabsContent value="tickets" className="mt-6">
                 <RecentTicketsTab tickets={mockTickets} onViewTicket={handleViewTicket} />
-              </TabsContent>
-              
-              <TabsContent value="analytics" className="mt-6">
-                <AnalyticsTab />
               </TabsContent>
             </Tabs>
           </>
