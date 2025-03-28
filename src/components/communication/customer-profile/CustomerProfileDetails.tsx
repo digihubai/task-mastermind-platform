@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CustomerProfile } from '@/types/omnichannel';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -17,7 +16,7 @@ import {
   Monitor,
   LucideIcon,
   Calendar,
-  Language,
+  Languages,
   CreditCard,
   Link as LinkIcon,
   Send,
@@ -106,7 +105,7 @@ const CustomerProfileDetails: React.FC<CustomerProfileDetailsProps> = ({ profile
           <ProfileDetailItem icon={CreditCard} label="Currency" value={profile.currency} />
           <ProfileDetailItem icon={MapPin} label="Location" value={profile.location} />
           <ProfileDetailItem icon={Clock} label="Timezone" value={profile.timezone} />
-          <ProfileDetailItem icon={Language} label="Language" value={profile.language} />
+          <ProfileDetailItem icon={Languages} label="Language" value={profile.language} />
         </div>
       </div>
       

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,12 +50,10 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
     onSendMessage(messageText);
   };
 
-  // Calculate customer satisfaction if available
   const satisfactionPercentage = satisfaction !== null ? satisfaction : 85;
 
-  // Get conversation-specific messages
   const conversationMessages = messages.filter(
-    message => message.conversationId === selectedConversation.id
+    message => message.customerId === selectedConversation.customerId
   );
 
   return (

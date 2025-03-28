@@ -25,6 +25,7 @@ export interface Message {
   channel: string; // Must match the conversation channel to properly filter messages
   isRead?: boolean;
   customerId: string; // Added customerId to link messages to conversations
+  conversationId?: string; // Adding this to fix the error
   attachments?: Array<{
     type: string;
     url: string;
@@ -57,4 +58,25 @@ export interface HumanAgent {
   status: 'online' | 'away' | 'offline';
   assignedConversations: number;
   maxConcurrentChats?: number;
+}
+
+export interface CustomerProfile {
+  id: string;
+  name: string;
+  email: string;
+  type: string;
+  createdAt: string;
+  lastActivity: string;
+  browser: string;
+  language: string;
+  company: string;
+  currency: string;
+  currentUrl: string;
+  ip: string;
+  location: string;
+  os: string;
+  phone: string;
+  timezone: string;
+  conversationId: string;
+  userId: string;
 }

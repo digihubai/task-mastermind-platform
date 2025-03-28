@@ -184,7 +184,7 @@ const OmnichannelInbox: React.FC<OmnichannelInboxProps> = ({ onAssignToHuman }) 
       unread: false,
       status: 'active',
       priority: 'medium',
-      assignmentStatus: 'ai_handling',
+      assignmentStatus: 'ai', // Changed from 'ai_handling' to 'ai' to match the allowed types
       agent: 'AI Assistant',
       customerId: `new-cust-${Date.now()}`,
     };
