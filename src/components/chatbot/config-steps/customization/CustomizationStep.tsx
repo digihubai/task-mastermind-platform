@@ -1,6 +1,5 @@
 
-import React, { useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 import { LogoUpload } from "./LogoUpload";
 import { LanguageSelector } from "./LanguageSelector";
 import { FooterLinkInput } from "./FooterLinkInput";
@@ -34,8 +33,7 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
   chatbotInfo,
   setNewChatbotInfo,
 }) => {
-  const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   
   const updateInfo = (key: string, value: any) => {
     setNewChatbotInfo({ ...chatbotInfo, [key]: value });
