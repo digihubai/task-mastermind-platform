@@ -67,6 +67,16 @@ export interface HumanAgent {
   status: 'online' | 'away' | 'offline';
   assignedConversations: number;
   maxConcurrentChats?: number;
+  responseTime?: number; // Average response time in minutes
+  specialties?: string[]; // Areas of expertise (e.g. technical, billing)
+  languages?: string[]; // Languages the agent can speak
+  department?: string; // Department the agent belongs to
+  availability?: {
+    startTime: string; // HH:MM format
+    endTime: string; // HH:MM format
+    timeZone: string; // e.g. 'America/New_York'
+    daysOfWeek: number[]; // 0-6 (Sunday to Saturday)
+  };
 }
 
 export interface CustomerProfile {
@@ -99,6 +109,7 @@ export interface SavedReply {
   lastUsed?: string;
   usageCount?: number;
   isFavorite?: boolean;
+  createdAt: string;
 }
 
 export interface CSATSurvey {
@@ -110,4 +121,17 @@ export interface CSATSurvey {
   wouldRecommend: boolean;
   comments?: string;
   submittedAt: string;
+}
+
+export interface SupportQueue {
+  id: string;
+  name: string;
+  description?: string;
+  conversations: number;
+  waitTime: number; // Average wait time in minutes
+  priority: 'low' | 'medium' | 'high';
+  status: 'active' | 'paused';
+  agents: string[]; // IDs of agents assigned to this queue
+  channels?: string[]; // Channels this queue handles
+  department?: string; // Department this queue belongs to
 }

@@ -9,8 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TicketList } from "@/components/support/TicketList";
 import { TicketDetails } from "@/components/support/TicketDetails";
 import { NewTicketForm } from "@/components/support/NewTicketForm";
+import { QueueManagement } from "@/components/support/QueueManagement";
 import { SupportTicket } from "@/types/support";
 import { useToast } from "@/hooks/use-toast";
+import { mockQueues } from "@/components/support/mock-data/queues";
+import { mockAgents } from "@/components/support/mock-data/agents";
 
 // Mock data for tickets
 const mockTickets: SupportTicket[] = [
@@ -113,6 +116,7 @@ const TicketsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
+  const [dashboardTab, setDashboardTab] = useState('tickets');
 
   const handleCreateTicket = (newTicket: Partial<SupportTicket>) => {
     const ticket: SupportTicket = {
@@ -252,95 +256,108 @@ const TicketsPage: React.FC = () => {
           />
         ) : (
           <>
-            <div className="flex gap-4 items-center">
-              <div className="relative flex-1 max-w-sm">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search tickets..."
-                  className="pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
-            
-            <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+            <Tabs defaultValue="tickets" value={dashboardTab} onValueChange={setDashboardTab}>
               <TabsList>
-                <TabsTrigger value="all">All Tickets</TabsTrigger>
-                <TabsTrigger value="open">Open</TabsTrigger>
-                <TabsTrigger value="in_progress">In Progress</TabsTrigger>
-                <TabsTrigger value="resolved">Resolved</TabsTrigger>
-                <TabsTrigger value="closed">Closed</TabsTrigger>
+                <TabsTrigger value="tickets">Tickets</TabsTrigger>
+                <TabsTrigger value="queues">Queues & Agents</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="all" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>All Tickets ({filteredTickets.length})</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <TicketList 
-                      tickets={filteredTickets} 
-                      onViewTicket={handleTicketClick}
+              <TabsContent value="tickets" className="mt-6 space-y-6">
+                <div className="flex gap-4 items-center">
+                  <div className="relative flex-1 max-w-sm">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search tickets..."
+                      className="pl-8"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
+                
+                <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+                  <TabsList>
+                    <TabsTrigger value="all">All Tickets</TabsTrigger>
+                    <TabsTrigger value="open">Open</TabsTrigger>
+                    <TabsTrigger value="in_progress">In Progress</TabsTrigger>
+                    <TabsTrigger value="resolved">Resolved</TabsTrigger>
+                    <TabsTrigger value="closed">Closed</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="all" className="mt-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>All Tickets ({filteredTickets.length})</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <TicketList 
+                          tickets={filteredTickets} 
+                          onViewTicket={handleTicketClick}
+                        />
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                  
+                  <TabsContent value="open" className="mt-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Open Tickets ({filteredTickets.length})</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <TicketList 
+                          tickets={filteredTickets}
+                          onViewTicket={handleTicketClick}
+                        />
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                  
+                  <TabsContent value="in_progress" className="mt-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>In Progress ({filteredTickets.length})</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <TicketList 
+                          tickets={filteredTickets}
+                          onViewTicket={handleTicketClick}
+                        />
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                  
+                  <TabsContent value="resolved" className="mt-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Resolved Tickets ({filteredTickets.length})</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <TicketList 
+                          tickets={filteredTickets}
+                          onViewTicket={handleTicketClick}
+                        />
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                  
+                  <TabsContent value="closed" className="mt-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Closed Tickets ({filteredTickets.length})</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <TicketList 
+                          tickets={filteredTickets}
+                          onViewTicket={handleTicketClick}
+                        />
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
               </TabsContent>
               
-              <TabsContent value="open" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Open Tickets ({filteredTickets.length})</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <TicketList 
-                      tickets={filteredTickets}
-                      onViewTicket={handleTicketClick}
-                    />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="in_progress" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>In Progress ({filteredTickets.length})</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <TicketList 
-                      tickets={filteredTickets}
-                      onViewTicket={handleTicketClick}
-                    />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="resolved" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Resolved Tickets ({filteredTickets.length})</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <TicketList 
-                      tickets={filteredTickets}
-                      onViewTicket={handleTicketClick}
-                    />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="closed" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Closed Tickets ({filteredTickets.length})</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <TicketList 
-                      tickets={filteredTickets}
-                      onViewTicket={handleTicketClick}
-                    />
-                  </CardContent>
-                </Card>
+              <TabsContent value="queues" className="mt-6">
+                <QueueManagement queues={mockQueues} agents={mockAgents} />
               </TabsContent>
             </Tabs>
           </>
