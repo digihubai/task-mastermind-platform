@@ -15,6 +15,11 @@ interface CustomerTicketFormProps {
   showBookingButton?: boolean;
   availableCategories?: string[];
   availableDepartments?: string[];
+  showAiSupportOption?: boolean;
+  requiredFields?: {
+    phone?: boolean;
+    company?: boolean;
+  };
 }
 
 export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({ 
@@ -24,7 +29,9 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
   assistantName = "Support AI",
   showBookingButton = true,
   availableCategories = ["Technical", "Billing", "General", "Feature Request"],
-  availableDepartments = ["Customer Support", "Technical Support", "Billing", "Sales"]
+  availableDepartments = ["Customer Support", "Technical Support", "Billing", "Sales"],
+  showAiSupportOption = true,
+  requiredFields = { phone: false, company: false }
 }) => {
   const { toast } = useToast();
   const [submitted, setSubmitted] = useState(false);
@@ -108,6 +115,8 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
             onChangeCustomerInfo={handleCustomerInfoChange}
             onToggleAIChat={() => setShowAIChat(!showAIChat)}
             onContinue={handleContinue}
+            showAiSupportOption={showAiSupportOption}
+            requiredFields={requiredFields}
           />
         </div>
       </div>
@@ -137,6 +146,7 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
         onCancel={() => setStep('contact')}
         availableCategories={availableCategories}
         availableDepartments={availableDepartments}
+        requiredFields={requiredFields}
       />
     </div>
   );

@@ -49,6 +49,7 @@ export const EmbeddableTicketForm: React.FC<EmbeddableTicketFormProps> = ({
             availableDepartments={availableDepartments}
             showAiSupportOption={showAiSupportOption}
             requiredFields={requiredFields}
+            compact={compact}
           />
         </CardContent>
       </Card>
@@ -107,7 +108,7 @@ export const FormCustomizationInterface: React.FC<{
             id="form-theme"
             className="w-full p-2 border rounded mt-1"
             value={settings.theme || 'auto'}
-            onChange={(e) => handleChange('theme', e.target.value)}
+            onChange={(e) => handleChange('theme', e.target.value as 'light' | 'dark' | 'auto')}
           >
             <option value="light">Light</option>
             <option value="dark">Dark</option>

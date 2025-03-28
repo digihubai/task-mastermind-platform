@@ -4,9 +4,8 @@ import AppLayout from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Code, ExternalLink, Check } from "lucide-react";
+import { Copy, ExternalLink } from "lucide-react";
 import { EmbeddableTicketForm, FormCustomizationInterface } from '@/components/support/EmbeddableTicketForm';
 
 const EmbedTicketPage = () => {
@@ -15,7 +14,7 @@ const EmbedTicketPage = () => {
     customTitle: "Support Request",
     customDescription: "Submit a new support request and we'll get back to you as soon as possible.",
     compact: false,
-    theme: 'auto',
+    theme: 'auto' as const,
     showAiSupportOption: true,
     availableCategories: ["General", "Technical", "Billing", "Feature Request"],
     availableDepartments: ["Support", "Sales", "Billing", "Product"],
