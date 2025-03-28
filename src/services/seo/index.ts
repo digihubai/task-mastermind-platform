@@ -8,5 +8,4 @@ export * from './linkService';
 export * from './imageService';
 export * from './campaignService';
 // Export analyticsService separately to avoid name conflicts
-export { SEOAnalytics } from './analyticsService';
-export { fetchSEOAnalytics } from './analyticsService';
+export { SEOAnalytics, fetchSEOAnalytics } from './analyticsService';

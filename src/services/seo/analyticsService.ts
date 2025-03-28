@@ -22,3 +22,6 @@ export const fetchSEOAnalytics = async (): Promise<SEOAnalytics> => {
     ]
   };
 };
+
+// Re-export SEOAnalytics type for convenience
+export { SEOAnalytics };
