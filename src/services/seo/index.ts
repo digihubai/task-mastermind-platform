@@ -7,4 +7,6 @@ export * from './contentService';
 export * from './linkService';
 export * from './imageService';
 export * from './campaignService';
-export * from './analyticsService';
+// Export analyticsService separately to avoid name conflicts
+export { SEOAnalytics } from './analyticsService';
+export { fetchSEOAnalytics } from './analyticsService';

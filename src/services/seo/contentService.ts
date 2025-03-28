@@ -1,4 +1,3 @@
-
 /**
  * Generates mock SEO content for previewing purposes
  */
@@ -366,4 +365,76 @@ export const generateContentWithImages = async (
 
   console.log("Generated content length:", content.length);
   return content;
+};
+
+/**
+ * Generates basic SEO content without images or links
+ * This function must be exported for the seoService compatibility layer
+ */
+export const generateContent = async (
+  topic: string,
+  keywords: string[],
+  title: string,
+  outline: string
+): Promise<string> => {
+  console.log("Generating basic content for:", { topic, title });
+  
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // Clean up and format inputs
+  const cleanTopic = topic.trim();
+  const formattedTopic = cleanTopic.charAt(0).toUpperCase() + cleanTopic.slice(1).toLowerCase();
+  const formattedKeywords = keywords.map(k => k.trim()).filter(k => k.length > 0);
+  const currentYear = new Date().getFullYear();
+  
+  // Generate a more basic version of content compared to generateContentWithImages
+  return `<h1>${title || formattedTopic}</h1>
+
+<h2>Introduction</h2>
+
+<p>Welcome to our comprehensive guide on ${formattedTopic}. This article will provide you with actionable insights about ${formattedKeywords.join(", ")}, helping you achieve measurable results in ${currentYear}.</p>
+
+<p>In today's competitive landscape, implementing effective ${formattedTopic} strategies can lead to significant improvements in customer engagement, conversion rates, and overall business growth. We'll explore proven approaches backed by data and real-world case studies.</p>
+
+<h2>Why ${formattedTopic} Matters</h2>
+
+<p>Understanding the importance of ${formattedTopic} is crucial for businesses looking to stay competitive. Recent studies have shown that organizations focusing on ${formattedTopic} see:</p>
+
+<ul>
+  <li>35% increase in customer engagement</li>
+  <li>28% improvement in conversion rates</li>
+  <li>42% better retention metrics</li>
+  <li>Significant competitive advantages in their market segment</li>
+</ul>
+
+<h2>Best Practices for ${formattedTopic}</h2>
+
+<p>To maximize the effectiveness of your ${formattedTopic} strategy, consider implementing these proven best practices:</p>
+
+<ol>
+  <li><strong>Start with clear objectives</strong> that align with your business goals</li>
+  <li><strong>Use data-driven decision making</strong> to guide your strategy</li>
+  <li><strong>Focus on customer needs</strong> rather than just technical implementation</li>
+  <li><strong>Regularly review and adjust</strong> your approach based on performance</li>
+</ol>
+
+<h2>Common Challenges with ${formattedTopic}</h2>
+
+<p>While the benefits are clear, many organizations face challenges when implementing ${formattedTopic}. These often include:</p>
+
+<ul>
+  <li>Difficulty integrating with existing systems</li>
+  <li>Resistance to change within the organization</li>
+  <li>Lack of specialized expertise or resources</li>
+  <li>Challenges measuring ROI effectively</li>
+</ul>
+
+<h2>Case Studies: ${formattedTopic} Success Stories</h2>
+
+<p>Leading organizations have demonstrated remarkable results through effective ${formattedTopic} implementation. For example, Company X achieved a 200% increase in engagement after overhauling their approach to ${formattedKeywords[0] || formattedTopic}.</p>
+
+<h2>Conclusion</h2>
+
+<p>Implementing effective ${formattedTopic} strategies requires commitment, expertise, and a willingness to adapt. By following the guidelines outlined in this article, you'll be well-positioned to achieve significant improvements in your key performance indicators.</p>`;
 };
