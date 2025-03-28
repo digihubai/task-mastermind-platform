@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import EmailComposer from './EmailComposer';
+import MessageComposer from './MessageComposer';
+import CallInterface from './CallInterface';
 import {
   Clock,
   Mail,
@@ -56,6 +59,9 @@ const CustomerProfileDetails: React.FC<CustomerProfileDetailsProps> = ({ profile
   const [notes, setNotes] = useState<string>('');
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [savedNotes, setSavedNotes] = useState<string>('');
+  const [showEmailComposer, setShowEmailComposer] = useState(false);
+  const [showMessageComposer, setShowMessageComposer] = useState(false);
+  const [showCallInterface, setShowCallInterface] = useState(false);
   
   const handleSaveNotes = () => {
     setIsSaving(true);
@@ -74,24 +80,15 @@ const CustomerProfileDetails: React.FC<CustomerProfileDetailsProps> = ({ profile
   };
 
   const handleEmailClick = () => {
-    toast({
-      title: 'Email action triggered',
-      description: `Preparing to send an email to ${profile.email}`,
-    });
+    setShowEmailComposer(true);
   };
 
   const handleCallClick = () => {
-    toast({
-      title: 'Call action triggered',
-      description: `Initiating a call to ${profile.phone}`,
-    });
+    setShowCallInterface(true);
   };
 
   const handleMessageClick = () => {
-    toast({
-      title: 'Message action triggered',
-      description: `Opening messaging interface for ${profile.name}`,
-    });
+    setShowMessageComposer(true);
   };
 
   return (
@@ -204,6 +201,30 @@ const CustomerProfileDetails: React.FC<CustomerProfileDetailsProps> = ({ profile
           </Button>
         </div>
       </div>
+      
+      {/* Email Composer Dialog */}
+      <EmailComposer
+        open={showEmailComposer}
+        onClose={() => setShowEmailComposer(false)}
+        recipientEmail={profile.email}
+        recipientName={profile.name}
+      />
+      
+      {/* Message Composer Dialog */}
+      <MessageComposer
+        open={showMessageComposer}
+        onClose={() => setShowMessageComposer(false)}
+        recipientPhone={profile.phone}
+        recipientName={profile.name}
+      />
+      
+      {/* Call Interface Dialog */}
+      <CallInterface
+        open={showCallInterface}
+        onClose={() => setShowCallInterface(false)}
+        recipientPhone={profile.phone}
+        recipientName={profile.name}
+      />
     </div>
   );
 };
