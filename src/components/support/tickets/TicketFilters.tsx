@@ -69,7 +69,7 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
   toggleSortOrder
 }) => {
   
-  const hasActiveFilters = !!(priorityFilter || categoryFilter || departmentFilter || agentFilter);
+  const hasActiveFilters = !!(searchQuery || priorityFilter || categoryFilter || departmentFilter || agentFilter);
   
   // Debug what categories and departments are available
   useEffect(() => {
@@ -127,7 +127,7 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             </DropdownMenuContent>
           </DropdownMenu>
           
-          {(searchQuery || priorityFilter || categoryFilter || departmentFilter || agentFilter) && (
+          {hasActiveFilters && (
             <Button variant="ghost" onClick={clearFilters}>
               Clear
             </Button>
@@ -141,7 +141,7 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             <div>
               <label className="block text-sm font-medium mb-1">Priority</label>
               <Select 
-                value={priorityFilter || ""} 
+                value={priorityFilter || "all"} 
                 onValueChange={(value) => setPriorityFilter(value === "all" ? null : value)}
               >
                 <SelectTrigger>
@@ -159,8 +159,11 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             <div>
               <label className="block text-sm font-medium mb-1">Category</label>
               <Select 
-                value={categoryFilter || ""} 
-                onValueChange={(value) => setCategoryFilter(value === "all" ? null : value)}
+                value={categoryFilter || "all"} 
+                onValueChange={(value) => {
+                  console.log('Setting category filter to:', value);
+                  setCategoryFilter(value === "all" ? null : value);
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All Categories" />
@@ -177,8 +180,11 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             <div>
               <label className="block text-sm font-medium mb-1">Department</label>
               <Select 
-                value={departmentFilter || ""} 
-                onValueChange={(value) => setDepartmentFilter(value === "all" ? null : value)}
+                value={departmentFilter || "all"} 
+                onValueChange={(value) => {
+                  console.log('Setting department filter to:', value);
+                  setDepartmentFilter(value === "all" ? null : value);
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All Departments" />
@@ -195,7 +201,7 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
             <div>
               <label className="block text-sm font-medium mb-1">Assigned Agent</label>
               <Select 
-                value={agentFilter || ""} 
+                value={agentFilter || "all"} 
                 onValueChange={(value) => setAgentFilter(value === "all" ? null : value)}
               >
                 <SelectTrigger>

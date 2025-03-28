@@ -1,5 +1,5 @@
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { SupportTicket } from '@/types/support';
 
 export interface UseTicketFilteringResult {
@@ -47,14 +47,34 @@ export const useTicketFiltering = (
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showFilters, setShowFilters] = useState(false);
   
-  // Extract all unique categories, departments, priorities without normalizing case
-  const categories = useMemo(() => 
-    [...new Set(tickets.map(ticket => ticket.category).filter(Boolean))], [tickets]
-  );
+  // Extract all unique categories and departments without normalizing the display values
+  const categories = useMemo(() => {
+    // Collect all categories, filtering out empty values
+    const allCategories = tickets
+      .map(ticket => ticket.category)
+      .filter(Boolean);
+    
+    // Remove duplicates and preserve original casing
+    return [...new Set(allCategories)];
+  }, [tickets]);
   
-  const departments = useMemo(() => 
-    [...new Set(tickets.map(ticket => ticket.department).filter(Boolean))], [tickets]
-  );
+  const departments = useMemo(() => {
+    // Collect all departments, filtering out empty values
+    const allDepartments = tickets
+      .map(ticket => ticket.department)
+      .filter(Boolean);
+    
+    // Remove duplicates and preserve original casing
+    return [...new Set(allDepartments)];
+  }, [tickets]);
+  
+  // Debug what we're finding
+  useEffect(() => {
+    console.log('Categories found in useTicketFiltering:', categories);
+    console.log('Departments found in useTicketFiltering:', departments);
+    console.log('Current category filter:', categoryFilter);
+    console.log('Current department filter:', departmentFilter);
+  }, [categories, departments, categoryFilter, departmentFilter]);
   
   const priorities = useMemo(() => 
     [...new Set(tickets.map(ticket => ticket.priority).filter(Boolean))], [tickets]
@@ -91,6 +111,7 @@ export const useTicketFiltering = (
 
   const filteredTickets = useMemo(() => {
     return tickets.filter(ticket => {
+      // Search filtering
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const subjectMatch = ticket.subject.toLowerCase().includes(query);
@@ -100,34 +121,40 @@ export const useTicketFiltering = (
         }
       }
       
+      // Status filtering
       if (activeTab !== 'all' && ticket.status !== activeTab) {
         return false;
       }
       
+      // Priority filtering
       if (priorityFilter && priorityFilter !== "all" && ticket.priority !== priorityFilter) {
         return false;
       }
       
-      // Use exact match for category without converting case
-      if (categoryFilter && categoryFilter !== "all") {
+      // Category filtering - exact match
+      if (categoryFilter && categoryFilter !== "all" && ticket.category) {
+        console.log(`Comparing category: "${ticket.category}" with filter: "${categoryFilter}"`);
         if (ticket.category !== categoryFilter) {
           return false;
         }
       }
       
-      // Use exact match for department without converting case
-      if (departmentFilter && departmentFilter !== "all") {
+      // Department filtering - exact match
+      if (departmentFilter && departmentFilter !== "all" && ticket.department) {
+        console.log(`Comparing department: "${ticket.department}" with filter: "${departmentFilter}"`);
         if (ticket.department !== departmentFilter) {
           return false;
         }
       }
       
+      // Agent filtering
       if (agentFilter && agentFilter !== "all" && ticket.assignedTo !== agentFilter) {
         return false;
       }
       
       return true;
     }).sort((a, b) => {
+      // Sorting logic
       if (!(sortField in a) || !(sortField in b)) {
         return 0;
       }

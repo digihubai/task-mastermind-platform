@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,8 +34,16 @@ export const TicketStatusTabs: React.FC<TicketStatusTabsProps> = ({
   };
 
   // Debug filtered tickets
-  console.log('TicketStatusTabs - filteredTickets:', filteredTickets);
-  console.log('TicketStatusTabs - Active tab:', activeTab);
+  useEffect(() => {
+    console.log('TicketStatusTabs - Active tab:', activeTab);
+    console.log('TicketStatusTabs - filteredTickets:', filteredTickets);
+    
+    // Additional debugging for categories and departments
+    const uniqueCategories = [...new Set(filteredTickets.map(t => t.category))];
+    const uniqueDepartments = [...new Set(filteredTickets.map(t => t.department))];
+    console.log('Unique categories in filtered tickets:', uniqueCategories);
+    console.log('Unique departments in filtered tickets:', uniqueDepartments);
+  }, [filteredTickets, activeTab]);
 
   return (
     <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>

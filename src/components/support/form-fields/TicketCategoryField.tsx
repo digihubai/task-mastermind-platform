@@ -19,7 +19,7 @@ interface TicketCategoryFieldProps {
 export const TicketCategoryField: React.FC<TicketCategoryFieldProps> = ({
   value,
   onChange,
-  availableCategories = ["General", "Technical", "Billing", "Feature Request"]
+  availableCategories = ["General", "Technical", "Billing", "Feature Request", "Integration"]
 }) => {
   // Debug the categories
   useEffect(() => {
