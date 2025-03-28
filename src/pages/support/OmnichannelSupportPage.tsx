@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,8 +13,8 @@ import { toast } from "@/hooks/use-toast";
 import AIAssistantSettings from '@/components/support/AIAssistantSettings';
 import { mockConversations } from '@/components/communication/mockData';
 import { Conversation } from '@/types/omnichannel';
+import { Badge } from "@/components/ui/badge";
 
-// Mock data for tickets
 const mockTickets: SupportTicket[] = [
   {
     id: "ticket-003",
@@ -99,7 +98,6 @@ const OmnichannelSupportPage: React.FC = () => {
   };
   
   const handleAssignToHuman = () => {
-    // Update our human assigned conversations list
     const updatedAssignments = mockConversations.filter(conv => 
       conv.assignmentStatus === 'waiting_for_human' || 
       conv.assignmentStatus === 'assigned_to_human'
