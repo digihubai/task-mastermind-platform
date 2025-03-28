@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Image as ImageIcon, Upload, Search, Sparkles, Loader } from "lucide-react";
+import { ChevronLeft, ChevronRight, Image as ImageIcon, Upload, Search, Sparkles, Loader, SkipForward } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -31,8 +30,8 @@ const ImageStep: React.FC<ImageStepProps> = ({
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [stockImages, setStockImages] = useState<string[]>([]);
   const [aiImages, setAiImages] = useState<string[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
-  // Set search query based on topic and keywords when component mounts
   useEffect(() => {
     if (topic) {
       const query = selectedKeywords.length > 0 
@@ -51,9 +50,7 @@ const ImageStep: React.FC<ImageStepProps> = ({
 
     setSearching(true);
     
-    // Simulate API call to stock image service
     setTimeout(() => {
-      // Random images from Unsplash for demo
       const mockStockImages = [
         `https://source.unsplash.com/random/800x600?${query.replace(/\s+/g, '+')}`,
         `https://source.unsplash.com/random/900x600?${query.replace(/\s+/g, '+')}&1`,
@@ -78,14 +75,11 @@ const ImageStep: React.FC<ImageStepProps> = ({
 
     setGeneratingAI(true);
     
-    // Create a prompt based on the topic and keywords
     const prompt = selectedKeywords.length > 0
       ? `${topic} with focus on ${selectedKeywords.slice(0, 2).join(' and ')}`
       : topic;
     
-    // Simulate API call to AI image generation service
     setTimeout(() => {
-      // For demo, use placeholder images
       const mockAIImages = [
         `https://source.unsplash.com/random/800x600?ai,${prompt.replace(/\s+/g, '+')}`,
         `https://source.unsplash.com/random/900x600?ai,${prompt.replace(/\s+/g, '+')}&1`,
@@ -104,11 +98,9 @@ const ImageStep: React.FC<ImageStepProps> = ({
     const newSelectedImages = [...selectedImages];
     
     if (newSelectedImages.includes(imageUrl)) {
-      // Remove image if already selected
       const index = newSelectedImages.indexOf(imageUrl);
       newSelectedImages.splice(index, 1);
     } else {
-      // Add image to selection (limit to 3 images)
       if (newSelectedImages.length < 3) {
         newSelectedImages.push(imageUrl);
       } else {
@@ -121,12 +113,27 @@ const ImageStep: React.FC<ImageStepProps> = ({
     onImageSelect(newSelectedImages);
   };
 
-  const handleNext = () => {
-    if (selectedImages.length === 0) {
-      toast.warning("Please select at least one image");
-      return;
+  const handleUploadFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      const fileUrls = files.map(file => URL.createObjectURL(file));
+      setUploadedFiles(files);
+      
+      const newSelected = [...selectedImages];
+      fileUrls.forEach(url => {
+        if (newSelected.length < 3 && !newSelected.includes(url)) {
+          newSelected.push(url);
+        }
+      });
+      
+      setSelectedImages(newSelected);
+      onImageSelect(newSelected);
+      toast.success(`${files.length} image(s) uploaded successfully`);
     }
-    
+  };
+
+  const handleSkipImages = () => {
+    toast.info("Skipping image selection");
     onNext();
   };
 
@@ -135,8 +142,19 @@ const ImageStep: React.FC<ImageStepProps> = ({
       <Card className="p-6 border border-border/40">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold">Select Images</h2>
-          <div className="text-sm text-muted-foreground">
-            {selectedImages.length}/3 images selected
+          <div className="flex items-center gap-2">
+            <div className="text-sm text-muted-foreground">
+              {selectedImages.length}/3 images selected
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleSkipImages}
+              className="gap-1"
+            >
+              Skip this step
+              <SkipForward size={14} />
+            </Button>
           </div>
         </div>
 
@@ -186,7 +204,6 @@ const ImageStep: React.FC<ImageStepProps> = ({
                       alt={`Stock image ${index + 1}`} 
                       className="w-full h-36 object-cover"
                       onError={(e) => {
-                        // Handle image loading error
                         (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Image+Error';
                       }}
                     />
@@ -276,7 +293,10 @@ const ImageStep: React.FC<ImageStepProps> = ({
           </TabsContent>
           
           <TabsContent value="upload" className="space-y-4">
-            <div className="border-2 border-dashed rounded-lg p-8 text-center space-y-4">
+            <div 
+              className="border-2 border-dashed rounded-lg p-8 text-center space-y-4 cursor-pointer hover:bg-accent/10 transition-colors"
+              onClick={() => document.getElementById('file-upload')?.click()}
+            >
               <div className="flex justify-center">
                 <Upload className="h-10 w-10 text-muted-foreground/50" />
               </div>
@@ -287,11 +307,30 @@ const ImageStep: React.FC<ImageStepProps> = ({
                   <Upload size={16} />
                   Select Files
                 </Button>
+                <input 
+                  id="file-upload" 
+                  type="file" 
+                  accept="image/*" 
+                  multiple
+                  className="hidden"
+                  onChange={handleUploadFiles} 
+                />
               </div>
               <p className="text-xs text-muted-foreground">
                 Supports: JPG, PNG, GIF (Max 5MB each)
               </p>
             </div>
+            
+            {uploadedFiles.length > 0 && (
+              <div className="mt-4">
+                <h4 className="text-sm font-medium mb-2">Uploaded Files:</h4>
+                <ul className="text-sm space-y-1">
+                  {uploadedFiles.map((file, index) => (
+                    <li key={index}>{file.name} - {(file.size / 1024).toFixed(1)} KB</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
         
@@ -329,11 +368,11 @@ const ImageStep: React.FC<ImageStepProps> = ({
         </Button>
         
         <Button 
-          onClick={handleNext} 
-          disabled={isLoading || selectedImages.length === 0}
+          onClick={onNext} 
+          disabled={isLoading}
           className="gap-1"
         >
-          Continue to Content
+          {selectedImages.length > 0 ? "Continue with Selected Images" : "Skip Images"}
           <ChevronRight size={16} />
         </Button>
       </div>

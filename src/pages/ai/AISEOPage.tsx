@@ -50,6 +50,17 @@ const AISEOPage = () => {
       handleAutoGenerateKeywords();
     }
   }, [seoData.topic, activeStep]);
+
+  // Effect to auto-navigate to title step after keywords selected
+  useEffect(() => {
+    if (activeStep === 2 && seoData.selectedKeywords.length >= 3) {
+      // Delay to show the user that their selection was registered
+      const timer = setTimeout(() => {
+        handleNext();
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [seoData.selectedKeywords, activeStep]);
   
   const handleDataChange = (field: string, value: any) => {
     setSeoData(prev => ({
@@ -79,9 +90,11 @@ const AISEOPage = () => {
           keywords,
           selectedKeywords: keywords.slice(0, 3)
         }));
+        toast.success(`Generated ${keywords.length} keyword suggestions based on your topic`);
       }
     } catch (error) {
       console.error("Error auto-generating keywords:", error);
+      toast.error("Failed to generate keywords automatically. Please try manually.");
     }
   };
   
@@ -98,8 +111,33 @@ const AISEOPage = () => {
         seoData.selectedImages
       );
       
-      handleDataChange("generatedContent", generatedContent);
-      toast.success("Content successfully generated!");
+      // Add special image content integration if images were selected
+      let finalContent = generatedContent;
+      if (seoData.selectedImages && seoData.selectedImages.length > 0) {
+        // Insert image references into the content where appropriate
+        const contentParts = finalContent.split('\n\n');
+        
+        // Add first image after introduction
+        if (contentParts.length > 2 && seoData.selectedImages[0]) {
+          contentParts.splice(2, 0, `![${seoData.selectedKeywords[0] || 'Featured image'} 1](${seoData.selectedImages[0]})`);
+        }
+        
+        // Add second image in the middle if available
+        if (contentParts.length > 4 && seoData.selectedImages[1]) {
+          const middleIndex = Math.floor(contentParts.length / 2);
+          contentParts.splice(middleIndex, 0, `![${seoData.selectedKeywords[1] || 'Featured image'} 2](${seoData.selectedImages[1]})`);
+        }
+        
+        // Add third image near the end if available
+        if (contentParts.length > 6 && seoData.selectedImages[2]) {
+          contentParts.splice(contentParts.length - 2, 0, `![${seoData.selectedKeywords[2] || 'Featured image'} 3](${seoData.selectedImages[2]})`);
+        }
+        
+        finalContent = contentParts.join('\n\n');
+      }
+      
+      handleDataChange("generatedContent", finalContent);
+      toast.success("Content successfully generated with integrated images!");
     } catch (error) {
       console.error("Error generating content:", error);
       toast.error("Failed to generate content. Please try again.");
@@ -262,8 +300,7 @@ const AISEOPage = () => {
     if (seoData.selectedKeywords.length === 0) return 2;
     if (!seoData.selectedTitle) return 3;
     if (!seoData.selectedOutline) return 4;
-    if (seoData.selectedImages?.length === 0) return 5;
-    return 6;
+    return 6; // Allow skipping images
   }
 };
 

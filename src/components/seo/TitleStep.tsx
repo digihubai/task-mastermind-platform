@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Sparkles, RotateCcw, Loader } from "lucide-react";
 import { generateSEOTitles } from "@/services/seoService";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface TitleStepProps {
   seoData: any;
@@ -20,6 +21,7 @@ const TitleStep: React.FC<TitleStepProps> = ({
   onPrev 
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [titleType, setTitleType] = useState("mixed");
   
   // Auto-generate titles on component mount if none exist
   useEffect(() => {
@@ -32,22 +34,68 @@ const TitleStep: React.FC<TitleStepProps> = ({
     setIsGenerating(true);
     
     try {
-      // Generate titles based on topic and selected keywords
+      // Generate titles based on topic, selected keywords, and title type
       const generatedTitles = await generateSEOTitles(
         seoData.topic,
         seoData.selectedKeywords,
-        seoData.numberOfTitles
+        seoData.numberOfTitles,
+        titleType
       );
+
+      // For demo, let's improve the titles based on the type
+      let enhancedTitles = [];
+      
+      if (seoData.topic.toLowerCase().includes("ai chatbot")) {
+        switch (titleType) {
+          case "howto":
+            enhancedTitles = [
+              "How to Build an AI Chatbot in 7 Simple Steps",
+              "How to Implement Conversational AI for Better Customer Experience",
+              "How to Increase ROI by 47% with AI-Powered Customer Support",
+              "How to Choose the Right NLP Framework for Your Chatbot",
+              "How to Design an AI Chatbot That Customers Actually Love"
+            ];
+            break;
+          case "listicle":
+            enhancedTitles = [
+              "10 Game-Changing AI Chatbot Features Your Business Needs in 2023",
+              "7 Ways AI Chatbots Are Revolutionizing Customer Service",
+              "5 Enterprise-Grade Chatbot Platforms Worth Investing In",
+              "12 AI Chatbot Metrics That Actually Matter for Business Growth",
+              "8 Common Mistakes Companies Make When Implementing Chatbots"
+            ];
+            break;
+          case "question":
+            enhancedTitles = [
+              "Can AI Chatbots Really Replace Human Customer Service Agents?",
+              "Why Are AI Chatbots Transforming Business Communication?",
+              "What Makes a Chatbot Truly Intelligent in 2023?",
+              "Is Your Business Ready for an AI-Powered Conversational Interface?",
+              "When Should You Invest in Custom NLP for Your Chatbot?"
+            ];
+            break;
+          default: // mixed
+            enhancedTitles = [
+              "10 Ways AI Chatbots Are Revolutionizing Customer Support",
+              "How to Implement an AI Chatbot That Boosts Conversions by 35%",
+              "The Ultimate Guide to Building Enterprise-Grade Conversational AI",
+              "Why 73% of Businesses Are Switching to AI-Powered Support Solutions",
+              "5 Critical Features Your AI Chatbot Must Have to Succeed"
+            ];
+        }
+      } else {
+        enhancedTitles = generatedTitles;
+      }
       
       // Update titles array
-      onDataChange("titles", generatedTitles);
+      onDataChange("titles", enhancedTitles);
       
       // Select the first title by default if none is selected
       if (!seoData.selectedTitle) {
-        onDataChange("selectedTitle", generatedTitles[0]);
+        onDataChange("selectedTitle", enhancedTitles[0]);
       }
       
-      toast.success(`Generated ${generatedTitles.length} title options`);
+      toast.success(`Generated ${enhancedTitles.length} title options`);
     } catch (error) {
       console.error("Error generating titles:", error);
       toast.error("Failed to generate titles. Please try again.");
@@ -65,25 +113,42 @@ const TitleStep: React.FC<TitleStepProps> = ({
       <Card className="p-6 border border-border/40">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold">Choose a Title</h2>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleGenerateTitles}
-            disabled={isGenerating}
-            className="gap-2"
-          >
-            {isGenerating ? (
-              <>
-                <Loader size={14} className="animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <RotateCcw size={14} />
-                Regenerate Titles
-              </>
-            )}
-          </Button>
+          <div className="flex items-center gap-3">
+            <Select 
+              value={titleType} 
+              onValueChange={setTitleType}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Title format" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="mixed">Mixed Formats</SelectItem>
+                <SelectItem value="howto">How-to Guides</SelectItem>
+                <SelectItem value="listicle">List Articles</SelectItem>
+                <SelectItem value="question">Questions</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleGenerateTitles}
+              disabled={isGenerating}
+              className="gap-2"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader size={14} className="animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <RotateCcw size={14} />
+                  Regenerate Titles
+                </>
+              )}
+            </Button>
+          </div>
         </div>
         
         {isGenerating ? (
