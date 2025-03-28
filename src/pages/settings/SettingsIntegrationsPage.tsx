@@ -36,34 +36,34 @@ const SettingsIntegrationsPage = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="api" className="w-full">
+        <Tabs defaultValue="cms" className="w-full">
           <TabsList className="mb-4">
-            <TabsTrigger value="api">API Connections</TabsTrigger>
             <TabsTrigger value="cms">CMS</TabsTrigger>
-            <TabsTrigger value="messaging">Messaging</TabsTrigger>
             <TabsTrigger value="seo-analytics">SEO Analytics</TabsTrigger>
-            <TabsTrigger value="seo">SEO Tools</TabsTrigger>
+            <TabsTrigger value="messaging">Messaging</TabsTrigger>
+            <TabsTrigger value="seo-tools">SEO Tools</TabsTrigger>
+            <TabsTrigger value="api">API Connections</TabsTrigger>
             <TabsTrigger value="vision">Vision AI</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="api" className="space-y-4">
-            <ApiKeysIntegrations />
-          </TabsContent>
-          
           <TabsContent value="cms" className="space-y-4">
             <CMSIntegrations />
-          </TabsContent>
-          
-          <TabsContent value="messaging" className="space-y-4">
-            <MessagingIntegrations />
           </TabsContent>
           
           <TabsContent value="seo-analytics" className="space-y-4">
             <SEOAnalyticsIntegrations />
           </TabsContent>
           
-          <TabsContent value="seo">
+          <TabsContent value="messaging" className="space-y-4">
+            <MessagingIntegrations />
+          </TabsContent>
+          
+          <TabsContent value="seo-tools" className="space-y-4">
             <SEOIntegrations />
+          </TabsContent>
+          
+          <TabsContent value="api" className="space-y-4">
+            <ApiKeysIntegrations />
           </TabsContent>
           
           <TabsContent value="vision" className="space-y-4">
