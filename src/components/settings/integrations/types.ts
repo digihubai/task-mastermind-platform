@@ -4,7 +4,7 @@ export interface ApiIntegration {
   name: string;
   description: string; 
   icon: React.ReactNode;
-  category: 'ai' | 'communication' | 'ecommerce' | 'tools' | 'analytics' | 'cms';
+  category: 'ai' | 'communication' | 'ecommerce' | 'tools' | 'analytics' | 'cms' | 'seo';
   isActive: boolean;
   apiKey?: string;
   credits?: number;

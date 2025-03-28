@@ -15,10 +15,15 @@ import {
   Phone,
   Mail,
   MessageCircle,
-  MessagesSquare
+  MessagesSquare,
+  Search,
+  Code
 } from "lucide-react";
 import SEOIntegrations from "@/components/seo/SEOIntegrations";
-import OmnichannelIntegrations from "@/components/communication/OmnichannelIntegrations";
+import ApiKeysIntegrations from "@/components/settings/integrations/ApiKeysIntegrations";
+import MessagingIntegrations from "@/components/settings/integrations/MessagingIntegrations";
+import CMSIntegrations from "@/components/settings/integrations/CMSIntegrations";
+import SEOAnalyticsIntegrations from "@/components/settings/integrations/SEOAnalyticsIntegrations";
 
 const SettingsIntegrationsPage = () => {
   return (
@@ -34,70 +39,27 @@ const SettingsIntegrationsPage = () => {
         <Tabs defaultValue="api" className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="api">API Connections</TabsTrigger>
-            <TabsTrigger value="omnichannel">Omnichannel</TabsTrigger>
+            <TabsTrigger value="cms">CMS</TabsTrigger>
+            <TabsTrigger value="messaging">Messaging</TabsTrigger>
+            <TabsTrigger value="seo-analytics">SEO Analytics</TabsTrigger>
             <TabsTrigger value="seo">SEO Tools</TabsTrigger>
             <TabsTrigger value="vision">Vision AI</TabsTrigger>
-            <TabsTrigger value="chat">Chat Services</TabsTrigger>
           </TabsList>
           
           <TabsContent value="api" className="space-y-4">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">API Integrations</h2>
-              <p className="mb-6 text-muted-foreground">
-                Connect DigiHub to your favorite services via API
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-3 p-4 border rounded-lg">
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-full inline-block">
-                    <Globe className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <h3 className="font-medium">CRM Connections</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Connect to Salesforce, HubSpot, and more
-                  </p>
-                  <div className="flex gap-2 mt-4">
-                    <Badge variant="outline">Salesforce</Badge>
-                    <Badge variant="outline">HubSpot</Badge>
-                  </div>
-                  <Button className="w-full mt-4">Configure</Button>
-                </div>
-                
-                <div className="space-y-3 p-4 border rounded-lg">
-                  <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-full inline-block">
-                    <FileText className="h-6 w-6 text-green-600 dark:text-green-400" />
-                  </div>
-                  <h3 className="font-medium">Marketing Tools</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Connect to Mailchimp, ActiveCampaign, and more
-                  </p>
-                  <div className="flex gap-2 mt-4">
-                    <Badge variant="outline">Mailchimp</Badge>
-                    <Badge variant="outline">Marketing</Badge>
-                  </div>
-                  <Button className="w-full mt-4">Configure</Button>
-                </div>
-                
-                <div className="space-y-3 p-4 border rounded-lg">
-                  <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-full inline-block">
-                    <BarChart3 className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <h3 className="font-medium">Analytics APIs</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Connect to Google Analytics, Mixpanel, and more
-                  </p>
-                  <div className="flex gap-2 mt-4">
-                    <Badge variant="outline">Google</Badge>
-                    <Badge variant="outline">Mixpanel</Badge>
-                  </div>
-                  <Button className="w-full mt-4">Configure</Button>
-                </div>
-              </div>
-            </Card>
+            <ApiKeysIntegrations />
           </TabsContent>
           
-          <TabsContent value="omnichannel" className="space-y-4">
-            <OmnichannelIntegrations />
+          <TabsContent value="cms" className="space-y-4">
+            <CMSIntegrations />
+          </TabsContent>
+          
+          <TabsContent value="messaging" className="space-y-4">
+            <MessagingIntegrations />
+          </TabsContent>
+          
+          <TabsContent value="seo-analytics" className="space-y-4">
+            <SEOAnalyticsIntegrations />
           </TabsContent>
           
           <TabsContent value="seo">
@@ -138,32 +100,6 @@ const SettingsIntegrationsPage = () => {
                   <div className="flex gap-2 mt-4">
                     <Badge variant="outline">Custom Models</Badge>
                     <Badge variant="outline">Image Gen</Badge>
-                  </div>
-                  <Button className="w-full mt-4">Configure</Button>
-                </div>
-              </div>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="chat" className="space-y-4">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Chat Services Integrations</h2>
-              <p className="mb-6 text-muted-foreground">
-                Connect DigiHub Chat to messaging platforms
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3 p-4 border rounded-lg">
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-full inline-block">
-                    <MessageSquare className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <h3 className="font-medium">Chat Platform Connections</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Connect to Slack, Discord, and more
-                  </p>
-                  <div className="flex gap-2 mt-4">
-                    <Badge variant="outline">Slack</Badge>
-                    <Badge variant="outline">Discord</Badge>
                   </div>
                   <Button className="w-full mt-4">Configure</Button>
                 </div>
