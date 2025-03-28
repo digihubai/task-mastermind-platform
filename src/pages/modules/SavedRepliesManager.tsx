@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -96,11 +95,13 @@ const SavedRepliesManager = () => {
       });
     } else {
       const newId = `reply-${Date.now()}`;
+      const currentDate = new Date().toISOString();
       setSavedReplies([
         ...savedReplies,
         {
           id: newId,
-          ...newReply
+          ...newReply,
+          createdAt: currentDate
         }
       ]);
       toast({
