@@ -37,14 +37,16 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
       images: seoData.selectedImages
     });
     
-    // If no content but we have required data, suggest regeneration
+    // Automatically trigger content generation if we have required data but no content
     if (!seoData.generatedContent && 
         seoData.selectedTitle && 
         (seoData.selectedOutline || seoData.outline) && 
-        seoData.selectedKeywords?.length > 0) {
-      toast.info("Content ready to be generated. Click 'Generate Content Now' to proceed.");
+        seoData.selectedKeywords?.length > 0 &&
+        !isGenerating) {
+      console.log("Auto-triggering content generation");
+      onRegenerateContent();
     }
-  }, [seoData]);
+  }, [seoData, isGenerating, onRegenerateContent]);
   
   const {
     linkType,

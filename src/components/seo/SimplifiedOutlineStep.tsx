@@ -42,7 +42,12 @@ const SimplifiedOutlineStep: React.FC<SimplifiedOutlineStepProps> = ({
     
     // Simulate API call
     setTimeout(() => {
-      const mockOutlines = generateMockOutlines(seoData.selectedTitle);
+      // Pass topic and keywords to generateMockOutlines
+      const mockOutlines = generateMockOutlines(
+        seoData.selectedTitle, 
+        seoData.topic, 
+        seoData.selectedKeywords
+      );
       setGeneratedOutlines(mockOutlines);
       
       if (!selectedOutline && mockOutlines.length > 0) {

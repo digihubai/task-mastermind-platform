@@ -21,7 +21,7 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
         <h3 className="text-lg font-medium mb-2">Generating SEO-optimized content</h3>
         <p className="text-muted-foreground max-w-md">
           We're creating a comprehensive article based on your selected topic, keywords, title, 
-          and outline structure.
+          and outline structure. This may take a moment...
         </p>
       </div>
     );

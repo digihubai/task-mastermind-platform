@@ -53,7 +53,13 @@ const AISEOPage = () => {
   
   const handleNext = () => {
     window.scrollTo(0, 0);
-    setActiveStep(prev => prev + 1);
+    const nextStep = activeStep + 1;
+    setActiveStep(nextStep);
+    
+    // Auto-generate content when moving from Links step (6) to Content step (7)
+    if (nextStep === 7 && !seoData.generatedContent) {
+      handleGenerateContent();
+    }
   };
   
   const handlePrev = () => {
@@ -107,9 +113,6 @@ const AISEOPage = () => {
       
       handleDataChange("generatedContent", generatedContent);
       toast.success("Content successfully generated!");
-      
-      // Auto-navigate to the content step
-      setActiveStep(7);
     } catch (error) {
       console.error("Error generating content:", error);
       toast.error("Failed to generate content. Please try again.");
@@ -188,7 +191,6 @@ const AISEOPage = () => {
     }
   };
 
-  // Helper function to determine the maximum step the user is allowed to reach
   const getMaxAllowedStep = () => {
     if (!seoData.topic) return 1;
     if (seoData.selectedKeywords.length === 0) return 2;
@@ -209,7 +211,6 @@ const AISEOPage = () => {
         </div>
         
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Left Side - Content Steps */}
           <div className="lg:w-3/4 space-y-6">
             <StepIndicator 
               activeStep={activeStep} 
@@ -229,7 +230,6 @@ const AISEOPage = () => {
             )}
           </div>
           
-          {/* Right Side - SEO Information Panel */}
           <div className="lg:w-1/4">
             <SEOSidebar 
               seoData={seoData} 
