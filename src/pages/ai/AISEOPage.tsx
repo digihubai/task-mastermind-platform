@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -40,11 +41,12 @@ const AISEOPage = () => {
     generatedContent: "",
     imageSize: "square",
     imageCount: 4,
-    imagePrompt: ""
+    imagePrompt: "",
+    advancedSettings: {}
   });
 
   const handleDataChange = (field: string, value: any) => {
-    console.log(`Updating ${field} with:`, value);
+    console.log(`Updating ${field} with:`, field === 'generatedContent' ? `${value.substring(0, 50)}...` : value);
     setSeoData(prev => ({
       ...prev,
       [field]: value
@@ -73,7 +75,7 @@ const AISEOPage = () => {
       title: seoData.selectedTitle,
       outline: seoData.selectedOutline || seoData.outline,
       keywords: seoData.selectedKeywords,
-      images: seoData.selectedImages
+      images: seoData.selectedImages?.length
     });
     
     // Validate required inputs
@@ -104,12 +106,12 @@ const AISEOPage = () => {
         seoData.selectedKeywords,
         seoData.selectedTitle,
         outlineContent,
-        seoData.selectedImages,
+        seoData.selectedImages || [],
         seoData.internalLinks || [],
         seoData.externalLinks || []
       );
       
-      console.log("Content successfully generated:", generatedContent);
+      console.log("Content successfully generated:", generatedContent?.substring(0, 100) + "...");
       
       handleDataChange("generatedContent", generatedContent);
       toast.success("Content successfully generated!");
@@ -121,6 +123,26 @@ const AISEOPage = () => {
     }
   };
   
+  // Auto-generate content when navigating directly to the content step
+  useEffect(() => {
+    if (activeStep === 7 && 
+        !seoData.generatedContent && 
+        !isGenerating && 
+        seoData.selectedTitle && 
+        (seoData.selectedOutline || seoData.outline) && 
+        seoData.selectedKeywords?.length > 0) {
+      console.log("Auto-triggering content generation on step 7 load");
+      handleGenerateContent();
+    }
+  }, [activeStep, seoData, isGenerating]);
+  
+  // Auto-generate content when moving from Links (step 6) to Content (step 7)
+  useEffect(() => {
+    if (activeStep === 6) {
+      console.log("Preparing for auto-generation when moving to step 7");
+    }
+  }, [activeStep]);
+  
   const renderStep = () => {
     switch (activeStep) {
       case 1:
@@ -128,7 +150,9 @@ const AISEOPage = () => {
           <TopicStep 
             topic={seoData.topic} 
             onTopicChange={(value: string) => handleDataChange("topic", value)} 
-            onNext={handleNext} 
+            onNext={handleNext}
+            advancedSettings={seoData.advancedSettings}
+            onAdvancedSettingsChange={(settings) => handleDataChange("advancedSettings", settings)}
           />
         );
       case 2:

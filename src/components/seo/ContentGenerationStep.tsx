@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Globe } from "lucide-react";
+import { ChevronLeft, Globe, AlertCircle } from "lucide-react";
 import ContentActionButtons from "./ContentActionButtons";
 import ContentDisplay from "./ContentDisplay";
 import AddLinksDialog from "./AddLinksDialog";
@@ -26,15 +26,16 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
   onRegenerateContent
 }) => {
   const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
+  const [contentError, setContentError] = useState<string | null>(null);
   
   useEffect(() => {
     // Debug logging to identify issues
     console.log("ContentGenerationStep rendered with data:", {
-      content: seoData.generatedContent,
+      content: seoData.generatedContent ? `${seoData.generatedContent.slice(0, 50)}...` : null,
       title: seoData.selectedTitle,
-      outline: seoData.selectedOutline || seoData.outline,
+      outline: seoData.selectedOutline ? `${seoData.selectedOutline.slice(0, 50)}...` : null,
       keywords: seoData.selectedKeywords,
-      images: seoData.selectedImages
+      images: seoData.selectedImages?.length || 0
     });
     
     // Automatically trigger content generation if we have required data but no content
@@ -46,7 +47,20 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
       console.log("Auto-triggering content generation");
       onRegenerateContent();
     }
+    
+    // Check if content has repetitive placeholders
+    if (seoData.generatedContent && 
+        seoData.generatedContent.includes("This section explores key aspects of") && 
+        seoData.generatedContent.match(/This section explores key aspects of/g)?.length > 2) {
+      setContentError("We detected repetitive content in the generated text. Please regenerate for better quality.");
+    } else {
+      setContentError(null);
+    }
   }, [seoData, isGenerating, onRegenerateContent]);
+  
+  const handleContentChange = (newContent: string) => {
+    onDataChange("generatedContent", newContent);
+  };
   
   const {
     linkType,
@@ -79,10 +93,18 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
           />
         </div>
         
+        {contentError && (
+          <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-md p-3 mb-4 flex items-center gap-2">
+            <AlertCircle className="h-5 w-5 text-amber-500" />
+            <p className="text-sm">{contentError}</p>
+          </div>
+        )}
+        
         <ContentDisplay 
           isGenerating={isGenerating}
           content={seoData.generatedContent}
           onRegenerateContent={onRegenerateContent}
+          onContentChange={handleContentChange}
         />
       </Card>
       
