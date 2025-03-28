@@ -55,6 +55,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  const formatFullDate = (date: Date) => {
+    return `${date.toLocaleDateString()} / ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  };
+
   const handleSendMessage = () => {
     if (!message.trim()) return;
     
@@ -95,19 +99,27 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   const renderAvatar = () => {
-    switch(avatar) {
-      case "avatar1":
-        return <User className="text-primary-foreground" />;
-      case "avatar2":
-        return <User className="text-purple-500" />;
-      case "avatar3":
-        return <User className="text-green-500" />;
-      case "avatar4":
-        return <User className="text-orange-500" />;
-      case "avatar5":
-        return <MessageCircle className="text-blue-500" />;
-      default:
-        return <Bot className="text-primary-foreground" />;
+    // Check if avatar is one of our predefined options or a custom image URL
+    if (avatar.startsWith("avatar")) {
+      switch(avatar) {
+        case "avatar1":
+          return <User className="text-primary-foreground" />;
+        case "avatar2":
+          return <User className="text-purple-500" />;
+        case "avatar3":
+          return <User className="text-green-500" />;
+        case "avatar4":
+          return <User className="text-orange-500" />;
+        case "avatar5":
+          return <MessageCircle className="text-blue-500" />;
+        default:
+          return <Bot className="text-primary-foreground" />;
+      }
+    } else {
+      // If it's a custom image URL
+      return (
+        <AvatarImage src={avatar} alt="Custom Avatar" className="object-cover" />
+      );
     }
   };
 
@@ -147,7 +159,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             {/* Display timestamp if enabled */}
             {showDateTime && (
               <div className={`text-xs text-muted-foreground mt-1 ${msg.isBot ? 'text-left' : 'text-right'}`}>
-                {formatMessageTime(msg.timestamp)}
+                {formatFullDate(msg.timestamp)}
               </div>
             )}
           </div>
@@ -211,7 +223,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         
         {showBranding && (
           <div className="text-center text-xs text-muted-foreground mt-2">
-            Powered by DigiHub AI
+            Powered by DigiHub
           </div>
         )}
       </div>
