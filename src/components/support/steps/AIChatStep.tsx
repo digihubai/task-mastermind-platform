@@ -37,26 +37,27 @@ export const AIChatStep: React.FC<AIChatStepProps> = ({
         </Button>
       </div>
       
-      <div className="h-[400px]">
+      <div className="h-[400px] rounded-lg shadow-sm hover:shadow-md transition-all">
         <ChatInterface 
           title={assistantName}
           config={{
-            initialMessage: `Hello ${customerInfo.name}! I'm your ${assistantName} assistant. How can I help you today?`,
+            initialMessage: `Hello ${customerInfo.name}! 👋 I'm your ${assistantName} assistant. How can I help you today?`,
             modelName: "gpt-4o",
             maxTokens: 1000,
             temperature: 0.7
           }}
           variant="embedded"
+          accentColor="#8B5CF6"
         />
       </div>
       
       <div className="flex justify-between mt-4">
-        <Button variant="outline" onClick={onSwitchToForm}>
+        <Button variant="outline" onClick={onSwitchToForm} className="hover:bg-muted transition-all">
           Create Support Ticket
         </Button>
         {showBookingButton && (
           <div>
-            <Button>
+            <Button className="bg-violet-600 hover:bg-violet-700 transition-all">
               Book a Meeting
             </Button>
           </div>

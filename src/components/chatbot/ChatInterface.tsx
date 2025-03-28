@@ -1,7 +1,10 @@
 
 import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageCircle, User, Bot, Send } from "lucide-react";
+import { MessageCircle, User, Bot, Send, Smile } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
 
 interface ChatInterfaceProps {
   title: string;
@@ -35,6 +38,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [messages, setMessages] = useState<{ text: string; isBot: boolean }[]>([
     { text: config.initialMessage || "Hello! How can I help you today?", isBot: true }
   ]);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const handleSendMessage = () => {
     if (!message.trim()) return;
@@ -45,7 +49,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     // Simulate bot response
     setTimeout(() => {
       setMessages(prev => [...prev, { 
-        text: "This is a preview of how the chatbot would respond to your message.", 
+        text: "This is a preview of how the chatbot would respond to your message. 😊", 
         isBot: true 
       }]);
     }, 1000);
@@ -58,6 +62,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const handleEmojiSelect = (emoji: any) => {
+    setMessage(prev => prev + emoji.native);
+    setShowEmojiPicker(false);
   };
 
   const renderAvatar = () => {
@@ -78,8 +87,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   return (
-    <div className={`chat-interface ${variant === "embedded" ? "h-[500px] w-full" : "h-full w-full"} border rounded-lg bg-background flex flex-col`}>
-      <div className="chat-header p-3 border-b flex items-center justify-between" style={{ borderColor: accentColor }}>
+    <div className={`chat-interface ${variant === "embedded" ? "h-[500px] w-full" : "h-full w-full"} border rounded-lg bg-background flex flex-col shadow-sm hover:shadow-md transition-all duration-300`}>
+      <div 
+        className="chat-header p-3 border-b flex items-center justify-between" 
+        style={{ borderColor: accentColor, backgroundColor: `${accentColor}20` }}
+      >
         <div className="flex items-center gap-2">
           <Avatar className="w-8 h-8">
             <AvatarFallback 
@@ -95,12 +107,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       
       <div className="chat-messages p-4 h-[calc(100%-110px)] overflow-y-auto flex flex-col gap-3">
         {messages.map((msg, index) => (
-          <div key={index} className={`message ${msg.isBot ? 'bot' : 'user'}`}>
+          <div key={index} className={`message ${msg.isBot ? 'bot' : 'user'} animate-fade-in`}>
             <div 
               className={`message-bubble p-3 rounded-lg inline-block max-w-[80%] ${
                 msg.isBot 
-                  ? 'bg-muted text-left ml-0' 
-                  : 'bg-primary text-primary-foreground text-right ml-auto'
+                  ? 'bg-muted text-left ml-0 border border-border/30' 
+                  : 'text-primary-foreground text-right ml-auto'
               }`}
               style={{ backgroundColor: msg.isBot ? undefined : accentColor }}
             >
@@ -111,19 +123,40 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
       
       <div className="chat-input border-t p-3">
-        <div className="relative">
+        <div className="relative flex items-center gap-2">
+          <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+            <PopoverTrigger asChild>
+              <button 
+                className="p-2 rounded-full hover:bg-muted transition-colors"
+                aria-label="Add emoji"
+              >
+                <Smile size={20} className="text-muted-foreground" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Picker 
+                data={data} 
+                onEmojiSelect={handleEmojiSelect} 
+                theme="light"
+                previewPosition="none"
+              />
+            </PopoverContent>
+          </Popover>
+          
           <input 
             type="text" 
-            className="w-full border rounded-full py-2 px-4 pr-10" 
+            className="w-full border rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-2 transition-all" 
+            style={{ borderColor: `${accentColor}50`, focusRingColor: `${accentColor}50` }}
             placeholder="Type a message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyPress}
           />
           <button 
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-white rounded-full p-1"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-white rounded-full p-1.5 transition-transform hover:scale-110"
             onClick={handleSendMessage}
-            style={{ backgroundColor: accentColor }}
+            disabled={!message.trim()}
+            style={{ backgroundColor: message.trim() ? accentColor : '#ccc' }}
           >
             <Send size={16} />
           </button>
@@ -140,7 +173,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       {variant === "embedded" && (
         <div className={`absolute ${position === 'left' ? '-left-16' : '-right-16'} bottom-4`}>
           <div 
-            className={`rounded-full cursor-pointer flex items-center justify-center shadow-md ${transparentTrigger ? 'bg-opacity-70' : ''}`}
+            className={`rounded-full cursor-pointer flex items-center justify-center shadow-md ${transparentTrigger ? 'bg-opacity-70' : ''} transition-transform hover:scale-105`}
             style={{ 
               backgroundColor: transparentTrigger ? 'rgba(255,255,255,0.8)' : accentColor,
               width: `${triggerSize}px`,
