@@ -11,6 +11,9 @@ export interface Conversation {
   agent: string | null;
   lastUpdated?: string;
   isAiHandled?: boolean;
+  assignmentStatus?: 'ai' | 'waiting_for_human' | 'assigned_to_human' | 'unassigned';
+  assignedToHumanAt?: string;
+  assignedHumanAgent?: string;
 }
 
 export interface Message {
@@ -42,4 +45,14 @@ export interface AIAssistantConfig {
     slack: boolean;
     sms: boolean;
   };
+}
+
+export interface HumanAgent {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  status: 'online' | 'away' | 'offline';
+  assignedConversations: number;
+  maxConcurrentChats?: number;
 }

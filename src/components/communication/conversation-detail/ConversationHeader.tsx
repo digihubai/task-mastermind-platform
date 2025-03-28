@@ -4,7 +4,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowUpRight, MessageSquare, Mail, Phone } from "lucide-react";
+import { ArrowUpRight, MessageSquare, Mail, Phone, AlertCircle } from "lucide-react";
 import type { Conversation } from "@/types/omnichannel";
 
 interface ConversationHeaderProps {
@@ -32,6 +32,9 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
 }) => {
   if (!conversation) return null;
 
+  const isAlreadyAssignedToHuman = conversation.assignmentStatus === 'waiting_for_human' || 
+                                  conversation.assignmentStatus === 'assigned_to_human';
+
   return (
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-3">
@@ -48,9 +51,25 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
               {getChannelIcon(conversation.channel)}
               {conversation.channel}
             </Badge>
+            
+            {conversation.assignmentStatus === 'waiting_for_human' && (
+              <Badge variant="outline" className="text-xs bg-amber-100 text-amber-800 border-amber-300">
+                <AlertCircle size={12} className="mr-1" />
+                Waiting for human
+              </Badge>
+            )}
+            
+            {conversation.assignmentStatus === 'assigned_to_human' && (
+              <Badge variant="outline" className="text-xs bg-green-100 text-green-800 border-green-300">
+                Human assigned
+              </Badge>
+            )}
           </div>
           <p className="text-xs text-muted-foreground">
             Customer since January 2023 • 5 previous conversations
+            {conversation.assignedHumanAgent && (
+              <span className="ml-2 font-medium">• Assigned to: {conversation.assignedHumanAgent}</span>
+            )}
           </p>
         </div>
       </div>
@@ -60,10 +79,11 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
           variant="outline" 
           size="sm" 
           onClick={onAssignToHuman} 
-          className="bg-primary text-white hover:bg-primary/90 hover:text-white"
+          disabled={isAlreadyAssignedToHuman}
+          className={`${!isAlreadyAssignedToHuman ? "bg-primary text-white hover:bg-primary/90 hover:text-white" : ""}`}
         >
           <ArrowUpRight size={14} className="mr-1.5" />
-          Assign to Human
+          {isAlreadyAssignedToHuman ? 'Already Assigned' : 'Assign to Human'}
         </Button>
         <Select defaultValue={conversation.status || "open"}>
           <SelectTrigger className="w-[110px]">

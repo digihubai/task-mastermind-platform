@@ -4,7 +4,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { 
   Mail, MessageSquare, Phone, Instagram, 
-  Twitter, Facebook 
+  Twitter, Facebook, AlertCircle
 } from "lucide-react";
 import type { Conversation } from "@/types/omnichannel";
 
@@ -55,10 +55,13 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
   isSelected,
   onClick
 }) => {
+  const isWaitingForHuman = conversation.assignmentStatus === 'waiting_for_human';
+  const isAssignedToHuman = conversation.assignmentStatus === 'assigned_to_human';
+
   return (
     <div 
       className={`p-3 rounded-lg cursor-pointer transition-colors ${
-        isSelected ? 'bg-primary/10' : 'hover:bg-muted'
+        isSelected ? 'bg-primary/10' : isWaitingForHuman ? 'bg-amber-50' : 'hover:bg-muted'
       }`}
       onClick={onClick}
     >
@@ -74,6 +77,9 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
             <div className="flex items-center gap-1.5">
               <p className="font-medium">{conversation.name}</p>
               <div className={`h-2 w-2 rounded-full ${getStatusColor(conversation.status)}`}></div>
+              {isWaitingForHuman && (
+                <AlertCircle size={12} className="text-amber-500" />
+              )}
             </div>
             <span className="text-xs text-muted-foreground">{conversation.time}</span>
           </div>
@@ -93,7 +99,11 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
               {conversation.priority.charAt(0).toUpperCase() + conversation.priority.slice(1)}
             </Badge>
             
-            {conversation.agent ? (
+            {isWaitingForHuman ? (
+              <span className="text-xs text-amber-500 font-medium">Waiting for human</span>
+            ) : isAssignedToHuman ? (
+              <span className="text-xs text-green-600 font-medium">Human assigned</span>
+            ) : conversation.agent ? (
               <span className="text-xs text-muted-foreground">
                 {conversation.agent === 'AI Assistant' ? '🤖 AI' : `👤 ${conversation.agent}`}
               </span>

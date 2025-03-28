@@ -6,12 +6,14 @@ import OmnichannelInbox from '@/components/communication/OmnichannelInbox';
 import SupportStats from '@/components/support/SupportStats';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Settings, Users } from "lucide-react";
+import { PlusCircle, Settings, Users, UserCog } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { TicketList } from '@/components/support/TicketList';
 import { SupportTicket } from '@/types/support';
 import { toast } from "@/hooks/use-toast";
 import AIAssistantSettings from '@/components/support/AIAssistantSettings';
+import { mockConversations } from '@/components/communication/mockData';
+import { Conversation } from '@/types/omnichannel';
 
 // Mock data for tickets
 const mockTickets: SupportTicket[] = [
@@ -72,6 +74,12 @@ const mockTickets: SupportTicket[] = [
 const OmnichannelSupportPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('inbox');
   const [showSettings, setShowSettings] = useState(false);
+  const [humanAssignedConversations, setHumanAssignedConversations] = useState<Conversation[]>(
+    mockConversations.filter(conv => 
+      conv.assignmentStatus === 'waiting_for_human' || 
+      conv.assignmentStatus === 'assigned_to_human'
+    )
+  );
   const navigate = useNavigate();
 
   const handleNewTicket = () => {
@@ -91,6 +99,14 @@ const OmnichannelSupportPage: React.FC = () => {
   };
   
   const handleAssignToHuman = () => {
+    // Update our human assigned conversations list
+    const updatedAssignments = mockConversations.filter(conv => 
+      conv.assignmentStatus === 'waiting_for_human' || 
+      conv.assignmentStatus === 'assigned_to_human'
+    );
+    
+    setHumanAssignedConversations(updatedAssignments);
+    
     toast({
       title: "Assigned to human agent",
       description: "The conversation has been assigned to the next available human agent"
@@ -128,12 +144,65 @@ const OmnichannelSupportPage: React.FC = () => {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
               <TabsList className="w-full max-w-md">
                 <TabsTrigger value="inbox" className="flex-1">Omnichannel Inbox</TabsTrigger>
+                <TabsTrigger value="human-inbox" className="flex-1">
+                  Human Inbox
+                  {humanAssignedConversations.length > 0 && (
+                    <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                      {humanAssignedConversations.length}
+                    </span>
+                  )}
+                </TabsTrigger>
                 <TabsTrigger value="tickets" className="flex-1">Support Tickets</TabsTrigger>
                 <TabsTrigger value="analytics" className="flex-1">Analytics</TabsTrigger>
               </TabsList>
               
               <TabsContent value="inbox" className="mt-6 h-[calc(100vh-26rem)]">
                 <OmnichannelInbox onAssignToHuman={handleAssignToHuman} />
+              </TabsContent>
+              
+              <TabsContent value="human-inbox" className="mt-6 h-[calc(100vh-26rem)]">
+                <Card className="h-full">
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <UserCog className="h-5 w-5 mr-2" />
+                      Human Agent Assignments
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {humanAssignedConversations.length > 0 ? (
+                      <div className="space-y-4">
+                        {humanAssignedConversations.map(conv => (
+                          <Card key={conv.id} className="p-4 border-l-4 border-l-amber-500">
+                            <div className="flex justify-between">
+                              <div>
+                                <h3 className="font-medium">{conv.name}</h3>
+                                <p className="text-sm text-muted-foreground">{conv.message}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge variant="outline" className="text-xs">
+                                    {conv.channel}
+                                  </Badge>
+                                  <Badge variant="outline" className="text-xs bg-amber-50 text-amber-800">
+                                    {conv.assignmentStatus === 'waiting_for_human' 
+                                      ? 'Waiting for human' 
+                                      : 'Assigned to human'}
+                                  </Badge>
+                                </div>
+                              </div>
+                              <div>
+                                <Button size="sm">Take Over</Button>
+                              </div>
+                            </div>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <UserCog className="h-10 w-10 mx-auto mb-3 opacity-20" />
+                        <p>No conversations currently assigned to human agents</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               </TabsContent>
               
               <TabsContent value="tickets" className="mt-6">
