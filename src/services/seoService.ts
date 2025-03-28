@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 
 export interface SEOCampaign {
@@ -188,6 +189,7 @@ export const generateSEOTitles = async (topic: string, keywords: string[], count
     setTimeout(() => {
       // Clean the topic and extract main concept
       const mainConcept = topic.trim().split(/\s+/).slice(0, 3).join(' ');
+      const keywordPhrase = keywords[0] || mainConcept;
       
       const titles = [
         `${count} Essential ${mainConcept} Strategies for Business Growth in 2023`,
@@ -196,7 +198,7 @@ export const generateSEOTitles = async (topic: string, keywords: string[], count
         `${mainConcept} Explained: A Comprehensive Guide for ${keywords[0] || 'Professionals'}`,
         `Why ${mainConcept} Matters for Your ${keywords[1] || 'Business'} and How to Get Started`,
         `The Future of ${mainConcept}: Trends and Predictions for 2023 and Beyond`,
-        `${mainConcept} 101: Everything You Need to Know About ${keywords[0] || 'This Field'}`
+        `${mainConcept} 101: Everything You Need to Know About ${keywords[0] || 'This Technology'}`
       ];
       
       // Return only the requested number of titles
@@ -209,10 +211,12 @@ export const generateKeywords = async (topic: string, count: number = 10): Promi
   return new Promise((resolve) => {
     // Extract main keywords from the topic
     const words = topic.toLowerCase().split(/\s+/).filter(word => word.length > 3);
-    const mainWord = words[0] || "digital";
+    const topicWords = [...new Set(words)]; // Remove duplicates
     
-    // Create related keywords based on the topic
-    const keywordCategories = {
+    // Define categories with relevant keywords
+    const keywordCategories: Record<string, string[]> = {
+      chatbot: ["chatbot", "conversation", "dialogue", "virtual assistant", "chat interface", "automation", "natural language", "bot", "user support", "customer service"],
+      ai: ["artificial intelligence", "machine learning", "neural networks", "NLP", "deep learning", "AI algorithms", "predictive models", "automation", "intelligent systems", "data science"],
       marketing: ["marketing", "advertising", "branding", "promotion", "campaign", "strategy", "audience", "conversion", "engagement", "analytics"],
       technology: ["software", "hardware", "platform", "application", "system", "interface", "network", "database", "automation", "integration"],
       business: ["business", "company", "enterprise", "startup", "corporation", "industry", "market", "revenue", "profit", "growth"],
@@ -220,30 +224,46 @@ export const generateKeywords = async (topic: string, count: number = 10): Promi
       seo: ["seo", "ranking", "keywords", "backlinks", "optimization", "search", "indexing", "visibility", "traffic", "algorithm"]
     };
     
-    // Determine which category this topic belongs to
-    let category = "marketing";
+    // Determine which categories this topic belongs to
+    const matchedCategories: string[] = [];
     for (const [cat, keywords] of Object.entries(keywordCategories)) {
-      if (keywords.some(kw => topic.toLowerCase().includes(kw))) {
-        category = cat;
-        break;
+      if (keywords.some(kw => topic.toLowerCase().includes(kw)) || cat === "ai" || cat === "chatbot") {
+        matchedCategories.push(cat);
       }
     }
     
-    // Generate keywords based on the topic and category
-    const baseKeywords = keywordCategories[category as keyof typeof keywordCategories];
-    const generatedKeywords = baseKeywords.map(kw => {
-      // Create keyword variations combining topic words with category keywords
-      if (words.length > 1) {
-        return `${mainWord} ${kw}`;
-      }
-      return kw;
+    // Default to AI and marketing if no categories match
+    if (matchedCategories.length === 0) {
+      matchedCategories.push("ai", "marketing");
+    }
+    
+    // Generate relevant keywords
+    let generatedKeywords: string[] = [];
+    
+    // Add topic words directly as keywords
+    generatedKeywords = [...topicWords];
+    
+    // Add keywords from matched categories
+    matchedCategories.forEach(category => {
+      const categoryKeywords = keywordCategories[category];
+      
+      // Generate compound keywords by combining topic words with category keywords
+      topicWords.forEach(word => {
+        categoryKeywords.forEach(catWord => {
+          if (!catWord.includes(word) && !word.includes(catWord)) {
+            generatedKeywords.push(`${word} ${catWord}`);
+          }
+        });
+      });
+      
+      // Add some category keywords directly
+      generatedKeywords = [...generatedKeywords, ...categoryKeywords.slice(0, 3)];
     });
     
-    // Add the original topic words as keywords
-    const allKeywords = [...words, ...generatedKeywords];
-    
-    // Filter out duplicates and limit to requested count
-    const uniqueKeywords = [...new Set(allKeywords)].slice(0, count);
+    // Filter out duplicates, too long keywords, and limit to requested count
+    const uniqueKeywords = [...new Set(generatedKeywords)]
+      .filter(kw => kw.length < 30)
+      .slice(0, count);
     
     setTimeout(() => {
       resolve(uniqueKeywords);
@@ -343,7 +363,7 @@ export const generateContentWithImages = async (
           if (index === 0) return section;
           
           // Add image after this section if available
-          if (imageIndex < images.length && index % 2 === 1) {
+          if (imageIndex < images.length) {
             const imageMarkdown = `\n\n![Image related to ${topic}](${images[imageIndex]})\n\n`;
             imageIndex++;
             return section + imageMarkdown;
@@ -354,6 +374,13 @@ export const generateContentWithImages = async (
         
         contentWithImages = enhancedSections.join('##');
       }
+      
+      // Fix spacing issues in the content
+      contentWithImages = contentWithImages
+        .replace(/\n{3,}/g, '\n\n') // Replace excessive line breaks with double line breaks
+        .replace(/##/g, '\n##') // Add newline before headings
+        .replace(/\n##/g, '\n\n##') // Ensure double newline before headings
+        .replace(/\n\n\n##/g, '\n\n##'); // Clean up triple newlines before headings
       
       resolve(contentWithImages);
     }, 2000);

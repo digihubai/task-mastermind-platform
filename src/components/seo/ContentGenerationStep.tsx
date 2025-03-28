@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Copy, Download, RotateCcw, Loader, ExternalLink } from "lucide-react";
+import { ChevronLeft, Copy, Download, RotateCcw, Loader, ExternalLink, Globe } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { generateContentWithImages } from "@/services/seoService";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import PublishToCMSDialog from "./PublishToCMSDialog";
 
 interface ContentGenerationStepProps {
   seoData: any;
@@ -27,6 +28,7 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
   const [activeTab, setActiveTab] = useState("preview");
   const [isGeneratingWithImages, setIsGeneratingWithImages] = useState(false);
   const [generationProgress, setGenerationProgress] = useState({ step: 0, message: "" });
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false);
 
   useEffect(() => {
     if (seoData.selectedImages && seoData.selectedImages.length > 0 && !seoData.generatedContent) {
@@ -134,7 +136,7 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
             return <h3 key={index} className="text-lg font-bold mt-4 mb-2">{line.substring(4)}</h3>;
           } 
           // Handle images
-          else if (line.startsWith("![")) {
+          else if (line.match(/!\[.*?\]\(.*?\)/)) {
             const altTextMatch = line.match(/!\[(.*?)\]/);
             const urlMatch = line.match(/\((.*?)\)/);
             const altText = altTextMatch ? altTextMatch[1] : "Image";
@@ -164,6 +166,14 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
         })}
       </div>
     );
+  };
+
+  const openPublishDialog = () => {
+    if (!seoData.generatedContent) {
+      toast.error("Please generate content first");
+      return;
+    }
+    setPublishDialogOpen(true);
   };
 
   return (
@@ -224,25 +234,47 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
               </TabsContent>
             </Tabs>
             
-            <div className="flex flex-wrap gap-3">
-              <Button variant="outline" size="sm" onClick={handleCopyToClipboard} className="gap-1.5">
-                <Copy size={14} />
-                Copy to Clipboard
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleDownloadMarkdown} className="gap-1.5">
-                <Download size={14} />
-                Download Markdown
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleTryAgain} className="gap-1.5">
-                <RotateCcw size={14} />
-                Regenerate
-              </Button>
-              <Button variant="outline" size="sm" className="gap-1.5 ml-auto" asChild>
-                <a href="#" target="_blank" rel="noopener noreferrer">
-                  <ExternalLink size={14} />
-                  Publish
-                </a>
-              </Button>
+            <div className="flex flex-wrap justify-between gap-3">
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleCopyToClipboard} 
+                  className="gap-1.5"
+                >
+                  <Copy size={14} />
+                  Copy to Clipboard
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleDownloadMarkdown} 
+                  className="gap-1.5"
+                >
+                  <Download size={14} />
+                  Download Markdown
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleTryAgain} 
+                  className="gap-1.5"
+                >
+                  <RotateCcw size={14} />
+                  Regenerate
+                </Button>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button 
+                  onClick={openPublishDialog}
+                  className="gap-1.5"
+                  variant="default"
+                >
+                  <Globe size={14} />
+                  Publish to CMS
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
@@ -265,6 +297,13 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
           Back to Images
         </Button>
       </div>
+      
+      {/* Publish to CMS Dialog */}
+      <PublishToCMSDialog 
+        isOpen={publishDialogOpen}
+        onClose={() => setPublishDialogOpen(false)}
+        seoData={seoData}
+      />
     </div>
   );
 };

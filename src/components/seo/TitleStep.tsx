@@ -1,15 +1,9 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  RefreshCw, 
-  CheckCircle2,
-  FileText,
-  Copy
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, RotateCcw, Loader } from "lucide-react";
+import { generateSEOTitles } from "@/services/seoService";
 import { toast } from "sonner";
 
 interface TitleStepProps {
@@ -25,115 +19,127 @@ const TitleStep: React.FC<TitleStepProps> = ({
   onNext, 
   onPrev 
 }) => {
-  const generateMoreTitles = () => {
-    toast.info("Generating more title options...");
+  const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Auto-generate titles on component mount if none exist
+  useEffect(() => {
+    if (seoData.titles.length === 0 && seoData.selectedKeywords.length > 0) {
+      handleGenerateTitles();
+    }
+  }, []);
+  
+  const handleGenerateTitles = async () => {
+    setIsGenerating(true);
     
-    // Simulate generating more titles
-    setTimeout(() => {
-      const additionalTitles = [
-        `The Future of ${seoData.selectedKeywords[0]}: Trends to Watch`,
-        `How to Implement ${seoData.selectedKeywords[0]} in Your Business Strategy`,
-        `${seoData.selectedKeywords[0]} 101: A Beginner's Guide to Success`,
-        `Advanced ${seoData.selectedKeywords[0]} Techniques for Professionals`,
-        `${seoData.selectedKeywords[0]}: Debunking Common Myths and Misconceptions`
-      ];
+    try {
+      // Generate titles based on topic and selected keywords
+      const generatedTitles = await generateSEOTitles(
+        seoData.topic,
+        seoData.selectedKeywords,
+        seoData.numberOfTitles
+      );
       
-      onDataChange('titles', [...seoData.titles, ...additionalTitles]);
-      toast.success("Generated 5 more title options!");
-    }, 1500);
-  };
-
-  const selectTitle = (title: string) => {
-    onDataChange('selectedTitle', title);
+      // Update titles array
+      onDataChange("titles", generatedTitles);
+      
+      // Select the first title by default if none is selected
+      if (!seoData.selectedTitle) {
+        onDataChange("selectedTitle", generatedTitles[0]);
+      }
+      
+      toast.success(`Generated ${generatedTitles.length} title options`);
+    } catch (error) {
+      console.error("Error generating titles:", error);
+      toast.error("Failed to generate titles. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
   
-  const copyTitle = (title: string) => {
-    navigator.clipboard.writeText(title);
-    toast.success("Title copied to clipboard!");
+  const handleSelectTitle = (title: string) => {
+    onDataChange("selectedTitle", title);
   };
-
+  
   return (
-    <Card className="p-6 border border-border/40">
-      <h2 className="text-xl font-medium mb-6">Step 2: Choose Your Title</h2>
-      
-      <div className="space-y-6">
-        <div>
-          <label className="text-sm font-medium mb-4 block flex justify-between">
-            <span>Select a title for your content</span>
-            <span className="text-muted-foreground">
-              Selected keywords: {seoData.selectedKeywords.join(', ')}
-            </span>
-          </label>
-          
+    <div className="space-y-6">
+      <Card className="p-6 border border-border/40">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold">Choose a Title</h2>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleGenerateTitles}
+            disabled={isGenerating}
+            className="gap-2"
+          >
+            {isGenerating ? (
+              <>
+                <Loader size={14} className="animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <RotateCcw size={14} />
+                Regenerate Titles
+              </>
+            )}
+          </Button>
+        </div>
+        
+        {isGenerating ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <Loader className="h-12 w-12 animate-spin mb-4 opacity-70" />
+            <h3 className="text-lg font-medium mb-2">Generating SEO-optimized titles</h3>
+            <p className="text-muted-foreground max-w-md">
+              We're creating titles that include your selected keywords and are optimized for search engines.
+            </p>
+          </div>
+        ) : seoData.titles.length > 0 ? (
           <div className="space-y-3">
             {seoData.titles.map((title: string, index: number) => (
-              <div 
+              <div
                 key={index}
-                className={`p-4 border rounded-md cursor-pointer transition-colors ${
-                  seoData.selectedTitle === title
-                    ? 'border-primary bg-primary/5'
-                    : 'hover:bg-accent/50'
+                className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                  seoData.selectedTitle === title 
+                    ? "border-primary bg-primary/5" 
+                    : "border-border hover:border-primary/50 hover:bg-accent/50"
                 }`}
-                onClick={() => selectTitle(title)}
+                onClick={() => handleSelectTitle(title)}
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3">
-                    {seoData.selectedTitle === title ? (
-                      <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                    ) : (
-                      <FileText className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-                    )}
-                    <span className={seoData.selectedTitle === title ? 'font-medium' : ''}>
-                      {title}
-                    </span>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8 shrink-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      copyTitle(title);
-                    }}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
+                <h3 className="font-medium">{title}</h3>
               </div>
             ))}
           </div>
-          
-          <Button
-            variant="outline"
-            className="mt-4 gap-2 w-full"
-            onClick={generateMoreTitles}
-          >
-            <RefreshCw size={16} />
-            Generate More Titles
-          </Button>
-        </div>
-      </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <Sparkles className="h-12 w-12 text-primary/50 mb-4" />
+            <h3 className="text-lg font-medium mb-2">No titles generated yet</h3>
+            <p className="text-muted-foreground max-w-md">
+              Click "Regenerate Titles" to create SEO-optimized title options based on your topic and keywords.
+            </p>
+            <Button className="mt-4" onClick={handleGenerateTitles}>
+              Generate Titles Now
+            </Button>
+          </div>
+        )}
+      </Card>
       
-      <div className="mt-8 flex justify-between">
-        <Button 
-          variant="outline" 
-          onClick={onPrev}
-          className="gap-2"
-        >
-          <ArrowLeft size={16} />
-          Previous Step
+      <div className="flex justify-between">
+        <Button variant="outline" onClick={onPrev} className="gap-1">
+          <ChevronLeft size={16} />
+          Back to Keywords
         </Button>
         
         <Button 
-          onClick={onNext}
+          onClick={onNext} 
           disabled={!seoData.selectedTitle}
-          className="gap-2"
+          className="gap-1"
         >
-          Next Step
-          <ArrowRight size={16} />
+          Continue to Outline
+          <ChevronRight size={16} />
         </Button>
       </div>
-    </Card>
+    </div>
   );
 };
 

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CalendarIcon, Globe, Loader } from "lucide-react";
+import { Globe, Loader, Calendar, Clock } from "lucide-react";
 import { toast } from 'sonner';
 
 interface PublishToCMSDialogProps {
@@ -27,21 +27,37 @@ const PublishToCMSDialog: React.FC<PublishToCMSDialogProps> = ({ isOpen, onClose
   const [scheduledTime, setScheduledTime] = useState('12:00');
   const [includeFeaturedImage, setIncludeFeaturedImage] = useState(true);
   const [enableComments, setEnableComments] = useState(true);
+  const [addTags, setAddTags] = useState(true);
   
   const handlePublish = () => {
+    if (publishMode === 'schedule' && (!scheduledDate || !scheduledTime)) {
+      toast.error("Please select both date and time for scheduled publishing");
+      return;
+    }
+    
     setIsPublishing(true);
     
     // Simulate publishing to CMS
     setTimeout(() => {
       setIsPublishing(false);
-      toast.success(`Content ${publishMode === 'now' ? 'published' : publishMode === 'schedule' ? 'scheduled' : 'saved as draft'} successfully!`);
+      
+      let message = "";
+      if (publishMode === 'now') {
+        message = `Content published to ${selectedPlatform} successfully!`;
+      } else if (publishMode === 'schedule') {
+        message = `Content scheduled for publication on ${scheduledDate} at ${scheduledTime}`;
+      } else {
+        message = `Content saved as draft on ${selectedPlatform}`;
+      }
+      
+      toast.success(message);
       onClose();
     }, 2000);
   };
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Publish to CMS</DialogTitle>
           <DialogDescription>
@@ -72,6 +88,18 @@ const PublishToCMSDialog: React.FC<PublishToCMSDialogProps> = ({ isOpen, onClose
           </div>
           
           <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="title" className="text-right">
+              Title
+            </Label>
+            <Input
+              id="title"
+              value={seoData.selectedTitle}
+              className="col-span-3"
+              readOnly
+            />
+          </div>
+          
+          <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="category" className="text-right">
               Category
             </Label>
@@ -98,59 +126,77 @@ const PublishToCMSDialog: React.FC<PublishToCMSDialogProps> = ({ isOpen, onClose
             
             <TabsContent value="schedule" className="pt-2">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="schedule-date" className="text-right">
-                  Date
-                </Label>
-                <div className="col-span-3">
-                  <div className="flex gap-2">
-                    <Input
-                      id="schedule-date"
-                      type="date"
-                      value={scheduledDate}
-                      onChange={(e) => setScheduledDate(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Input
-                      id="schedule-time"
-                      type="time"
-                      value={scheduledTime}
-                      onChange={(e) => setScheduledTime(e.target.value)}
-                      className="w-[100px]"
-                    />
+                <div className="col-span-1"></div>
+                <div className="col-span-3 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <Label htmlFor="schedule-date" className="text-sm">Date</Label>
                   </div>
+                  <Input
+                    id="schedule-date"
+                    type="date"
+                    value={scheduledDate}
+                    onChange={(e) => setScheduledDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                  
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <Label htmlFor="schedule-time" className="text-sm">Time</Label>
+                  </div>
+                  <Input
+                    id="schedule-time"
+                    type="time"
+                    value={scheduledTime}
+                    onChange={(e) => setScheduledTime(e.target.value)}
+                  />
                 </div>
               </div>
             </TabsContent>
           </Tabs>
           
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Options</Label>
-            <div className="col-span-3 space-y-2">
+          <div className="grid grid-cols-4 items-start gap-4 pt-2">
+            <Label className="text-right pt-2">Options</Label>
+            <div className="col-span-3 space-y-3">
               <div className="flex items-center space-x-2">
                 <Checkbox 
                   id="featured-image" 
-                  checked={includeFeaturedImage} 
-                  onCheckedChange={(checked: boolean) => setIncludeFeaturedImage(checked)} 
+                  checked={includeFeaturedImage}
+                  onCheckedChange={() => setIncludeFeaturedImage(!includeFeaturedImage)}
                 />
-                <label
-                  htmlFor="featured-image"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                <label 
+                  htmlFor="featured-image" 
+                  className="text-sm cursor-pointer"
                 >
-                  Use first image as featured image
+                  Include featured image from selected images
                 </label>
               </div>
               
               <div className="flex items-center space-x-2">
                 <Checkbox 
-                  id="comments" 
-                  checked={enableComments} 
-                  onCheckedChange={(checked: boolean) => setEnableComments(checked)} 
+                  id="add-tags" 
+                  checked={addTags}
+                  onCheckedChange={() => setAddTags(!addTags)}
                 />
-                <label
-                  htmlFor="comments"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                <label 
+                  htmlFor="add-tags" 
+                  className="text-sm cursor-pointer"
                 >
-                  Enable comments
+                  Add keywords as tags/categories
+                </label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="enable-comments" 
+                  checked={enableComments}
+                  onCheckedChange={() => setEnableComments(!enableComments)}
+                />
+                <label 
+                  htmlFor="enable-comments" 
+                  className="text-sm cursor-pointer"
+                >
+                  Enable comments on published content
                 </label>
               </div>
             </div>
@@ -161,20 +207,20 @@ const PublishToCMSDialog: React.FC<PublishToCMSDialogProps> = ({ isOpen, onClose
           <Button variant="outline" onClick={onClose} disabled={isPublishing}>
             Cancel
           </Button>
-          <Button onClick={handlePublish} disabled={isPublishing}>
+          <Button 
+            onClick={handlePublish} 
+            disabled={isPublishing}
+            className="gap-2"
+          >
             {isPublishing ? (
               <>
-                <Loader className="mr-2 h-4 w-4 animate-spin" />
-                {publishMode === 'now' ? 'Publishing...' : 
-                 publishMode === 'schedule' ? 'Scheduling...' : 
-                 'Saving...'}
+                <Loader size={16} className="animate-spin" />
+                {publishMode === 'now' ? 'Publishing...' : publishMode === 'schedule' ? 'Scheduling...' : 'Saving...'}
               </>
             ) : (
               <>
-                <Globe className="mr-2 h-4 w-4" />
-                {publishMode === 'now' ? 'Publish Now' : 
-                 publishMode === 'schedule' ? 'Schedule' : 
-                 'Save as Draft'}
+                <Globe size={16} />
+                {publishMode === 'now' ? 'Publish Now' : publishMode === 'schedule' ? 'Schedule Publication' : 'Save as Draft'}
               </>
             )}
           </Button>

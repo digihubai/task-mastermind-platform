@@ -38,6 +38,18 @@ const KeywordsStep: React.FC<KeywordsStepProps> = ({
     }
   }, [topic]);
 
+  // Effect to proceed to next step when keywords are selected
+  useEffect(() => {
+    if (selectedKeywords.length >= 2 && keywords.length > 0) {
+      // Wait a moment before proceeding to give user time to see selections
+      const timer = setTimeout(() => {
+        onNext();
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [selectedKeywords]);
+
   const handleGenerateKeywords = async () => {
     if (!topic.trim()) {
       toast.error("Please enter a topic first");

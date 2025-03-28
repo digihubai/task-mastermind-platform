@@ -2,426 +2,341 @@
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, Image as ImageIcon, Upload, Search, Sparkles, Loader } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { 
-  Image as ImageIcon, 
-  Search, 
-  Upload, 
-  ChevronRight, 
-  ChevronLeft,
-  Sparkles,
-  Loader,
-  X
-} from "lucide-react";
 import { toast } from "sonner";
 
 interface ImageStepProps {
   onImageSelect: (images: string[]) => void;
   onNext: () => void;
   onPrev: () => void;
-  isLoading: boolean;
-  selectedKeywords?: string[];
-  topic?: string;
+  isLoading?: boolean;
+  selectedKeywords: string[];
+  topic: string;
 }
 
-const ImageStep: React.FC<ImageStepProps> = ({ 
-  onImageSelect, 
-  onNext, 
-  onPrev, 
-  isLoading, 
-  selectedKeywords = [],
-  topic = ""
+const ImageStep: React.FC<ImageStepProps> = ({
+  onImageSelect,
+  onNext,
+  onPrev,
+  isLoading,
+  selectedKeywords,
+  topic
 }) => {
   const [activeTab, setActiveTab] = useState("stock");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [searchResults, setSearchResults] = useState<string[]>([]);
-  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [generatingAI, setGeneratingAI] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
-  const [draggedFile, setDraggedFile] = useState(false);
-  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  
-  // Initialize search query based on keywords or topic
-  useEffect(() => {
-    if (!searchQuery && (selectedKeywords.length > 0 || topic)) {
-      const initialQuery = selectedKeywords.length > 0 
-        ? selectedKeywords.slice(0, 2).join(" ") 
-        : topic.split(" ").slice(0, 3).join(" ");
-      
-      setSearchQuery(initialQuery);
-      handleSearchImages(initialQuery);
-    }
-  }, [selectedKeywords, topic]);
+  const [stockImages, setStockImages] = useState<string[]>([]);
+  const [aiImages, setAiImages] = useState<string[]>([]);
 
-  const handleSearchImages = async (query = searchQuery) => {
+  // Set search query based on topic and keywords when component mounts
+  useEffect(() => {
+    if (topic) {
+      const query = selectedKeywords.length > 0 
+        ? selectedKeywords[0] 
+        : topic.split(' ').slice(0, 2).join(' ');
+      setSearchQuery(query);
+      handleSearchStockImages(query);
+    }
+  }, [topic, selectedKeywords]);
+
+  const handleSearchStockImages = (query: string = searchQuery) => {
     if (!query.trim()) {
       toast.error("Please enter a search term");
       return;
     }
 
-    setIsSearching(true);
+    setSearching(true);
     
-    try {
-      // Simulate API call to fetch stock images
-      setTimeout(() => {
-        // Mock image URLs
-        const mockImages = [
-          "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1530099486328-e021101a494a?w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1576267423445-b2e0074d68a4?w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800&auto=format&fit=crop",
-        ];
-        
-        setSearchResults(mockImages);
-        setIsSearching(false);
-      }, 1500);
-    } catch (error) {
-      console.error("Error searching for images:", error);
-      toast.error("Failed to search for images. Please try again.");
-      setIsSearching(false);
-    }
+    // Simulate API call to stock image service
+    setTimeout(() => {
+      // Random images from Unsplash for demo
+      const mockStockImages = [
+        `https://source.unsplash.com/random/800x600?${query.replace(/\s+/g, '+')}`,
+        `https://source.unsplash.com/random/900x600?${query.replace(/\s+/g, '+')}&1`,
+        `https://source.unsplash.com/random/800x700?${query.replace(/\s+/g, '+')}&2`,
+        `https://source.unsplash.com/random/700x500?${query.replace(/\s+/g, '+')}&3`,
+        `https://source.unsplash.com/random/600x800?${query.replace(/\s+/g, '+')}&4`,
+        `https://source.unsplash.com/random/800x800?${query.replace(/\s+/g, '+')}&5`,
+        `https://source.unsplash.com/random/900x700?${query.replace(/\s+/g, '+')}&6`,
+        `https://source.unsplash.com/random/800x500?${query.replace(/\s+/g, '+')}&7`,
+      ];
+      
+      setStockImages(mockStockImages);
+      setSearching(false);
+    }, 1500);
   };
 
-  const handleGenerateAIImages = async () => {
-    if (!searchQuery.trim()) {
-      toast.error("Please enter a prompt for image generation");
+  const handleGenerateAIImages = () => {
+    if (!topic) {
+      toast.error("Please set a topic first");
       return;
     }
 
-    setIsGenerating(true);
+    setGeneratingAI(true);
     
-    try {
-      // Simulate API call to generate AI images
-      setTimeout(() => {
-        // Mock generated image URLs
-        const mockGeneratedImages = [
-          "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1640158615573-cd28feb28bd7?w=800&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1633412802994-5c058f151b66?w=800&auto=format&fit=crop",
-        ];
-        
-        setGeneratedImages(mockGeneratedImages);
-        setIsGenerating(false);
-      }, 3000);
-    } catch (error) {
-      console.error("Error generating AI images:", error);
-      toast.error("Failed to generate AI images. Please try again.");
-      setIsGenerating(false);
-    }
+    // Create a prompt based on the topic and keywords
+    const prompt = selectedKeywords.length > 0
+      ? `${topic} with focus on ${selectedKeywords.slice(0, 2).join(' and ')}`
+      : topic;
+    
+    // Simulate API call to AI image generation service
+    setTimeout(() => {
+      // For demo, use placeholder images
+      const mockAIImages = [
+        `https://source.unsplash.com/random/800x600?ai,${prompt.replace(/\s+/g, '+')}`,
+        `https://source.unsplash.com/random/900x600?ai,${prompt.replace(/\s+/g, '+')}&1`,
+        `https://source.unsplash.com/random/800x700?ai,${prompt.replace(/\s+/g, '+')}&2`,
+        `https://source.unsplash.com/random/700x500?ai,${prompt.replace(/\s+/g, '+')}&3`,
+        `https://source.unsplash.com/random/600x800?ai,${prompt.replace(/\s+/g, '+')}&4`
+      ];
+      
+      setAiImages(mockAIImages);
+      setGeneratingAI(false);
+      toast.success("AI images generated successfully");
+    }, 3000);
   };
 
   const handleImageSelect = (imageUrl: string) => {
-    setSelectedImages(prev => {
-      if (prev.includes(imageUrl)) {
-        return prev.filter(url => url !== imageUrl);
+    const newSelectedImages = [...selectedImages];
+    
+    if (newSelectedImages.includes(imageUrl)) {
+      // Remove image if already selected
+      const index = newSelectedImages.indexOf(imageUrl);
+      newSelectedImages.splice(index, 1);
+    } else {
+      // Add image to selection (limit to 3 images)
+      if (newSelectedImages.length < 3) {
+        newSelectedImages.push(imageUrl);
       } else {
-        return [...prev, imageUrl];
+        toast.info("You can select up to 3 images. Remove one to add another.");
+        return;
       }
-    });
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-    
-    processUploadedFiles(Array.from(files));
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDraggedFile(false);
-    
-    if (e.dataTransfer.files.length > 0) {
-      processUploadedFiles(Array.from(e.dataTransfer.files));
     }
+    
+    setSelectedImages(newSelectedImages);
+    onImageSelect(newSelectedImages);
   };
 
-  const processUploadedFiles = (files: File[]) => {
-    const imageFiles = files.filter(file => file.type.startsWith('image/'));
-    
-    if (imageFiles.length === 0) {
-      toast.error("Please upload image files only");
+  const handleNext = () => {
+    if (selectedImages.length === 0) {
+      toast.warning("Please select at least one image");
       return;
     }
     
-    // Process each image file
-    const newImages: string[] = [];
-    
-    imageFiles.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target && typeof event.target.result === 'string') {
-          newImages.push(event.target.result);
-          
-          // Update state when all images are processed
-          if (newImages.length === imageFiles.length) {
-            setUploadedImages(prev => [...prev, ...newImages]);
-          }
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-    
-    toast.success(`Uploaded ${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''}`);
-  };
-
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDraggedFile(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDraggedFile(false);
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
-
-  const handleRemoveUploadedImage = (index: number) => {
-    setUploadedImages(prev => prev.filter((_, i) => i !== index));
-    setSelectedImages(prev => prev.filter(url => url !== uploadedImages[index]));
-  };
-
-  const handleContinue = () => {
-    onImageSelect(selectedImages);
     onNext();
   };
 
   return (
     <div className="space-y-6">
       <Card className="p-6 border border-border/40">
-        <h2 className="text-xl font-semibold mb-4">Select Images for Your Content</h2>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold">Select Images</h2>
+          <div className="text-sm text-muted-foreground">
+            {selectedImages.length}/3 images selected
+          </div>
+        </div>
+
+        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="stock">Stock Photos</TabsTrigger>
             <TabsTrigger value="ai">AI Generated</TabsTrigger>
             <TabsTrigger value="upload">Upload</TabsTrigger>
           </TabsList>
           
-          <div className="mb-6">
+          <TabsContent value="stock" className="space-y-4">
             <div className="flex gap-2">
-              <Input
-                placeholder={activeTab === "ai" ? "Enter a prompt for AI image generation..." : "Search for stock photos..."}
+              <Input 
+                placeholder="Search stock photos..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1"
               />
-              {activeTab === "stock" ? (
-                <Button onClick={() => handleSearchImages()} disabled={isSearching}>
-                  {isSearching ? <Loader className="h-4 w-4 animate-spin mr-2" /> : <Search className="h-4 w-4 mr-2" />}
-                  {isSearching ? "Searching..." : "Search"}
-                </Button>
-              ) : activeTab === "ai" ? (
-                <Button onClick={handleGenerateAIImages} disabled={isGenerating} className="gap-1">
-                  {isGenerating ? <Loader className="h-4 w-4 animate-spin mr-2" /> : <Sparkles className="h-4 w-4 mr-2" />}
-                  {isGenerating ? "Generating..." : "Generate"}
-                </Button>
-              ) : null}
+              <Button 
+                onClick={() => handleSearchStockImages()} 
+                disabled={searching || !searchQuery.trim()}
+                className="gap-2"
+              >
+                {searching ? <Loader size={16} className="animate-spin" /> : <Search size={16} />}
+                Search
+              </Button>
             </div>
-          </div>
-          
-          <TabsContent value="stock" className="mt-0">
-            {isSearching ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <Loader className="h-8 w-8 animate-spin mb-4 text-primary" />
-                <p className="text-muted-foreground">Searching for images...</p>
+            
+            {searching ? (
+              <div className="py-12 flex flex-col items-center justify-center text-center">
+                <Loader className="h-10 w-10 text-primary/50 animate-spin mb-4" />
+                <h3 className="text-lg font-medium mb-1">Searching stock photos</h3>
+                <p className="text-muted-foreground">Finding high-quality images for "{searchQuery}"</p>
               </div>
-            ) : searchResults.length > 0 ? (
+            ) : stockImages.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {searchResults.map((imageUrl, index) => (
-                  <div 
-                    key={index} 
-                    className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 ${
-                      selectedImages.includes(imageUrl) ? 'border-primary' : 'border-transparent'
-                    }`}
+                {stockImages.map((imageUrl, index) => (
+                  <div
+                    key={index}
+                    className={`relative cursor-pointer rounded-md overflow-hidden border-2 transition-all 
+                      ${selectedImages.includes(imageUrl) ? 'border-primary ring-2 ring-primary/30' : 'border-transparent hover:border-primary/40'}
+                    `}
                     onClick={() => handleImageSelect(imageUrl)}
                   >
                     <img 
                       src={imageUrl} 
                       alt={`Stock image ${index + 1}`} 
-                      className="w-full h-40 object-cover"
+                      className="w-full h-36 object-cover"
+                      onError={(e) => {
+                        // Handle image loading error
+                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Image+Error';
+                      }}
                     />
-                    <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${
-                      selectedImages.includes(imageUrl) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                    }`}>
-                      {selectedImages.includes(imageUrl) && (
-                        <div className="bg-primary rounded-full p-1">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        </div>
-                      )}
-                    </div>
+                    {selectedImages.includes(imageUrl) && (
+                      <div className="absolute top-2 right-2 bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center">
+                        ✓
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <ImageIcon className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                <h3 className="text-lg font-medium mb-1">No images found</h3>
-                <p className="text-muted-foreground max-w-md">
-                  Try searching for different keywords to find stock photos for your content.
-                </p>
+              <div className="py-12 flex flex-col items-center justify-center text-center">
+                <Search className="h-10 w-10 text-muted-foreground/50 mb-4" />
+                <h3 className="text-lg font-medium mb-1">No stock photos found</h3>
+                <p className="text-muted-foreground">Search for images related to your topic</p>
               </div>
             )}
           </TabsContent>
           
-          <TabsContent value="ai" className="mt-0">
-            {isGenerating ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <Loader className="h-8 w-8 animate-spin mb-4 text-primary" />
-                <p className="text-muted-foreground">Generating AI images based on your prompt...</p>
-                <p className="text-xs text-muted-foreground/70 mt-2">This may take a minute or two</p>
+          <TabsContent value="ai" className="space-y-4">
+            <div className="flex gap-2">
+              <Input 
+                placeholder="Describe the image you want..." 
+                defaultValue={topic}
+                className="flex-1"
+                disabled={generatingAI}
+              />
+              <Button 
+                onClick={handleGenerateAIImages} 
+                disabled={generatingAI}
+                className="gap-2"
+              >
+                {generatingAI ? <Loader size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                Generate
+              </Button>
+            </div>
+            
+            {generatingAI ? (
+              <div className="py-12 flex flex-col items-center justify-center text-center">
+                <Loader className="h-10 w-10 text-primary/50 animate-spin mb-4" />
+                <h3 className="text-lg font-medium mb-1">Generating AI images</h3>
+                <p className="text-muted-foreground">Creating custom images for your content</p>
+                <div className="w-full max-w-md mt-6">
+                  <div className="w-full bg-secondary rounded-full h-2.5">
+                    <div className="bg-primary h-2.5 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+                  </div>
+                </div>
               </div>
-            ) : generatedImages.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {generatedImages.map((imageUrl, index) => (
-                  <div 
-                    key={index} 
-                    className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 ${
-                      selectedImages.includes(imageUrl) ? 'border-primary' : 'border-transparent'
-                    }`}
+            ) : aiImages.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {aiImages.map((imageUrl, index) => (
+                  <div
+                    key={index}
+                    className={`relative cursor-pointer rounded-md overflow-hidden border-2 transition-all 
+                      ${selectedImages.includes(imageUrl) ? 'border-primary ring-2 ring-primary/30' : 'border-transparent hover:border-primary/40'}
+                    `}
                     onClick={() => handleImageSelect(imageUrl)}
                   >
                     <img 
                       src={imageUrl} 
                       alt={`AI generated image ${index + 1}`} 
-                      className="w-full h-40 object-cover"
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Image+Error';
+                      }}
                     />
-                    <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${
-                      selectedImages.includes(imageUrl) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                    }`}>
-                      {selectedImages.includes(imageUrl) && (
-                        <div className="bg-primary rounded-full p-1">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        </div>
-                      )}
-                    </div>
+                    {selectedImages.includes(imageUrl) && (
+                      <div className="absolute top-2 right-2 bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center">
+                        ✓
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Sparkles className="h-12 w-12 text-muted-foreground/50 mb-4" />
+              <div className="py-12 flex flex-col items-center justify-center text-center">
+                <Sparkles className="h-10 w-10 text-muted-foreground/50 mb-4" />
                 <h3 className="text-lg font-medium mb-1">No AI images generated yet</h3>
-                <p className="text-muted-foreground max-w-md">
-                  Enter a prompt and click "Generate" to create unique AI images for your content.
-                </p>
+                <p className="text-muted-foreground">Click "Generate" to create AI images for your content</p>
+                <Button onClick={handleGenerateAIImages} className="mt-4 gap-2">
+                  <Sparkles size={16} />
+                  Generate Images Now
+                </Button>
               </div>
             )}
           </TabsContent>
           
-          <TabsContent value="upload" className="mt-0">
-            <div 
-              className={`border-2 border-dashed ${draggedFile ? 'border-primary bg-primary/5' : 'border-border'} rounded-lg p-8 text-center`}
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onDragEnter={handleDragEnter}
-              onDragLeave={handleDragLeave}
-            >
-              <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium mb-2">Upload Images</h3>
-              <p className="text-muted-foreground mb-4">Drag and drop images here, or click to browse</p>
-              <Input 
-                id="image-upload" 
-                type="file" 
-                accept="image/*" 
-                multiple 
-                className="hidden" 
-                onChange={handleFileUpload}
-              />
-              <Button asChild variant="outline">
-                <label htmlFor="image-upload" className="cursor-pointer">Browse Files</label>
-              </Button>
-            </div>
-            
-            {uploadedImages.length > 0 && (
-              <div className="mt-6">
-                <h3 className="font-medium mb-3">Uploaded Images</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {uploadedImages.map((imageUrl, index) => (
-                    <div 
-                      key={index} 
-                      className={`relative group rounded-lg overflow-hidden border-2 ${
-                        selectedImages.includes(imageUrl) ? 'border-primary' : 'border-transparent'
-                      }`}
-                    >
-                      <img 
-                        src={imageUrl} 
-                        alt={`Uploaded image ${index + 1}`} 
-                        className="w-full h-40 object-cover cursor-pointer"
-                        onClick={() => handleImageSelect(imageUrl)}
-                      />
-                      <button 
-                        className="absolute top-2 right-2 bg-black/70 rounded-full p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => handleRemoveUploadedImage(index)}
-                      >
-                        <X size={16} />
-                      </button>
-                      <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${
-                        selectedImages.includes(imageUrl) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                      }`}>
-                        {selectedImages.includes(imageUrl) && (
-                          <div className="bg-primary rounded-full p-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          <TabsContent value="upload" className="space-y-4">
+            <div className="border-2 border-dashed rounded-lg p-8 text-center space-y-4">
+              <div className="flex justify-center">
+                <Upload className="h-10 w-10 text-muted-foreground/50" />
               </div>
-            )}
+              <h3 className="text-lg font-medium">Upload your images</h3>
+              <p className="text-muted-foreground">Drag and drop files here, or click to select files</p>
+              <div>
+                <Button variant="outline" className="gap-2 mt-2">
+                  <Upload size={16} />
+                  Select Files
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Supports: JPG, PNG, GIF (Max 5MB each)
+              </p>
+            </div>
           </TabsContent>
         </Tabs>
+        
+        {selectedImages.length > 0 && (
+          <div className="mt-6 space-y-4">
+            <h3 className="font-medium">Selected Images</h3>
+            <div className="flex gap-3 overflow-x-auto py-2">
+              {selectedImages.map((imageUrl, index) => (
+                <div key={index} className="relative min-w-[150px] max-w-[150px]">
+                  <img 
+                    src={imageUrl} 
+                    alt={`Selected image ${index + 1}`} 
+                    className="w-full h-24 object-cover rounded-md"
+                  />
+                  <button
+                    className="absolute -top-2 -right-2 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleImageSelect(imageUrl);
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Card>
       
       <div className="flex justify-between">
         <Button variant="outline" onClick={onPrev} className="gap-1">
           <ChevronLeft size={16} />
-          Back
+          Back to Outline
         </Button>
         
         <Button 
-          onClick={handleContinue} 
-          disabled={selectedImages.length === 0}
+          onClick={handleNext} 
+          disabled={isLoading || selectedImages.length === 0}
           className="gap-1"
         >
-          Continue
+          Continue to Content
           <ChevronRight size={16} />
         </Button>
       </div>
-      
-      {selectedImages.length > 0 && (
-        <div>
-          <h3 className="font-medium mb-3">Selected Images ({selectedImages.length})</h3>
-          <div className="grid grid-cols-4 md:grid-cols-6 gap-4">
-            {selectedImages.map((imageUrl, index) => (
-              <div key={index} className="relative group rounded-lg overflow-hidden border border-border">
-                <img 
-                  src={imageUrl} 
-                  alt={`Selected image ${index + 1}`} 
-                  className="w-full h-20 object-cover"
-                />
-                <button 
-                  className="absolute top-1 right-1 bg-black/70 rounded-full p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => handleImageSelect(imageUrl)}
-                >
-                  <X size={12} />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
