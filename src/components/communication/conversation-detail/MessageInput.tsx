@@ -109,7 +109,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
                     variant="ghost" 
                     size="icon" 
                     className="h-6 w-6"
-                    onClick={() => setSearchSavedReplies(false)}
+                    onClick={() => setShowSavedReplies(false)}
                   >
                     <X className="h-4 w-4" />
                   </Button>
