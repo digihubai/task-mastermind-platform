@@ -49,7 +49,7 @@ const AISEOPage = () => {
     }
   }, [seoData.topic]);
 
-  const updateSeoData = async (field, value) => {
+  const updateSeoData = (field, value) => {
     setSeoData((prev) => ({
       ...prev,
       [field]: value,
@@ -342,7 +342,7 @@ In conclusion, ${seoData.topic} is an important topic to understand...`;
             <ImageStep 
               seoData={seoData} 
               onDataChange={updateSeoData}
-              onNext={() => setStep(5)}
+              onNext={handleNextStep}
               onPrev={handlePreviousStep}
               onSkip={() => setStep(5)}
             />

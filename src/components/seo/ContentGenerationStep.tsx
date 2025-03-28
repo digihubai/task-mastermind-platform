@@ -3,15 +3,17 @@ import React from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
-  ArrowLeft,
+  ArrowLeft, 
+  Download, 
+  Copy, 
   RefreshCw,
-  FileText,
-  Download,
-  Copy,
-  Wand2
+  CheckCircle2,
+  Share,
+  Globe
 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import SEOContentPreview from "./SEOContentPreview";
 import { toast } from "sonner";
-import ReactMarkdown from 'react-markdown';
 
 interface ContentGenerationStepProps {
   seoData: any;
@@ -28,115 +30,167 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
   onPrev,
   onRegenerateContent
 }) => {
-  const handleDownload = () => {
-    const element = document.createElement("a");
-    const file = new Blob([seoData.generatedContent], {type: 'text/plain'});
-    element.href = URL.createObjectURL(file);
-    element.download = `${seoData.selectedTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.md`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-    toast.success("Content downloaded successfully!");
-  };
-  
-  const handleCopy = () => {
+  const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(seoData.generatedContent);
     toast.success("Content copied to clipboard!");
+  };
+  
+  const handleDownloadMarkdown = () => {
+    const blob = new Blob([seoData.generatedContent], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${seoData.selectedTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("Content downloaded as Markdown!");
+  };
+
+  const handlePublishToWordPress = () => {
+    toast.info("Publishing to WordPress...");
+    
+    setTimeout(() => {
+      toast.success("Published to WordPress successfully!");
+    }, 1500);
   };
 
   return (
     <Card className="p-6 border border-border/40">
       <h2 className="text-xl font-medium mb-6">Step 5: Generated Content</h2>
       
-      {isGenerating ? (
-        <div className="flex justify-center py-12">
-          <div className="flex flex-col items-center gap-2">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-            <p className="text-sm text-muted-foreground">Generating your SEO-optimized content...</p>
+      <div className="space-y-6">
+        {isGenerating ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <RefreshCw className="h-12 w-12 animate-spin text-primary" />
+            <p className="mt-6 text-lg">Generating your content...</p>
+            <p className="text-muted-foreground mt-2">This may take a few moments</p>
           </div>
-        </div>
-      ) : seoData.generatedContent ? (
-        <div className="space-y-6">
-          <div className="flex justify-between mb-4">
-            <Button 
-              variant="outline" 
-              className="gap-2"
-              onClick={onRegenerateContent}
-            >
-              <RefreshCw size={16} />
-              Regenerate
-            </Button>
+        ) : seoData.generatedContent ? (
+          <>
+            <Tabs defaultValue="preview" className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="preview">Preview</TabsTrigger>
+                <TabsTrigger value="metadata">Metadata</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="preview">
+                <SEOContentPreview content={seoData.generatedContent} />
+              </TabsContent>
+              
+              <TabsContent value="metadata">
+                <Card className="border border-border/40 p-4">
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Title</h3>
+                      <p className="font-medium">{seoData.selectedTitle}</p>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Keywords</h3>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {seoData.selectedKeywords.map((keyword: string, idx: number) => (
+                          <span key={idx} className="px-2 py-1 bg-secondary text-xs rounded-full">
+                            {keyword}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Word Count</h3>
+                      <p>{seoData.generatedContent.split(/\s+/).length}</p>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Reading Time</h3>
+                      <p>{Math.ceil(seoData.generatedContent.split(/\s+/).length / 200)} min</p>
+                    </div>
+                    
+                    {seoData.selectedImages.length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-medium text-muted-foreground">Selected Images</h3>
+                        <div className="grid grid-cols-4 gap-2 mt-2">
+                          {seoData.selectedImages.map((imgUrl: string, idx: number) => (
+                            <img 
+                              key={idx}
+                              src={imgUrl}
+                              alt={`Selected image ${idx + 1}`}
+                              className="rounded-md w-full h-auto aspect-video object-cover"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              </TabsContent>
+            </Tabs>
             
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Button 
                 variant="outline" 
                 className="gap-2"
-                onClick={handleCopy}
+                onClick={handleCopyToClipboard}
               >
                 <Copy size={16} />
-                Copy
+                Copy to Clipboard
               </Button>
               
               <Button 
                 variant="outline" 
                 className="gap-2"
-                onClick={handleDownload}
+                onClick={handleDownloadMarkdown}
               >
                 <Download size={16} />
-                Download
+                Download as Markdown
+              </Button>
+              
+              <Button 
+                className="gap-2 ml-auto"
+                onClick={handlePublishToWordPress}
+              >
+                <Globe size={16} />
+                Publish to WordPress
               </Button>
             </div>
-          </div>
-          
-          <div className="border rounded-md p-4 max-h-[500px] overflow-y-auto">
-            <div className="prose dark:prose-invert max-w-none">
-              <ReactMarkdown>{seoData.generatedContent}</ReactMarkdown>
-            </div>
-          </div>
-          
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-            <h3 className="font-medium flex items-center gap-2 mb-2">
-              <Wand2 className="h-4 w-4 text-primary" />
-              SEO Performance Score
-            </h3>
-            <div className="flex items-center gap-4">
-              <div className="w-full bg-secondary rounded-full h-2">
-                <div className="bg-primary h-2 rounded-full" style={{ width: '86%' }}></div>
-              </div>
-              <span className="font-medium">86/100</span>
-            </div>
-            <p className="text-sm text-muted-foreground mt-2">
-              This content is well-optimized for your target keywords and follows SEO best practices.
+          </>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">
+              Something went wrong. Please try generating the content again.
             </p>
+            <Button 
+              onClick={onRegenerateContent}
+              className="mt-4"
+            >
+              Try Again
+            </Button>
           </div>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <FileText className="h-16 w-16 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">Content Not Generated Yet</h3>
-          <p className="text-muted-foreground mb-6 max-w-md">
-            Click the button below to generate your SEO-optimized content based on your selected title and outline.
-          </p>
-          <Button 
-            onClick={onRegenerateContent}
-            className="gap-2"
-          >
-            <Wand2 size={16} />
-            Generate Content
-          </Button>
-        </div>
-      )}
+        )}
+      </div>
       
-      <div className="mt-8 flex justify-start">
+      <div className="mt-8 flex justify-between">
         <Button 
           variant="outline" 
           onClick={onPrev}
           className="gap-2"
-          disabled={isGenerating}
         >
           <ArrowLeft size={16} />
           Previous Step
         </Button>
+        
+        {seoData.generatedContent && (
+          <Button 
+            onClick={onRegenerateContent}
+            variant="outline"
+            className="gap-2"
+          >
+            <RefreshCw size={16} />
+            Regenerate Content
+          </Button>
+        )}
       </div>
     </Card>
   );

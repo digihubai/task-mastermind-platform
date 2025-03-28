@@ -48,6 +48,10 @@ const aiRoutes: RouteObject[] = [
     element: <AISEOWriterPage />,
   },
   {
+    path: '/ai-seo-writer',
+    element: <AISEOWriterPage />,
+  },
+  {
     path: '/ai/vision',
     element: <AIVisionPage />,
   },

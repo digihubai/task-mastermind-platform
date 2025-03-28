@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -7,10 +7,8 @@ import {
   ArrowRight, 
   RefreshCw, 
   CheckCircle2,
-  ListOrdered,
-  Copy,
-  PlusCircle,
-  MinusCircle
+  ListChecks,
+  Copy
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,65 +25,72 @@ const OutlineStep: React.FC<OutlineStepProps> = ({
   onNext, 
   onPrev 
 }) => {
-  const [loading, setLoading] = useState(false);
-  
-  // Generate outlines when the component mounts if none exist
+  const [isGenerating, setIsGenerating] = useState(false);
+
   useEffect(() => {
+    // Generate outlines when component mounts if none exist
     if (seoData.outlines.length === 0) {
       generateOutlines();
     }
   }, []);
 
   const generateOutlines = () => {
-    setLoading(true);
+    setIsGenerating(true);
     toast.info("Generating content outlines...");
     
-    // Simulate generating outlines
+    // Simulate generating outlines based on the title and keywords
     setTimeout(() => {
-      const generatedOutlines = [
+      const outlines = [
         {
-          id: "outline-1",
-          title: `Outline 1 for: ${seoData.selectedTitle}`,
+          id: '1',
+          title: `Outline for: ${seoData.selectedTitle}`,
           sections: [
-            "Introduction to the Topic",
-            `What is ${seoData.selectedKeywords[0]}?`,
-            `Benefits of ${seoData.selectedKeywords[0]}`,
-            `How to Implement ${seoData.selectedKeywords[0]}`,
-            `Common Challenges with ${seoData.selectedKeywords[0]}`,
-            `Future of ${seoData.selectedKeywords[0]}`,
-            "Conclusion and Next Steps"
+            'Introduction to the topic',
+            'Current trends and industry insights',
+            'Key benefits and advantages',
+            'Common challenges and solutions',
+            'Implementation strategies',
+            'Case studies and examples',
+            'Best practices and recommendations',
+            'Future outlook and predictions',
+            'Conclusion'
           ]
         },
         {
-          id: "outline-2",
-          title: `Outline 2 for: ${seoData.selectedTitle}`,
+          id: '2',
+          title: `Alternative structure for: ${seoData.selectedTitle}`,
           sections: [
-            "Understanding the Basics",
-            `History of ${seoData.selectedKeywords[0]}`,
-            `Key Components of ${seoData.selectedKeywords[0]}`,
-            `Real-World Applications`,
-            `Case Studies: Success Stories`,
-            `Tools and Resources`,
-            "Conclusion: Getting Started Today"
+            'What is ' + seoData.selectedKeywords[0] + '?',
+            'Why ' + seoData.selectedKeywords[0] + ' matters in today\'s world',
+            'Top 5 strategies for implementing ' + seoData.selectedKeywords[0],
+            'How leading companies are using ' + seoData.selectedKeywords[0],
+            'Step-by-step guide to getting started',
+            'Measuring success and ROI',
+            'Tools and resources',
+            'Expert opinions and insights',
+            'Key takeaways'
           ]
         },
         {
-          id: "outline-3",
-          title: `Outline 3 for: ${seoData.selectedTitle}`,
+          id: '3',
+          title: `Comprehensive guide to: ${seoData.selectedTitle}`,
           sections: [
-            "Introduction: Why This Matters",
-            `The Evolution of ${seoData.selectedKeywords[0]}`,
-            `Key Strategies for Success`,
-            `Avoiding Common Pitfalls`,
-            `Expert Insights and Tips`,
-            `Measuring Results and ROI`,
-            "Conclusion and Action Items"
+            'Executive summary',
+            'Historical context and evolution',
+            'Core principles and fundamentals',
+            'Comparative analysis with alternatives',
+            'Technical requirements and specifications',
+            'Implementation roadmap',
+            'Success metrics and KPIs',
+            'Troubleshooting common issues',
+            'Industry best practices',
+            'Future developments and innovations'
           ]
         }
       ];
       
-      onDataChange('outlines', generatedOutlines);
-      setLoading(false);
+      onDataChange('outlines', outlines);
+      setIsGenerating(false);
       toast.success("Generated 3 content outlines!");
     }, 2000);
   };
@@ -95,8 +100,8 @@ const OutlineStep: React.FC<OutlineStepProps> = ({
   };
   
   const copyOutline = (outline: any) => {
-    const formattedOutline = `# ${outline.title}\n\n${outline.sections.map((section: string) => `## ${section}`).join('\n\n')}`;
-    navigator.clipboard.writeText(formattedOutline);
+    const outlineText = `# ${outline.title}\n\n${outline.sections.map((section: string) => `## ${section}`).join('\n\n')}`;
+    navigator.clipboard.writeText(outlineText);
     toast.success("Outline copied to clipboard!");
   };
 
@@ -107,18 +112,16 @@ const OutlineStep: React.FC<OutlineStepProps> = ({
       <div className="space-y-6">
         <div>
           <label className="text-sm font-medium mb-4 block flex justify-between">
-            <span>Select a content structure</span>
+            <span>Select an outline for your content</span>
             <span className="text-muted-foreground">
-              Title: {seoData.selectedTitle}
+              Based on: {seoData.selectedTitle}
             </span>
           </label>
           
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <div className="flex flex-col items-center gap-2">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-                <p className="text-sm text-muted-foreground">Generating outlines...</p>
-              </div>
+          {isGenerating ? (
+            <div className="flex flex-col items-center justify-center py-8">
+              <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+              <p className="mt-4 text-muted-foreground">Generating outlines based on your title...</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -132,16 +135,28 @@ const OutlineStep: React.FC<OutlineStepProps> = ({
                   }`}
                   onClick={() => selectOutline(outline)}
                 >
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div className="flex items-start gap-3">
-                      {seoData.selectedOutline?.id === outline.id ? (
-                        <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                      ) : (
-                        <ListOrdered className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-                      )}
-                      <h3 className={`${seoData.selectedOutline?.id === outline.id ? 'font-medium' : ''}`}>
-                        {outline.title}
-                      </h3>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-start gap-3">
+                        {seoData.selectedOutline?.id === outline.id ? (
+                          <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                        ) : (
+                          <ListChecks className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
+                        )}
+                        <div>
+                          <span className={seoData.selectedOutline?.id === outline.id ? 'font-medium' : ''}>
+                            {outline.title}
+                          </span>
+                          
+                          <ul className="mt-3 space-y-1">
+                            {outline.sections.map((section: string, idx: number) => (
+                              <li key={idx} className="text-sm text-muted-foreground">
+                                • {section}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
                     </div>
                     <Button 
                       variant="ghost" 
@@ -155,29 +170,19 @@ const OutlineStep: React.FC<OutlineStepProps> = ({
                       <Copy className="h-4 w-4" />
                     </Button>
                   </div>
-                  
-                  <div className="pl-8 space-y-1">
-                    {outline.sections.map((section: string, sIndex: number) => (
-                      <div key={sIndex} className="text-sm flex items-center gap-2">
-                        <span className="text-muted-foreground text-xs">{sIndex + 1}.</span>
-                        <span>{section}</span>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               ))}
+              
+              <Button
+                variant="outline"
+                className="mt-4 gap-2 w-full"
+                onClick={generateOutlines}
+              >
+                <RefreshCw size={16} />
+                Generate More Outlines
+              </Button>
             </div>
           )}
-          
-          <Button
-            variant="outline"
-            className="mt-4 gap-2 w-full"
-            onClick={generateOutlines}
-            disabled={loading}
-          >
-            <RefreshCw size={16} />
-            Generate New Outlines
-          </Button>
         </div>
       </div>
       
@@ -186,7 +191,6 @@ const OutlineStep: React.FC<OutlineStepProps> = ({
           variant="outline" 
           onClick={onPrev}
           className="gap-2"
-          disabled={loading}
         >
           <ArrowLeft size={16} />
           Previous Step
@@ -194,7 +198,7 @@ const OutlineStep: React.FC<OutlineStepProps> = ({
         
         <Button 
           onClick={onNext}
-          disabled={!seoData.selectedOutline || loading}
+          disabled={!seoData.selectedOutline && !isGenerating}
           className="gap-2"
         >
           Next Step
