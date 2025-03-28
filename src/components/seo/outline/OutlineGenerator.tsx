@@ -5,7 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronDown } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 
 interface OutlineGeneratorProps {
@@ -74,7 +80,10 @@ const OutlineGenerator: React.FC<OutlineGeneratorProps> = ({
             onClick={() => onDataChange("showAdvancedOptions", !seoData.showAdvancedOptions)}
           >
             <span>Advanced Options</span>
-            <ChevronDown size={16} className={`transition-transform ${seoData.showAdvancedOptions ? 'rotate-180' : ''}`} />
+            <ChevronDown 
+              size={16} 
+              className={`transition-transform ${seoData.showAdvancedOptions ? 'rotate-180' : ''}`} 
+            />
           </Button>
           
           {seoData.showAdvancedOptions && (
