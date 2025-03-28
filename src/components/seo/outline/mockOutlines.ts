@@ -15,13 +15,213 @@ export const generateMockOutlines = (title: string, topic: string = "", keywords
   
   const outlines = [
     // First outline format - Problem/Solution with relevant keywords
-    `# ${title}\n\n- Introduction to ${mainSubject} and Its Importance\n- Common Challenges with Implementing ${firstKeyword}\n- Key Benefits of Using ${firstKeyword} for Business Growth\n- How ${secondKeyword} Enhances Customer Experience\n- Step-by-Step Implementation Process\n- Case Study: Companies Achieving 35%+ Conversion Rate Increase\n- Measuring ROI and Performance Metrics\n- Best Practices for Optimizing ${mainSubject}\n- Common Pitfalls to Avoid When Deploying ${firstKeyword}\n- Future Trends in ${mainSubject} for ${nextYear}\n- Conclusion: Taking Your ${mainSubject} Strategy to the Next Level`,
+    `# ${title}
+
+## Introduction to ${mainSubject} and Its Importance
+- Overview of what ${firstKeyword} is and why it matters
+- Current state of ${mainSubject} in ${currentYear}
+- Key challenges businesses face without proper ${secondKeyword} implementation
+
+## Common Challenges with Implementing ${firstKeyword}
+- Technical barriers to adoption
+- Integration issues with existing systems
+- Cost considerations and ROI challenges
+- Skill gaps and training requirements
+
+## Key Benefits of Using ${firstKeyword} for Business Growth
+- Improved customer engagement metrics
+- Cost savings and operational efficiencies
+- Competitive advantages in the marketplace
+- Real-world success statistics
+
+## How ${secondKeyword} Enhances Customer Experience
+- Personalization capabilities
+- Response time improvements
+- 24/7 availability benefits
+- Customer satisfaction metrics and improvements
+
+## Step-by-Step Implementation Process
+- Planning and strategy development
+- Vendor selection criteria
+- Technical setup and integration
+- Testing and quality assurance
+- Launch and monitoring
+
+## Case Study: Companies Achieving 35%+ Conversion Rate Increase
+- B2B implementation example
+- E-commerce success story
+- Service industry transformation
+- Before/after metrics analysis
+
+## Measuring ROI and Performance Metrics
+- Key performance indicators to track
+- Attribution models for ${firstKeyword}
+- Dashboard setup and monitoring
+- Improvement iteration process
+
+## Best Practices for Optimizing ${mainSubject}
+- Content strategy alignment
+- Technical optimization techniques
+- Integration with marketing automation
+- Continuous improvement framework
+
+## Common Pitfalls to Avoid When Deploying ${firstKeyword}
+- Over-automation risks
+- Customer experience disconnects
+- Data security considerations
+- Scalability challenges
+
+## Future Trends in ${mainSubject} for ${nextYear}
+- Emerging technologies to watch
+- Integration with other marketing technologies
+- AI and machine learning advancements
+- Industry predictions from experts
+
+## Conclusion: Taking Your ${mainSubject} Strategy to the Next Level
+- Strategic recommendations
+- Next steps for implementation
+- Resources for ongoing education
+- Final thoughts and recommendations`,
     
     // Second outline format - Guide/How-To with specific implementations
-    `# ${title}\n\n- Understanding ${mainSubject} in ${currentYear}\n- The Evolution of ${firstKeyword} Technology\n- Essential Components of an Effective ${secondKeyword} System\n- Step-by-Step Implementation Guide with Code Examples\n- Integration Strategies with CRM and Marketing Platforms\n- Advanced ${firstKeyword} Features That Drive Conversions\n- Data Privacy and Compliance Considerations\n- Measuring Success: KPIs for ${mainSubject} Performance\n- User Experience Design for Optimal ${firstKeyword} Engagement\n- Case Studies: How Industry Leaders Use ${secondKeyword}\n- Future-Proofing Your ${mainSubject} Investment`,
+    `# ${title}
+
+## Understanding ${mainSubject} in ${currentYear}
+- Definition and scope of ${firstKeyword}
+- Historical development and recent advances
+- Key market players and solutions
+- Statistics on adoption and effectiveness
+
+## The Evolution of ${firstKeyword} Technology
+- First generation capabilities and limitations
+- Current technology landscape
+- Recent breakthroughs and innovations
+- Comparison of approaches and methodologies
+
+## Essential Components of an Effective ${secondKeyword} System
+- Core architectural elements
+- Key features for business success
+- Integration requirements
+- Security and compliance considerations
+
+## Step-by-Step Implementation Guide with Code Examples
+- Planning and requirements gathering
+- Solution architecture design
+- Technical implementation walkthrough
+- Testing and quality assurance procedures
+- Documentation and knowledge transfer
+
+## Integration Strategies with CRM and Marketing Platforms
+- Salesforce integration approach
+- HubSpot connector implementation
+- Marketing automation platform connections
+- Data synchronization strategies
+
+## Advanced ${firstKeyword} Features That Drive Conversions
+- Personalization algorithms
+- Behavioral trigger implementation
+- A/B testing frameworks
+- Predictive analytics capabilities
+
+## Data Privacy and Compliance Considerations
+- GDPR requirements and implementation
+- CCPA compliance framework
+- Industry-specific regulations
+- Privacy by design principles
+
+## Measuring Success: KPIs for ${mainSubject} Performance
+- Conversion metrics framework
+- Engagement measurement approach
+- Revenue attribution models
+- Customer lifetime value impact
+
+## User Experience Design for Optimal ${firstKeyword} Engagement
+- Interface design principles
+- User journey mapping
+- Friction point identification and resolution
+- Accessibility considerations
+
+## Case Studies: How Industry Leaders Use ${secondKeyword}
+- Technology sector example
+- E-commerce implementation
+- B2B application case study
+- Service industry transformation
+
+## Future-Proofing Your ${mainSubject} Investment
+- Scalability planning
+- Technology evolution roadmap
+- Team capability development
+- Competitive differentiation strategies`,
     
     // Third outline format - Research/Analysis with data focus
-    `# ${title}\n\n- The Current State of ${mainSubject} Technology\n- Research Methodology: Analyzing ${firstKeyword} Performance\n- Key Findings: What Makes ${secondKeyword} Convert at 35%+\n- User Behavior Analysis When Interacting with ${firstKeyword}\n- Competitive Analysis of Top ${mainSubject} Solutions\n- Technical Architecture of High-Performing ${secondKeyword} Systems\n- ROI Analysis: Cost vs. Revenue Impact\n- Implementation Timeline and Resource Requirements\n- Data Security and Compliance Framework\n- Strategic Recommendations Based on Industry Benchmarks\n- Conclusion: Implementing These Findings in Your Business`
+    `# ${title}
+
+## The Current State of ${mainSubject} Technology
+- Market size and growth analysis
+- Vendor landscape assessment
+- Technology adoption rates
+- Investment trends and funding analysis
+
+## Research Methodology: Analyzing ${firstKeyword} Performance
+- Data collection approach
+- Measurement framework
+- Analysis techniques
+- Validation methodologies
+
+## Key Findings: What Makes ${secondKeyword} Convert at 35%+
+- Critical success factors
+- Performance variables correlation
+- Implementation characteristics
+- User experience elements
+
+## User Behavior Analysis When Interacting with ${firstKeyword}
+- User journey mapping results
+- Engagement patterns
+- Friction point identification
+- Behavioral segmentation insights
+
+## Competitive Analysis of Top ${mainSubject} Solutions
+- Feature comparison matrix
+- Pricing model assessment
+- Performance benchmarking
+- Customer satisfaction analysis
+
+## Technical Architecture of High-Performing ${secondKeyword} Systems
+- Component architecture analysis
+- Integration approaches comparison
+- Scalability characteristics
+- Performance optimization techniques
+
+## ROI Analysis: Cost vs. Revenue Impact
+- Implementation cost breakdown
+- Operational expense analysis
+- Revenue impact assessment
+- Payback period calculation
+- Long-term value projection
+
+## Implementation Timeline and Resource Requirements
+- Project planning framework
+- Resource allocation guide
+- Critical path identification
+- Risk mitigation strategies
+
+## Data Security and Compliance Framework
+- Security architecture requirements
+- Data handling protocols
+- Regulatory compliance approach
+- Audit and monitoring systems
+
+## Strategic Recommendations Based on Industry Benchmarks
+- Implementation approach recommendations
+- Technology selection criteria
+- Operational best practices
+- Growth strategy alignment
+
+## Conclusion: Implementing These Findings in Your Business
+- Action plan development
+- Prioritization framework
+- Success measurement approach
+- Continuous improvement methodology`
   ];
   
   return outlines;
