@@ -29,7 +29,7 @@ export const PositionSelection: React.FC<PositionSelectionProps> = ({
       <RadioGroup 
         value={position} 
         onValueChange={(value) => handlePositionChange(value as "left" | "right")}
-        className="mt-2 hidden"
+        className="mt-2"
       >
         <div className="grid grid-cols-2 gap-4 mt-4">
           <div 

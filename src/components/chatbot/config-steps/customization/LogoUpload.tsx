@@ -36,22 +36,24 @@ export const LogoUpload: React.FC<LogoUploadProps> = ({ fileInputRef }) => {
           ref={fileInputRef}
           onChange={handleLogoUpload}
           className="hidden"
-          accept="image/*"
+          accept="image/*, application/pdf, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         />
-        <Button 
-          variant="outline" 
-          className="w-full flex items-center justify-between"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <span>{selectedFileName || "Choose File"}</span>
-          <Upload size={16} />
-        </Button>
-        <p className="text-xs text-muted-foreground mt-1">
-          {selectedFileName ? `Selected: ${selectedFileName}` : "No file chosen"}
-        </p>
-        <p className="text-xs text-muted-foreground mt-1">
-          Supported formats: JPG, PNG, SVG, GIF (max 2MB)
-        </p>
+        <div className="flex flex-col gap-2">
+          <Button 
+            variant="outline" 
+            className="w-full flex items-center justify-between"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <span>{selectedFileName || "Choose File"}</span>
+            <Upload size={16} />
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            {selectedFileName ? `Selected: ${selectedFileName}` : "No file chosen"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Supported formats: JPG, PNG, SVG, GIF, PDF, Excel, etc.
+          </p>
+        </div>
       </div>
     </div>
   );

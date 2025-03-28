@@ -16,8 +16,11 @@ export const FloatingTrigger: React.FC<FloatingTriggerProps> = ({
   triggerSize,
   renderAvatar
 }) => {
+  // Calculate positions based on the side
+  const positionClass = position === 'left' ? '-left-20' : '-right-20';
+
   return (
-    <div className={`absolute ${position === 'left' ? '-left-20' : '-right-20'} bottom-4`}>
+    <div className={`absolute ${positionClass} bottom-4`}>
       <div 
         className={`rounded-full cursor-pointer flex items-center justify-center shadow-md ${transparentTrigger ? 'bg-opacity-70' : ''} transition-transform hover:scale-105`}
         style={{ 
@@ -26,9 +29,9 @@ export const FloatingTrigger: React.FC<FloatingTriggerProps> = ({
           height: `${triggerSize}px`,
         }}
       >
-        <span className={`text-${transparentTrigger ? 'black' : 'white'} text-lg font-medium`}>
+        <div className={`text-${transparentTrigger ? 'black' : 'white'} text-lg font-medium`} style={{ transform: `scale(${triggerSize / 60})` }}>
           {renderAvatar()}
-        </span>
+        </div>
       </div>
     </div>
   );

@@ -20,6 +20,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   accentColor,
   language
 }) => {
+  // Determine alignment: 
+  // - User messages are always right-aligned
+  // - Bot messages are aligned according to position setting
   const isUserMessage = !message.isBot;
   const shouldAlignRight = isUserMessage || (message.isBot && position === "right");
   
@@ -36,27 +39,27 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   };
 
   return (
-    <div className={`message ${message.isBot ? 'bot' : 'user'} animate-fade-in`}>
-      <div 
-        className={`message-bubble p-3 rounded-lg inline-block max-w-[80%] ${
-          shouldAlignRight 
-            ? 'text-primary-foreground text-right ml-auto shadow-sm' 
-            : 'bg-muted text-left ml-0 border border-border/30 shadow-sm'
-        }`}
-        style={{ 
-          backgroundColor: shouldAlignRight ? accentColor : undefined, 
-          marginLeft: shouldAlignRight ? 'auto' : 0,
-          marginRight: shouldAlignRight ? 0 : 'auto',
-        }}
-      >
-        {message.text}
-      </div>
-      
-      {showDateTime && (
-        <div className={`text-xs text-muted-foreground mt-1 ${shouldAlignRight ? 'text-right' : 'text-left'}`}>
-          {formatFullDate(message.timestamp)}
+    <div className={`message ${message.isBot ? 'bot' : 'user'} animate-fade-in w-full flex ${shouldAlignRight ? 'justify-end' : 'justify-start'}`}>
+      <div className="max-w-[80%]">
+        <div 
+          className={`message-bubble p-3 rounded-lg ${
+            shouldAlignRight 
+              ? 'text-primary-foreground text-right shadow-sm' 
+              : 'bg-muted text-left border border-border/30 shadow-sm'
+          }`}
+          style={{ 
+            backgroundColor: shouldAlignRight ? accentColor : undefined
+          }}
+        >
+          {message.text}
         </div>
-      )}
+        
+        {showDateTime && (
+          <div className={`text-xs text-muted-foreground mt-1 ${shouldAlignRight ? 'text-right' : 'text-left'}`}>
+            {formatFullDate(message.timestamp)}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
