@@ -1,220 +1,210 @@
 
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  RefreshCw, 
-  CheckCircle2,
-  Image,
-  Skip,
-  Forward
-} from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
+import { 
+  UploadCloud, 
+  Image as ImageIcon, 
+  X, 
+  Plus,
+  RefreshCw
+} from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 interface ImageStepProps {
-  seoData: any;
-  onDataChange: (field: string, value: any) => void;
+  onImageSelect: (images: string[]) => void;
   onNext: () => void;
   onPrev: () => void;
-  onSkip: () => void;
+  isLoading?: boolean;
 }
 
 const ImageStep: React.FC<ImageStepProps> = ({ 
-  seoData, 
-  onDataChange, 
+  onImageSelect, 
   onNext, 
   onPrev,
-  onSkip
+  isLoading = false
 }) => {
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [imageQuery, setImageQuery] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const generateImages = () => {
-    if (!seoData.imagePrompt.trim()) {
-      toast.error("Please enter an image prompt");
-      return;
-    }
+  // Dummy data to simulate image results
+  const dummyImageResults = [
+    "https://images.unsplash.com/photo-1579546929518-9e396f3cc809",
+    "https://images.unsplash.com/photo-1576495199011-eb94736d05d6",
+    "https://images.unsplash.com/photo-1615751072497-5f5169febe17",
+    "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e",
+    "https://images.unsplash.com/photo-1628196483163-829af3e0d25e",
+    "https://images.unsplash.com/photo-1639322537138-5e513100b36e"
+  ];
+
+  const handleSearchImages = () => {
+    if (!imageQuery.trim()) return;
     
     setIsGenerating(true);
-    toast.info("Generating images...");
     
-    // Simulate API call
+    // Simulate API call with a timeout
     setTimeout(() => {
-      // In a real implementation, you would call an image generation API
-      // For this example, we'll use placeholder image URLs
-      const mockImages = [
-        'https://placehold.co/600x400/4F46E5/FFFFFF?text=AI+Generated+Image+1',
-        'https://placehold.co/600x400/3B82F6/FFFFFF?text=AI+Generated+Image+2',
-        'https://placehold.co/600x400/10B981/FFFFFF?text=AI+Generated+Image+3',
-        'https://placehold.co/600x400/F59E0B/FFFFFF?text=AI+Generated+Image+4'
-      ];
-      
-      onDataChange('generatedImages', mockImages);
       setIsGenerating(false);
-      toast.success("Generated 4 images!");
-    }, 2000);
+    }, 1500);
   };
 
-  const handleSelectImage = (imgUrl: string) => {
-    const selectedImages = [...seoData.selectedImages];
-    
-    if (selectedImages.includes(imgUrl)) {
-      onDataChange('selectedImages', selectedImages.filter(url => url !== imgUrl));
+  const toggleImageSelection = (image: string) => {
+    if (selectedImages.includes(image)) {
+      setSelectedImages(selectedImages.filter(img => img !== image));
     } else {
-      onDataChange('selectedImages', [...selectedImages, imgUrl]);
+      setSelectedImages([...selectedImages, image]);
     }
+  };
+
+  const handleContinue = () => {
+    onImageSelect(selectedImages);
+    onNext();
+  };
+
+  const handleSkip = () => {
+    onImageSelect([]);
+    onNext();
   };
 
   return (
     <Card className="p-6 border border-border/40">
-      <h2 className="text-xl font-medium mb-6">Step 4: Select Images</h2>
+      <h2 className="text-xl font-medium mb-4">Image Selection</h2>
       
       <div className="space-y-6">
-        <div>
-          <label className="text-sm font-medium mb-2 block">
-            Image prompt
-          </label>
+        <div className="space-y-2">
+          <Label htmlFor="image-query">Generate or search for relevant images</Label>
           <div className="flex gap-2">
-            <Input
-              placeholder="Describe the image you want to generate..."
-              value={seoData.imagePrompt}
-              onChange={(e) => onDataChange('imagePrompt', e.target.value)}
+            <Input 
+              id="image-query" 
+              placeholder="e.g., business meeting, data analysis, marketing team" 
+              value={imageQuery}
+              onChange={(e) => setImageQuery(e.target.value)}
             />
             <Button 
-              onClick={generateImages}
-              disabled={isGenerating || !seoData.imagePrompt.trim()}
+              onClick={handleSearchImages}
+              disabled={!imageQuery.trim() || isGenerating}
             >
               {isGenerating ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Searching...
+                </>
               ) : (
-                "Generate"
+                "Search"
               )}
             </Button>
           </div>
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="imageSize">Image Size</Label>
-            <Select 
-              value={seoData.imageSize} 
-              onValueChange={(value) => onDataChange('imageSize', value)}
-            >
-              <SelectTrigger id="imageSize">
-                <SelectValue placeholder="Select image size" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="small">Small (512x512)</SelectItem>
-                <SelectItem value="medium">Medium (768x768)</SelectItem>
-                <SelectItem value="large">Large (1024x1024)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div>
-            <Label htmlFor="numberOfImages">Number of Images</Label>
-            <Select 
-              value={seoData.numberOfImages.toString()} 
-              onValueChange={(value) => onDataChange('numberOfImages', parseInt(value))}
-            >
-              <SelectTrigger id="numberOfImages">
-                <SelectValue placeholder="Select number of images" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">1 Image</SelectItem>
-                <SelectItem value="2">2 Images</SelectItem>
-                <SelectItem value="4">4 Images</SelectItem>
-                <SelectItem value="6">6 Images</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="border rounded-md p-4">
+          <h3 className="text-sm font-medium mb-4">Upload your own images</h3>
+          <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center">
+            <UploadCloud className="h-8 w-8 text-muted-foreground mb-2" />
+            <p className="text-sm text-muted-foreground mb-2">Drag and drop images here, or click to select files</p>
+            <Button variant="secondary" size="sm">
+              Select Images
+            </Button>
           </div>
         </div>
         
-        {isGenerating ? (
-          <div className="flex flex-col items-center justify-center py-8">
-            <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-            <p className="mt-4 text-muted-foreground">Generating images...</p>
-          </div>
-        ) : seoData.generatedImages.length > 0 ? (
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              Select images for your content
-            </label>
-            <div className="grid grid-cols-2 gap-4">
-              {seoData.generatedImages.map((imgUrl: string, index: number) => {
-                const isSelected = seoData.selectedImages.includes(imgUrl);
-                
-                return (
-                  <div 
-                    key={index}
-                    className={`relative rounded-md overflow-hidden cursor-pointer transition-all border-2 ${
-                      isSelected ? 'border-primary ring-2 ring-primary/30' : 'border-transparent hover:border-muted'
-                    }`}
-                    onClick={() => handleSelectImage(imgUrl)}
-                  >
-                    <img 
-                      src={imgUrl} 
-                      alt={`Generated image ${index + 1}`} 
-                      className="w-full h-auto aspect-video object-cover"
-                    />
-                    {isSelected && (
-                      <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">
-                        <CheckCircle2 size={16} />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+        <div>
+          <h3 className="text-sm font-medium mb-4">Search results</h3>
+          
+          {!imageQuery.trim() ? (
+            <div className="text-center py-8 border rounded-lg">
+              <ImageIcon className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
+              <p className="text-muted-foreground">Search for images to see results</p>
             </div>
-            
-            <Button
-              variant="outline"
-              className="mt-4 gap-2 w-full"
-              onClick={generateImages}
-            >
-              <RefreshCw size={16} />
-              Generate More Images
-            </Button>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-8 bg-muted/30 rounded-lg">
-            <Image className="h-12 w-12 text-muted-foreground opacity-30" />
-            <p className="mt-4 text-muted-foreground">Enter a prompt and click "Generate" to create images</p>
+          ) : isGenerating ? (
+            <div className="text-center py-12 border rounded-lg">
+              <RefreshCw className="h-8 w-8 animate-spin text-primary mx-auto mb-3" />
+              <p className="text-muted-foreground">Searching for images...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-3">
+              {dummyImageResults.map((image, index) => (
+                <div 
+                  key={index}
+                  className={cn(
+                    "relative aspect-video rounded-md overflow-hidden border-2 cursor-pointer group",
+                    selectedImages.includes(image) ? "border-primary" : "border-transparent hover:border-muted"
+                  )}
+                  onClick={() => toggleImageSelection(image)}
+                >
+                  <img 
+                    src={image}
+                    alt={`Search result ${index + 1}`}
+                    className="object-cover w-full h-full"
+                  />
+                  {selectedImages.includes(image) && (
+                    <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                      <Button 
+                        size="icon" 
+                        variant="secondary" 
+                        className="h-6 w-6 rounded-full bg-primary text-primary-foreground"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleImageSelection(image);
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        {selectedImages.length > 0 && (
+          <div className="space-y-3">
+            <Separator />
+            <h3 className="text-sm font-medium">Selected Images ({selectedImages.length})</h3>
+            <div className="flex flex-wrap gap-2">
+              {selectedImages.map((image, index) => (
+                <div key={index} className="relative h-16 w-16">
+                  <img 
+                    src={image}
+                    alt={`Selected ${index + 1}`}
+                    className="h-full w-full object-cover rounded-md"
+                  />
+                  <Button 
+                    size="icon" 
+                    variant="secondary" 
+                    className="h-5 w-5 absolute -top-2 -right-2 rounded-full bg-background border"
+                    onClick={() => toggleImageSelection(image)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+              <Button 
+                className="h-16 w-16 border border-dashed rounded-md bg-transparent text-muted-foreground hover:text-foreground"
+                variant="ghost"
+                onClick={() => document.getElementById('image-query')?.focus()}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         )}
       </div>
       
-      <div className="mt-8 flex justify-between">
-        <Button 
-          variant="outline" 
-          onClick={onPrev}
-          className="gap-2"
-        >
-          <ArrowLeft size={16} />
-          Previous Step
+      <div className="mt-6 flex justify-between">
+        <Button variant="outline" onClick={onPrev}>
+          Back
         </Button>
-        
-        <div className="flex gap-2">
-          <Button 
-            variant="outline"
-            onClick={onSkip}
-            className="gap-2"
-          >
-            <Forward size={16} />
-            Skip Images
+        <div className="space-x-2">
+          <Button variant="secondary" onClick={handleSkip}>
+            Skip this step
           </Button>
-          
-          <Button 
-            onClick={onNext}
-            disabled={seoData.selectedImages.length === 0 && seoData.generatedImages.length > 0}
-            className="gap-2"
-          >
-            Next Step
-            <ArrowRight size={16} />
+          <Button onClick={handleContinue} disabled={isLoading}>
+            {isLoading ? "Loading..." : "Continue"}
           </Button>
         </div>
       </div>

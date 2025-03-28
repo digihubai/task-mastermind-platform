@@ -1,6 +1,5 @@
 
 import { supabase } from "@/lib/supabase";
-import { json } from "@remix-run/server-runtime";
 
 export interface SEOKeyword {
   id: string;
