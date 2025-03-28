@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Sparkles, RotateCcw, Loader } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, RotateCcw, Loader, MessageSquare } from "lucide-react";
 import { generateSEOTitles } from "@/services/seoService";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 interface TitleStepProps {
   seoData: any;
@@ -22,6 +24,8 @@ const TitleStep: React.FC<TitleStepProps> = ({
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [titleType, setTitleType] = useState("mixed");
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackText, setFeedbackText] = useState("");
   
   // Auto-generate titles on component mount if none exist
   useEffect(() => {
@@ -108,6 +112,27 @@ const TitleStep: React.FC<TitleStepProps> = ({
     onDataChange("selectedTitle", title);
   };
   
+  const handleSubmitFeedback = () => {
+    if (!feedbackText.trim()) {
+      toast.error("Please enter your feedback");
+      return;
+    }
+
+    toast.success("Thank you for your feedback. Regenerating titles...");
+    
+    // Save feedback
+    onDataChange("titleFeedback", feedbackText);
+    
+    // Close dialog
+    setFeedbackOpen(false);
+    
+    // Clear feedback text for next time
+    setFeedbackText("");
+    
+    // Regenerate titles
+    handleGenerateTitles();
+  };
+  
   return (
     <div className="space-y-6">
       <Card className="p-6 border border-border/40">
@@ -128,6 +153,16 @@ const TitleStep: React.FC<TitleStepProps> = ({
                 <SelectItem value="question">Questions</SelectItem>
               </SelectContent>
             </Select>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setFeedbackOpen(true)}
+              className="gap-2"
+            >
+              <MessageSquare size={14} />
+              Feedback
+            </Button>
             
             <Button 
               variant="outline" 
@@ -204,6 +239,35 @@ const TitleStep: React.FC<TitleStepProps> = ({
           <ChevronRight size={16} />
         </Button>
       </div>
+      
+      <Dialog open={feedbackOpen} onOpenChange={setFeedbackOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Provide Feedback on Title Generation</DialogTitle>
+            <DialogDescription>
+              Let us know what kind of titles you're looking for, and we'll regenerate based on your feedback.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <Textarea
+              value={feedbackText}
+              onChange={(e) => setFeedbackText(e.target.value)}
+              placeholder="Example: I need more specific titles related to implementing AI chatbots for e-commerce..."
+              className="min-h-[150px]"
+            />
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setFeedbackOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmitFeedback}>
+              Submit & Regenerate
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

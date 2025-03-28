@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
@@ -23,7 +24,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import SEOContentPreview from "@/components/seo/SEOContentPreview";
-import { generateMockSEOContent } from "@/services/seoService";
+import { generateSEOTitles, generateMockSEOContent } from "@/services/seoService";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";

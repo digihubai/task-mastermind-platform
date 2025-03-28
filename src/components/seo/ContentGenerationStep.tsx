@@ -2,10 +2,13 @@
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Copy, Download, RotateCcw, Loader, Globe } from "lucide-react";
+import { ChevronLeft, Copy, Download, RotateCcw, Loader, Globe, LinkIcon, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PublishToCMSDialog from "@/components/seo/PublishToCMSDialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 interface ContentGenerationStepProps {
   seoData: any;
@@ -24,6 +27,12 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState("preview");
   const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const [showLinksDialog, setShowLinksDialog] = useState(false);
+  const [linkOptions, setLinkOptions] = useState({
+    internal: true,
+    external: true
+  });
+  const [linkProcessing, setLinkProcessing] = useState(false);
   
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(seoData.generatedContent);
@@ -49,6 +58,46 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
     toast.success("Content downloaded as Markdown file");
   };
   
+  const handleApplyLinks = () => {
+    if (!linkOptions.internal && !linkOptions.external) {
+      toast.error("Please select at least one link type");
+      return;
+    }
+    
+    setLinkProcessing(true);
+    
+    // Simulate processing time
+    setTimeout(() => {
+      // Get the current content
+      let updatedContent = seoData.generatedContent;
+      
+      // Add mock internal links
+      if (linkOptions.internal) {
+        updatedContent = updatedContent.replace(
+          /## Key Strategies/,
+          "## Key Strategies\n\nLearn more about our [comprehensive strategy framework](/strategies) and [methodology](/methodology) for best results."
+        );
+      }
+      
+      // Add mock external links
+      if (linkOptions.external) {
+        updatedContent = updatedContent.replace(
+          /## Advanced Techniques/,
+          "## Advanced Techniques\n\nAccording to [industry research](https://example.com/research) and [expert analysis](https://example.com/analysis), these techniques can significantly improve outcomes."
+        );
+      }
+      
+      // Update content
+      onDataChange("generatedContent", updatedContent);
+      
+      // Close dialog
+      setShowLinksDialog(false);
+      setLinkProcessing(false);
+      
+      toast.success(`Successfully added ${linkOptions.internal && linkOptions.external ? 'internal and external' : linkOptions.internal ? 'internal' : 'external'} links to your content`);
+    }, 1500);
+  };
+  
   return (
     <div className="space-y-6">
       <Card className="p-6 border border-border/40">
@@ -64,6 +113,15 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
                 <Button variant="outline" size="sm" onClick={handleDownloadContent} className="gap-1">
                   <Download size={14} />
                   Download
+                </Button>
+                <Button 
+                  variant="outline"
+                  size="sm" 
+                  onClick={() => setShowLinksDialog(true)} 
+                  className="gap-1"
+                >
+                  <LinkIcon size={14} />
+                  Add Links
                 </Button>
                 <Button 
                   size="sm" 
@@ -107,6 +165,7 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
                     .replace(/### (.+)/g, '<h3>$1</h3>')
                     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
                  }} />
                 
                 {/* Display images inline if selected */}
@@ -210,6 +269,76 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
           </Button>
         )}
       </div>
+      
+      {/* Add Links Dialog */}
+      <Dialog open={showLinksDialog} onOpenChange={setShowLinksDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add Links to Your Content</DialogTitle>
+            <DialogDescription>
+              Enhance your SEO by adding relevant internal and external links to your content.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-4">
+            <div className="flex items-start space-x-3">
+              <div>
+                <Checkbox 
+                  id="internal-links" 
+                  checked={linkOptions.internal}
+                  onCheckedChange={(checked) => 
+                    setLinkOptions(prev => ({...prev, internal: !!checked}))
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="internal-links" className="font-medium">
+                  Internal Links
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Add links to other pages on your website for better site structure and SEO.
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <div>
+                <Checkbox 
+                  id="external-links" 
+                  checked={linkOptions.external}
+                  onCheckedChange={(checked) => 
+                    setLinkOptions(prev => ({...prev, external: !!checked}))
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="external-links" className="font-medium">
+                  External Links (Authority Sites)
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Add links to reputable external sources to increase content credibility and authority.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowLinksDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleApplyLinks} disabled={linkProcessing}>
+              {linkProcessing ? (
+                <>
+                  <Loader size={16} className="mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>Apply Links</>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       
       <PublishToCMSDialog 
         isOpen={showPublishDialog}
