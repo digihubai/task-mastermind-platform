@@ -15,6 +15,7 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
     wordpress: "",
     shopify: "",
     wix: "",
+    wixecommerce: "",
     squarespace: "",
     joomla: "",
     magento: "",
@@ -22,12 +23,14 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
     bigcommerce: "",
     webflow: "",
     hubspot: "",
+    prestashop: "",
   });
   
   const [connected, setConnected] = useState<{[key: string]: boolean}>({
     wordpress: false,
     shopify: false,
     wix: false,
+    wixecommerce: false,
     squarespace: false,
     joomla: false,
     magento: false,
@@ -35,6 +38,7 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
     bigcommerce: false,
     webflow: false,
     hubspot: false,
+    prestashop: false,
   });
 
   const handleInputChange = (platform: string, value: string) => {
@@ -193,6 +197,16 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
           "text-purple-600"
         )}
         
+        {/* Wix eCommerce */}
+        {renderCMSCard(
+          "wixecommerce",
+          "Wix eCommerce",
+          "Connect your Wix eCommerce store",
+          <ShoppingCart className="h-5 w-5 text-purple-600" />,
+          "bg-purple-100",
+          "text-purple-600"
+        )}
+        
         {/* Squarespace */}
         {renderCMSCard(
           "squarespace",
@@ -261,6 +275,16 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
           <FileText className="h-5 w-5 text-orange-600" />,
           "bg-orange-100",
           "text-orange-600"
+        )}
+        
+        {/* PrestaShop - New */}
+        {renderCMSCard(
+          "prestashop",
+          "PrestaShop",
+          "Connect your PrestaShop store",
+          <ShoppingCart className="h-5 w-5 text-blue-600" />,
+          "bg-blue-100",
+          "text-blue-600"
         )}
       </div>
       
