@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -96,9 +95,9 @@ const SEOIntegrations = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Content Management Integrations</h2>
+      <h2 className="text-xl font-semibold">SEO Platform Integrations</h2>
       <p className="text-sm text-muted-foreground">
-        Connect your preferred CMS platforms to seamlessly push optimized content and get real-time SEO insights
+        Connect your websites to optimize SEO performance, analyze rankings, and automatically push SEO improvements
       </p>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -109,7 +108,7 @@ const SEOIntegrations = () => {
             </div>
             <div>
               <h4 className="font-medium">WordPress</h4>
-              <p className="text-xs text-muted-foreground">Connect your WordPress site</p>
+              <p className="text-xs text-muted-foreground">Connect for SEO optimization</p>
             </div>
           </div>
           
@@ -167,7 +166,7 @@ const SEOIntegrations = () => {
             </div>
             <div>
               <h4 className="font-medium">Shopify</h4>
-              <p className="text-xs text-muted-foreground">Connect your Shopify store</p>
+              <p className="text-xs text-muted-foreground">Connect for product SEO</p>
             </div>
           </div>
           
@@ -225,7 +224,7 @@ const SEOIntegrations = () => {
             </div>
             <div>
               <h4 className="font-medium">Wix</h4>
-              <p className="text-xs text-muted-foreground">Connect your Wix site</p>
+              <p className="text-xs text-muted-foreground">Connect for SEO analysis</p>
             </div>
           </div>
           
@@ -278,23 +277,23 @@ const SEOIntegrations = () => {
       </div>
       
       <Card className="p-5 border mt-6">
-        <h3 className="text-lg font-medium mb-4">Advanced Integration Settings</h3>
+        <h3 className="text-lg font-medium mb-4">SEO Integration Settings</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-medium mb-2">Content Publishing Options</h4>
+            <h4 className="font-medium mb-2">SEO Content Options</h4>
             <ul className="space-y-2">
               <li className="flex items-center text-sm">
                 <input type="checkbox" id="auto-publish" className="mr-2" />
-                <label htmlFor="auto-publish">Auto-publish optimized content</label>
+                <label htmlFor="auto-publish">Auto-publish SEO optimizations</label>
               </li>
               <li className="flex items-center text-sm">
                 <input type="checkbox" id="schedule" className="mr-2" />
-                <label htmlFor="schedule">Schedule content publishing</label>
+                <label htmlFor="schedule">Schedule SEO updates</label>
               </li>
               <li className="flex items-center text-sm">
                 <input type="checkbox" id="version" className="mr-2" />
-                <label htmlFor="version">Keep version history</label>
+                <label htmlFor="version">Keep optimization history</label>
               </li>
             </ul>
           </div>
@@ -304,15 +303,15 @@ const SEOIntegrations = () => {
             <ul className="space-y-2">
               <li className="flex items-center text-sm">
                 <input type="checkbox" id="analytics" className="mr-2" />
-                <label htmlFor="analytics">Sync analytics data</label>
+                <label htmlFor="analytics">Sync SEO analytics data</label>
               </li>
               <li className="flex items-center text-sm">
                 <input type="checkbox" id="keywords" className="mr-2" />
-                <label htmlFor="keywords">Import existing keywords</label>
+                <label htmlFor="keywords">Import keyword rankings</label>
               </li>
               <li className="flex items-center text-sm">
                 <input type="checkbox" id="meta" className="mr-2" />
-                <label htmlFor="meta">Sync meta descriptions</label>
+                <label htmlFor="meta">Optimize meta descriptions</label>
               </li>
             </ul>
           </div>
@@ -320,13 +319,13 @@ const SEOIntegrations = () => {
         
         <Button className="mt-6">
           <Settings className="mr-2 h-4 w-4" />
-          Save Integration Settings
+          Save SEO Integration Settings
         </Button>
       </Card>
       
       <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
         <Link className="h-4 w-4" />
-        <span>Need help with integrations? <a href="#" className="text-primary hover:underline">View our integration docs</a></span>
+        <span>Need help with SEO integrations? <a href="#" className="text-primary hover:underline">View our SEO integration docs</a></span>
       </div>
     </div>
   );

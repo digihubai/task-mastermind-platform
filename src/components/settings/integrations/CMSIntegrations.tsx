@@ -21,9 +21,9 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold">CMS Integrations</h2>
+      <h2 className="text-xl font-semibold">Content Management Systems</h2>
       <p className="text-sm text-muted-foreground">
-        Connect your content management systems to optimize SEO directly within your platform
+        Connect your website and e-commerce platforms for centralized content management and publishing
       </p>
       
       <CMSFilter 
@@ -46,7 +46,7 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
       
       <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
         <Link className="h-4 w-4" />
-        <span>Need help with CMS integrations? <a href="#" className="text-primary hover:underline">View our integration docs</a></span>
+        <span>Need help with CMS connections? <a href="#" className="text-primary hover:underline">View our integration docs</a></span>
       </div>
     </div>
   );
