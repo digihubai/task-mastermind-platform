@@ -32,7 +32,10 @@ export const FloatingTrigger: React.FC<FloatingTriggerProps> = ({
         }}
         onClick={onClick}
       >
-        <div className={`text-${transparentTrigger ? 'black' : 'white'} text-lg font-medium flex items-center justify-center`} style={{ transform: `scale(${triggerSize / 60})` }}>
+        <div 
+          className={`text-${transparentTrigger ? 'black' : 'white'} text-lg font-medium flex items-center justify-center`} 
+          style={{ transform: `scale(${triggerSize / 60})` }}
+        >
           {renderAvatar()}
         </div>
       </div>

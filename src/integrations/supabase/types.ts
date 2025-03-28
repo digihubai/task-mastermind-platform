@@ -105,6 +105,162 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_analytics: {
+        Row: {
+          created_at: string | null
+          data: Json
+          id: string
+          timeframe: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json
+          id?: string
+          timeframe: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json
+          id?: string
+          timeframe?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      seo_campaigns: {
+        Row: {
+          avg_position: number
+          backlinks: number
+          created_at: string | null
+          end_date: string | null
+          id: string
+          keyword_count: number
+          name: string
+          page_count: number
+          start_date: string
+          status: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          avg_position?: number
+          backlinks?: number
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          keyword_count?: number
+          name: string
+          page_count?: number
+          start_date: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          avg_position?: number
+          backlinks?: number
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          keyword_count?: number
+          name?: string
+          page_count?: number
+          start_date?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      seo_content: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          date: string
+          id: string
+          keywords: string[]
+          platform: string
+          seo_score: number
+          status: string
+          title: string
+          updated_at: string | null
+          url: string | null
+          user_id: string | null
+          word_count: number
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          date: string
+          id?: string
+          keywords?: string[]
+          platform?: string
+          seo_score?: number
+          status?: string
+          title: string
+          updated_at?: string | null
+          url?: string | null
+          user_id?: string | null
+          word_count?: number
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          keywords?: string[]
+          platform?: string
+          seo_score?: number
+          status?: string
+          title?: string
+          updated_at?: string | null
+          url?: string | null
+          user_id?: string | null
+          word_count?: number
+        }
+        Relationships: []
+      }
+      seo_keywords: {
+        Row: {
+          change: number
+          created_at: string | null
+          difficulty: string
+          id: string
+          keyword: string
+          position: number
+          updated_at: string | null
+          user_id: string | null
+          volume: number
+        }
+        Insert: {
+          change?: number
+          created_at?: string | null
+          difficulty?: string
+          id?: string
+          keyword: string
+          position?: number
+          updated_at?: string | null
+          user_id?: string | null
+          volume?: number
+        }
+        Update: {
+          change?: number
+          created_at?: string | null
+          difficulty?: string
+          id?: string
+          keyword?: string
+          position?: number
+          updated_at?: string | null
+          user_id?: string | null
+          volume?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
