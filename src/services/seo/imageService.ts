@@ -10,6 +10,8 @@ export const searchStockPhotos = async (
   source: 'unsplash' | 'pexels' | 'pixabay' = 'unsplash',
   count: number = 4
 ) => {
+  console.log(`Searching for ${count} ${source} photos with query: ${query}`);
+  
   // This is a mock implementation
   // In production, this would call actual APIs with proper authentication
   
@@ -21,7 +23,8 @@ export const searchStockPhotos = async (
   for (let i = 0; i < count; i++) {
     // Using Unsplash source API as a placeholder
     // In production you would use the actual API endpoints with auth
-    images.push(`https://source.unsplash.com/random/800x600?${query.replace(/\s+/g, '+')}&sig=${Math.random()}`);
+    const randomParam = `${Date.now()}-${Math.random()}`;
+    images.push(`https://source.unsplash.com/random/800x600?${query.replace(/\s+/g, '+')}&sig=${randomParam}`);
   }
   
   return images;
@@ -33,6 +36,8 @@ export const generateAIImages = async (
   count: number = 4,
   size: 'square' | 'landscape' | 'portrait' | 'widescreen' = 'square'
 ) => {
+  console.log(`Generating ${count} AI images with prompt: ${prompt}`);
+  
   // This is a mock implementation
   // In production, this would call an AI image generation API like DALL-E, Midjourney, etc.
   
@@ -50,7 +55,9 @@ export const generateAIImages = async (
   for (let i = 0; i < count; i++) {
     // Using Unsplash source API as a placeholder
     // In production you would use actual AI generation APIs
-    images.push(`https://source.unsplash.com/random/${dimensions}?${prompt.replace(/\s+/g, '+')}&sig=${Date.now() + i}`);
+    // Adding a random parameter to force different images
+    const randomParam = `${Date.now()}-${Math.random()}-${i}`;
+    images.push(`https://source.unsplash.com/random/${dimensions}?${prompt.replace(/\s+/g, '+')}&sig=${randomParam}`);
   }
   
   return images;

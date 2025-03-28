@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { 
   Loader, 
@@ -11,7 +12,7 @@ import {
   Heading3, 
   List, 
   ListOrdered, 
-  Link, 
+  Link as LinkIcon, 
   Image, 
   Quote,
   Code,
@@ -20,7 +21,9 @@ import {
   AlignRight,
   AlignJustify,
   Table,
-  Youtube
+  Youtube,
+  Search,
+  Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -48,6 +51,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner"; 
+import { generateAIImages, searchStockPhotos } from "@/services/seo/imageService";
 
 interface ContentDisplayProps {
   isGenerating: boolean;
@@ -76,6 +81,11 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
   const [showTableDialog, setShowTableDialog] = useState(false);
   const [showEmbedDialog, setShowEmbedDialog] = useState(false);
   const [selectedText, setSelectedText] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchingImages, setIsSearchingImages] = useState(false);
+  const [isGeneratingImages, setIsGeneratingImages] = useState(false);
+  const [searchResults, setSearchResults] = useState<string[]>([]);
+  const [selectedRange, setSelectedRange] = useState<Range | null>(null);
   
   useEffect(() => {
     setEditableContent(content);
@@ -88,6 +98,7 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
       if (range.commonAncestorContainer.parentNode === editorRef.current ||
           editorRef.current?.contains(range.commonAncestorContainer)) {
         setSelectedText(selection.toString());
+        setSelectedRange(range.cloneRange());
         return range;
       }
     }
@@ -105,6 +116,11 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
   };
   
   const execCommand = (command: string, value: string = '') => {
+    // Restore selection if we have a saved range
+    if (selectedRange) {
+      restoreSelection(selectedRange);
+    }
+    
     document.execCommand(command, false, value);
     if (editorRef.current) {
       const newContent = editorRef.current.innerHTML;
@@ -133,6 +149,10 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
 
   const insertLink = () => {
     if (linkUrl) {
+      if (selectedRange) {
+        restoreSelection(selectedRange);
+      }
+      
       const linkHtml = `<a href="${linkUrl}" target="_blank" rel="noopener noreferrer">${linkText || linkUrl}</a>`;
       execCommand('insertHTML', linkHtml);
       setLinkUrl("");
@@ -141,24 +161,71 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
     }
   };
   
+  const handleImageSearch = async () => {
+    if (!searchQuery.trim()) {
+      toast.error("Please enter a search term");
+      return;
+    }
+    
+    setIsSearchingImages(true);
+    try {
+      const results = await searchStockPhotos(searchQuery);
+      setSearchResults(results);
+      toast.success(`Found ${results.length} images for "${searchQuery}"`);
+    } catch (error) {
+      console.error("Error searching images:", error);
+      toast.error("Failed to search images. Please try again.");
+    } finally {
+      setIsSearchingImages(false);
+    }
+  };
+  
+  const handleGenerateAIImages = async () => {
+    if (!searchQuery.trim()) {
+      toast.error("Please enter a description for image generation");
+      return;
+    }
+    
+    setIsGeneratingImages(true);
+    try {
+      const results = await generateAIImages(searchQuery);
+      setSearchResults(results);
+      toast.success(`Generated ${results.length} images for "${searchQuery}"`);
+    } catch (error) {
+      console.error("Error generating images:", error);
+      toast.error("Failed to generate images. Please try again.");
+    } finally {
+      setIsGeneratingImages(false);
+    }
+  };
+  
   const insertImage = () => {
     if (imageUrl) {
-      const imgHtml = `<img src="${imageUrl}" alt="${imageAlt}" style="max-width: 100%; height: auto;" />`;
+      if (selectedRange) {
+        restoreSelection(selectedRange);
+      }
+      
+      const imgHtml = `<img src="${imageUrl}" alt="${imageAlt}" style="max-width: 100%; height: auto; margin: 16px 0;" />`;
       execCommand('insertHTML', imgHtml);
       setImageUrl("");
       setImageAlt("");
+      setSearchResults([]);
       setShowImageDialog(false);
     }
   };
   
   const insertTable = () => {
     if (tableRows > 0 && tableCols > 0) {
-      let tableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
+      if (selectedRange) {
+        restoreSelection(selectedRange);
+      }
+      
+      let tableHtml = '<table border="1" style="width: 100%; border-collapse: collapse; margin: 16px 0;">';
       
       // Create header row
       tableHtml += '<thead><tr>';
       for (let i = 0; i < tableCols; i++) {
-        tableHtml += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Header ${i+1}</th>`;
+        tableHtml += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #f5f5f5;">Header ${i+1}</th>`;
       }
       tableHtml += '</tr></thead><tbody>';
       
@@ -179,6 +246,10 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
   
   const insertEmbed = () => {
     if (embedUrl) {
+      if (selectedRange) {
+        restoreSelection(selectedRange);
+      }
+      
       let embedHtml = '';
       
       // Handle YouTube embeds
@@ -188,7 +259,7 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
           : new URLSearchParams(new URL(embedUrl).search).get('v');
         
         if (videoId) {
-          embedHtml = `<div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+          embedHtml = `<div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: 16px 0;">
             <iframe 
               style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
               src="https://www.youtube.com/embed/${videoId}" 
@@ -200,7 +271,7 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
         }
       } else {
         // Generic iframe embed
-        embedHtml = `<iframe src="${embedUrl}" width="100%" height="400" frameborder="0"></iframe>`;
+        embedHtml = `<iframe src="${embedUrl}" width="100%" height="400" frameborder="0" style="margin: 16px 0;"></iframe>`;
       }
       
       execCommand('insertHTML', embedHtml);
@@ -213,6 +284,33 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
     if (editorRef.current && onContentChange) {
       onContentChange(editorRef.current.innerHTML);
     }
+  };
+
+  const cleanAndFormatContent = () => {
+    if (!editorRef.current) return;
+    
+    // Get the current content
+    const content = editorRef.current.innerHTML;
+    
+    // Fix spacing issues with headers
+    let formattedContent = content
+      // Add margin after headers
+      .replace(/<\/h([1-6])>(?!\s*<)/g, '</h$1><br>')
+      // Fix double paragraphs
+      .replace(/<p>\s*<br>\s*<\/p>/g, '<p></p>')
+      // Ensure paragraphs have proper spacing
+      .replace(/<\/p>(?!\s*<)/g, '</p><br>')
+      // Remove excessive breaks
+      .replace(/<br\s*\/?>\s*<br\s*\/?>/g, '<br>');
+      
+    // Update the content
+    editorRef.current.innerHTML = formattedContent;
+    handleContentChange();
+    toast.success("Content formatting improved");
+  };
+
+  const selectSearchImage = (url: string) => {
+    setImageUrl(url);
   };
 
   if (isGenerating) {
@@ -497,7 +595,7 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
                     className="h-8 w-8" 
                     onClick={handleLinkInsert}
                   >
-                    <Link className="h-4 w-4" />
+                    <LinkIcon className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Insert Link</TooltipContent>
@@ -509,7 +607,10 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
                     variant="ghost" 
                     size="icon" 
                     className="h-8 w-8" 
-                    onClick={() => setShowImageDialog(true)}
+                    onClick={() => {
+                      saveSelection();
+                      setShowImageDialog(true);
+                    }}
                   >
                     <Image className="h-4 w-4" />
                   </Button>
@@ -523,7 +624,10 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
                     variant="ghost" 
                     size="icon" 
                     className="h-8 w-8" 
-                    onClick={() => setShowTableDialog(true)}
+                    onClick={() => {
+                      saveSelection();
+                      setShowTableDialog(true);
+                    }}
                   >
                     <Table className="h-4 w-4" />
                   </Button>
@@ -537,12 +641,34 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
                     variant="ghost" 
                     size="icon" 
                     className="h-8 w-8" 
-                    onClick={() => setShowEmbedDialog(true)}
+                    onClick={() => {
+                      saveSelection();
+                      setShowEmbedDialog(true);
+                    }}
                   >
                     <Youtube className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Insert Embed</TooltipContent>
+              </Tooltip>
+            </div>
+            
+            <Separator orientation="vertical" className="mx-1 h-8" />
+            
+            {/* Content formatting fixes */}
+            <div className="flex flex-wrap gap-1 ml-auto">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={cleanAndFormatContent}
+                    className="h-8"
+                  >
+                    Fix Formatting
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Fix spacing and formatting issues</TooltipContent>
               </Tooltip>
             </div>
           </TooltipProvider>
@@ -592,41 +718,197 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
       
       {/* Image Dialog */}
       <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>Insert Image</DialogTitle>
             <DialogDescription>
-              Enter the image details.
+              Enter image details or search for images.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="image-url" className="text-right">
-                Image URL
-              </Label>
-              <Input
-                id="image-url"
-                placeholder="https://example.com/image.jpg"
-                className="col-span-3"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="image-alt" className="text-right">
-                Alt Text
-              </Label>
-              <Input
-                id="image-alt"
-                placeholder="Image description"
-                className="col-span-3"
-                value={imageAlt}
-                onChange={(e) => setImageAlt(e.target.value)}
-              />
-            </div>
-          </div>
+          
+          <Tabs defaultValue="search">
+            <TabsList className="w-full">
+              <TabsTrigger value="search">Search Images</TabsTrigger>
+              <TabsTrigger value="ai">AI Generated</TabsTrigger>
+              <TabsTrigger value="url">Direct URL</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="search" className="space-y-4 py-4">
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="Search for images..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={handleImageSearch}
+                  disabled={isSearchingImages || !searchQuery.trim()}
+                >
+                  {isSearchingImages ? (
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Search className="mr-2 h-4 w-4" />
+                  )}
+                  Search
+                </Button>
+              </div>
+              
+              {searchResults.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto p-2">
+                  {searchResults.map((url, index) => (
+                    <div 
+                      key={index} 
+                      className={`cursor-pointer border-2 rounded-md overflow-hidden ${imageUrl === url ? 'border-primary ring-2 ring-primary/30' : 'border-transparent hover:border-gray-300'}`}
+                      onClick={() => selectSearchImage(url)}
+                    >
+                      <img 
+                        src={url} 
+                        alt={`Search result ${index + 1}`} 
+                        className="w-full h-32 object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  {isSearchingImages ? 
+                    "Searching for images..." : 
+                    "Search for images to see results here"}
+                </div>
+              )}
+              
+              {imageUrl && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="image-alt" className="text-right">
+                      Alt Text
+                    </Label>
+                    <Input
+                      id="image-alt"
+                      placeholder="Image description"
+                      className="col-span-3"
+                      value={imageAlt}
+                      onChange={(e) => setImageAlt(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="ai" className="space-y-4 py-4">
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="Describe the image you want to generate..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={handleGenerateAIImages}
+                  disabled={isGeneratingImages || !searchQuery.trim()}
+                >
+                  {isGeneratingImages ? (
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="mr-2 h-4 w-4" />
+                  )}
+                  Generate
+                </Button>
+              </div>
+              
+              {searchResults.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto p-2">
+                  {searchResults.map((url, index) => (
+                    <div 
+                      key={index} 
+                      className={`cursor-pointer border-2 rounded-md overflow-hidden ${imageUrl === url ? 'border-primary ring-2 ring-primary/30' : 'border-transparent hover:border-gray-300'}`}
+                      onClick={() => selectSearchImage(url)}
+                    >
+                      <img 
+                        src={url} 
+                        alt={`AI generated image ${index + 1}`} 
+                        className="w-full h-32 object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  {isGeneratingImages ? 
+                    "Generating AI images..." : 
+                    "Describe the image you want to generate"}
+                </div>
+              )}
+              
+              {imageUrl && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="image-alt" className="text-right">
+                      Alt Text
+                    </Label>
+                    <Input
+                      id="image-alt"
+                      placeholder="Image description"
+                      className="col-span-3"
+                      value={imageAlt}
+                      onChange={(e) => setImageAlt(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="url" className="space-y-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="image-url" className="text-right">
+                  Image URL
+                </Label>
+                <Input
+                  id="image-url"
+                  placeholder="https://example.com/image.jpg"
+                  className="col-span-3"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="image-alt" className="text-right">
+                  Alt Text
+                </Label>
+                <Input
+                  id="image-alt"
+                  placeholder="Image description"
+                  className="col-span-3"
+                  value={imageAlt}
+                  onChange={(e) => setImageAlt(e.target.value)}
+                />
+              </div>
+              
+              {imageUrl && (
+                <div className="mt-4 border rounded-md p-2">
+                  <p className="text-sm font-medium mb-2">Image Preview:</p>
+                  <img 
+                    src={imageUrl} 
+                    alt={imageAlt || "Preview"} 
+                    className="max-w-full max-h-[200px] object-contain mx-auto"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x200?text=Image+Not+Found";
+                    }}
+                  />
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+          
           <DialogFooter>
-            <Button type="submit" onClick={insertImage}>Insert Image</Button>
+            <Button 
+              type="submit" 
+              onClick={insertImage}
+              disabled={!imageUrl}
+            >
+              Insert Image
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
