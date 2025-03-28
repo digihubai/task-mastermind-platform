@@ -1,8 +1,9 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Loader2, Plus } from "lucide-react";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { RefreshCw, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface WebsiteTrainingProps {
@@ -13,165 +14,180 @@ export const WebsiteTraining: React.FC<WebsiteTrainingProps> = ({ onSkip }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [websiteUrl, setWebsiteUrl] = useState("");
-  const [step, setStep] = useState(1);
-  const [websiteCrawlDepth, setWebsiteCrawlDepth] = useState(2);
+  const [crawlingDepth, setCrawlingDepth] = useState<number>(2);
+  const [savedWebsites, setSavedWebsites] = useState<Array<{id: string, url: string, depth: number, trained: boolean}>>([]);
   
-  const handleAddUrl = () => {
-    if (!websiteUrl) {
+  const handleAddWebsite = () => {
+    // Validate URL format
+    if (!websiteUrl.trim() || !isValidUrl(websiteUrl)) {
       toast({
         variant: "destructive",
-        title: "URL required",
-        description: "Please enter a valid URL to continue."
+        title: "Invalid URL",
+        description: "Please enter a valid website URL."
       });
       return;
     }
     
     setIsLoading(true);
     
-    // Simulate loading
+    // Simulate website processing
     setTimeout(() => {
       setIsLoading(false);
-      setStep(2);
+      
+      // Save the website
+      const newWebsiteId = Date.now().toString();
+      setSavedWebsites([...savedWebsites, {
+        id: newWebsiteId,
+        url: websiteUrl,
+        depth: crawlingDepth,
+        trained: false
+      }]);
+      
+      // Reset input fields
+      setWebsiteUrl("");
+      
       toast({
         title: "Website added",
-        description: "Your website has been added for crawling."
+        description: "Website has been added for crawling and training."
       });
     }, 1500);
   };
-
-  const handleStartCrawling = () => {
-    setIsLoading(true);
-    
+  
+  const handleTrainAll = () => {
+    // Simulate training process
     toast({
-      title: "Crawling started",
-      description: "Website crawling has been initiated. This may take some time."
+      title: "Crawling and training started",
+      description: "Your websites are being crawled and processed for training."
     });
     
-    // Simulate crawling process
     setTimeout(() => {
-      setIsLoading(false);
-      setStep(1);
-      setWebsiteUrl("");
+      setSavedWebsites(savedWebsites.map(website => ({...website, trained: true})));
       toast({
-        title: "Crawling completed",
-        description: "Website has been successfully crawled and knowledge has been extracted."
+        title: "Training complete",
+        description: "All websites have been successfully crawled and trained."
       });
-    }, 3000);
+    }, 2000);
+  };
+  
+  const handleDeleteWebsite = (id: string) => {
+    setSavedWebsites(savedWebsites.filter(website => website.id !== id));
+    toast({
+      title: "Website removed",
+      description: "The website has been removed from training."
+    });
+  };
+  
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
   
   return (
-    <>
-      {step === 1 ? (
-        <div className="bg-primary/5 p-4 rounded-lg space-y-4 border border-primary/10">
-          <div className="flex gap-2 items-center">
-            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
-              1
-            </div>
-            <span className="font-medium">Add URL</span>
-          </div>
-          
-          <div className="space-y-2">
+    <div className="space-y-6">
+      <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg mb-4">
+        <h3 className="text-base font-medium flex items-center gap-2">
+          <span className="h-6 w-6 rounded-full bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300 flex items-center justify-center text-sm">1</span>
+          Add Website
+        </h3>
+      </div>
+      
+      <div className="space-y-4">
+        <div>
+          <Label htmlFor="website-url" className="mb-2 block">Website URL</Label>
+          <Input 
+            id="website-url"
+            placeholder="https://example.com"
+            value={websiteUrl}
+            onChange={(e) => setWebsiteUrl(e.target.value)}
+          />
+        </div>
+        
+        <div>
+          <Label htmlFor="crawling-depth" className="mb-2 block">Crawling Depth</Label>
+          <select
+            id="crawling-depth"
+            className="w-full p-2 border rounded-md"
+            value={crawlingDepth}
+            onChange={(e) => setCrawlingDepth(Number(e.target.value))}
+          >
+            <option value={1}>1 - Homepage only</option>
+            <option value={2}>2 - Homepage + linked pages</option>
+            <option value={3}>3 - Deep crawl</option>
+          </select>
+          <p className="text-xs text-muted-foreground mt-1">
+            Higher depth means more pages will be crawled, but will take longer.
+          </p>
+        </div>
+        
+        <Button 
+          className="w-full"
+          onClick={handleAddWebsite}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 size={16} className="mr-2 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            <>
+              <Plus size={16} className="mr-2" />
+              Add
+            </>
+          )}
+        </Button>
+      </div>
+      
+      {savedWebsites.length > 0 && (
+        <>
+          <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg mb-4 mt-8">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Website</span>
-              <span className="text-xs text-muted-foreground">Single URL</span>
-            </div>
-            
-            <div className="flex gap-2">
-              <Input 
-                placeholder="https://example.com"
-                value={websiteUrl}
-                onChange={(e) => setWebsiteUrl(e.target.value)}
-                className="flex-1"
-              />
-              <Button 
-                size="icon" 
-                variant="ghost"
-                className="shrink-0"
-                onClick={() => setWebsiteUrl("")}
-              >
-                <RefreshCw size={18} />
+              <h3 className="text-base font-medium flex items-center gap-2">
+                <span className="h-6 w-6 rounded-full bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300 flex items-center justify-center text-sm">2</span>
+                Manage Websites
+              </h3>
+              <Button variant="ghost" size="sm" onClick={() => setSavedWebsites(savedWebsites.map(w => ({...w, selected: true})))}>
+                Select All
               </Button>
             </div>
           </div>
           
-          <Button
-            className="w-full bg-primary/10 text-primary hover:bg-primary/20"
-            onClick={handleAddUrl}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 size={16} className="mr-2 animate-spin" />
-                Processing...
-              </>
-            ) : "Next"}
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {savedWebsites.map((website) => (
+              <div key={website.id} className="flex items-center justify-between border rounded-md p-3">
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" className="h-4 w-4" checked={website.selected} />
+                  <span>{website.url}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs px-2 py-1 rounded-full ${website.trained ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                    {website.trained ? 'Trained' : 'Not Trained'}
+                  </span>
+                  <Button variant="ghost" size="sm" onClick={() => handleDeleteWebsite(website.id)}>
+                    &times;
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <Button className="w-full bg-indigo-600 hover:bg-indigo-700" onClick={handleTrainAll}>
+            Train GPT
           </Button>
-        </div>
-      ) : (
-        <>
-          <div className="bg-primary/5 p-4 rounded-lg border border-primary/10 mb-4">
-            <div className="flex gap-2 items-center mb-4">
-              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
-                ✓
-              </div>
-              <span className="font-medium">URL Added</span>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {websiteUrl}
-            </div>
-          </div>
-          
-          <div className="bg-primary/5 p-4 rounded-lg space-y-4 border border-primary/10">
-            <div className="flex gap-2 items-center">
-              <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
-                2
-              </div>
-              <span className="font-medium">Configure Crawl Depth</span>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Depth Level</label>
-              <div className="flex gap-2">
-                {[1, 2, 3].map((level) => (
-                  <button
-                    key={level}
-                    className={`flex-1 p-2 border rounded-md text-center ${
-                      websiteCrawlDepth === level 
-                        ? "border-primary bg-primary/5 text-primary" 
-                        : "border-border hover:border-primary/50"
-                    }`}
-                    onClick={() => setWebsiteCrawlDepth(level)}
-                  >
-                    {level}
-                  </button>
-                ))}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Level {websiteCrawlDepth} is {websiteCrawlDepth === 2 ? "recommended for most websites" : websiteCrawlDepth === 1 ? "good for simple websites" : "for complex websites"}. Higher levels may take longer to process.
-              </p>
-            </div>
-            
-            <Button 
-              className="w-full"
-              onClick={handleStartCrawling}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 size={16} className="mr-2 animate-spin" />
-                  Crawling...
-                </>
-              ) : "Start Crawling"}
-            </Button>
-          </div>
-          
-          <div className="flex justify-between pt-4">
-            <Button variant="outline" onClick={() => setStep(1)}>
-              Back
-            </Button>
-          </div>
         </>
       )}
-    </>
+      
+      <Button 
+        variant="secondary" 
+        className="w-full mt-4"
+        onClick={() => onSkip()}
+      >
+        Next
+      </Button>
+    </div>
   );
 };

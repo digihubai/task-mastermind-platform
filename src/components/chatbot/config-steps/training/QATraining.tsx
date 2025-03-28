@@ -1,10 +1,10 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input"; 
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
 interface QATrainingProps {
@@ -16,112 +16,173 @@ export const QATraining: React.FC<QATrainingProps> = ({ onSkip }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
-  const [qaItems, setQaItems] = useState<{question: string; answer: string}[]>([]);
+  const [savedQAPairs, setSavedQAPairs] = useState<Array<{id: string, question: string, answer: string, trained: boolean}>>([]);
   
-  const handleAddQa = () => {
-    if (!question.trim() || !answer.trim()) {
+  const handleAddQA = () => {
+    if (!question.trim()) {
       toast({
         variant: "destructive",
-        title: "Incomplete Q&A",
-        description: "Please enter both a question and an answer."
+        title: "Question required",
+        description: "Please enter a question to continue."
       });
       return;
     }
     
-    setQaItems([...qaItems, { question, answer }]);
-    setQuestion("");
-    setAnswer("");
-    
-    toast({
-      title: "Q&A added",
-      description: "Question and answer pair has been added successfully."
-    });
-  };
-  
-  const handleSaveQaSet = () => {
-    if (qaItems.length === 0) {
+    if (!answer.trim()) {
       toast({
         variant: "destructive",
-        title: "No Q&A pairs",
-        description: "Please add at least one question and answer pair."
+        title: "Answer required",
+        description: "Please enter an answer to continue."
       });
       return;
     }
     
     setIsLoading(true);
     
-    // Simulate saving Q&A set
+    // Simulate processing
     setTimeout(() => {
       setIsLoading(false);
-      setQaItems([]);
+      
+      // Save the Q&A pair
+      const newPairId = Date.now().toString();
+      setSavedQAPairs([...savedQAPairs, {
+        id: newPairId,
+        question: question,
+        answer: answer,
+        trained: false
+      }]);
+      
+      // Reset input fields
+      setQuestion("");
+      setAnswer("");
+      
       toast({
-        title: "Q&A set saved",
-        description: `${qaItems.length} question and answer pair(s) have been saved.`
+        title: "Q&A pair added",
+        description: "Question and answer have been saved and are ready for training."
       });
-    }, 1500);
+    }, 1000);
+  };
+  
+  const handleTrainAll = () => {
+    // Simulate training process
+    toast({
+      title: "Training started",
+      description: "Your Q&A pairs are being processed for training."
+    });
+    
+    setTimeout(() => {
+      setSavedQAPairs(savedQAPairs.map(pair => ({...pair, trained: true})));
+      toast({
+        title: "Training complete",
+        description: "All Q&A pairs have been successfully trained."
+      });
+    }, 2000);
+  };
+  
+  const handleDeletePair = (id: string) => {
+    setSavedQAPairs(savedQAPairs.filter(pair => pair.id !== id));
+    toast({
+      title: "Q&A pair removed",
+      description: "The question and answer have been removed from training."
+    });
   };
   
   return (
-    <div className="space-y-4">
-      <div className="space-y-4 border p-4 rounded-lg">
+    <div className="space-y-6">
+      <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg mb-4">
+        <h3 className="text-base font-medium flex items-center gap-2">
+          <span className="h-6 w-6 rounded-full bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300 flex items-center justify-center text-sm">1</span>
+          Add Question & Answer
+        </h3>
+      </div>
+      
+      <div className="space-y-4">
         <div>
-          <Label htmlFor="qa-question" className="block text-sm font-medium mb-1">Question</Label>
+          <Label htmlFor="question" className="mb-2 block">Question</Label>
           <Input 
-            id="qa-question"
-            placeholder="How do I reset my password?"
+            id="question"
+            placeholder="Enter a question your users might ask"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
           />
         </div>
+        
         <div>
-          <Label htmlFor="qa-answer" className="block text-sm font-medium mb-1">Answer</Label>
+          <Label htmlFor="answer" className="mb-2 block">Answer</Label>
           <Textarea 
-            id="qa-answer"
-            className="h-20 resize-none focus:ring-2 focus:ring-primary/30"
-            placeholder="To reset your password, click on the 'Forgot Password' link on the login page..."
+            id="answer"
+            className="h-40 resize-none focus:ring-2 focus:ring-primary/30"
+            placeholder="Enter the answer to the question"
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
           />
         </div>
-      </div>
-      
-      <div className="flex gap-2">
+        
         <Button 
-          className="flex-1"
-          onClick={handleAddQa}
-          disabled={!question.trim() || !answer.trim()}
-        >
-          <Plus size={16} className="mr-1" />
-          Add Q&A Pair
-        </Button>
-        <Button 
-          variant="default" 
-          className="flex-1"
-          onClick={handleSaveQaSet}
-          disabled={isLoading || qaItems.length === 0}
+          className="w-full"
+          onClick={handleAddQA}
+          disabled={isLoading}
         >
           {isLoading ? (
             <>
               <Loader2 size={16} className="mr-2 animate-spin" />
-              Saving...
+              Processing...
             </>
-          ) : "Save Q&A Set"}
+          ) : (
+            <>
+              <Plus size={16} className="mr-2" />
+              Add
+            </>
+          )}
         </Button>
       </div>
       
-      {qaItems.length > 0 && (
-        <div className="mt-4 space-y-2">
-          <h3 className="text-sm font-medium">Added Q&A Pairs ({qaItems.length})</h3>
-          <div className="max-h-[200px] overflow-y-auto space-y-2">
-            {qaItems.map((item, index) => (
-              <div key={index} className="bg-muted/50 p-3 rounded-md">
-                <p className="font-medium text-sm">{item.question}</p>
-                <p className="text-sm text-muted-foreground mt-1">{item.answer}</p>
+      {savedQAPairs.length > 0 && (
+        <>
+          <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg mb-4 mt-8">
+            <div className="flex justify-between items-center">
+              <h3 className="text-base font-medium flex items-center gap-2">
+                <span className="h-6 w-6 rounded-full bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300 flex items-center justify-center text-sm">2</span>
+                Manage Q&A Pairs
+              </h3>
+              <Button variant="ghost" size="sm" onClick={() => setSavedQAPairs(savedQAPairs.map(p => ({...p, selected: true})))}>
+                Select All
+              </Button>
+            </div>
+          </div>
+          
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {savedQAPairs.map((pair) => (
+              <div key={pair.id} className="flex items-center justify-between border rounded-md p-3">
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" className="h-4 w-4" checked={pair.selected} />
+                  <span>{pair.question.length > 40 ? pair.question.substring(0, 40) + '...' : pair.question}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs px-2 py-1 rounded-full ${pair.trained ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                    {pair.trained ? 'Trained' : 'Not Trained'}
+                  </span>
+                  <Button variant="ghost" size="sm" onClick={() => handleDeletePair(pair.id)}>
+                    &times;
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
-        </div>
+          
+          <Button className="w-full bg-indigo-600 hover:bg-indigo-700" onClick={handleTrainAll}>
+            Train GPT
+          </Button>
+        </>
       )}
+      
+      <Button 
+        variant="secondary" 
+        className="w-full mt-4"
+        onClick={() => onSkip()}
+      >
+        Next
+      </Button>
     </div>
   );
 };

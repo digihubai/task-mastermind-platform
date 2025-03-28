@@ -1,7 +1,7 @@
 
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, RefreshCw, Loader2 } from "lucide-react";
+import { Loader2, Upload, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface PDFTrainingProps {
@@ -10,121 +10,162 @@ interface PDFTrainingProps {
 
 export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<Array<{id: string, name: string, trained: boolean}>>([]);
   
-  const handleFileUpload = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-  
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const newFiles = Array.from(files);
-      setSelectedFiles([...selectedFiles, ...newFiles]);
-      
-      toast({
-        title: "Files added",
-        description: `${newFiles.length} PDF file(s) added for processing.`
-      });
-    }
-  };
-  
-  const handleRemoveFile = (index: number) => {
-    const updatedFiles = [...selectedFiles];
-    updatedFiles.splice(index, 1);
-    setSelectedFiles(updatedFiles);
-  };
-  
-  const handleProcessPdfs = () => {
-    if (selectedFiles.length === 0) {
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
+    const file = files[0];
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    
+    // Check if the file is a PDF, XLSX, or CSV
+    if (!['pdf', 'xlsx', 'csv'].includes(fileExtension || '')) {
       toast({
         variant: "destructive",
-        title: "No files selected",
-        description: "Please upload at least one PDF file to continue."
+        title: "Invalid file format",
+        description: "Please upload a PDF, XLSX, or CSV file.",
       });
       return;
     }
     
-    setIsLoading(true);
-    
-    // Simulate PDF processing
-    setTimeout(() => {
-      setIsLoading(false);
-      setSelectedFiles([]);
+    // Check file size (max 25MB)
+    if (file.size > 25 * 1024 * 1024) {
       toast({
-        title: "PDFs processed",
-        description: `${selectedFiles.length} PDF file(s) have been processed and knowledge has been extracted.`
+        variant: "destructive",
+        title: "File too large",
+        description: "Please upload a file smaller than 25MB.",
+      });
+      return;
+    }
+    
+    setIsUploading(true);
+    
+    // Simulate file upload
+    setTimeout(() => {
+      setIsUploading(false);
+      
+      // Add the file to the uploaded files list
+      setUploadedFiles([...uploadedFiles, {
+        id: Date.now().toString(),
+        name: file.name,
+        trained: false
+      }]);
+      
+      toast({
+        title: "File uploaded",
+        description: `${file.name} has been uploaded successfully.`,
+      });
+    }, 1500);
+  };
+  
+  const handleTrainAll = () => {
+    // Simulate training process
+    toast({
+      title: "Training started",
+      description: "Your files are being processed for training."
+    });
+    
+    setTimeout(() => {
+      setUploadedFiles(uploadedFiles.map(file => ({...file, trained: true})));
+      toast({
+        title: "Training complete",
+        description: "All files have been successfully trained."
       });
     }, 2000);
   };
   
+  const handleDeleteFile = (id: string) => {
+    setUploadedFiles(uploadedFiles.filter(file => file.id !== id));
+    toast({
+      title: "File removed",
+      description: "The file has been removed from training."
+    });
+  };
+  
   return (
-    <div className="space-y-4">
-      <div className={`border-2 border-dashed rounded-lg ${selectedFiles.length === 0 ? 'border-muted-foreground/20' : 'border-primary/20'} p-6 flex flex-col items-center justify-center`}>
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={onFileChange}
-          className="hidden"
-          accept=".pdf"
-          multiple
-        />
+    <div className="space-y-6">
+      <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-10 bg-white dark:bg-gray-800/20">
+        <div className="h-12 w-12 rounded-full border flex items-center justify-center mb-3">
+          <Plus size={24} />
+        </div>
+        <p className="text-center font-medium mb-1">UPLOAD PDF, XLSX, CSV</p>
+        <p className="text-center text-sm text-muted-foreground mb-5">Upload a File (Max: 25Mb)</p>
         
-        {selectedFiles.length === 0 ? (
-          <>
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-              <Upload size={24} className="text-primary" />
-            </div>
-            <p className="text-muted-foreground mb-3 text-center">Drag & drop PDF files here or click to browse</p>
-            <Button variant="outline" size="sm" onClick={handleFileUpload}>
-              Upload PDFs
-            </Button>
-          </>
-        ) : (
-          <div className="w-full">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-medium">{selectedFiles.length} PDF file(s) selected</h3>
-              <Button variant="outline" size="sm" onClick={handleFileUpload}>
-                Add More
-              </Button>
-            </div>
-            <div className="space-y-2 max-h-[200px] overflow-y-auto">
-              {selectedFiles.map((file, index) => (
-                <div key={index} className="flex items-center justify-between bg-muted/50 p-2 rounded-md">
-                  <span className="text-sm truncate max-w-[80%]">{file.name}</span>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-8 w-8 p-0" 
-                    onClick={() => handleRemoveFile(index)}
-                  >
-                    <RefreshCw size={16} className="rotate-45" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-      
-      {selectedFiles.length > 0 && (
         <Button 
-          className="w-full mt-4" 
-          onClick={handleProcessPdfs}
-          disabled={isLoading}
+          className="w-full max-w-xs bg-emerald-500 hover:bg-emerald-600"
+          onClick={() => document.getElementById('file-upload')?.click()}
+          disabled={isUploading}
         >
-          {isLoading ? (
+          {isUploading ? (
             <>
               <Loader2 size={16} className="mr-2 animate-spin" />
-              Processing PDFs...
+              Uploading...
             </>
-          ) : `Process ${selectedFiles.length} PDF file(s)`}
+          ) : (
+            <>
+              <Plus size={16} className="mr-2" />
+              Upload
+            </>
+          )}
         </Button>
+        <input
+          id="file-upload"
+          type="file"
+          accept=".pdf,.xlsx,.csv"
+          className="hidden"
+          onChange={handleFileUpload}
+          disabled={isUploading}
+        />
+      </div>
+      
+      {uploadedFiles.length > 0 && (
+        <>
+          <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg mb-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-base font-medium flex items-center gap-2">
+                <span className="h-6 w-6 rounded-full bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300 flex items-center justify-center text-sm">2</span>
+                Manage Files
+              </h3>
+              <Button variant="ghost" size="sm" onClick={() => setUploadedFiles(uploadedFiles.map(f => ({...f, selected: true})))}>
+                Select All
+              </Button>
+            </div>
+          </div>
+          
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {uploadedFiles.map((file) => (
+              <div key={file.id} className="flex items-center justify-between border rounded-md p-3">
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" className="h-4 w-4" checked={file.selected} />
+                  <span>{file.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs px-2 py-1 rounded-full ${file.trained ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                    {file.trained ? 'Trained' : 'Not Trained'}
+                  </span>
+                  <Button variant="ghost" size="sm" onClick={() => handleDeleteFile(file.id)}>
+                    &times;
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <Button className="w-full bg-indigo-600 hover:bg-indigo-700" onClick={handleTrainAll}>
+            Train GPT
+          </Button>
+        </>
       )}
+      
+      <Button 
+        variant="secondary" 
+        className="w-full mt-4"
+        onClick={() => onSkip()}
+      >
+        Next
+      </Button>
     </div>
   );
 };
