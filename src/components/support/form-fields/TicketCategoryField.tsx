@@ -20,7 +20,7 @@ export const TicketCategoryField: React.FC<TicketCategoryFieldProps> = ({
   onChange,
   availableCategories = ["General", "Technical", "Billing", "Feature Request"]
 }) => {
-  // Use provided categories if available, or fall back to defaults
+  // Map categories to consistent format - preserve original label but lowercase value for comparison
   const categories = availableCategories.map(cat => ({ 
     value: cat.toLowerCase(), 
     label: cat 

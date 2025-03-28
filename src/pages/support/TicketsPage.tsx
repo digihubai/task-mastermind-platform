@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -286,12 +287,20 @@ const TicketsPage: React.FC = () => {
         return false;
       }
       
-      if (categoryFilter && categoryFilter !== "all" && ticket.category !== categoryFilter) {
-        return false;
+      // Fixed category filter to properly compare lowercase values
+      if (categoryFilter && categoryFilter !== "all") {
+        // Compare lowercase values to make matching case-insensitive
+        if (ticket.category?.toLowerCase() !== categoryFilter.toLowerCase()) {
+          return false;
+        }
       }
       
-      if (departmentFilter && departmentFilter !== "all" && ticket.department !== departmentFilter) {
-        return false;
+      // Fixed department filter to properly compare lowercase values
+      if (departmentFilter && departmentFilter !== "all") {
+        // Compare lowercase values to make matching case-insensitive
+        if (ticket.department?.toLowerCase() !== departmentFilter.toLowerCase()) {
+          return false;
+        }
       }
       
       if (agentFilter && agentFilter !== "all" && ticket.assignedTo !== agentFilter) {

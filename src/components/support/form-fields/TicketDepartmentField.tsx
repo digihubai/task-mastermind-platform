@@ -20,9 +20,9 @@ export const TicketDepartmentField: React.FC<TicketDepartmentFieldProps> = ({
   onChange,
   availableDepartments = ["Support", "Sales", "Billing", "Product", "Technical"]
 }) => {
-  // Use provided departments
+  // Map departments to consistent format - preserve original label but lowercase value for comparison
   const departments = availableDepartments.map(dept => ({ 
-    value: dept, 
+    value: dept.toLowerCase(), 
     label: dept 
   }));
 
