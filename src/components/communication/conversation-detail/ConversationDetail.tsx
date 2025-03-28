@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
-import { BadgeHelp, MoreHorizontal, ThumbsUp, User } from 'lucide-react';
+import { BadgeHelp, MoreHorizontal, ThumbsUp, User, UserRound, Eye } from 'lucide-react';
 import { Conversation, Message } from '@/types/omnichannel';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
@@ -21,13 +21,15 @@ interface ConversationDetailProps {
   messages: Message[];
   onSendMessage: (message: string) => void;
   onAssignToHuman: () => void;
+  onViewProfile: () => void;
 }
 
 const ConversationDetail: React.FC<ConversationDetailProps> = ({
   selectedConversation,
   messages,
   onSendMessage,
-  onAssignToHuman
+  onAssignToHuman,
+  onViewProfile
 }) => {
   const [satisfaction, setSatisfaction] = useState<number | null>(null);
   
@@ -51,6 +53,11 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
 
   // Calculate customer satisfaction if available
   const satisfactionPercentage = satisfaction !== null ? satisfaction : 85;
+
+  // Get conversation-specific messages
+  const conversationMessages = messages.filter(
+    message => message.conversationId === selectedConversation.id
+  );
 
   return (
     <Card className="h-full flex flex-col">
@@ -79,23 +86,33 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
               </div>
             </div>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => onAssignToHuman()}>
-                <User className="h-4 w-4 mr-2" />
-                Assign to human
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <ThumbsUp className="h-4 w-4 mr-2" />
-                Mark as resolved
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex">
+            <Button variant="ghost" size="sm" onClick={onViewProfile} className="mr-2">
+              <Eye className="h-4 w-4 mr-2" />
+              View Profile
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => onAssignToHuman()}>
+                  <User className="h-4 w-4 mr-2" />
+                  Assign to human
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <ThumbsUp className="h-4 w-4 mr-2" />
+                  Mark as resolved
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <UserRound className="h-4 w-4 mr-2" />
+                  Update satisfaction
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </CardHeader>
       
@@ -105,7 +122,7 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
         </div>
         
         <MessageList 
-          messages={messages} 
+          messages={conversationMessages.length > 0 ? conversationMessages : messages} 
           className="flex-1 overflow-y-auto p-4"
         />
         
