@@ -11,6 +11,7 @@ interface ChatInterfaceProps {
   };
   variant: "embedded" | "fullscreen";
   showBranding?: boolean;
+  accentColor?: string; // Add the accentColor prop
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -18,12 +19,16 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   config,
   variant,
   showBranding = true,
+  accentColor = "#2196F3", // Use a default blue color
 }) => {
   return (
     <div className={`chat-interface ${variant === "embedded" ? "h-[500px] w-full" : "h-full w-full"} border rounded-lg bg-background`}>
-      <div className="chat-header p-3 border-b flex items-center justify-between">
+      <div className="chat-header p-3 border-b flex items-center justify-between" style={{ borderColor: accentColor }}>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
+          <div 
+            className="w-8 h-8 rounded-full flex items-center justify-center text-primary-foreground"
+            style={{ backgroundColor: accentColor }}
+          >
             {title.substring(0, 1).toUpperCase()}
           </div>
           <h3 className="font-medium">{title}</h3>
@@ -47,8 +52,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             disabled
           />
           <button 
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-primary"
+            className="absolute right-2 top-1/2 -translate-y-1/2"
             disabled
+            style={{ color: accentColor }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="m22 2-7 20-4-9-9-4Z"/>
