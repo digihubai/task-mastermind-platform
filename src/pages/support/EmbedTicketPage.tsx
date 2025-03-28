@@ -14,7 +14,7 @@ const EmbedTicketPage = () => {
     customTitle: "Support Request",
     customDescription: "Submit a new support request and we'll get back to you as soon as possible.",
     compact: false,
-    theme: 'auto' as const,
+    theme: 'auto' as 'light' | 'dark' | 'auto',
     showAiSupportOption: true,
     availableCategories: ["General", "Technical", "Billing", "Feature Request"],
     availableDepartments: ["Support", "Sales", "Billing", "Product"],
