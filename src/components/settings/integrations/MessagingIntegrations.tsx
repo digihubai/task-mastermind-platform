@@ -3,17 +3,17 @@ import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Mail, MessageCircle } from "lucide-react";
-import EmailIntegration from "./integrations/messaging/EmailIntegration";
-import TwilioIntegration from "./integrations/messaging/TwilioIntegration";
-import WhatsAppIntegration from "./integrations/messaging/WhatsAppIntegration";
-import MessengerIntegration from "./integrations/messaging/MessengerIntegration";
-import SMSIntegration from "./integrations/messaging/SMSIntegration";
-import ViberIntegration from "./integrations/messaging/ViberIntegration";
-import LineIntegration from "./integrations/messaging/LineIntegration";
-import InstagramIntegration from "./integrations/messaging/InstagramIntegration";
-import TwitterIntegration from "./integrations/messaging/TwitterIntegration";
-import LiveChatIntegration from "./integrations/messaging/LiveChatIntegration";
-import { useMessagingService } from "./integrations/messaging/utils";
+import EmailIntegration from "@/components/settings/integrations/messaging/EmailIntegration";
+import TwilioIntegration from "@/components/settings/integrations/messaging/TwilioIntegration";
+import WhatsAppIntegration from "@/components/settings/integrations/messaging/WhatsAppIntegration";
+import MessengerIntegration from "@/components/settings/integrations/messaging/MessengerIntegration";
+import SMSIntegration from "@/components/settings/integrations/messaging/SMSIntegration";
+import ViberIntegration from "@/components/settings/integrations/messaging/ViberIntegration";
+import LineIntegration from "@/components/settings/integrations/messaging/LineIntegration";
+import InstagramIntegration from "@/components/settings/integrations/messaging/InstagramIntegration";
+import TwitterIntegration from "@/components/settings/integrations/messaging/TwitterIntegration";
+import LiveChatIntegration from "@/components/settings/integrations/messaging/LiveChatIntegration";
+import { useMessagingService } from "@/components/settings/integrations/messaging/utils";
 
 interface MessagingIntegrationsProps {
   onConnect?: (service: string) => void;

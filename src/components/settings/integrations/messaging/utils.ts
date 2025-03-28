@@ -1,64 +1,76 @@
 
-import { useToast } from "@/hooks/use-toast";
-import { Dispatch, SetStateAction } from "react";
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
-export const getServiceName = (service: string): string => {
-  const serviceNames: {[key: string]: string} = {
-    whatsapp: "WhatsApp Business",
-    messenger: "Facebook Messenger",
-    twitter: "Twitter",
-    telegram: "Telegram",
-    slack: "Slack",
+export const getServiceName = (serviceId: string): string => {
+  const serviceNames: Record<string, string> = {
     email: "Email",
     twilio: "Twilio",
+    whatsapp: "WhatsApp",
+    messenger: "Facebook Messenger",
+    sms: "SMS",
     viber: "Viber",
     line: "LINE",
     livechat: "Live Chat",
     instagram: "Instagram",
-    sms: "SMS"
+    twitter: "Twitter/X"
   };
-  return serviceNames[service] || service;
+  
+  return serviceNames[serviceId] || serviceId;
 };
 
 export const useMessagingService = () => {
   const { toast } = useToast();
   
   const simulateConnection = (
-    service: string, 
-    setConnecting: Dispatch<SetStateAction<string | null>>,
-    setConnected: Dispatch<SetStateAction<Record<string, boolean>>>,
-    connected: Record<string, boolean>,
+    serviceId: string, 
+    setConnecting: React.Dispatch<React.SetStateAction<string | null>>, 
+    setConnected: React.Dispatch<React.SetStateAction<Record<string, boolean>>>, 
+    currentConnected: Record<string, boolean>,
     onConnect?: (service: string) => void
   ) => {
-    setConnecting(service);
+    // Start loading
+    setConnecting(serviceId);
     
+    // Simulate API call
     setTimeout(() => {
       setConnecting(null);
-      setConnected(prev => ({...prev, [service]: true}));
+      
+      // Update connected state
+      setConnected(prevState => ({
+        ...prevState,
+        [serviceId]: true
+      }));
+      
+      // Show success message
       toast({
-        title: "Connection Successful",
-        description: `Your ${getServiceName(service)} account has been connected successfully.`,
+        title: "Connection successful",
+        description: `${getServiceName(serviceId)} has been connected successfully.`,
       });
       
+      // Call the onConnect callback if provided
       if (onConnect) {
-        onConnect(service);
+        onConnect(serviceId);
       }
     }, 1500);
   };
-  
+
   const handleDisconnect = (
-    service: string,
-    setConnected: Dispatch<SetStateAction<Record<string, boolean>>>,
-    connected: Record<string, boolean>
+    serviceId: string, 
+    setConnected: React.Dispatch<React.SetStateAction<Record<string, boolean>>>, 
+    currentConnected: Record<string, boolean>
   ) => {
-    setConnected(prev => ({...prev, [service]: false}));
+    setConnected(prevState => ({
+      ...prevState,
+      [serviceId]: false
+    }));
     
     toast({
       title: "Disconnected",
-      description: `Your ${getServiceName(service)} account has been disconnected.`,
+      description: `${getServiceName(serviceId)} has been disconnected.`,
     });
   };
-  
+
   return {
     simulateConnection,
     handleDisconnect
