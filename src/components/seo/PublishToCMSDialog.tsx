@@ -13,10 +13,16 @@ import { toast } from 'sonner';
 interface PublishToCMSDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  seoData: any;
+  seoData?: any; // Keep for backward compatibility
+  seoContent?: {
+    title: string;
+    content: string;
+    keywords: string[];
+    images: string[];
+  };
 }
 
-const PublishToCMSDialog: React.FC<PublishToCMSDialogProps> = ({ isOpen, onClose, seoData }) => {
+const PublishToCMSDialog: React.FC<PublishToCMSDialogProps> = ({ isOpen, onClose, seoData, seoContent }) => {
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishMode, setPublishMode] = useState('now');
   const [selectedPlatform, setSelectedPlatform] = useState('wordpress');
@@ -28,6 +34,9 @@ const PublishToCMSDialog: React.FC<PublishToCMSDialogProps> = ({ isOpen, onClose
   const [includeFeaturedImage, setIncludeFeaturedImage] = useState(true);
   const [enableComments, setEnableComments] = useState(true);
   const [addTags, setAddTags] = useState(true);
+  
+  // Get content from either seoContent or seoData
+  const content = seoContent || seoData;
   
   const handlePublish = () => {
     if (publishMode === 'schedule' && (!scheduledDate || !scheduledTime)) {
@@ -93,7 +102,7 @@ const PublishToCMSDialog: React.FC<PublishToCMSDialogProps> = ({ isOpen, onClose
             </Label>
             <Input
               id="title"
-              value={seoData.selectedTitle}
+              value={content?.title || ""}
               className="col-span-3"
               readOnly
             />

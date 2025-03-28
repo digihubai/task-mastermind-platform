@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,7 +42,6 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
     setIsLoadingLinks(true);
     
     try {
-      // Fetch both internal and external links in parallel
       const [internal, external] = await Promise.all([
         fetchInternalLinks(),
         fetchRelatedExternalLinks(seoData.topic, seoData.selectedKeywords)
@@ -166,7 +164,6 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
         )}
       </div>
       
-      {/* Publish to CMS Dialog */}
       {isPublishDialogOpen && (
         <PublishToCMSDialog 
           isOpen={isPublishDialogOpen} 
@@ -180,7 +177,6 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
         />
       )}
       
-      {/* Add Links Dialog */}
       <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
