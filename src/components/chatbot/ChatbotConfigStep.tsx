@@ -51,13 +51,18 @@ export const ChatbotConfigStep: React.FC<ChatbotConfigStepProps> = ({
   ];
   
   const colorOptions = [
-    { id: "black", color: "#202123" },
-    { id: "green", color: "#4CAF50" },
-    { id: "orange", color: "#FF9800" },
-    { id: "purple", color: "#9C27B0" },
-    { id: "blue", color: "#2196F3" },
-    { id: "custom", color: "multicolor" },
+    { id: "blue", color: "#2196F3", label: "Blue" },
+    { id: "green", color: "#4CAF50", label: "Green" },
+    { id: "orange", color: "#FF9800", label: "Orange" },
+    { id: "purple", color: "#9C27B0", label: "Purple" },
+    { id: "black", color: "#202123", label: "Black" },
+    { id: "red", color: "#F44336", label: "Red" },
   ];
+  
+  // Function to handle direct color input changes
+  const handleColorInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewChatbotInfo({...newChatbotInfo, color: e.target.value});
+  };
   
   switch (step) {
     case 1:
@@ -143,7 +148,7 @@ export const ChatbotConfigStep: React.FC<ChatbotConfigStepProps> = ({
         <div className="space-y-6">
           <h2 className="text-2xl font-semibold">Customize</h2>
           <p className="text-muted-foreground">
-            Create and configure a chatbot that interacts with your users, ensuring it delivers accurate information.
+            Customize the look and feel of your chatbot to match your brand.
           </p>
           
           <div className="space-y-6 mt-6">
@@ -207,7 +212,7 @@ export const ChatbotConfigStep: React.FC<ChatbotConfigStepProps> = ({
             <div className="space-y-2">
               <Label>Color</Label>
               <p className="text-sm text-muted-foreground mb-2">Choose an accent color that represents your brand.</p>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 flex-wrap mb-4">
                 {colorOptions.map((colorOpt) => (
                   <div 
                     key={colorOpt.id}
@@ -217,9 +222,9 @@ export const ChatbotConfigStep: React.FC<ChatbotConfigStepProps> = ({
                         : ''
                     }`}
                     style={{ 
-                      backgroundColor: colorOpt.color !== 'multicolor' ? colorOpt.color : undefined,
-                      background: colorOpt.color === 'multicolor' ? 'linear-gradient(90deg, #f44336, #ff9800, #ffeb3b, #4caf50, #2196f3, #9c27b0)' : undefined
+                      backgroundColor: colorOpt.color
                     }}
+                    title={colorOpt.label}
                     onClick={() => setNewChatbotInfo({...newChatbotInfo, color: colorOpt.color})}
                   >
                     {newChatbotInfo.color === colorOpt.color && (
@@ -227,6 +232,24 @@ export const ChatbotConfigStep: React.FC<ChatbotConfigStepProps> = ({
                     )}
                   </div>
                 ))}
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Label htmlFor="custom-color">Custom Color</Label>
+                <input 
+                  type="color"
+                  id="custom-color"
+                  value={newChatbotInfo.color}
+                  onChange={handleColorInputChange}
+                  className="cursor-pointer w-8 h-8 p-0 border-0 rounded-md"
+                />
+                <Input
+                  type="text"
+                  value={newChatbotInfo.color}
+                  onChange={handleColorInputChange}
+                  placeholder="#2196F3"
+                  className="w-32"
+                />
               </div>
             </div>
             
@@ -264,7 +287,7 @@ export const ChatbotConfigStep: React.FC<ChatbotConfigStepProps> = ({
             </div>
             
             <div className="space-y-2">
-              <Label>Trigger Avatar Size</Label>
+              <Label>Trigger Avatar Size ({newChatbotInfo.triggerSize}px)</Label>
               <div className="flex items-center gap-4">
                 <Slider
                   value={[newChatbotInfo.triggerSize]}
@@ -282,7 +305,7 @@ export const ChatbotConfigStep: React.FC<ChatbotConfigStepProps> = ({
               <Label>Position</Label>
               <div className="grid grid-cols-2 gap-4">
                 <div 
-                  className={`border rounded-md p-4 flex items-center justify-center cursor-pointer ${
+                  className={`border rounded-md p-4 flex flex-col items-center justify-center cursor-pointer ${
                     newChatbotInfo.position === 'left' ? 'bg-muted' : ''
                   }`}
                   onClick={() => setNewChatbotInfo({...newChatbotInfo, position: 'left'})}
@@ -290,23 +313,18 @@ export const ChatbotConfigStep: React.FC<ChatbotConfigStepProps> = ({
                   <div className="relative w-28 h-20 bg-muted/40 rounded">
                     <div className="absolute left-1 bottom-1 w-6 h-6 bg-gray-400 rounded-full"></div>
                   </div>
-                  <div className="mt-2 text-center text-sm">Left</div>
+                  <div className="mt-2 text-sm text-center">Left</div>
                 </div>
                 <div 
-                  className={`border rounded-md p-4 flex items-center justify-center cursor-pointer ${
+                  className={`border rounded-md p-4 flex flex-col items-center justify-center cursor-pointer ${
                     newChatbotInfo.position === 'right' ? 'bg-muted' : ''
                   }`}
                   onClick={() => setNewChatbotInfo({...newChatbotInfo, position: 'right'})}
                 >
                   <div className="relative w-28 h-20 bg-muted/40 rounded">
                     <div className="absolute right-1 bottom-1 w-6 h-6 bg-gray-400 rounded-full"></div>
-                    {newChatbotInfo.position === 'right' && (
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <Check className="h-5 w-5 text-primary" />
-                      </div>
-                    )}
                   </div>
-                  <div className="mt-2 text-center text-sm">Right</div>
+                  <div className="mt-2 text-sm text-center">Right</div>
                 </div>
               </div>
             </div>

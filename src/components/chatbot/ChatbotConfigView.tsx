@@ -100,7 +100,7 @@ export const ChatbotConfigView: React.FC<ChatbotConfigViewProps> = ({
         </div>
         
         <div className="hidden lg:block">
-          <div className="bg-muted/50 rounded-lg h-full flex items-center justify-center p-6">
+          <div className="bg-muted/50 rounded-lg h-full flex items-center justify-center p-6 relative">
             <ChatInterface 
               title={newChatbotInfo.title || "digibot"}
               config={{
@@ -112,6 +112,9 @@ export const ChatbotConfigView: React.FC<ChatbotConfigViewProps> = ({
               variant="embedded"
               showBranding={newChatbotInfo.showLogo}
               accentColor={newChatbotInfo.color}
+              triggerSize={newChatbotInfo.triggerSize}
+              transparentTrigger={newChatbotInfo.transparentTrigger}
+              avatar={newChatbotInfo.avatar}
             />
           </div>
         </div>
