@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronDown } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface OutlineGeneratorProps {
   seoData: any;
@@ -23,43 +25,45 @@ const OutlineGenerator: React.FC<OutlineGeneratorProps> = ({
     <Card className="p-6 border border-border/40">
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Outline Topic (Optional)</label>
+          <Label className="text-sm font-medium">Outline Topic (Optional)</Label>
           <Textarea 
             placeholder="Explain your idea"
             value={seoData.outlineTopic || seoData.topic || ""}
             onChange={(e) => onDataChange("outlineTopic", e.target.value)}
-            className="min-h-[100px]"
+            className="min-h-[100px] mt-1"
           />
         </div>
         
         <div>
-          <label className="block text-sm font-medium mb-1">Keywords</label>
+          <Label className="text-sm font-medium">Keywords</Label>
           <Input 
             value={(seoData.selectedKeywords || []).join(", ")}
             disabled
-            className="bg-muted"
+            className="bg-muted mt-1"
           />
         </div>
         
         <div>
-          <label className="block text-sm font-medium mb-1">Number of Subtitles</label>
+          <Label className="text-sm font-medium">Number of Subtitles</Label>
           <Input 
             type="number" 
             value={seoData.subtitleCount || 10}
             onChange={(e) => onDataChange("subtitleCount", parseInt(e.target.value))}
             min={3}
             max={15}
+            className="mt-1"
           />
         </div>
         
         <div>
-          <label className="block text-sm font-medium mb-1">Number of Outlines</label>
+          <Label className="text-sm font-medium">Number of Outlines</Label>
           <Input 
             type="number" 
             value={seoData.outlineCount || 3}
             onChange={(e) => onDataChange("outlineCount", parseInt(e.target.value))}
             min={1}
             max={5}
+            className="mt-1"
           />
         </div>
         
@@ -76,32 +80,40 @@ const OutlineGenerator: React.FC<OutlineGeneratorProps> = ({
           {seoData.showAdvancedOptions && (
             <div className="mt-3 space-y-3 border-t pt-3">
               <div>
-                <label className="block text-sm font-medium mb-1">Outline Style</label>
-                <select 
-                  className="w-full p-2 border rounded-md"
-                  onChange={(e) => onDataChange("outlineStyle", e.target.value)}
-                  value={seoData.outlineStyle || "comprehensive"}
+                <Label className="text-sm font-medium">Outline Style</Label>
+                <Select 
+                  defaultValue={seoData.outlineStyle || "comprehensive"}
+                  onValueChange={(value) => onDataChange("outlineStyle", value)}
                 >
-                  <option value="comprehensive">Comprehensive</option>
-                  <option value="concise">Concise</option>
-                  <option value="technical">Technical</option>
-                  <option value="creative">Creative</option>
-                  <option value="academic">Academic</option>
-                </select>
+                  <SelectTrigger className="w-full mt-1">
+                    <SelectValue placeholder="Select style" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="comprehensive">Comprehensive</SelectItem>
+                    <SelectItem value="concise">Concise</SelectItem>
+                    <SelectItem value="technical">Technical</SelectItem>
+                    <SelectItem value="creative">Creative</SelectItem>
+                    <SelectItem value="academic">Academic</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-1">Audience Level</label>
-                <select 
-                  className="w-full p-2 border rounded-md"
-                  onChange={(e) => onDataChange("audienceLevel", e.target.value)}
-                  value={seoData.audienceLevel || "intermediate"}
+                <Label className="text-sm font-medium">Audience Level</Label>
+                <Select 
+                  defaultValue={seoData.audienceLevel || "intermediate"}
+                  onValueChange={(value) => onDataChange("audienceLevel", value)}
                 >
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                  <option value="expert">Expert</option>
-                </select>
+                  <SelectTrigger className="w-full mt-1">
+                    <SelectValue placeholder="Select audience level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                    <SelectItem value="expert">Expert</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           )}
@@ -110,7 +122,7 @@ const OutlineGenerator: React.FC<OutlineGeneratorProps> = ({
         <Button 
           onClick={onGenerateOutlines} 
           disabled={isGenerating || !seoData.selectedTitle}
-          className="w-full bg-purple-800 hover:bg-purple-900 text-white"
+          className="w-full bg-primary hover:bg-primary/90 text-white"
         >
           {isGenerating ? "Generating Outlines..." : "Generate Outline"}
         </Button>

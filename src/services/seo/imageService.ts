@@ -1,8 +1,9 @@
 
 /**
  * This service handles image generation and search for SEO content
- * In a production environment, this would connect to actual image APIs
  */
+
+import { toast } from "sonner";
 
 // For fetching stock photos from various services
 export const searchStockPhotos = async (
@@ -12,35 +13,40 @@ export const searchStockPhotos = async (
 ) => {
   console.log(`Searching for ${count} ${source} photos with query: ${query}`);
   
-  // This is a mock implementation
-  // In production, this would call actual APIs with proper authentication
-  
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  // Generate mock results that would come from the API
-  const images = [];
-  
-  // Sanitize the query to make it URL-friendly
-  const sanitizedQuery = query.replace(/\s+/g, '+').trim();
-  
-  for (let i = 0; i < count; i++) {
-    // Using Unsplash source API as a placeholder
-    // In production you would use the actual API endpoints with auth
-    const randomParam = `${Date.now()}-${Math.random()}-${i}`;
+  try {
+    // This is a mock implementation
+    // In production, this would call actual APIs with proper authentication
     
-    // Different dimensions for variety
-    const dimensions = i % 2 === 0 ? '800x600' : '900x600';
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
     
-    if (sanitizedQuery) {
-      images.push(`https://source.unsplash.com/random/${dimensions}?${sanitizedQuery}&sig=${randomParam}`);
-    } else {
-      // Fallback to general images if no query
-      images.push(`https://source.unsplash.com/random/${dimensions}?digital+marketing&sig=${randomParam}`);
+    // Generate results that would come from the API
+    const images = [];
+    
+    // Sanitize the query to make it URL-friendly
+    const sanitizedQuery = query.replace(/\s+/g, '+').trim();
+    
+    for (let i = 0; i < count; i++) {
+      // Generate a unique image for each request using parameters
+      const randomParam = `${Date.now()}-${Math.random()}-${i}`;
+      
+      // Different dimensions for variety
+      const dimensions = i % 2 === 0 ? '800x600' : '900x600';
+      
+      if (sanitizedQuery) {
+        images.push(`https://source.unsplash.com/random/${dimensions}?${sanitizedQuery}&sig=${randomParam}`);
+      } else {
+        // Fallback to general images if no query
+        images.push(`https://source.unsplash.com/random/${dimensions}?digital+marketing&sig=${randomParam}`);
+      }
     }
+    
+    return images;
+  } catch (error) {
+    console.error("Error searching stock photos:", error);
+    toast.error("Failed to search for stock photos");
+    throw error;
   }
-  
-  return images;
 };
 
 // For generating AI images
@@ -51,38 +57,44 @@ export const generateAIImages = async (
 ) => {
   console.log(`Generating ${count} AI images with prompt: ${prompt}`);
   
+  if (!prompt || prompt.trim().length < 3) {
+    toast.error("Please provide a more descriptive prompt for image generation");
+    return [];
+  }
+  
   try {
-    // This is a mock implementation
-    // In production, this would call an AI image generation API like DALL-E, Midjourney, etc.
+    const response = await fetch('/api/generate-image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        prompt, 
+        count,
+        size
+      }),
+    });
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Determine dimensions based on size
-    let dimensions = '800x800'; // square default
-    if (size === 'landscape') dimensions = '1280x720';
-    if (size === 'portrait') dimensions = '768x1024';
-    if (size === 'widescreen') dimensions = '1920x840';
-    
-    // Generate mock results that would come from the API
-    const images = [];
-    
-    // Sanitize the prompt to make it URL-friendly
-    const sanitizedPrompt = prompt.trim().replace(/\s+/g, '+');
-    const searchTerms = sanitizedPrompt || 'business+professional+marketing';
-    
-    for (let i = 0; i < count; i++) {
-      // Using Unsplash source API as a placeholder
-      // In production you would use actual AI generation APIs
-      // Adding a random parameter to force different images
-      const randomParam = `${Date.now()}-${Math.random()}-${i}`;
-      images.push(`https://source.unsplash.com/random/${dimensions}?${searchTerms}&sig=${randomParam}`);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to generate images");
     }
     
-    return images;
+    const data = await response.json();
+    
+    if (!data.imageUrls || !Array.isArray(data.imageUrls) || data.imageUrls.length === 0) {
+      // Fallback to stock photos if the AI generation fails
+      console.log("AI image generation didn't return valid images, falling back to stock photos");
+      return searchStockPhotos(prompt, 'unsplash', count);
+    }
+    
+    return data.imageUrls;
   } catch (error) {
     console.error("Error generating AI images:", error);
-    throw new Error("Failed to generate AI images. Please try again.");
+    toast.error("Failed to generate AI images. Falling back to stock photos.");
+    
+    // Fallback to stock photos if there's an error
+    return searchStockPhotos(prompt, 'unsplash', count);
   }
 };
 

@@ -22,6 +22,3 @@ export const fetchSEOAnalytics = async (): Promise<SEOAnalytics> => {
     ]
   };
 };
-
-// Re-export the type properly
-export type { SEOAnalytics };

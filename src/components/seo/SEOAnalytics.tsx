@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Globe, Search, Link, ChevronDown, Loader, BarChart3 } from "lucide-react";
 import { fetchSEOAnalytics } from "@/services/seo/analyticsService";
 import type { SEOAnalytics as SEOAnalyticsType } from "@/services/seo/types";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const SEOAnalytics: React.FC = () => {
   const [analytics, setAnalytics] = useState<SEOAnalyticsType | null>(null);
@@ -96,11 +97,13 @@ const SEOAnalytics: React.FC = () => {
       <div className="border-t pt-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium">Top Performing Keywords</h3>
-          <div className="flex items-center">
-            <Button variant="outline" size="sm" className="flex items-center gap-1">
-              Last {timeframe === "30days" ? "30" : timeframe === "90days" ? "90" : "7"} Days <ChevronDown size={14} />
-            </Button>
-          </div>
+          <Tabs value={timeframe} onValueChange={setTimeframe}>
+            <TabsList>
+              <TabsTrigger value="7days">7 Days</TabsTrigger>
+              <TabsTrigger value="30days">30 Days</TabsTrigger>
+              <TabsTrigger value="90days">90 Days</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
         
         <div className="overflow-hidden border rounded-lg">

@@ -9,4 +9,4 @@ export * from './imageService';
 export * from './campaignService';
 // Export analyticsService separately to avoid name conflicts
 export { fetchSEOAnalytics } from './analyticsService';
-export type { SEOAnalytics } from './analyticsService';
+export type { SEOAnalytics } from './types';
