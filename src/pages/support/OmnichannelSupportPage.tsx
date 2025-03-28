@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +14,7 @@ import AIAssistantSettings from '@/components/support/AIAssistantSettings';
 import { mockConversations } from '@/components/communication/mock-data';
 import { Conversation } from '@/types/omnichannel';
 import { Badge } from "@/components/ui/badge";
+import IntegrationStatus from '@/components/communication/IntegrationStatus';
 
 const mockTickets: SupportTicket[] = [
   {
@@ -99,18 +99,15 @@ const OmnichannelSupportPage: React.FC = () => {
   };
   
   const handleAssignToHuman = (assignedConversation: Conversation) => {
-    // Find and update the conversation in the human assigned list
     const existingIndex = humanAssignedConversations.findIndex(
       c => c.id === assignedConversation.id
     );
     
     if (existingIndex >= 0) {
-      // Update existing conversation
       const updatedAssignments = [...humanAssignedConversations];
       updatedAssignments[existingIndex] = assignedConversation;
       setHumanAssignedConversations(updatedAssignments);
     } else {
-      // Add new conversation to the list
       setHumanAssignedConversations([...humanAssignedConversations, assignedConversation]);
     }
     
@@ -125,7 +122,6 @@ const OmnichannelSupportPage: React.FC = () => {
   };
   
   const handleTakeOverConversation = (conversationId: string) => {
-    // In a real app, this would update the backend
     setHumanAssignedConversations(
       humanAssignedConversations.map(conv => 
         conv.id === conversationId 
@@ -166,7 +162,14 @@ const OmnichannelSupportPage: React.FC = () => {
           <AIAssistantSettings onClose={() => setShowSettings(false)} />
         ) : (
           <>
-            <SupportStats />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="md:col-span-3">
+                <SupportStats />
+              </div>
+              <div className="md:col-span-1">
+                <IntegrationStatus />
+              </div>
+            </div>
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
               <TabsList className="w-full max-w-md">
@@ -227,7 +230,6 @@ const OmnichannelSupportPage: React.FC = () => {
                                     </Badge>
                                   )}
                                   
-                                  {/* Show assignment information clearly */}
                                   {conv.assignedHumanAgent && (
                                     <span className="text-xs bg-slate-100 px-2 py-1 rounded-md">
                                       Agent: <span className="font-medium">{conv.assignedHumanAgent}</span>

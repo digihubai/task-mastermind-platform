@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+
+import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { 
@@ -7,7 +8,11 @@ import {
   Smile, 
   Save,
   FileText,
-  X
+  X,
+  Phone,
+  Mic,
+  PhoneCall,
+  Video
 } from "lucide-react";
 import { 
   Popover, 
@@ -17,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { savedReplies } from '../mock-data';
+import { toast } from "@/hooks/use-toast";
 
 interface MessageInputProps {
   onSendMessage: (message: string) => void;
@@ -26,6 +32,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
   const [message, setMessage] = useState('');
   const [showSavedReplies, setShowSavedReplies] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSend = () => {
@@ -62,6 +69,40 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
       textareaRef.current.focus();
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
+  
+  const handleStartVoiceCall = () => {
+    toast({
+      title: "Starting voice call",
+      description: "Initiating voice call with the customer...",
+    });
+    // In a real app, this would connect to a service like Twilio to initiate a call
+  };
+  
+  const handleStartVideoCall = () => {
+    toast({
+      title: "Starting video call",
+      description: "Initiating video call with the customer...",
+    });
+    // In a real app, this would connect to a video conferencing service
+  };
+  
+  const toggleVoiceRecording = () => {
+    if (isRecording) {
+      setIsRecording(false);
+      toast({
+        title: "Voice message recorded",
+        description: "Your voice message has been recorded and will be sent.",
+      });
+      // In a real app, this would process the voice recording and send it
+    } else {
+      setIsRecording(true);
+      toast({
+        title: "Recording voice message",
+        description: "Speak now to record your message. Click again to stop recording.",
+      });
+      // In a real app, this would start recording audio
     }
   };
 
@@ -137,12 +178,44 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
           </div>
         </div>
         <div className="flex gap-1">
-          <Button variant="ghost" size="icon" className="text-muted-foreground">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className={`text-muted-foreground ${isRecording ? 'text-red-500 bg-red-50 dark:bg-red-900/20' : ''}`}
+            onClick={toggleVoiceRecording}
+            title="Record voice message"
+          >
+            <Mic className="h-5 w-5" />
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-muted-foreground"
+            onClick={handleStartVoiceCall}
+            title="Start voice call"
+          >
+            <Phone className="h-5 w-5" />
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-muted-foreground"
+            onClick={handleStartVideoCall}
+            title="Start video call"
+          >
+            <Video className="h-5 w-5" />
+          </Button>
+        
+          <Button variant="ghost" size="icon" className="text-muted-foreground" title="Attach file">
             <Paperclip className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="text-muted-foreground">
+          
+          <Button variant="ghost" size="icon" className="text-muted-foreground" title="Add emoji">
             <Smile className="h-5 w-5" />
           </Button>
+          
           <Button onClick={handleSend}>
             <Send className="h-4 w-4 mr-1" />
             Send

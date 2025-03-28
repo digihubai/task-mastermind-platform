@@ -1,76 +1,142 @@
 
 import React from 'react';
-import { Avatar } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowUpRight, MessageSquare, Mail, Phone, AlertCircle } from "lucide-react";
-import type { Conversation } from "@/types/omnichannel";
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  MoreVertical,
+  UserPlus,
+  Bot,
+  User,
+  MessageSquare,
+  Mail,
+  Phone,
+  Video,
+  Link2,
+  Globe,
+  MessagesSquare
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Conversation } from '@/types/omnichannel';
 
 interface ConversationHeaderProps {
-  conversation: Conversation | undefined;
+  conversation: Conversation;
   onAssignToHuman: () => void;
 }
 
 const getChannelIcon = (channel: string) => {
-  switch (channel.toLowerCase()) {
-    case 'email':
-      return <Mail size={14} className="mr-1" />;
-    case 'phone':
-    case 'sms':
-      return <Phone size={14} className="mr-1" />;
-    case 'chat':
+  switch (channel) {
     case 'website':
+      return <Globe className="h-4 w-4" />;
+    case 'email':
+      return <Mail className="h-4 w-4" />;
+    case 'whatsapp':
+      return <MessageSquare className="h-4 w-4" />;
+    case 'messenger':
+      return <MessagesSquare className="h-4 w-4" />;
+    case 'telegram':
+      return <Link2 className="h-4 w-4" />;
+    case 'slack':
+      return <MessageSquare className="h-4 w-4" />;
+    case 'sms':
+      return <MessageSquare className="h-4 w-4" />;
+    case 'voice':
+      return <Phone className="h-4 w-4" />;
+    case 'video':
+      return <Video className="h-4 w-4" />;
     default:
-      return <MessageSquare size={14} className="mr-1" />;
+      return <MessageSquare className="h-4 w-4" />;
   }
 };
 
-const ConversationHeader: React.FC<ConversationHeaderProps> = ({
-  conversation,
-  onAssignToHuman
-}) => {
-  if (!conversation) return null;
+const getChannelName = (channel: string) => {
+  switch (channel) {
+    case 'website':
+      return 'Website Chat';
+    case 'email':
+      return 'Email';
+    case 'whatsapp':
+      return 'WhatsApp';
+    case 'messenger':
+      return 'Facebook Messenger';
+    case 'telegram':
+      return 'Telegram';
+    case 'slack':
+      return 'Slack';
+    case 'sms':
+      return 'SMS';
+    case 'voice':
+      return 'Voice Call';
+    case 'video':
+      return 'Video Call';
+    default:
+      return channel.charAt(0).toUpperCase() + channel.slice(1);
+  }
+};
 
-  const isAlreadyAssignedToHuman = conversation.assignmentStatus === 'waiting_for_human' || 
-                                  conversation.assignmentStatus === 'assigned_to_human';
+const ConversationHeader: React.FC<ConversationHeaderProps> = ({ 
+  conversation,
+  onAssignToHuman 
+}) => {
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  const getAgentBadge = () => {
+    if (conversation.isAiHandled) {
+      return (
+        <Badge variant="outline" className="ml-2 bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-400">
+          <Bot className="h-3 w-3 mr-1" />
+          AI Agent
+        </Badge>
+      );
+    } else if (conversation.agent) {
+      return (
+        <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+          <User className="h-3 w-3 mr-1" />
+          {conversation.agent}
+        </Badge>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="flex justify-between items-center">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center">
         <Avatar className="h-9 w-9">
-          <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary font-medium">
-            {conversation.name.substring(0, 2)}
-          </div>
+          <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${conversation.name}`} alt={conversation.name} />
+          <AvatarFallback>{getInitials(conversation.name)}</AvatarFallback>
         </Avatar>
-        
-        <div>
-          <div className="flex items-center gap-2">
-            <h3 className="font-medium">{conversation.name}</h3>
-            <Badge variant="outline" className="text-xs capitalize flex items-center">
-              {getChannelIcon(conversation.channel)}
-              {conversation.channel}
-            </Badge>
-            
-            {conversation.assignmentStatus === 'waiting_for_human' && (
-              <Badge variant="outline" className="text-xs bg-amber-100 text-amber-800 border-amber-300">
-                <AlertCircle size={12} className="mr-1" />
-                Waiting for human
-              </Badge>
-            )}
-            
-            {conversation.assignmentStatus === 'assigned_to_human' && (
-              <Badge variant="outline" className="text-xs bg-green-100 text-green-800 border-green-300">
-                Human assigned
-              </Badge>
-            )}
+        <div className="ml-3">
+          <div className="flex items-center">
+            <h2 className="text-sm font-semibold">{conversation.name}</h2>
+            {getAgentBadge()}
           </div>
-          <p className="text-xs text-muted-foreground">
-            Customer since January 2023 • 5 previous conversations
-            {conversation.assignedHumanAgent && (
-              <span className="ml-2 font-medium">• Assigned to: {conversation.assignedHumanAgent}</span>
-            )}
-          </p>
+          <div className="flex items-center mt-1">
+            <Badge 
+              variant="outline" 
+              className="mr-2 flex items-center gap-1 px-2 py-0.5 bg-secondary/50"
+            >
+              {getChannelIcon(conversation.channel)}
+              <span className="text-xs">{getChannelName(conversation.channel)}</span>
+            </Badge>
+            <span className="text-xs text-muted-foreground">
+              {conversation.lastUpdated || conversation.time}
+            </span>
+          </div>
         </div>
       </div>
       
@@ -78,24 +144,37 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={onAssignToHuman} 
-          disabled={isAlreadyAssignedToHuman}
-          className={`${!isAlreadyAssignedToHuman ? "bg-primary text-white hover:bg-primary/90 hover:text-white" : ""}`}
+          onClick={onAssignToHuman}
+          disabled={conversation.assignmentStatus === 'assigned_to_human'}
         >
-          <ArrowUpRight size={14} className="mr-1.5" />
-          {isAlreadyAssignedToHuman ? 'Already Assigned' : 'Assign to Human'}
+          <UserPlus className="h-4 w-4 mr-2" />
+          {conversation.isAiHandled ? 'Assign to Human' : 'Take Over'}
         </Button>
-        <Select defaultValue={conversation.status || "open"}>
-          <SelectTrigger className="w-[110px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="open">Open</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="waiting">Waiting</SelectItem>
-            <SelectItem value="closed">Closed</SelectItem>
-          </SelectContent>
-        </Select>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem>
+              <Phone className="h-4 w-4 mr-2" />
+              Start Voice Call
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Video className="h-4 w-4 mr-2" />
+              Start Video Call
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>View Customer Profile</DropdownMenuItem>
+            <DropdownMenuItem>See Previous Conversations</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Block Customer</DropdownMenuItem>
+            <DropdownMenuItem>Close Conversation</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
