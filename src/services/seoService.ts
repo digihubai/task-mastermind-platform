@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 export interface SEOCampaign {
@@ -183,19 +182,21 @@ export const fetchSEOAnalytics = async (timeframe: string): Promise<any> => {
   });
 };
 
-// Add new function to generate SEO titles
 export const generateSEOTitles = async (topic: string, keywords: string[], count: number = 5): Promise<string[]> => {
-  // Simulate API call with mock data
+  // Simulate API call with more relevant mock data
   return new Promise((resolve) => {
     setTimeout(() => {
+      // Clean the topic and extract main concept
+      const mainConcept = topic.trim().split(/\s+/).slice(0, 3).join(' ');
+      
       const titles = [
-        `${count} Essential ${topic} Strategies for Business Growth in 2023`,
-        `The Ultimate Guide to ${topic}: Boost Your ${keywords[0] || 'Results'} Today`,
-        `How to Master ${topic} and Increase Your ${keywords[1] || 'Performance'} by 200%`,
-        `${topic} Explained: A Comprehensive Guide for ${keywords[0] || 'Professionals'}`,
-        `Why ${topic} Matters for Your ${keywords[1] || 'Business'} and How to Get Started`,
-        `The Future of ${topic}: Trends and Predictions for 2023 and Beyond`,
-        `${topic} 101: Everything You Need to Know About ${keywords[0] || 'This Field'}`
+        `${count} Essential ${mainConcept} Strategies for Business Growth in 2023`,
+        `The Ultimate Guide to ${mainConcept}: Boost Your ${keywords[0] || 'Results'} Today`,
+        `How to Master ${mainConcept} and Increase Your ${keywords[1] || 'Performance'} by 200%`,
+        `${mainConcept} Explained: A Comprehensive Guide for ${keywords[0] || 'Professionals'}`,
+        `Why ${mainConcept} Matters for Your ${keywords[1] || 'Business'} and How to Get Started`,
+        `The Future of ${mainConcept}: Trends and Predictions for 2023 and Beyond`,
+        `${mainConcept} 101: Everything You Need to Know About ${keywords[0] || 'This Field'}`
       ];
       
       // Return only the requested number of titles
@@ -204,7 +205,52 @@ export const generateSEOTitles = async (topic: string, keywords: string[], count
   });
 };
 
-// Add new function to generate SEO outlines
+export const generateKeywords = async (topic: string, count: number = 10): Promise<string[]> => {
+  return new Promise((resolve) => {
+    // Extract main keywords from the topic
+    const words = topic.toLowerCase().split(/\s+/).filter(word => word.length > 3);
+    const mainWord = words[0] || "digital";
+    
+    // Create related keywords based on the topic
+    const keywordCategories = {
+      marketing: ["marketing", "advertising", "branding", "promotion", "campaign", "strategy", "audience", "conversion", "engagement", "analytics"],
+      technology: ["software", "hardware", "platform", "application", "system", "interface", "network", "database", "automation", "integration"],
+      business: ["business", "company", "enterprise", "startup", "corporation", "industry", "market", "revenue", "profit", "growth"],
+      content: ["content", "article", "blog", "guide", "tutorial", "ebook", "video", "podcast", "infographic", "webinar"],
+      seo: ["seo", "ranking", "keywords", "backlinks", "optimization", "search", "indexing", "visibility", "traffic", "algorithm"]
+    };
+    
+    // Determine which category this topic belongs to
+    let category = "marketing";
+    for (const [cat, keywords] of Object.entries(keywordCategories)) {
+      if (keywords.some(kw => topic.toLowerCase().includes(kw))) {
+        category = cat;
+        break;
+      }
+    }
+    
+    // Generate keywords based on the topic and category
+    const baseKeywords = keywordCategories[category as keyof typeof keywordCategories];
+    const generatedKeywords = baseKeywords.map(kw => {
+      // Create keyword variations combining topic words with category keywords
+      if (words.length > 1) {
+        return `${mainWord} ${kw}`;
+      }
+      return kw;
+    });
+    
+    // Add the original topic words as keywords
+    const allKeywords = [...words, ...generatedKeywords];
+    
+    // Filter out duplicates and limit to requested count
+    const uniqueKeywords = [...new Set(allKeywords)].slice(0, count);
+    
+    setTimeout(() => {
+      resolve(uniqueKeywords);
+    }, 800);
+  });
+};
+
 export const generateSEOOutlines = async (
   topic: string, 
   keywords: string[], 
@@ -271,5 +317,45 @@ export const generateSEOOutlines = async (
       
       resolve(outlines);
     }, 1500);
+  });
+};
+
+export const generateContentWithImages = async (
+  topic: string, 
+  keywords: string[], 
+  title: string,
+  outline: any,
+  images: string[]
+): Promise<string> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const content = generateMockSEOContent(topic, keywords);
+      
+      // If we have images, insert them into the content
+      let contentWithImages = content;
+      if (images && images.length > 0) {
+        const sections = contentWithImages.split('##');
+        
+        // Insert images after specific sections
+        let imageIndex = 0;
+        const enhancedSections = sections.map((section, index) => {
+          // Skip inserting image in the first (title) section
+          if (index === 0) return section;
+          
+          // Add image after this section if available
+          if (imageIndex < images.length && index % 2 === 1) {
+            const imageMarkdown = `\n\n![Image related to ${topic}](${images[imageIndex]})\n\n`;
+            imageIndex++;
+            return section + imageMarkdown;
+          }
+          
+          return section;
+        });
+        
+        contentWithImages = enhancedSections.join('##');
+      }
+      
+      resolve(contentWithImages);
+    }, 2000);
   });
 };

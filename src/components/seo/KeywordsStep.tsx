@@ -1,18 +1,13 @@
 
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { 
-  ChevronRight, 
-  ChevronLeft, 
-  RefreshCw,
-  Plus,
-  X,
-  Search
-} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { ChevronRight, Search, Info, Loader } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { generateKeywords } from "@/services/seoService";
+import { toast } from "sonner";
 
 interface KeywordsStepProps {
   topic: string;
@@ -24,213 +19,201 @@ interface KeywordsStepProps {
   onPrev: () => void;
 }
 
-const KeywordsStep: React.FC<KeywordsStepProps> = ({
-  topic,
-  keywordCount,
-  keywords,
-  selectedKeywords,
-  onDataChange,
-  onNext,
-  onPrev
+const KeywordsStep: React.FC<KeywordsStepProps> = ({ 
+  topic, 
+  keywordCount, 
+  keywords, 
+  selectedKeywords, 
+  onDataChange, 
+  onNext, 
+  onPrev 
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [customKeyword, setCustomKeyword] = useState("");
-  
-  // Generate keywords when topic changes or on initial load
+  const [loadingMessage, setLoadingMessage] = useState("Generating keywords...");
+
+  // Effect to auto-generate keywords when topic changes and it's not empty
   useEffect(() => {
-    if (topic && keywords.length === 0) {
+    if (topic.trim() && keywords.length === 0) {
       handleGenerateKeywords();
     }
   }, [topic]);
 
-  const handleGenerateKeywords = () => {
+  const handleGenerateKeywords = async () => {
     if (!topic.trim()) {
+      toast.error("Please enter a topic first");
       return;
     }
     
     setIsGenerating(true);
+    setLoadingMessage("Analyzing topic...");
     
-    // Simulate API call with mock data
-    setTimeout(() => {
-      const generatedKeywords = [
-        "digital marketing", "SEO", "content strategy", "search engine",
-        "keyword research", "backlinks", "meta description", "search ranking",
-        "organic traffic", "SERP", "landing page", "conversion rate",
-        "indexing", "mobile optimization", "page authority", "technical SEO"
+    try {
+      // Show fake progress messages for UX
+      const progressMessages = [
+        "Analyzing topic...",
+        "Identifying relevant terms...",
+        "Evaluating search volumes...",
+        "Finalizing keyword list..."
       ];
       
-      // Randomly select a subset of keywords based on the specified count
-      const shuffled = [...generatedKeywords].sort(() => 0.5 - Math.random());
-      const selected = shuffled.slice(0, keywordCount);
+      let messageIndex = 0;
+      const messageInterval = setInterval(() => {
+        messageIndex = (messageIndex + 1) % progressMessages.length;
+        setLoadingMessage(progressMessages[messageIndex]);
+      }, 800);
       
-      onDataChange("keywords", selected);
+      // Generate keywords based on the topic
+      const generatedKeywords = await generateKeywords(topic, keywordCount);
+      clearInterval(messageInterval);
+      
+      // Update the state with the generated keywords
+      onDataChange("keywords", generatedKeywords);
+      
+      // If no keywords are selected yet, select the first 3 by default
+      if (selectedKeywords.length === 0) {
+        onDataChange("selectedKeywords", generatedKeywords.slice(0, 3));
+      }
+      
+      toast.success(`Generated ${generatedKeywords.length} keywords`);
+    } catch (error) {
+      console.error("Error generating keywords:", error);
+      toast.error("Failed to generate keywords. Please try again.");
+    } finally {
       setIsGenerating(false);
-    }, 1500);
+    }
   };
   
   const handleKeywordSelect = (keyword: string) => {
-    const updatedSelection = selectedKeywords.includes(keyword)
-      ? selectedKeywords.filter(k => k !== keyword)
-      : [...selectedKeywords, keyword];
-    
-    onDataChange("selectedKeywords", updatedSelection);
-  };
-  
-  const handleAddCustomKeyword = () => {
-    if (!customKeyword.trim()) return;
-    
-    // Add to keywords list if not already there
-    if (!keywords.includes(customKeyword)) {
-      onDataChange("keywords", [...keywords, customKeyword]);
-    }
-    
-    // Add to selected keywords
-    if (!selectedKeywords.includes(customKeyword)) {
-      onDataChange("selectedKeywords", [...selectedKeywords, customKeyword]);
-    }
-    
-    setCustomKeyword("");
-  };
-  
-  const handleKeywordCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const count = parseInt(e.target.value);
-    if (count >= 1 && count <= 20) {
-      onDataChange("keywordCount", count);
+    const selected = [...selectedKeywords];
+    if (selected.includes(keyword)) {
+      onDataChange("selectedKeywords", selected.filter(k => k !== keyword));
+    } else {
+      onDataChange("selectedKeywords", [...selected, keyword]);
     }
   };
 
   return (
-    <Card className="p-6 border border-border/40">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-medium">Step 2: Keywords Selection</h2>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Keyword count:</span>
-          <Input
-            type="number"
-            value={keywordCount}
-            onChange={handleKeywordCountChange}
-            className="w-16 h-8"
-            min={1}
-            max={20}
-          />
-        </div>
-      </div>
-      
-      <div className="space-y-6">
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <div>
-              <h3 className="text-sm font-medium">Generated Keywords</h3>
-              <p className="text-xs text-muted-foreground">
-                Based on your topic: "{topic}"
-              </p>
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleGenerateKeywords}
-              disabled={isGenerating || !topic.trim()}
-            >
-              {isGenerating ? (
-                <>
-                  <RefreshCw className="mr-2 h-3 w-3 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="mr-2 h-3 w-3" />
-                  Regenerate
-                </>
-              )}
-            </Button>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <Card className="p-6 border border-border/40">
+        <h2 className="text-xl font-semibold mb-4">1. Select Topic</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">What is this article about?</label>
+            <Textarea 
+              placeholder="Describe your article topic in detail..."
+              value={topic}
+              onChange={(e) => onDataChange("topic", e.target.value)}
+              className="min-h-[120px]"
+            />
           </div>
           
-          {isGenerating ? (
-            <div className="h-32 border rounded-md flex items-center justify-center">
-              <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
-              <span className="ml-2 text-muted-foreground">Generating keywords...</span>
-            </div>
-          ) : keywords.length === 0 ? (
-            <div className="h-32 border rounded-md flex flex-col items-center justify-center text-center p-4">
-              <Search className="h-8 w-8 text-muted-foreground mb-2 opacity-50" />
-              <p className="text-muted-foreground">
-                {!topic.trim() 
-                  ? "Please enter a topic to generate keywords" 
-                  : "Click 'Regenerate' to generate keywords for your topic"}
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-wrap gap-2 mt-4">
-              {keywords.map((keyword, index) => (
-                <Badge
+          <div>
+            <label className="block text-sm font-medium mb-1">Number of Keywords</label>
+            <Input 
+              type="number" 
+              value={keywordCount.toString()}
+              onChange={(e) => onDataChange("keywordCount", parseInt(e.target.value) || 5)}
+              min={5}
+              max={20}
+            />
+          </div>
+          
+          <Button 
+            onClick={handleGenerateKeywords} 
+            disabled={!topic.trim() || isGenerating}
+            className="w-full"
+          >
+            {isGenerating ? (
+              <div className="flex items-center">
+                <Loader size={16} className="animate-spin mr-2" />
+                {loadingMessage}
+              </div>
+            ) : (
+              <>Generate Keywords</>
+            )}
+          </Button>
+          
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="advanced">
+              <AccordionTrigger>Advanced Options</AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 pt-2">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Language</label>
+                    <select className="w-full p-2 border rounded">
+                      <option value="en">English</option>
+                      <option value="es">Spanish</option>
+                      <option value="fr">French</option>
+                      <option value="de">German</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Keyword Difficulty</label>
+                    <select className="w-full p-2 border rounded">
+                      <option value="easy">Easy (0-30)</option>
+                      <option value="medium">Medium (31-60)</option>
+                      <option value="hard">Hard (61-100)</option>
+                    </select>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </Card>
+      
+      <Card className="p-6 border border-border/40">
+        <h2 className="text-xl font-semibold mb-4">2. Select Keywords</h2>
+        
+        {isGenerating ? (
+          <div className="flex flex-col items-center justify-center h-[300px] text-center text-muted-foreground">
+            <Loader size={40} className="animate-spin mb-4 opacity-70" />
+            <h3 className="text-lg font-medium mb-1">{loadingMessage}</h3>
+            <p className="max-w-xs">We're finding the best keywords for your topic.</p>
+          </div>
+        ) : keywords.length > 0 ? (
+          <>
+            <p className="text-sm text-muted-foreground mb-4">
+              Select relevant keywords for your content. Selected keywords will receive more emphasis.
+            </p>
+            
+            <div className="flex flex-wrap gap-2 mb-6">
+              {keywords.map((keyword: string, index: number) => (
+                <button
                   key={index}
-                  variant={selectedKeywords.includes(keyword) ? "default" : "outline"}
-                  className="cursor-pointer text-sm py-1.5 px-3"
+                  className={`px-3 py-1.5 rounded-full text-sm ${
+                    selectedKeywords.includes(keyword)
+                    ? "bg-primary text-white"
+                    : "bg-secondary hover:bg-secondary/80"
+                  }`}
                   onClick={() => handleKeywordSelect(keyword)}
                 >
                   {keyword}
-                </Badge>
+                </button>
               ))}
             </div>
-          )}
-        </div>
-        
-        <Separator />
-        
-        <div>
-          <h3 className="text-sm font-medium mb-2">Add Custom Keywords</h3>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Enter a custom keyword"
-              value={customKeyword}
-              onChange={(e) => setCustomKeyword(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddCustomKeyword()}
-            />
-            <Button onClick={handleAddCustomKeyword} disabled={!customKeyword.trim()}>
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-        
-        {selectedKeywords.length > 0 && (
-          <div>
-            <h3 className="text-sm font-medium mb-2">
-              Selected Keywords ({selectedKeywords.length})
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {selectedKeywords.map((keyword, index) => (
-                <div 
-                  key={index}
-                  className="bg-primary/10 text-primary rounded-full py-1.5 px-3 flex items-center gap-1"
-                >
-                  <span>{keyword}</span>
-                  <button 
-                    onClick={() => handleKeywordSelect(keyword)}
-                    className="h-4 w-4 rounded-full inline-flex items-center justify-center hover:bg-primary/20"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
+            
+            <div className="mt-auto pt-4">
+              <Button 
+                onClick={onNext} 
+                disabled={selectedKeywords.length === 0}
+                className="w-full flex justify-between items-center"
+              >
+                <span>Continue to Title</span>
+                <ChevronRight size={16} />
+              </Button>
             </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-[300px] text-center text-muted-foreground">
+            <Search size={40} className="mb-4 opacity-50" />
+            <h3 className="text-lg font-medium mb-1">No keywords generated yet</h3>
+            <p className="max-w-xs">Enter your topic and click "Generate Keywords" to see keyword suggestions here.</p>
           </div>
         )}
-      </div>
-      
-      <div className="flex justify-between mt-8">
-        <Button variant="outline" onClick={onPrev}>
-          <ChevronLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-        <Button 
-          onClick={onNext} 
-          disabled={selectedKeywords.length === 0}
-        >
-          Continue
-          <ChevronRight className="ml-2 h-4 w-4" />
-        </Button>
-      </div>
-    </Card>
+      </Card>
+    </div>
   );
 };
 

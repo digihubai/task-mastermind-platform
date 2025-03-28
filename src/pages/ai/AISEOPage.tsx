@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,8 @@ import {
   BookOpen,
   FileEdit,
   Image as ImageIcon,
-  RefreshCw
+  RefreshCw,
+  Loader
 } from "lucide-react";
 import TopicStep from "@/components/seo/TopicStep";
 import KeywordsStep from "@/components/seo/KeywordsStep";
@@ -19,7 +20,8 @@ import OutlineStep from "@/components/seo/OutlineStep";
 import ImageStep from "@/components/seo/ImageStep";
 import ContentGenerationStep from "@/components/seo/ContentGenerationStep";
 import SEOSidebar from "@/components/seo/SEOSidebar";
-import { generateMockSEOContent } from "@/services/seoService";
+import { generateContentWithImages, generateKeywords } from "@/services/seoService";
+import { toast } from "sonner";
 
 const AISEOPage = () => {
   const [activeStep, setActiveStep] = useState(1);
@@ -27,7 +29,7 @@ const AISEOPage = () => {
   
   const [seoData, setSeoData] = useState({
     topic: "",
-    keywordCount: 5,
+    keywordCount: 10,
     keywords: [],
     selectedKeywords: [],
     titles: [],
@@ -41,6 +43,13 @@ const AISEOPage = () => {
     selectedImages: [],
     generatedContent: ""
   });
+
+  // Effect to autogenerate keywords when topic is provided
+  useEffect(() => {
+    if (seoData.topic && activeStep === 2 && seoData.keywords.length === 0) {
+      handleAutoGenerateKeywords();
+    }
+  }, [seoData.topic, activeStep]);
   
   const handleDataChange = (field: string, value: any) => {
     setSeoData(prev => ({
@@ -58,20 +67,45 @@ const AISEOPage = () => {
     window.scrollTo(0, 0);
     setActiveStep(prev => prev - 1);
   };
+
+  const handleAutoGenerateKeywords = async () => {
+    if (!seoData.topic.trim()) return;
+    
+    try {
+      const keywords = await generateKeywords(seoData.topic, seoData.keywordCount);
+      if (keywords && keywords.length > 0) {
+        setSeoData(prev => ({
+          ...prev,
+          keywords,
+          selectedKeywords: keywords.slice(0, 3)
+        }));
+      }
+    } catch (error) {
+      console.error("Error auto-generating keywords:", error);
+    }
+  };
   
   const handleGenerateContent = async () => {
     setIsGenerating(true);
     
-    // Simulating AI content generation
-    setTimeout(() => {
-      const generatedContent = generateMockSEOContent(
-        seoData.topic, 
-        seoData.selectedKeywords
+    try {
+      // Generate content with integrated images
+      const generatedContent = await generateContentWithImages(
+        seoData.topic,
+        seoData.selectedKeywords,
+        seoData.selectedTitle,
+        seoData.selectedOutline,
+        seoData.selectedImages
       );
       
       handleDataChange("generatedContent", generatedContent);
+      toast.success("Content successfully generated!");
+    } catch (error) {
+      console.error("Error generating content:", error);
+      toast.error("Failed to generate content. Please try again.");
+    } finally {
       setIsGenerating(false);
-    }, 3000);
+    }
   };
   
   const renderStep = () => {
@@ -121,6 +155,8 @@ const AISEOPage = () => {
             onNext={handleNext}
             onPrev={handlePrev}
             isLoading={isGenerating}
+            selectedKeywords={seoData.selectedKeywords}
+            topic={seoData.topic}
           />
         );
       case 6:
@@ -164,26 +200,29 @@ const AISEOPage = () => {
                   ].map(({ step, label, icon: Icon }) => (
                     <button
                       key={step}
-                      onClick={() => setActiveStep(step)}
+                      onClick={() => step <= getMaxAllowedStep() && setActiveStep(step)}
                       className={`
                         flex items-center whitespace-nowrap px-4 py-3 border-b-2 text-sm font-medium
                         ${activeStep === step 
                           ? "border-primary text-primary" 
-                          : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"}
-                        ${step > 1 && !seoData.topic ? "opacity-50 cursor-not-allowed" : ""}
-                        ${step > 2 && seoData.selectedKeywords.length === 0 ? "opacity-50 cursor-not-allowed" : ""}
-                        ${step > 3 && !seoData.selectedTitle ? "opacity-50 cursor-not-allowed" : ""}
-                        ${step > 4 && !seoData.selectedOutline ? "opacity-50 cursor-not-allowed" : ""}
+                          : step <= getMaxAllowedStep()
+                            ? "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+                            : "border-transparent text-muted-foreground/50 cursor-not-allowed"}
                       `}
-                      disabled={
-                        (step > 1 && !seoData.topic) ||
-                        (step > 2 && seoData.selectedKeywords.length === 0) ||
-                        (step > 3 && !seoData.selectedTitle) ||
-                        (step > 4 && !seoData.selectedOutline)
-                      }
+                      disabled={step > getMaxAllowedStep()}
                     >
-                      <div className="bg-muted rounded-full h-6 w-6 flex items-center justify-center mr-2">
-                        <span className="text-xs">{step}</span>
+                      <div className={`rounded-full h-6 w-6 flex items-center justify-center mr-2 ${
+                        activeStep === step 
+                          ? "bg-primary text-primary-foreground" 
+                          : step < activeStep
+                            ? "bg-primary/20 text-primary"
+                            : "bg-muted text-muted-foreground"
+                      }`}>
+                        {step < activeStep ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        ) : (
+                          <span className="text-xs">{step}</span>
+                        )}
                       </div>
                       <Icon className="h-4 w-4 mr-2" />
                       {label}
@@ -195,7 +234,7 @@ const AISEOPage = () => {
             
             {renderStep()}
             
-            {activeStep === 5 && !isGenerating && (
+            {activeStep === 5 && !isGenerating && seoData.selectedImages?.length > 0 && (
               <Button 
                 className="w-full"
                 onClick={handleGenerateContent}
@@ -216,6 +255,16 @@ const AISEOPage = () => {
       </div>
     </AppLayout>
   );
+  
+  // Helper function to determine the maximum step the user is allowed to reach
+  function getMaxAllowedStep() {
+    if (!seoData.topic) return 1;
+    if (seoData.selectedKeywords.length === 0) return 2;
+    if (!seoData.selectedTitle) return 3;
+    if (!seoData.selectedOutline) return 4;
+    if (seoData.selectedImages?.length === 0) return 5;
+    return 6;
+  }
 };
 
 export default AISEOPage;
