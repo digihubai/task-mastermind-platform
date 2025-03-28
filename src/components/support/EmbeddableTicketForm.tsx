@@ -9,6 +9,8 @@ export interface EmbeddableTicketFormProps {
   customDescription?: string;
   successTitle?: string;
   successMessage?: string;
+  successBodyText?: string;
+  emailNotificationText?: string;
   departmentId?: string;
   theme?: 'light' | 'dark' | 'auto';
   availableCategories?: string[];
@@ -33,6 +35,8 @@ export const EmbeddableTicketForm: React.FC<EmbeddableTicketFormProps> = ({
   customDescription = "Submit a new support request and we'll get back to you as soon as possible.",
   successTitle = "Request Submitted",
   successMessage = "Thank you for contacting support",
+  successBodyText = "Your support request has been submitted successfully. Our team will review it and get back to you as soon as possible.",
+  emailNotificationText = "You will receive updates on your request via email at",
   departmentId,
   theme = 'auto',
   availableCategories,
@@ -63,6 +67,8 @@ export const EmbeddableTicketForm: React.FC<EmbeddableTicketFormProps> = ({
             compact={compact}
             successTitle={successTitle}
             successMessage={successMessage}
+            successBodyText={successBodyText}
+            emailNotificationText={emailNotificationText}
           />
         </CardContent>
       </Card>

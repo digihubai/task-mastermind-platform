@@ -9,6 +9,8 @@ interface SuccessStepProps {
   compact?: boolean;
   successTitle?: string;
   successMessage?: string;
+  successBodyText?: string;
+  emailNotificationText?: string;
 }
 
 export const SuccessStep: React.FC<SuccessStepProps> = ({
@@ -16,7 +18,9 @@ export const SuccessStep: React.FC<SuccessStepProps> = ({
   onNewTicket,
   compact = false,
   successTitle = "Request Submitted",
-  successMessage = "Thank you for contacting support"
+  successMessage = "Thank you for contacting support",
+  successBodyText = "Your support request has been submitted successfully. Our team will review it and get back to you as soon as possible.",
+  emailNotificationText = "You will receive updates on your request via email at"
 }) => {
   return (
     <Card className={compact ? "max-w-md mx-auto" : "max-w-2xl mx-auto"}>
@@ -25,8 +29,8 @@ export const SuccessStep: React.FC<SuccessStepProps> = ({
         <CardDescription>{successMessage}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p>Your support request has been submitted successfully. Our team will review it and get back to you as soon as possible.</p>
-        <p>You will receive updates on your request via email at <strong>{customerEmail}</strong>.</p>
+        <p>{successBodyText}</p>
+        <p>{emailNotificationText} <strong>{customerEmail}</strong>.</p>
         <div className="flex justify-end">
           <Button 
             onClick={onNewTicket}

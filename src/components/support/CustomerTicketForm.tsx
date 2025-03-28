@@ -17,6 +17,8 @@ interface CustomerTicketFormProps {
   showAiSupportOption?: boolean;
   successTitle?: string;
   successMessage?: string;
+  successBodyText?: string;
+  emailNotificationText?: string;
   requiredFields?: {
     phone?: boolean;
     company?: boolean;
@@ -41,6 +43,8 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
   showAiSupportOption = true,
   successTitle = "Request Submitted",
   successMessage = "Thank you for contacting support",
+  successBodyText = "Your support request has been submitted successfully. Our team will review it and get back to you as soon as possible.",
+  emailNotificationText = "You will receive updates on your request via email at",
   requiredFields = { phone: false, company: false },
   optionalFields = { orderNumber: false, urgencyLevel: true, preferredContact: false, bestTimeToReach: false, custom: {} }
 }) => {
@@ -114,6 +118,8 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
         compact={compact}
         successTitle={successTitle}
         successMessage={successMessage}
+        successBodyText={successBodyText}
+        emailNotificationText={emailNotificationText}
       />
     );
   }

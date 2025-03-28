@@ -15,6 +15,8 @@ interface FormCustomizationInterfaceProps {
 export const FormCustomizationInterface: React.FC<FormCustomizationInterfaceProps> = ({ settings, onSettingsChange }) => {
   const [customFields, setCustomFields] = useState<string[]>([]);
   const [newCustomField, setNewCustomField] = useState('');
+  const [categoryInput, setCategoryInput] = useState('');
+  const [departmentInput, setDepartmentInput] = useState('');
   
   // Initialize custom fields from settings
   useEffect(() => {
@@ -92,12 +94,46 @@ export const FormCustomizationInterface: React.FC<FormCustomizationInterfaceProp
       custom: restCustom
     });
   };
+
+  const addCategory = () => {
+    if (!categoryInput.trim()) return;
+    
+    const currentCategories = settings.availableCategories || [];
+    if (!currentCategories.includes(categoryInput)) {
+      handleChange('availableCategories', [...currentCategories, categoryInput]);
+      setCategoryInput('');
+    }
+  };
+
+  const removeCategory = (index: number) => {
+    const currentCategories = settings.availableCategories || [];
+    const updatedCategories = [...currentCategories];
+    updatedCategories.splice(index, 1);
+    handleChange('availableCategories', updatedCategories);
+  };
+
+  const addDepartment = () => {
+    if (!departmentInput.trim()) return;
+    
+    const currentDepartments = settings.availableDepartments || [];
+    if (!currentDepartments.includes(departmentInput)) {
+      handleChange('availableDepartments', [...currentDepartments, departmentInput]);
+      setDepartmentInput('');
+    }
+  };
+
+  const removeDepartment = (index: number) => {
+    const currentDepartments = settings.availableDepartments || [];
+    const updatedDepartments = [...currentDepartments];
+    updatedDepartments.splice(index, 1);
+    handleChange('availableDepartments', updatedDepartments);
+  };
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h3 className="text-lg font-medium">Customize Your Form</h3>
       
-      <div className="space-y-3">
+      <div className="space-y-4">
         <div>
           <Label htmlFor="form-title">Form Title</Label>
           <Input 
@@ -118,10 +154,10 @@ export const FormCustomizationInterface: React.FC<FormCustomizationInterfaceProp
           />
         </div>
         
-        {/* Success Message Customization */}
-        <div>
+        {/* Success Message Customization - Expanded */}
+        <div className="border p-4 rounded-md">
           <h4 className="font-medium text-sm mb-2">Success Message Customization</h4>
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div>
               <Label htmlFor="success-title">Success Title</Label>
               <Input 
@@ -131,12 +167,104 @@ export const FormCustomizationInterface: React.FC<FormCustomizationInterfaceProp
               />
             </div>
             <div>
-              <Label htmlFor="success-message">Success Message</Label>
+              <Label htmlFor="success-message">Success Subtitle</Label>
               <Input 
                 id="success-message"
                 value={settings.successMessage || 'Thank you for contacting support'} 
                 onChange={(e) => handleChange('successMessage', e.target.value)}
               />
+            </div>
+            <div>
+              <Label htmlFor="success-body-text">Success Body Text</Label>
+              <textarea 
+                id="success-body-text"
+                className="w-full p-2 border rounded mt-1" 
+                rows={2}
+                value={settings.successBodyText || 'Your support request has been submitted successfully. Our team will review it and get back to you as soon as possible.'} 
+                onChange={(e) => handleChange('successBodyText', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="email-notification-text">Email Notification Text</Label>
+              <Input 
+                id="email-notification-text"
+                value={settings.emailNotificationText || 'You will receive updates on your request via email at'} 
+                onChange={(e) => handleChange('emailNotificationText', e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Categories Customization */}
+        <div className="border p-4 rounded-md">
+          <h4 className="font-medium text-sm mb-2">Available Categories</h4>
+          <div className="space-y-2">
+            {(settings.availableCategories || []).map((category, index) => (
+              <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                <span>{category}</span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => removeCategory(index)}
+                >
+                  <XCircle className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            ))}
+            <div className="pt-2">
+              <Label htmlFor="new-category">Add Category</Label>
+              <div className="flex mt-1 gap-2">
+                <Input
+                  id="new-category"
+                  placeholder="Category Name"
+                  value={categoryInput}
+                  onChange={(e) => setCategoryInput(e.target.value)}
+                />
+                <Button 
+                  variant="outline" 
+                  onClick={addCategory}
+                >
+                  <PlusCircle className="h-4 w-4 mr-1" />
+                  Add
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Departments Customization */}
+        <div className="border p-4 rounded-md">
+          <h4 className="font-medium text-sm mb-2">Available Departments</h4>
+          <div className="space-y-2">
+            {(settings.availableDepartments || []).map((department, index) => (
+              <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                <span>{department}</span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => removeDepartment(index)}
+                >
+                  <XCircle className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            ))}
+            <div className="pt-2">
+              <Label htmlFor="new-department">Add Department</Label>
+              <div className="flex mt-1 gap-2">
+                <Input
+                  id="new-department"
+                  placeholder="Department Name"
+                  value={departmentInput}
+                  onChange={(e) => setDepartmentInput(e.target.value)}
+                />
+                <Button 
+                  variant="outline" 
+                  onClick={addDepartment}
+                >
+                  <PlusCircle className="h-4 w-4 mr-1" />
+                  Add
+                </Button>
+              </div>
             </div>
           </div>
         </div>
