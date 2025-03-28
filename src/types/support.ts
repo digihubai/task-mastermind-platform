@@ -1,4 +1,3 @@
-
 export interface SupportTicket {
   id: string;
   subject: string;
@@ -13,6 +12,14 @@ export interface SupportTicket {
   department: string;
   tags: string[];
   messages: SupportMessage[];
+  metadata?: {
+    orderNumber?: string;
+    urgencyLevel?: string;
+    preferredContact?: string;
+    bestTimeToReach?: string;
+    customFields?: {[key: string]: string};
+    attachments?: string[];
+  };
 }
 
 export interface SupportMessage {
