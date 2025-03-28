@@ -1,7 +1,7 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageCircle, User, Bot, Send, Smile } from "lucide-react";
+import { MessageCircle, User, Bot, Send, Smile, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
@@ -39,6 +39,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     { text: config.initialMessage || "Hello! How can I help you today?", isBot: true }
   ]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSendMessage = () => {
     if (!message.trim()) return;
@@ -46,12 +55,18 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     // Add user message
     setMessages([...messages, { text: message, isBot: false }]);
     
-    // Simulate bot response
+    // Simulate bot response with emoji
     setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        text: "This is a preview of how the chatbot would respond to your message. 😊", 
-        isBot: true 
-      }]);
+      const botResponses = [
+        "I understand your question about that! 😊 Let me help you with it.",
+        "That's an interesting point! 🤔 Here's what I think...",
+        "I'm looking into that for you right now. ⚡ One moment please.",
+        "Great question! 👍 Here's what I found...",
+        "I appreciate you asking about that! 🌟 Let me explain..."
+      ];
+      
+      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
+      setMessages(prev => [...prev, { text: randomResponse, isBot: true }]);
     }, 1000);
     
     setMessage("");
@@ -111,8 +126,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <div 
               className={`message-bubble p-3 rounded-lg inline-block max-w-[80%] ${
                 msg.isBot 
-                  ? 'bg-muted text-left ml-0 border border-border/30' 
-                  : 'text-primary-foreground text-right ml-auto'
+                  ? 'bg-muted text-left ml-0 border border-border/30 shadow-sm' 
+                  : 'text-primary-foreground text-right ml-auto shadow-sm'
               }`}
               style={{ backgroundColor: msg.isBot ? undefined : accentColor }}
             >
@@ -120,6 +135,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
       
       <div className="chat-input border-t p-3">
@@ -130,10 +146,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 className="p-2 rounded-full hover:bg-muted transition-colors"
                 aria-label="Add emoji"
               >
-                <Smile size={20} className="text-muted-foreground" />
+                <Smile size={20} className="text-muted-foreground hover:text-foreground transition-colors" />
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 border shadow-md" align="start">
               <Picker 
                 data={data} 
                 onEmojiSelect={handleEmojiSelect} 
@@ -143,23 +159,37 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             </PopoverContent>
           </Popover>
           
-          <input 
-            type="text" 
-            className="w-full border rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-2 focus-visible:ring-2 focus-visible:ring-offset-2 transition-all" 
-            style={{ borderColor: `${accentColor}50` }}
-            placeholder="Type a message..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={handleKeyPress}
-          />
-          <button 
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-white rounded-full p-1.5 transition-transform hover:scale-110"
-            onClick={handleSendMessage}
-            disabled={!message.trim()}
-            style={{ backgroundColor: message.trim() ? accentColor : '#ccc' }}
-          >
-            <Send size={16} />
-          </button>
+          <div className="relative flex-1">
+            <input 
+              type="text" 
+              className="w-full border rounded-full py-2 px-4 pr-12 focus:outline-none focus:ring-2 focus-visible:ring-2 focus-visible:ring-offset-2 transition-all" 
+              style={{ borderColor: `${accentColor}50` }}
+              placeholder="Type a message..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyPress}
+            />
+            
+            {message && (
+              <button 
+                className="absolute right-14 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground rounded-full p-1 transition-colors"
+                onClick={() => setMessage("")}
+                aria-label="Clear message"
+              >
+                <X size={16} />
+              </button>
+            )}
+            
+            <button 
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-white rounded-full p-1.5 transition-transform hover:scale-110"
+              onClick={handleSendMessage}
+              disabled={!message.trim()}
+              style={{ backgroundColor: message.trim() ? accentColor : '#ccc' }}
+              aria-label="Send message"
+            >
+              <Send size={16} />
+            </button>
+          </div>
         </div>
         
         {showBranding && (
@@ -171,7 +201,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
       {/* Floating trigger button preview based on position */}
       {variant === "embedded" && (
-        <div className={`absolute ${position === 'left' ? '-left-16' : '-right-16'} bottom-4`}>
+        <div className={`absolute ${position === 'left' ? '-left-20' : '-right-20'} bottom-4`}>
           <div 
             className={`rounded-full cursor-pointer flex items-center justify-center shadow-md ${transparentTrigger ? 'bg-opacity-70' : ''} transition-transform hover:scale-105`}
             style={{ 
