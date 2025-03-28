@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -268,10 +267,8 @@ const TicketsPage: React.FC = () => {
     setDepartmentFilter(null);
   };
 
-  // Fixed filtering and sorting logic with proper type handling
   const filteredTickets = useMemo(() => {
     return tickets.filter(ticket => {
-      // Text search filtering
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const subjectMatch = ticket.subject.toLowerCase().includes(query);
@@ -281,46 +278,38 @@ const TicketsPage: React.FC = () => {
         }
       }
       
-      // Status filtering
       if (activeTab !== 'all' && ticket.status !== activeTab) {
         return false;
       }
       
-      // Priority filtering
       if (priorityFilter && ticket.priority !== priorityFilter) {
         return false;
       }
       
-      // Category filtering
       if (categoryFilter && ticket.category !== categoryFilter) {
         return false;
       }
       
-      // Department filtering
       if (departmentFilter && ticket.department !== departmentFilter) {
         return false;
       }
       
-      // Agent filtering
       if (agentFilter && ticket.assignedTo !== agentFilter) {
         return false;
       }
       
       return true;
     }).sort((a, b) => {
-      // Make sure the field exists in both objects
       if (!(sortField in a) || !(sortField in b)) {
         return 0;
       }
       
-      // Handle date fields
       if (sortField === 'createdAt' || sortField === 'updatedAt') {
         const dateA = new Date(a[sortField as keyof SupportTicket] as string).getTime();
         const dateB = new Date(b[sortField as keyof SupportTicket] as string).getTime();
         return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
       }
       
-      // Handle string fields
       const valueA = String(a[sortField as keyof SupportTicket]);
       const valueB = String(b[sortField as keyof SupportTicket]);
       
@@ -453,7 +442,7 @@ const TicketsPage: React.FC = () => {
                             <SelectValue placeholder="All Priorities" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All Priorities</SelectItem>
+                            <SelectItem value="all">All Priorities</SelectItem>
                             {priorities.map((priority) => (
                               <SelectItem key={priority} value={priority}>{priority}</SelectItem>
                             ))}
@@ -471,7 +460,7 @@ const TicketsPage: React.FC = () => {
                             <SelectValue placeholder="All Categories" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All Categories</SelectItem>
+                            <SelectItem value="all">All Categories</SelectItem>
                             {categories.map((category) => (
                               <SelectItem key={category} value={category}>{category}</SelectItem>
                             ))}
@@ -489,7 +478,7 @@ const TicketsPage: React.FC = () => {
                             <SelectValue placeholder="All Departments" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All Departments</SelectItem>
+                            <SelectItem value="all">All Departments</SelectItem>
                             {departments.map((department) => (
                               <SelectItem key={department} value={department}>{department}</SelectItem>
                             ))}
@@ -507,7 +496,7 @@ const TicketsPage: React.FC = () => {
                             <SelectValue placeholder="All Agents" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All Agents</SelectItem>
+                            <SelectItem value="all">All Agents</SelectItem>
                             {assignedAgents.map((agent) => (
                               <SelectItem key={agent.id} value={agent.id}>{agent.name}</SelectItem>
                             ))}
