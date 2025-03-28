@@ -1,40 +1,12 @@
 
-import { supabase } from "@/lib/supabase";
-
-export interface SEOKeyword {
-  id: string;
-  keyword: string;
-  volume: number;
-  difficulty: string;
-  position: number;
-  change: number;
-  user_id?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface SEOContent {
-  id: string;
-  title: string;
-  date: string;
-  status: string;
-  platform: string;
-  keywords: string[];
-  word_count: number;
-  seo_score: number;
-  url: string | null;
-  content: string | null;
-  user_id?: string;
-  created_at?: string;
-  updated_at?: string;
-}
+import { useState, useEffect } from 'react';
 
 export interface SEOCampaign {
   id: string;
   name: string;
   keywordCount: number;
   pageCount: number;
-  status: string;
+  status: 'active' | 'inactive' | 'completed' | 'in_progress';
   startDate: string;
   endDate: string | null;
   metrics: {
@@ -44,218 +16,117 @@ export interface SEOCampaign {
   userId: string;
 }
 
-export interface SEOAnalytics {
-  id: string;
-  timeframe: string;
-  data: any;
-  user_id?: string;
-}
+export const generateMockSEOContent = (topic: string, keywords: string[]): string => {
+  const title = `The Ultimate Guide to ${topic}`;
+  
+  const introduction = `
+# ${title}
 
-export const fetchSEOKeywords = async (): Promise<SEOKeyword[]> => {
-  try {
-    const { data, error } = await supabase
-      .from("seo_keywords")
-      .select("*")
-      .order("created_at", { ascending: false });
+In today's digital landscape, understanding ${topic} is essential for businesses and professionals who want to stay competitive. This comprehensive guide will explore everything you need to know about ${topic}, with special focus on ${keywords.slice(0, 3).join(', ')}, and more.
 
-    if (error) throw error;
+## Introduction to ${topic}
 
-    return data as SEOKeyword[];
-  } catch (error) {
-    console.error("Error fetching SEO keywords:", error);
-    return [];
-  }
-};
+${topic} has revolutionized the way we approach business in the modern era. With advancements in technology and changing consumer behaviors, mastering ${topic} has become a critical skill. This guide will help you understand the fundamentals and advanced strategies of ${topic}.
+`;
 
-export const fetchSEOContent = async (): Promise<SEOContent[]> => {
-  try {
-    const { data, error } = await supabase
-      .from("seo_content")
-      .select("*")
-      .order("created_at", { ascending: false });
+  const sections = keywords.map((keyword, index) => `
+## Understanding ${keyword}
 
-    if (error) throw error;
+${keyword} is a core component of successful ${topic} strategies. Research shows that organizations implementing effective ${keyword} approaches see up to 30% improvement in their performance metrics.
 
-    return data as SEOContent[];
-  } catch (error) {
-    console.error("Error fetching SEO content:", error);
-    return [];
-  }
-};
+### Key Benefits of ${keyword}
 
-export const getSEOContentById = async (id: string): Promise<SEOContent | null> => {
-  try {
-    const { data, error } = await supabase
-      .from("seo_content")
-      .select("*")
-      .eq("id", id)
-      .single();
+1. **Improved Efficiency**: Streamline your processes and reduce wasted resources
+2. **Enhanced Customer Experience**: Better understand and serve your audience
+3. **Competitive Advantage**: Stay ahead of industry trends and outperform competitors
+4. **Increased ROI**: Maximize the return on your ${topic} investments
 
-    if (error) throw error;
+### Best Practices for ${keyword}
 
-    return data as SEOContent;
-  } catch (error) {
-    console.error("Error fetching SEO content by ID:", error);
-    return null;
-  }
+- Start with clear goals and objectives
+- Measure your performance consistently
+- Adapt your strategies based on data and feedback
+- Stay updated with the latest ${topic} innovations
+${index === 0 ? `
+- Integrate ${keywords[1] || keywords[0]} with your ${keyword} approach for best results
+` : ''}
+`).join('\n');
+
+  const conclusion = `
+## Conclusion
+
+Mastering ${topic} requires dedication, continuous learning, and strategic implementation. By focusing on key areas like ${keywords.join(', ')}, you can develop a comprehensive approach that delivers real results.
+
+Remember that the landscape of ${topic} is constantly evolving, so staying current with industry trends and best practices is essential for long-term success.
+
+## Next Steps
+
+Ready to take your ${topic} strategy to the next level? Start by implementing the principles discussed in this guide, particularly focusing on ${keywords[0]} and ${keywords[1] || keywords[0]}.
+
+For more advanced insights, consider connecting with industry experts and participating in professional communities focused on ${topic}.
+`;
+
+  return `${introduction}${sections}${conclusion}`;
 };
 
 export const fetchSEOCampaigns = async (): Promise<SEOCampaign[]> => {
-  try {
-    const { data, error } = await supabase
-      .from("seo_campaigns")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) throw error;
-
-    // Convert from DB format to our interface format
-    const campaigns = data.map(item => ({
-      id: item.id,
-      name: item.name,
-      keywordCount: item.keyword_count,
-      pageCount: item.page_count,
-      status: item.status,
-      startDate: item.start_date,
-      endDate: item.end_date,
-      metrics: {
-        backlinks: item.backlinks,
-        avgPosition: item.avg_position
-      },
-      userId: item.user_id
-    }));
-
-    return campaigns;
-  } catch (error) {
-    console.error("Error fetching SEO campaigns:", error);
-    return [];
-  }
+  // Simulate API call with mock data
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          id: "campaign1",
+          name: "Q4 Product Launch SEO",
+          keywordCount: 15,
+          pageCount: 5,
+          status: "active",
+          startDate: "2023-10-01",
+          endDate: "2023-12-31",
+          metrics: {
+            backlinks: 47,
+            avgPosition: 4
+          },
+          userId: "user123"
+        },
+        {
+          id: "campaign2",
+          name: "Blog Content Optimization",
+          keywordCount: 25,
+          pageCount: 12,
+          status: "in_progress",
+          startDate: "2023-09-15",
+          endDate: null,
+          metrics: {
+            backlinks: 32,
+            avgPosition: 7
+          },
+          userId: "user123"
+        }
+      ]);
+    }, 800);
+  });
 };
 
-export const createSEOCampaign = async (campaign: Omit<SEOCampaign, "id">): Promise<SEOCampaign | null> => {
-  try {
-    // Convert from our interface format to DB format
-    const dbCampaign = {
-      name: campaign.name,
-      keyword_count: campaign.keywordCount,
-      page_count: campaign.pageCount,
-      status: campaign.status,
-      start_date: campaign.startDate,
-      end_date: campaign.endDate,
-      backlinks: campaign.metrics.backlinks,
-      avg_position: campaign.metrics.avgPosition,
-      user_id: campaign.userId
+export const useSEOCampaigns = () => {
+  const [campaigns, setCampaigns] = useState<SEOCampaign[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const loadCampaigns = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchSEOCampaigns();
+        setCampaigns(data);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Unknown error occurred'));
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const { data, error } = await supabase
-      .from("seo_campaigns")
-      .insert(dbCampaign)
-      .select("*")
-      .single();
+    loadCampaigns();
+  }, []);
 
-    if (error) throw error;
-
-    // Convert back to our interface format
-    return {
-      id: data.id,
-      name: data.name,
-      keywordCount: data.keyword_count,
-      pageCount: data.page_count,
-      status: data.status,
-      startDate: data.start_date,
-      endDate: data.end_date,
-      metrics: {
-        backlinks: data.backlinks,
-        avgPosition: data.avg_position
-      },
-      userId: data.user_id
-    };
-  } catch (error) {
-    console.error("Error creating SEO campaign:", error);
-    return null;
-  }
-};
-
-export const generateSEOContent = async (topic: string, keywords: string[]): Promise<string> => {
-  try {
-    // Call the Edge Function for generating SEO content
-    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-seo-content`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ topic, keywords }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to generate SEO content');
-    }
-
-    const data = await response.json();
-    return data.content || '';
-  } catch (error) {
-    console.error('Error generating SEO content:', error);
-    return '';
-  }
-};
-
-export const fetchSEOAnalytics = async (timeframe: string): Promise<SEOAnalytics | null> => {
-  try {
-    const { data, error } = await supabase
-      .from("seo_analytics")
-      .select("*")
-      .eq("timeframe", timeframe)
-      .single();
-
-    if (error) throw error;
-
-    return data as SEOAnalytics;
-  } catch (error) {
-    console.error("Error fetching SEO analytics:", error);
-    return null;
-  }
-};
-
-// Mock function to generate sample SEO content for the UI
-export const generateMockSEOContent = (topic: string, keywords: string[] = []): string => {
-  const keywordsStr = keywords.length > 0 ? keywords.join(', ') : 'SEO, optimization';
-  
-  return `# Comprehensive Guide to ${topic}
-
-## Introduction
-In this comprehensive guide, we'll explore everything you need to know about ${topic}. 
-This guide covers the essential aspects of ${keywordsStr}.
-
-## Understanding ${topic}
-${topic} has become increasingly important in the digital landscape. 
-As more businesses focus on online presence, implementing effective strategies for ${keywordsStr} is crucial.
-
-## Best Practices for ${topic}
-When implementing ${topic} strategies, consider these best practices:
-1. Research your target audience thoroughly
-2. Create high-quality content that addresses user needs
-3. Optimize your content for search engines without sacrificing readability
-4. Build a strong backlink profile with reputable websites
-5. Regularly monitor and adjust your strategy based on performance data
-
-## Key Metrics to Track
-To measure the success of your ${topic} efforts, track these metrics:
-- Organic traffic
-- Keyword rankings
-- Conversion rates
-- Bounce rate
-- Time on page
-- Backlink quality and quantity
-
-## Advanced ${topic} Strategies
-For those looking to take their ${topic} to the next level:
-- Implement structured data markup
-- Create comprehensive topic clusters
-- Develop a mobile-first approach
-- Optimize for voice search
-- Focus on user experience metrics
-
-## Conclusion
-${topic} continues to evolve, but the fundamentals remain constant: create value for users, optimize for search engines, and measure your results. By following the strategies outlined in this guide, you'll be well-positioned to succeed with ${keywordsStr}.`;
+  return { campaigns, loading, error };
 };

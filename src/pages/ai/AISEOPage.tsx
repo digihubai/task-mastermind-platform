@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Search, 
   ArrowRight,
@@ -100,12 +99,7 @@ const AISEOPage = () => {
       case 3:
         return (
           <TitleStep 
-            topic={seoData.topic}
-            keywords={seoData.selectedKeywords}
-            titles={seoData.titles}
-            selectedTitle={seoData.selectedTitle}
-            numberOfTitles={seoData.numberOfTitles}
-            maxTitleLength={seoData.maxTitleLength}
+            seoData={seoData}
             onDataChange={handleDataChange}
             onNext={handleNext}
             onPrev={handlePrev}
@@ -114,13 +108,7 @@ const AISEOPage = () => {
       case 4:
         return (
           <OutlineStep 
-            topic={seoData.topic}
-            keywords={seoData.selectedKeywords}
-            title={seoData.selectedTitle}
-            outlines={seoData.outlines}
-            selectedOutline={seoData.selectedOutline}
-            numberOfOutlineSections={seoData.numberOfOutlineSections}
-            maxOutlineDepth={seoData.maxOutlineDepth}
+            seoData={seoData}
             onDataChange={handleDataChange}
             onNext={handleNext}
             onPrev={handlePrev}

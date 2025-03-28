@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -7,12 +7,12 @@ import {
   Download, 
   Copy, 
   RefreshCw,
-  CheckCircle2,
-  Share,
-  Globe
+  Globe,
+  Calendar
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SEOContentPreview from "./SEOContentPreview";
+import PublishToCMSDialog from "./PublishToCMSDialog";
 import { toast } from "sonner";
 
 interface ContentGenerationStepProps {
@@ -30,6 +30,8 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
   onPrev,
   onRegenerateContent
 }) => {
+  const [showCMSDialog, setShowCMSDialog] = useState(false);
+  
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(seoData.generatedContent);
     toast.success("Content copied to clipboard!");
@@ -48,151 +50,181 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
     toast.success("Content downloaded as Markdown!");
   };
 
-  const handlePublishToWordPress = () => {
-    toast.info("Publishing to WordPress...");
-    
-    setTimeout(() => {
-      toast.success("Published to WordPress successfully!");
-    }, 1500);
+  const handlePublishToCMS = () => {
+    setShowCMSDialog(true);
   };
 
   return (
-    <Card className="p-6 border border-border/40">
-      <h2 className="text-xl font-medium mb-6">Step 5: Generated Content</h2>
-      
-      <div className="space-y-6">
-        {isGenerating ? (
-          <div className="flex flex-col items-center justify-center py-12">
-            <RefreshCw className="h-12 w-12 animate-spin text-primary" />
-            <p className="mt-6 text-lg">Generating your content...</p>
-            <p className="text-muted-foreground mt-2">This may take a few moments</p>
-          </div>
-        ) : seoData.generatedContent ? (
-          <>
-            <Tabs defaultValue="preview" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="preview">Preview</TabsTrigger>
-                <TabsTrigger value="metadata">Metadata</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="preview">
-                <SEOContentPreview content={seoData.generatedContent} />
-              </TabsContent>
-              
-              <TabsContent value="metadata">
-                <Card className="border border-border/40 p-4">
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Title</h3>
-                      <p className="font-medium">{seoData.selectedTitle}</p>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Keywords</h3>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {seoData.selectedKeywords.map((keyword: string, idx: number) => (
-                          <span key={idx} className="px-2 py-1 bg-secondary text-xs rounded-full">
-                            {keyword}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Word Count</h3>
-                      <p>{seoData.generatedContent.split(/\s+/).length}</p>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Reading Time</h3>
-                      <p>{Math.ceil(seoData.generatedContent.split(/\s+/).length / 200)} min</p>
-                    </div>
-                    
-                    {seoData.selectedImages.length > 0 && (
+    <>
+      <Card className="p-6 border border-border/40">
+        <h2 className="text-xl font-medium mb-6">Step 5: Generated Content</h2>
+        
+        <div className="space-y-6">
+          {isGenerating ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <RefreshCw className="h-12 w-12 animate-spin text-primary" />
+              <p className="mt-6 text-lg">Generating your content...</p>
+              <p className="text-muted-foreground mt-2">This may take a few moments</p>
+            </div>
+          ) : seoData.generatedContent ? (
+            <>
+              <Tabs defaultValue="preview" className="w-full">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="preview">Preview</TabsTrigger>
+                  <TabsTrigger value="metadata">Metadata</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="preview">
+                  <SEOContentPreview content={seoData.generatedContent} />
+                </TabsContent>
+                
+                <TabsContent value="metadata">
+                  <Card className="border border-border/40 p-4">
+                    <div className="space-y-4">
                       <div>
-                        <h3 className="text-sm font-medium text-muted-foreground">Selected Images</h3>
-                        <div className="grid grid-cols-4 gap-2 mt-2">
-                          {seoData.selectedImages.map((imgUrl: string, idx: number) => (
-                            <img 
-                              key={idx}
-                              src={imgUrl}
-                              alt={`Selected image ${idx + 1}`}
-                              className="rounded-md w-full h-auto aspect-video object-cover"
-                            />
+                        <h3 className="text-sm font-medium text-muted-foreground">Title</h3>
+                        <p className="font-medium">{seoData.selectedTitle}</p>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-sm font-medium text-muted-foreground">Keywords</h3>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {seoData.selectedKeywords.map((keyword: string, idx: number) => (
+                            <span key={idx} className="px-2 py-1 bg-secondary text-xs rounded-full">
+                              {keyword}
+                            </span>
                           ))}
                         </div>
                       </div>
-                    )}
-                  </div>
-                </Card>
-              </TabsContent>
-            </Tabs>
-            
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <Button 
-                variant="outline" 
-                className="gap-2"
-                onClick={handleCopyToClipboard}
-              >
-                <Copy size={16} />
-                Copy to Clipboard
-              </Button>
+                      
+                      <div>
+                        <h3 className="text-sm font-medium text-muted-foreground">Word Count</h3>
+                        <p>{seoData.generatedContent.split(/\s+/).length}</p>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-sm font-medium text-muted-foreground">Reading Time</h3>
+                        <p>{Math.ceil(seoData.generatedContent.split(/\s+/).length / 200)} min</p>
+                      </div>
+                      
+                      {seoData.selectedImages?.length > 0 && (
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Selected Images</h3>
+                          <div className="grid grid-cols-4 gap-2 mt-2">
+                            {seoData.selectedImages.map((imgUrl: string, idx: number) => (
+                              <img 
+                                key={idx}
+                                src={imgUrl}
+                                alt={`Selected image ${idx + 1}`}
+                                className="rounded-md w-full h-auto aspect-video object-cover"
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                </TabsContent>
+              </Tabs>
               
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4">
+                <Button 
+                  variant="outline" 
+                  className="gap-2"
+                  onClick={handleCopyToClipboard}
+                >
+                  <Copy size={16} />
+                  Copy to Clipboard
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  className="gap-2"
+                  onClick={handleDownloadMarkdown}
+                >
+                  <Download size={16} />
+                  Download as Markdown
+                </Button>
+                
+                <Button 
+                  className="gap-2"
+                  onClick={handlePublishToCMS}
+                >
+                  <Globe size={16} />
+                  Publish to CMS
+                </Button>
+              </div>
+
+              <div className="mt-4 pt-4 border-t">
+                <h3 className="text-lg font-medium mb-4">Publishing Options</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Button 
+                    variant="outline" 
+                    className="gap-2"
+                    onClick={() => setShowCMSDialog(true)}
+                  >
+                    <Globe size={16} />
+                    Publish Now
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="gap-2"
+                    onClick={() => {
+                      setShowCMSDialog(true);
+                      // This will be handled by the dialog's onValueChange
+                    }}
+                  >
+                    <Calendar size={16} />
+                    Schedule Publication
+                  </Button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                Something went wrong. Please try generating the content again.
+              </p>
               <Button 
-                variant="outline" 
-                className="gap-2"
-                onClick={handleDownloadMarkdown}
+                onClick={onRegenerateContent}
+                className="mt-4"
               >
-                <Download size={16} />
-                Download as Markdown
-              </Button>
-              
-              <Button 
-                className="gap-2 ml-auto"
-                onClick={handlePublishToWordPress}
-              >
-                <Globe size={16} />
-                Publish to WordPress
+                Try Again
               </Button>
             </div>
-          </>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              Something went wrong. Please try generating the content again.
-            </p>
-            <Button 
-              onClick={onRegenerateContent}
-              className="mt-4"
-            >
-              Try Again
-            </Button>
-          </div>
-        )}
-      </div>
-      
-      <div className="mt-8 flex justify-between">
-        <Button 
-          variant="outline" 
-          onClick={onPrev}
-          className="gap-2"
-        >
-          <ArrowLeft size={16} />
-          Previous Step
-        </Button>
+          )}
+        </div>
         
-        {seoData.generatedContent && (
+        <div className="mt-8 flex justify-between">
           <Button 
-            onClick={onRegenerateContent}
-            variant="outline"
+            variant="outline" 
+            onClick={onPrev}
             className="gap-2"
           >
-            <RefreshCw size={16} />
-            Regenerate Content
+            <ArrowLeft size={16} />
+            Previous Step
           </Button>
-        )}
-      </div>
-    </Card>
+          
+          {seoData.generatedContent && (
+            <Button 
+              onClick={onRegenerateContent}
+              variant="outline"
+              className="gap-2"
+            >
+              <RefreshCw size={16} />
+              Regenerate Content
+            </Button>
+          )}
+        </div>
+      </Card>
+
+      <PublishToCMSDialog 
+        isOpen={showCMSDialog}
+        onClose={() => setShowCMSDialog(false)}
+        seoData={seoData}
+      />
+    </>
   );
 };
 
