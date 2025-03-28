@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QueueManagement } from "@/components/support/QueueManagement";
 import { TicketStatusTabs } from "./TicketStatusTabs";
 import { TicketFilters } from "./TicketFilters";
-import { UseTicketFilteringResult } from "./useTicketFiltering";
+import { UseTicketFilteringResult } from "@/hooks/support/ticketFiltering";
 import { SupportTicket } from "@/types/support";
 
 interface TicketTabsProps {
