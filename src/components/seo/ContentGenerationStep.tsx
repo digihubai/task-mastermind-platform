@@ -67,7 +67,7 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
       <div className="flex justify-between">
         <Button variant="outline" onClick={onPrev} className="gap-1">
           <ChevronLeft size={16} />
-          Back to Images
+          Back to Links
         </Button>
         
         {seoData.generatedContent && (

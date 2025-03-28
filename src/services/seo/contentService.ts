@@ -1,4 +1,3 @@
-
 /**
  * Generates mock SEO content for previewing purposes
  */
@@ -115,67 +114,73 @@ In today's digital landscape, ${formattedTopic} has become increasingly importan
     content += `\n![${formattedTopic} image](${images[0]})\n\n`;
   }
 
-  // Add outline content if available
-  if (outline && outline.sections) {
-    content += Object.entries(outline.sections).map(([key, section]: [string, any]) => {
-      let sectionContent = `## ${section.title}
-
-${section.content || `This section explores the critical aspects of ${section.title} and how it relates to ${formattedTopic}. By understanding these principles, you can develop more effective strategies for your business.`}
-
-${section.subsections ? section.subsections.map((subsection: any) => {
-  return `### ${subsection.title}
-
-${subsection.content || `${subsection.title} is a crucial component of ${formattedTopic} strategy that can significantly impact your results. Companies that excel in this area typically see higher engagement rates and better ROI.`}
-`;
-}).join('\n') : ''}`;
-
-      // Add an image to a random section if available
-      if (images && images.length > 1 && Math.random() > 0.5) {
-        const imageIndex = Math.floor(Math.random() * (images.length - 1)) + 1;
-        if (images[imageIndex]) {
-          sectionContent += `\n![${section.title} visualization](${images[imageIndex]})\n\n`;
-        }
-      }
-
-      return sectionContent;
-    }).join('\n\n');
-  } else if (outline) {
-    // If outline is a string (from the outline step)
-    const outlineLines = outline.split('\n').filter((line: string) => line.trim());
-    
-    // Process the outline
-    let currentMainSection = null;
-    
-    for (let i = 0; i < outlineLines.length; i++) {
-      const line = outlineLines[i].trim();
+  // Process the outline to create content sections
+  if (outline) {
+    // Handle string outlines (from the outline step)
+    if (typeof outline === 'string') {
+      const outlineLines = outline.split('\n').filter((line: string) => line.trim());
       
-      if (line.startsWith('# ')) {
-        // Main title (skip)
-        continue;
-      } else if (line.startsWith('## ')) {
-        // Main section
-        currentMainSection = line.replace('## ', '');
-        content += `\n## ${currentMainSection}\n\n`;
-        content += `This section explores key aspects of ${currentMainSection} and how it relates to ${formattedTopic}. Understanding these principles will help you develop more effective strategies.\n\n`;
+      // Process the outline based on markdown structure
+      let currentMainSection = null;
+      
+      for (let i = 0; i < outlineLines.length; i++) {
+        const line = outlineLines[i].trim();
         
-        // Add image to some sections if available
-        if (images && images.length > 1 && Math.random() > 0.7) {
-          const imageIndex = Math.floor(Math.random() * (images.length - 1)) + 1;
-          if (images[imageIndex]) {
-            content += `![${currentMainSection} visualization](${images[imageIndex]})\n\n`;
+        if (line.startsWith('# ')) {
+          // Main title (skip)
+          continue;
+        } else if (line.startsWith('- ')) {
+          // Convert bullet points to main sections
+          const sectionTitle = line.replace('- ', '');
+          content += `## ${sectionTitle}\n\n`;
+          content += `This section explores key aspects of ${sectionTitle} and how it relates to ${formattedTopic}. Understanding these principles will help you develop more effective strategies.\n\n`;
+          
+          // Add image to some sections if available
+          if (images && images.length > 1 && Math.random() > 0.7) {
+            const imageIndex = Math.floor(Math.random() * (images.length - 1)) + 1;
+            if (images[imageIndex]) {
+              content += `![${sectionTitle} visualization](${images[imageIndex]})\n\n`;
+            }
           }
+        } else if (line.startsWith('## ')) {
+          // Main section
+          currentMainSection = line.replace('## ', '');
+          content += `## ${currentMainSection}\n\n`;
+          content += `This section explores key aspects of ${currentMainSection} and how it relates to ${formattedTopic}. Understanding these principles will help you develop more effective strategies.\n\n`;
+          
+          // Add image to some sections if available
+          if (images && images.length > 1 && Math.random() > 0.7) {
+            const imageIndex = Math.floor(Math.random() * (images.length - 1)) + 1;
+            if (images[imageIndex]) {
+              content += `![${currentMainSection} visualization](${images[imageIndex]})\n\n`;
+            }
+          }
+        } else if (line.startsWith('### ') && currentMainSection) {
+          // Subsection
+          const subsection = line.replace('### ', '');
+          content += `### ${subsection}\n\n`;
+          content += `${subsection} is a crucial component of ${currentMainSection} that can significantly impact your ${formattedTopic} results. Companies that excel in this area typically see higher engagement rates and better ROI.\n\n`;
         }
-      } else if (line.startsWith('### ') && currentMainSection) {
-        // Subsection
-        const subsection = line.replace('### ', '');
-        content += `### ${subsection}\n\n`;
-        content += `${subsection} is a crucial component of ${currentMainSection} that can significantly impact your ${formattedTopic} results. Companies that excel in this area typically see higher engagement rates and better ROI.\n\n`;
       }
+    } else if (typeof outline === 'object' && outline.sections) {
+      // Handle object-based outlines
+      Object.entries(outline.sections).forEach(([key, section]: [string, any]) => {
+        content += `## ${section.title}\n\n`;
+        content += `${section.content || `This section explores the critical aspects of ${section.title} and how it relates to ${formattedTopic}. By understanding these principles, you can develop more effective strategies for your business.`}\n\n`;
+        
+        if (section.subsections && section.subsections.length > 0) {
+          section.subsections.forEach((subsection: any) => {
+            content += `### ${subsection.title}\n\n`;
+            content += `${subsection.content || `${subsection.title} is a crucial component of ${formattedTopic} strategy that can significantly impact your results. Companies that excel in this area typically see higher engagement rates and better ROI.`}\n\n`;
+          });
+        }
+      });
     }
   }
 
-  // Add more substantive content
-  content += `
+  // Add more substantive content if outline processing didn't generate enough
+  if (!content.includes('## Best Practices')) {
+    content += `
 ## Best Practices for ${formattedTopic}
 
 1. **Research and Planning**: Start with thorough research to understand your audience and competition. This foundation will guide all your future decisions.
@@ -213,11 +218,14 @@ A boutique agency specializing in ${formattedKeywords[0] || formattedTopic} saw 
 Mastering ${formattedTopic} requires ongoing education, experimentation, and adaptation. By following the strategies outlined in this guide, you'll be well-positioned to achieve your goals and drive meaningful results in ${currentYear} and beyond.
 
 `;
+  }
 
   // Insert links if available
   if (internalLinks && internalLinks.length > 0) {
     // Find keywords in the content and replace with links
     internalLinks.forEach(link => {
+      if (!link || !link.title || !link.url) return;
+      
       const linkText = link.title;
       const linkWords = linkText.toLowerCase().split(/\s+/).filter(word => word.length > 4);
       
@@ -242,6 +250,8 @@ Mastering ${formattedTopic} requires ongoing education, experimentation, and ada
   if (externalLinks && externalLinks.length > 0) {
     // Add external links with proper attribution
     externalLinks.forEach(link => {
+      if (!link || !link.title || !link.url) return;
+      
       const linkText = link.title;
       const linkWords = linkText.toLowerCase().split(/\s+/).filter(word => word.length > 4);
       
@@ -265,4 +275,3 @@ Mastering ${formattedTopic} requires ongoing education, experimentation, and ada
 
   return content;
 };
-

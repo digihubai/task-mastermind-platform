@@ -69,7 +69,9 @@ const AISEOPage = () => {
       return;
     }
     
-    if (!seoData.selectedOutline && !seoData.outline) {
+    // Check both selectedOutline and outline for backwards compatibility
+    const outlineContent = seoData.selectedOutline || seoData.outline;
+    if (!outlineContent) {
       toast.error("Please select an outline first");
       return;
     }
@@ -88,10 +90,10 @@ const AISEOPage = () => {
         seoData.topic,
         seoData.selectedKeywords,
         seoData.selectedTitle,
-        seoData.selectedOutline || seoData.outline,
+        outlineContent,
         seoData.selectedImages,
-        seoData.internalLinks,
-        seoData.externalLinks
+        seoData.internalLinks || [],
+        seoData.externalLinks || []
       );
       
       handleDataChange("generatedContent", generatedContent);
@@ -137,7 +139,7 @@ const AISEOPage = () => {
         );
       case 4:
         return (
-          <SEOOutlineStep 
+          <SimplifiedOutlineStep 
             seoData={seoData}
             onDataChange={handleDataChange}
             onNext={handleNext}
@@ -184,8 +186,7 @@ const AISEOPage = () => {
     if (!seoData.selectedTitle) return 3;
     if (!seoData.selectedOutline && !seoData.outline) return 4;
     if (!seoData.selectedImages || seoData.selectedImages.length === 0) return 5;
-    if (!seoData.internalLinks || !seoData.externalLinks) return 6;
-    return 7;
+    return 7; // Allow proceeding to content generation even without links
   };
   
   return (
