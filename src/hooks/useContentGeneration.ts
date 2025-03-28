@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { fetchInternalLinks, fetchRelatedExternalLinks, insertLinksIntoContent } from "@/services/seo";
 
@@ -56,6 +56,49 @@ export const useContentGeneration = ({ seoData, onDataChange }: UseContentGenera
     toast.success(`Added ${linkType === 'both' ? 'internal and external' : linkType} links to your content`);
   };
   
+  // New function to fix formatting issues in the generated content
+  const handleFixFormatting = useCallback(() => {
+    if (!seoData.generatedContent) {
+      toast.error("No content to fix");
+      return;
+    }
+    
+    let content = seoData.generatedContent;
+    
+    // Fix missing spacing after headings
+    content = content.replace(/<\/h[1-6]>(?!\s|<)/g, '</h$&>\n\n');
+    
+    // Fix missing spacing after paragraphs
+    content = content.replace(/<\/p>(?!\s|<)/g, '</p>\n\n');
+    
+    // Fix missing spacing after lists
+    content = content.replace(/<\/ul>(?!\s|<)/g, '</ul>\n\n');
+    content = content.replace(/<\/ol>(?!\s|<)/g, '</ol>\n\n');
+    
+    // Fix missing spacing after blockquotes
+    content = content.replace(/<\/blockquote>(?!\s|<)/g, '</blockquote>\n\n');
+    
+    // Fix missing spacing after tables
+    content = content.replace(/<\/table>(?!\s|<)/g, '</table>\n\n');
+    
+    // Fix missing spacing after images
+    content = content.replace(/<\/img>(?!\s|<)/g, '</img>\n\n');
+    content = content.replace(/(<img[^>]*>)(?!\s|<)/g, '$1\n\n');
+    
+    // Remove excessive line breaks (more than 2)
+    content = content.replace(/\n{3,}/g, '\n\n');
+    
+    // Ensure proper heading hierarchy (h1 before h2, etc.)
+    const headingMatch = content.match(/<h([1-6])[^>]*>/);
+    if (headingMatch && headingMatch[1] !== '1') {
+      // If the first heading isn't h1, replace it
+      content = content.replace(/<h([2-6])[^>]*>(.+?)<\/h[2-6]>/, '<h1>$2</h1>');
+    }
+    
+    onDataChange("generatedContent", content);
+    toast.success("Content formatting has been fixed");
+  }, [seoData.generatedContent, onDataChange]);
+  
   return {
     linkType,
     setLinkType,
@@ -66,6 +109,7 @@ export const useContentGeneration = ({ seoData, onDataChange }: UseContentGenera
     isLoadingLinks,
     handleCopyToClipboard,
     handleOpenLinkDialog,
-    handleAddLinks
+    handleAddLinks,
+    handleFixFormatting // New function to fix formatting
   };
 };

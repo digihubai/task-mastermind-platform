@@ -8,6 +8,7 @@ import ContentDisplay from "./ContentDisplay";
 import AddLinksDialog from "./AddLinksDialog";
 import PublishToCMSDialog from "./PublishToCMSDialog";
 import { useContentGeneration } from "@/hooks/useContentGeneration";
+import { validateImageURLs } from "@/services/seo/imageService";
 import { toast } from "sonner";
 
 interface ContentGenerationStepProps {
@@ -38,6 +39,14 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
       images: seoData.selectedImages?.length || 0
     });
     
+    // Validate images to ensure they're accessible
+    if (seoData.selectedImages && seoData.selectedImages.length > 0) {
+      const validatedImages = validateImageURLs(seoData.selectedImages);
+      if (validatedImages.length !== seoData.selectedImages.length) {
+        onDataChange("selectedImages", validatedImages);
+      }
+    }
+    
     // Automatically trigger content generation if we have required data but no content
     if (!seoData.generatedContent && 
         seoData.selectedTitle && 
@@ -56,7 +65,7 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
     } else {
       setContentError(null);
     }
-  }, [seoData, isGenerating, onRegenerateContent]);
+  }, [seoData, isGenerating, onRegenerateContent, onDataChange]);
   
   const handleContentChange = (newContent: string) => {
     onDataChange("generatedContent", newContent);
@@ -72,7 +81,8 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
     isLoadingLinks,
     handleCopyToClipboard,
     handleOpenLinkDialog,
-    handleAddLinks
+    handleAddLinks,
+    handleFixFormatting
   } = useContentGeneration({
     seoData,
     onDataChange
@@ -90,6 +100,7 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
             onCopy={handleCopyToClipboard}
             onAddLinks={handleOpenLinkDialog}
             onRegenerateContent={onRegenerateContent}
+            onFixFormatting={handleFixFormatting}
           />
         </div>
         
