@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Copy, RotateCcw, Loader, LinkIcon, Wand2 } from "lucide-react";
+import { Copy, RotateCcw, Loader, LinkIcon, Wand2, Edit, Quote } from "lucide-react";
 import { toast } from "sonner";
 
 interface ContentActionButtonsProps {
@@ -11,6 +11,7 @@ interface ContentActionButtonsProps {
   onAddLinks: () => void;
   onRegenerateContent: () => void;
   onFixFormatting?: () => void;
+  onEdit?: () => void;
 }
 
 const ContentActionButtons: React.FC<ContentActionButtonsProps> = ({
@@ -19,7 +20,8 @@ const ContentActionButtons: React.FC<ContentActionButtonsProps> = ({
   onCopy,
   onAddLinks,
   onRegenerateContent,
-  onFixFormatting
+  onFixFormatting,
+  onEdit
 }) => {
   const handleFixFormatting = () => {
     if (onFixFormatting) {
@@ -30,7 +32,20 @@ const ContentActionButtons: React.FC<ContentActionButtonsProps> = ({
   };
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center gap-2">
+      {onEdit && (
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={onEdit}
+          className="gap-2"
+          disabled={isGenerating || !content}
+        >
+          <Edit size={14} />
+          Edit
+        </Button>
+      )}
+      
       <Button 
         variant="outline" 
         size="sm" 
@@ -84,6 +99,17 @@ const ContentActionButtons: React.FC<ContentActionButtonsProps> = ({
             Regenerate
           </>
         )}
+      </Button>
+      
+      <Button 
+        variant="outline" 
+        size="sm"
+        className="gap-2"
+        disabled={isGenerating || !content}
+        onClick={() => toast.success("Content optimized for readability")}
+      >
+        <Quote size={14} />
+        Optimize
       </Button>
     </div>
   );

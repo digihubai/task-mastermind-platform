@@ -14,46 +14,89 @@ export const generateMockSEOContent = (topic: string, keywords: string[]) => {
   // Generate current year for relevance
   const currentYear = new Date().getFullYear();
   
-  return `# ${formattedTopic}
+  return `<h1>${formattedTopic}</h1>
 
-## Introduction
+<h2>Introduction</h2>
 
-This comprehensive guide covers everything you need to know about ${formattedTopic}${keywordText}. We'll explore the latest trends, best practices, and expert strategies to help you succeed in ${currentYear} and beyond.
+<p>This comprehensive guide covers everything you need to know about ${formattedTopic}${keywordText}. We'll explore the latest trends, best practices, and expert strategies to help you succeed in ${currentYear} and beyond.</p>
 
-## Why ${formattedTopic} Matters
+<p>In today's competitive digital landscape, understanding and implementing effective ${formattedTopic} strategies can be the difference between thriving and merely surviving. Our research-backed approach will give you actionable insights that you can implement immediately.</p>
 
-In today's digital landscape, ${formattedTopic} has become increasingly important for businesses of all sizes. Understanding how to leverage ${formattedTopic} effectively can lead to improved results and competitive advantage.
+<h2>Why ${formattedTopic} Matters in ${currentYear}</h2>
 
-## Key Strategies for ${formattedTopic}
+<p>In today's digital landscape, ${formattedTopic} has become increasingly important for businesses of all sizes. Understanding how to leverage ${formattedTopic} effectively can lead to improved results and competitive advantage.</p>
 
-1. **Research and Planning**: Start with thorough research to understand your audience and competition.
-2. **Implementation**: Follow best practices when implementing your ${formattedTopic} strategy.
-3. **Optimization**: Continuously test and refine your approach based on performance data.
-4. **Measurement**: Track key metrics to evaluate the success of your ${formattedTopic} initiatives.
+<p>Recent industry data shows that organizations focusing on ${formattedTopic} experience:</p>
 
-## Advanced Techniques
+<ul>
+  <li>47% higher customer engagement rates</li>
+  <li>36% increase in conversion rates</li>
+  <li>28% reduction in customer acquisition costs</li>
+  <li>Significant improvements in market positioning</li>
+</ul>
 
-For those looking to take their ${formattedTopic} efforts to the next level, consider these advanced techniques:
+<h2>Key Strategies for ${formattedTopic}</h2>
 
-- Leverage AI and automation tools
-- Implement cross-channel strategies
-- Focus on user experience optimization
-- Develop comprehensive analytics frameworks
+<ol>
+  <li>
+    <p><strong>Research and Planning</strong>: Start with thorough research to understand your audience and competition. This foundation will guide all your future decisions and ensure your strategy is aligned with market needs.</p>
+  </li>
+  <li>
+    <p><strong>Implementation</strong>: Follow best practices when implementing your ${formattedTopic} strategy. This includes setting realistic timelines, allocating appropriate resources, and establishing clear metrics for success.</p>
+  </li>
+  <li>
+    <p><strong>Optimization</strong>: Continuously test and refine your approach based on performance data. The most successful organizations view ${formattedTopic} as an ongoing process rather than a one-time initiative.</p>
+  </li>
+  <li>
+    <p><strong>Measurement</strong>: Track key metrics to evaluate the success of your ${formattedTopic} initiatives. Establish clear KPIs that directly connect to your business objectives.</p>
+  </li>
+</ol>
 
-## Case Studies: ${formattedTopic} Success Stories
+<h2>Advanced Techniques for ${formattedTopic}</h2>
 
-### Company A: 200% Growth in 6 Months
+<p>For those looking to take their ${formattedTopic} efforts to the next level, consider these advanced techniques:</p>
 
-Company A implemented a comprehensive ${formattedTopic} strategy that resulted in a 200% increase in conversion rates within just 6 months. Their approach focused on user experience optimization and data-driven decision making.
+<ul>
+  <li>
+    <p><strong>Leverage AI and automation tools</strong>: Artificial intelligence can analyze patterns and predict outcomes that would be impossible for humans to identify manually.</p>
+  </li>
+  <li>
+    <p><strong>Implement cross-channel strategies</strong>: Ensure consistency while optimizing for the unique attributes of each platform.</p>
+  </li>
+  <li>
+    <p><strong>Focus on user experience optimization</strong>: Create seamless, intuitive interactions that remove friction from the customer journey.</p>
+  </li>
+  <li>
+    <p><strong>Develop comprehensive analytics frameworks</strong>: Move beyond basic metrics to understand the true impact of your ${formattedTopic} initiatives.</p>
+  </li>
+</ul>
 
-### Company B: Market Leader in ${currentYear}
+<h2>Case Studies: ${formattedTopic} Success Stories</h2>
 
-By prioritizing ${formattedTopic}, Company B established themselves as a market leader in their industry. Their innovative approach to ${formattedKeywords[0] || formattedTopic} set them apart from competitors.
+<h3>Company A: 200% Growth in 6 Months</h3>
 
-## Conclusion
+<p>Company A implemented a comprehensive ${formattedTopic} strategy that resulted in a 200% increase in conversion rates within just 6 months. Their approach focused on user experience optimization and data-driven decision making.</p>
 
-Mastering ${formattedTopic} requires ongoing education, experimentation, and adaptation. By following the strategies outlined in this guide, you'll be well-positioned to achieve your goals and drive meaningful results.
+<p>Key elements of their strategy included:</p>
 
+<ul>
+  <li>Comprehensive audience research and segmentation</li>
+  <li>Content personalization based on user behavior</li>
+  <li>Continuous testing and optimization</li>
+  <li>Integration with existing marketing systems</li>
+</ul>
+
+<h3>Company B: Market Leader in ${currentYear}</h3>
+
+<p>By prioritizing ${formattedTopic}, Company B established themselves as a market leader in their industry. Their innovative approach to ${formattedKeywords[0] || formattedTopic} set them apart from competitors.</p>
+
+<p>Their case study demonstrates that consistency and commitment to quality are essential for long-term success with ${formattedTopic}.</p>
+
+<h2>Conclusion</h2>
+
+<p>Mastering ${formattedTopic} requires ongoing education, experimentation, and adaptation. By following the strategies outlined in this guide, you'll be well-positioned to achieve your goals and drive meaningful results.</p>
+
+<p>Remember that the most successful organizations view ${formattedTopic} as a journey rather than a destination. Continue to refine your approach based on performance data and emerging trends in the industry.</p>
 `;
 };
 
@@ -202,10 +245,10 @@ export const generateContentWithImages = async (
           content += `<p>Consider these best practices when developing your ${subsection} strategy:</p>\n\n`;
           
           content += `<ol>\n`;
-          content += `  <li>Start with clear objectives aligned to your business goals</li>\n`;
-          content += `  <li>Implement a data-driven approach to measure effectiveness</li>\n`;
-          content += `  <li>Regularly review and optimize based on performance metrics</li>\n`;
-          content += `  <li>Stay updated on industry innovations in this space</li>\n`;
+          content += `  <li><strong>Start with clear objectives</strong> aligned to your business goals</li>\n`;
+          content += `  <li><strong>Implement a data-driven approach</strong> to measure effectiveness</li>\n`;
+          content += `  <li><strong>Regularly review and optimize</strong> based on performance metrics</li>\n`;
+          content += `  <li><strong>Stay updated on industry innovations</strong> in this space</li>\n`;
           content += `</ol>\n\n`;
         }
       }
@@ -259,117 +302,25 @@ export const generateContentWithImages = async (
     }
   }
 
-  // Add more substantial content if outline processing didn't generate enough
-  if (!content.includes('<h2>Best Practices')) {
+  // Add conclusion section if not present
+  if (!content.includes('<h2>Conclusion') && !content.includes('<h2>Summary')) {
     content += `
-<h2>Best Practices for ${formattedTopic}</h2>
+<h2>Conclusion: Taking Your ${formattedTopic} Strategy to the Next Level</h2>
 
-<p>Implementing ${formattedTopic} effectively requires a strategic approach. Here are proven best practices to help you maximize results:</p>
+<p>${formattedTopic} continues to evolve, but the fundamentals remain constant: create value for users, optimize for measurable results, and continuously improve your approach. By implementing the strategies outlined in this guide, you'll be well-positioned to achieve significant improvements in your key performance metrics.</p>
 
-<ol>
-  <li>
-    <strong>Research and Planning</strong>
-    <p>Start with thorough research to understand your audience and competition. This foundation will guide all your future decisions and ensure your strategy is well-aligned with market needs.</p>
-  </li>
+<p>Remember that success with ${formattedTopic} requires a commitment to ongoing optimization. The most effective organizations view this as a journey rather than a destination, constantly refining their approach based on performance data and emerging trends.</p>
 
-  <li>
-    <strong>Implementation Strategy</strong>
-    <p>Follow best practices when implementing your ${formattedTopic} strategy, ensuring alignment with your overall business objectives and technical infrastructure.</p>
-  </li>
-
-  <li>
-    <strong>Continuous Optimization</strong>
-    <p>Treat optimization as an ongoing process, not a one-time event. Regularly analyze performance data and make incremental improvements to your approach.</p>
-  </li>
-
-  <li>
-    <strong>Performance Measurement</strong>
-    <p>Establish clear KPIs that directly connect to your business goals, and develop robust tracking mechanisms to monitor progress accurately.</p>
-  </li>
-</ol>
-
-<h2>Advanced Techniques for ${formattedTopic}</h2>
-
-<p>For organizations ready to take their ${formattedTopic} efforts to the next level, consider these advanced techniques:</p>
-
-<ul>
-  <li>
-    <strong>AI and Automation Integration</strong>
-    <p>Leverage artificial intelligence to analyze patterns and predict outcomes that would be impossible for humans to identify manually. This can significantly enhance decision-making and operational efficiency.</p>
-  </li>
-
-  <li>
-    <strong>Cross-Channel Strategy Optimization</strong>
-    <p>Ensure consistency and synergy across all your digital touchpoints to provide a seamless experience and maximize conversion opportunities.</p>
-  </li>
-
-  <li>
-    <strong>User Experience Enhancement</strong>
-    <p>Focus on creating exceptional user experiences that drive engagement, satisfaction, and ultimately, higher conversion rates.</p>
-  </li>
-
-  <li>
-    <strong>Data-Driven Decision Framework</strong>
-    <p>Develop comprehensive analytics frameworks that provide actionable insights and enable strategic decision-making based on solid evidence.</p>
-  </li>
-</ul>
-
-<h2>Case Studies: Real-World Success Stories</h2>
-
-<h3>Enterprise Implementation Success</h3>
-
-<p>A Fortune 500 company implemented a comprehensive ${formattedTopic} strategy that yielded impressive results. Within just three months, they experienced:</p>
-
-<ul>
-  <li>43% increase in conversion rates</li>
-  <li>37% improvement in customer satisfaction scores</li>
-  <li>28% reduction in customer acquisition costs</li>
-  <li>Significant competitive advantage in their market segment</li>
-</ul>
-
-<p>Their approach focused on personalization and data-driven decision making, allowing them to deliver highly relevant experiences to their target audience.</p>
-
-`;
-
-    // Add image if available
-    if (images && images.length > 0) {
-      const lastImageIndex = images.length - 1;
-      content += `<img src="${images[lastImageIndex]}" alt="Case study results visualization" class="w-full rounded-lg my-6" />\n\n`;
-    }
-
-    content += `
-<h3>Small Business Growth Story</h3>
-
-<p>A boutique agency specializing in ${formattedKeywords[0] || formattedTopic} implemented the strategies outlined in this guide and achieved remarkable growth:</p>
-
-<ul>
-  <li>78% expansion of their client base within 6 months</li>
-  <li>92% client retention rate</li>
-  <li>54% increase in average project value</li>
-  <li>247% ROI on their ${formattedTopic} investment</li>
-</ul>
-
-<p>Their success demonstrates that these techniques work for organizations of all sizes, not just enterprise-level companies with substantial resources.</p>
-
-<h2>Conclusion</h2>
-
-<p>Mastering ${formattedTopic} requires ongoing education, experimentation, and adaptation. By following the strategies outlined in this guide, you'll be well-positioned to achieve your goals and drive meaningful results in ${currentYear} and beyond.</p>
-
-<p>Remember that success doesn't happen overnight. Commit to continuous improvement, stay updated on industry developments, and be willing to adapt your approach based on performance data and emerging trends.</p>
-
-<p>For organizations ready to take their ${formattedTopic} efforts to the next level, the investment in terms of time, resources, and strategic focus will yield substantial returns in enhanced customer engagement, improved conversion rates, and sustainable business growth.</p>
-
+<p>We recommend starting with a comprehensive audit of your current ${formattedTopic} efforts, identifying key areas for improvement, and developing a structured implementation plan with clear timelines and accountability. This systematic approach will help you maximize the impact of your ${formattedTopic} initiatives and achieve sustainable results.</p>
 `;
   }
 
   // Insert links if available
   if (internalLinks && internalLinks.length > 0) {
     // Find keywords in the content and replace with links
-    internalLinks.forEach(link => {
-      if (!link || !link.title || !link.url) return;
-      
+    internalLinks.forEach((link: any) => {
       const linkText = link.title;
-      const linkWords = linkText.toLowerCase().split(/\s+/).filter(word => word.length > 4);
+      const linkWords = linkText.toLowerCase().split(/\s+/).filter((word: string) => word.length > 4);
       
       for (const word of linkWords) {
         // Don't add link if already has one
@@ -391,11 +342,9 @@ export const generateContentWithImages = async (
   
   if (externalLinks && externalLinks.length > 0) {
     // Add external links with proper attribution
-    externalLinks.forEach(link => {
-      if (!link || !link.title || !link.url) return;
-      
+    externalLinks.forEach((link: any) => {
       const linkText = link.title;
-      const linkWords = linkText.toLowerCase().split(/\s+/).filter(word => word.length > 4);
+      const linkWords = linkText.toLowerCase().split(/\s+/).filter((word: string) => word.length > 4);
       
       for (const word of linkWords) {
         // Don't add link if already has one

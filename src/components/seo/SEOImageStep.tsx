@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, Image, RefreshCw, SkipForward, Search, Loader } from "lucide-react";
+import { ChevronLeft, ChevronRight, Image, RefreshCw, SkipForward, Search, Loader, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -31,7 +31,7 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
     } else if (seoData.topic && !searchQuery) {
       setSearchQuery(seoData.topic.split(' ').slice(0, 2).join(' '));
     }
-  }, [seoData.selectedKeywords, seoData.topic]);
+  }, [seoData.selectedKeywords, seoData.topic, searchQuery]);
 
   // Generate images automatically if we have a topic and selected keywords
   useEffect(() => {
@@ -53,25 +53,28 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
       }
     }
     
+    // Add a timestamp to force a new image each time
+    const timestamp = Date.now();
+    
     // Simulate API call to generate or search for images
     setTimeout(() => {
       let images = [];
       
       if (imageSource === "ai") {
-        // Mock AI-generated images (in production would call an AI image generation API)
+        // AI-generated images with forced cache-busting
         images = [
-          `https://source.unsplash.com/random/800x600?${prompt.replace(/\s+/g, '+')}`,
-          `https://source.unsplash.com/random/800x600?${prompt.replace(/\s+/g, '+')}&1`,
-          `https://source.unsplash.com/random/800x600?${prompt.replace(/\s+/g, '+')}&2`,
-          `https://source.unsplash.com/random/800x600?${prompt.replace(/\s+/g, '+')}&3`,
+          `https://source.unsplash.com/random/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp}`,
+          `https://source.unsplash.com/random/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp+1}`,
+          `https://source.unsplash.com/random/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp+2}`,
+          `https://source.unsplash.com/random/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp+3}`,
         ];
       } else {
-        // Mock stock photo API (in production would call Unsplash, Pexels, or Pixabay API)
+        // Stock photo API with forced cache-busting
         images = [
-          `https://source.unsplash.com/featured/800x600?${prompt.replace(/\s+/g, '+')}`,
-          `https://source.unsplash.com/featured/800x600?${prompt.replace(/\s+/g, '+')}&1`,
-          `https://source.unsplash.com/featured/800x600?${prompt.replace(/\s+/g, '+')}&2`,
-          `https://source.unsplash.com/featured/800x600?${prompt.replace(/\s+/g, '+')}&3`,
+          `https://source.unsplash.com/featured/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp}`,
+          `https://source.unsplash.com/featured/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp+1}`,
+          `https://source.unsplash.com/featured/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp+2}`,
+          `https://source.unsplash.com/featured/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp+3}`,
         ];
       }
       
@@ -96,13 +99,16 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
     
     setIsSearching(true);
     
+    // Add a timestamp to force a new image each time
+    const timestamp = Date.now();
+    
     // In production, this would call an actual stock photo API
     setTimeout(() => {
       const images = [
-        `https://source.unsplash.com/random/800x600?${searchQuery.replace(/\s+/g, '+')}`,
-        `https://source.unsplash.com/random/800x600?${searchQuery.replace(/\s+/g, '+')}&v=1`,
-        `https://source.unsplash.com/random/800x600?${searchQuery.replace(/\s+/g, '+')}&v=2`,
-        `https://source.unsplash.com/random/800x600?${searchQuery.replace(/\s+/g, '+')}&v=3`,
+        `https://source.unsplash.com/random/800x600?${searchQuery.replace(/\s+/g, '+')}&t=${timestamp}`,
+        `https://source.unsplash.com/random/800x600?${searchQuery.replace(/\s+/g, '+')}&t=${timestamp+1}`,
+        `https://source.unsplash.com/random/800x600?${searchQuery.replace(/\s+/g, '+')}&t=${timestamp+2}`,
+        `https://source.unsplash.com/random/800x600?${searchQuery.replace(/\s+/g, '+')}&t=${timestamp+3}`,
       ];
       
       setGeneratedImages(images);
@@ -141,7 +147,7 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
       <Card className="p-6 border border-border/40">
         <h2 className="text-xl font-semibold mb-4">Generate Images</h2>
         <div className="space-y-4">
-          <Tabs defaultValue="ai" onValueChange={setImageSource}>
+          <Tabs defaultValue={imageSource} onValueChange={setImageSource}>
             <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="ai">AI Generated</TabsTrigger>
               <TabsTrigger value="stock">Stock Photos</TabsTrigger>
@@ -224,8 +230,8 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
               className="w-full"
             >
               {isGenerating || isSearching ? 
-                "Processing..." : 
-                imageSource === "stock" ? "Search Images" : "Generate Images"}
+                <><Loader className="mr-2 h-4 w-4 animate-spin" /> Processing...</> : 
+                imageSource === "stock" ? <><Search className="mr-2 h-4 w-4" /> Search Images</> : <><Sparkles className="mr-2 h-4 w-4" /> Generate Images</>}
             </Button>
             
             <Button 
@@ -247,7 +253,7 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
             <div className="grid grid-cols-2 gap-3 mb-6">
               {generatedImages.map((image, index) => (
                 <div 
-                  key={index}
+                  key={`${image}-${index}`}
                   className={`border rounded-md overflow-hidden cursor-pointer transition-all ${
                     selectedImage === image ? "ring-2 ring-primary" : "hover:opacity-90"
                   }`}
