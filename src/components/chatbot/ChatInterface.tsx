@@ -145,8 +145,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           
           <input 
             type="text" 
-            className="w-full border rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-2 transition-all" 
-            style={{ borderColor: `${accentColor}50`, focusRingColor: `${accentColor}50` }}
+            className="w-full border rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-2 focus-visible:ring-2 focus-visible:ring-offset-2 transition-all" 
+            style={{ borderColor: `${accentColor}50` }}
             placeholder="Type a message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
