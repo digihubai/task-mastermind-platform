@@ -1,46 +1,27 @@
 
-import React, { useEffect, useRef } from 'react';
-import { ScrollArea } from "@/components/ui/scroll-area";
+import React from 'react';
+import { Message } from '@/types/omnichannel';
 import MessageItem from './MessageItem';
-import type { Message, Conversation } from "@/types/omnichannel";
+import { cn } from '@/lib/utils';
 
 interface MessageListProps {
   messages: Message[];
-  selectedConversation: Conversation;
+  className?: string;
 }
 
-const MessageList: React.FC<MessageListProps> = ({ messages, selectedConversation }) => {
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  
-  // Auto-scroll to the bottom when messages change
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      const scrollContainer = scrollAreaRef.current;
-      setTimeout(() => {
-        scrollContainer.scrollTop = scrollContainer.scrollHeight;
-      }, 0);
-    }
-  }, [messages]);
-  
+const MessageList: React.FC<MessageListProps> = ({ messages, className }) => {
   return (
-    <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
-      <div className="space-y-4">
-        {messages.length > 0 ? (
-          messages.map((message) => (
-            <MessageItem 
-              key={message.id} 
-              message={message} 
-              channel={selectedConversation.channel}
-            />
-          ))
-        ) : (
-          <div className="text-center text-muted-foreground py-8">
-            <p>No messages yet in this conversation.</p>
-            <p className="text-sm">Send a message to start the conversation.</p>
-          </div>
-        )}
-      </div>
-    </ScrollArea>
+    <div className={cn("space-y-4 p-4", className)}>
+      {messages.length === 0 ? (
+        <div className="flex items-center justify-center h-full">
+          <p className="text-muted-foreground">No messages yet</p>
+        </div>
+      ) : (
+        messages.map((message) => (
+          <MessageItem key={message.id} message={message} channel={message.channel} />
+        ))
+      )}
+    </div>
   );
 };
 

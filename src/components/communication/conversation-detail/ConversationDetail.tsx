@@ -1,53 +1,119 @@
 
-import React from 'react';
-import ConversationHeader from './ConversationHeader';
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar } from "@/components/ui/avatar";
+import { BadgeHelp, MoreHorizontal, ThumbsUp, User } from 'lucide-react';
+import { Conversation, Message } from '@/types/omnichannel';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
-import { Conversation } from '@/types/omnichannel';
+import CommunicationChannels from './CommunicationChannels';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 
 interface ConversationDetailProps {
   selectedConversation: Conversation | undefined;
-  messages: any[];
+  messages: Message[];
   onSendMessage: (message: string) => void;
   onAssignToHuman: () => void;
 }
 
-const ConversationDetail: React.FC<ConversationDetailProps> = ({ 
+const ConversationDetail: React.FC<ConversationDetailProps> = ({
   selectedConversation,
   messages,
   onSendMessage,
   onAssignToHuman
 }) => {
+  const [satisfaction, setSatisfaction] = useState<number | null>(null);
+  
   if (!selectedConversation) {
     return (
-      <div className="h-full flex items-center justify-center border rounded-lg">
-        <div className="text-center p-8">
-          <h3 className="text-lg font-medium">No conversation selected</h3>
-          <p className="text-muted-foreground mt-1">Select a conversation from the sidebar to view details</p>
-        </div>
-      </div>
+      <Card className="h-full flex items-center justify-center">
+        <CardContent className="text-center p-6">
+          <BadgeHelp className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <h3 className="text-xl font-medium mb-2">No Conversation Selected</h3>
+          <p className="text-muted-foreground">
+            Select a conversation from the list to view details and respond
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
+  const handleSendMessage = (messageText: string) => {
+    onSendMessage(messageText);
+  };
+
+  // Calculate customer satisfaction if available
+  const satisfactionPercentage = satisfaction !== null ? satisfaction : 85;
+
   return (
-    <div className="flex flex-col h-full border rounded-lg bg-background overflow-hidden">
-      <div className="px-4 py-3 border-b">
-        <ConversationHeader 
-          conversation={selectedConversation} 
-          onAssignToHuman={onAssignToHuman}
+    <Card className="h-full flex flex-col">
+      <CardHeader className="border-b px-4 py-3 flex-none">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-9 w-9">
+              <div className="flex h-full w-full items-center justify-center bg-primary/10 text-primary font-medium">
+                {selectedConversation.name.substring(0, 2)}
+              </div>
+            </Avatar>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-medium">{selectedConversation.name}</h3>
+                <Badge variant="outline" className="capitalize">
+                  {selectedConversation.channel}
+                </Badge>
+                <Badge variant={selectedConversation.priority === "high" ? "destructive" : "outline"}>
+                  {selectedConversation.priority}
+                </Badge>
+              </div>
+              <div className="flex items-center text-xs text-muted-foreground gap-2">
+                <span>Customer ID: {selectedConversation.customerId}</span>
+                <span>•</span>
+                <span>CSAT: {satisfactionPercentage}%</span>
+              </div>
+            </div>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => onAssignToHuman()}>
+                <User className="h-4 w-4 mr-2" />
+                Assign to human
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <ThumbsUp className="h-4 w-4 mr-2" />
+                Mark as resolved
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="flex-1 overflow-hidden p-0 flex flex-col">
+        <div className="p-4 border-b">
+          <CommunicationChannels customerId={selectedConversation.customerId} />
+        </div>
+        
+        <MessageList 
+          messages={messages} 
+          className="flex-1 overflow-y-auto p-4"
         />
-      </div>
-      
-      <MessageList 
-        messages={messages}
-        selectedConversation={selectedConversation} 
-      />
-      
-      <MessageInput 
-        onSendMessage={onSendMessage} 
-        channel={selectedConversation.channel}
-      />
-    </div>
+        
+        <div className="p-4 border-t mt-auto">
+          <MessageInput onSendMessage={handleSendMessage} />
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
