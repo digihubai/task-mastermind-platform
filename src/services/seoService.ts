@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 
 export interface SEOCampaign {
@@ -179,5 +180,96 @@ export const fetchSEOAnalytics = async (timeframe: string): Promise<any> => {
         lastPublished: '2 days ago'
       });
     }, 800);
+  });
+};
+
+// Add new function to generate SEO titles
+export const generateSEOTitles = async (topic: string, keywords: string[], count: number = 5): Promise<string[]> => {
+  // Simulate API call with mock data
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const titles = [
+        `${count} Essential ${topic} Strategies for Business Growth in 2023`,
+        `The Ultimate Guide to ${topic}: Boost Your ${keywords[0] || 'Results'} Today`,
+        `How to Master ${topic} and Increase Your ${keywords[1] || 'Performance'} by 200%`,
+        `${topic} Explained: A Comprehensive Guide for ${keywords[0] || 'Professionals'}`,
+        `Why ${topic} Matters for Your ${keywords[1] || 'Business'} and How to Get Started`,
+        `The Future of ${topic}: Trends and Predictions for 2023 and Beyond`,
+        `${topic} 101: Everything You Need to Know About ${keywords[0] || 'This Field'}`
+      ];
+      
+      // Return only the requested number of titles
+      resolve(titles.slice(0, count));
+    }, 1000);
+  });
+};
+
+// Add new function to generate SEO outlines
+export const generateSEOOutlines = async (
+  topic: string, 
+  keywords: string[], 
+  title: string, 
+  sectionCount: number = 3
+): Promise<any[]> => {
+  // Simulate API call with mock data
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const outlines = [
+        {
+          id: "outline1",
+          title: title,
+          sections: [
+            {
+              title: `Introduction to ${topic}`,
+              subsections: ["Why is this important?", "Current market trends", "Who this guide is for"]
+            },
+            {
+              title: `Understanding ${keywords[0] || topic} Fundamentals`,
+              subsections: ["Key concepts", "Essential terminology", "Common challenges"]
+            },
+            {
+              title: `Best Practices for ${keywords[1] || topic} Implementation`,
+              subsections: ["Strategy development", "Tool selection", "Performance measurement"]
+            },
+            {
+              title: `Advanced ${topic} Techniques`,
+              subsections: ["Optimization strategies", "Integration with other systems", "Case studies"]
+            },
+            {
+              title: "Conclusion and Next Steps",
+              subsections: ["Key takeaways", "Implementation roadmap", "Additional resources"]
+            }
+          ].slice(0, sectionCount + 2) // Add intro and conclusion to the requested section count
+        },
+        {
+          id: "outline2",
+          title: title,
+          sections: [
+            {
+              title: `${topic} Overview`,
+              subsections: ["Definition and scope", "Historical context", "Why it matters now"]
+            },
+            {
+              title: `Core Elements of ${keywords[0] || topic}`,
+              subsections: ["Primary components", "Technical requirements", "Success factors"]
+            },
+            {
+              title: `Implementing ${keywords[1] || topic} Strategies`,
+              subsections: ["Step-by-step guide", "Common pitfalls", "Best tools and resources"]
+            },
+            {
+              title: `Measuring ${topic} Success`,
+              subsections: ["Key metrics", "Tracking methods", "Reporting frameworks"]
+            },
+            {
+              title: "Future Directions and Summary",
+              subsections: ["Emerging trends", "Action items", "Final thoughts"]
+            }
+          ].slice(0, sectionCount + 2)
+        }
+      ];
+      
+      resolve(outlines);
+    }, 1500);
   });
 };

@@ -41,6 +41,7 @@ const AISEOWriterPage = () => {
   const [showCMSOptions, setShowCMSOptions] = useState(false);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [selectedCMS, setSelectedCMS] = useState("wordpress");
+  const [publishPlatform, setPublishPlatform] = useState("wordpress");
   
   const [connectedCMS, setConnectedCMS] = useState({
     wordpress: true,
@@ -406,32 +407,22 @@ const AISEOWriterPage = () => {
             
             <div className="grid gap-4 py-4">
               <div>
-                <Label className="block mb-2">Select Platform</Label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {Object.entries(connectedCMS).map(([cms, isConnected]) => (
-                    <div 
-                      key={cms}
-                      className={`
-                        flex flex-col items-center gap-2 p-3 border rounded-md cursor-pointer
-                        ${selectedCMS === cms ? 'border-primary bg-primary/5' : 'border-border'}
-                        ${!isConnected ? 'opacity-50 cursor-not-allowed' : ''}
-                      `}
-                      onClick={() => isConnected && setSelectedCMS(cms)}
-                    >
-                      <div className={`p-2 rounded-full ${isConnected ? 'bg-primary/10 text-primary' : 'bg-secondary text-muted-foreground'}`}>
-                        <Globe size={18} />
-                      </div>
-                      <p className="text-sm font-medium">{cms.charAt(0).toUpperCase() + cms.slice(1)}</p>
-                      {isConnected ? (
-                        <p className="text-xs text-green-700 dark:text-green-400 flex items-center">
-                          <CheckCircle2 size={10} className="mr-1" />
-                          Connected
-                        </p>
-                      ) : (
-                        <p className="text-xs text-muted-foreground">Not connected</p>
-                      )}
-                    </div>
-                  ))}
+                <Label htmlFor="publish-platform">Platform</Label>
+                <div className="flex flex-col space-y-2">
+                  <Select
+                    value={publishPlatform}
+                    onValueChange={setPublishPlatform}
+                  >
+                    <SelectTrigger id="publish-platform">
+                      <SelectValue placeholder="Select platform" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="wordpress">WordPress</SelectItem>
+                      <SelectItem value="shopify">Shopify</SelectItem>
+                      <SelectItem value="webflow">Webflow</SelectItem>
+                      <SelectItem value="custom">Custom CMS</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               
