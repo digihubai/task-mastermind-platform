@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { SupportTicket } from "@/types/support";
 import { useToast } from "@/hooks/use-toast";
@@ -38,8 +39,8 @@ export const CustomerTicketForm: React.FC<CustomerTicketFormProps> = ({
   compact = false,
   assistantName = "Support AI",
   showBookingButton = true,
-  availableCategories = ["Technical", "Billing", "General", "Feature Request"],
-  availableDepartments = ["Customer Support", "Technical Support", "Billing", "Sales"],
+  availableCategories = ["General", "Technical", "Billing", "Feature Request"],
+  availableDepartments = ["Support", "Sales", "Billing", "Product", "Technical"],
   showAiSupportOption = true,
   successTitle = "Request Submitted",
   successMessage = "Thank you for contacting support",

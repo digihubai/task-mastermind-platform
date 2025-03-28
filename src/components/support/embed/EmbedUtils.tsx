@@ -22,8 +22,14 @@ export const createEmbeddableTicketForm = () => {
         preferredContact: false, 
         bestTimeToReach: false
       },
+      customTitle: 'Support Request',
+      customDescription: 'Submit a new support request and we\'ll get back to you as soon as possible.',
       successTitle: 'Request Submitted',
-      successMessage: 'Thank you for contacting support'
+      successMessage: 'Thank you for contacting support',
+      successBodyText: 'Your support request has been submitted successfully. Our team will review it and get back to you as soon as possible.',
+      emailNotificationText: 'You will receive updates on your request via email at',
+      availableCategories: ['General', 'Technical', 'Billing', 'Feature Request'],
+      availableDepartments: ['Support', 'Sales', 'Billing', 'Product', 'Technical']
     });
   `;
   return script;

@@ -18,24 +18,13 @@ interface TicketCategoryFieldProps {
 export const TicketCategoryField: React.FC<TicketCategoryFieldProps> = ({ 
   value, 
   onChange,
-  availableCategories 
+  availableCategories = ["General", "Technical", "Billing", "Feature Request"]
 }) => {
-  // Default categories if none provided
-  const defaultCategories = [
-    { value: "general", label: "General" },
-    { value: "account", label: "Account" },
-    { value: "billing", label: "Billing" },
-    { value: "technical", label: "Technical" },
-    { value: "feature", label: "Feature Request" },
-    { value: "bug", label: "Bug Report" },
-    { value: "integration", label: "Integration" },
-    { value: "security", label: "Security" }
-  ];
-  
   // Use provided categories if available, or fall back to defaults
-  const categories = availableCategories 
-    ? availableCategories.map(cat => ({ value: cat.toLowerCase(), label: cat }))
-    : defaultCategories;
+  const categories = availableCategories.map(cat => ({ 
+    value: cat.toLowerCase(), 
+    label: cat 
+  }));
 
   return (
     <div>

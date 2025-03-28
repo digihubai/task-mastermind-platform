@@ -39,8 +39,8 @@ export const EmbeddableTicketForm: React.FC<EmbeddableTicketFormProps> = ({
   emailNotificationText = "You will receive updates on your request via email at",
   departmentId,
   theme = 'auto',
-  availableCategories,
-  availableDepartments,
+  availableCategories = ["General", "Technical", "Billing", "Feature Request"],
+  availableDepartments = ["Support", "Sales", "Billing", "Product", "Technical"],
   showAiSupportOption = true,
   requiredFields = { phone: false, company: false },
   optionalFields = { orderNumber: false, urgencyLevel: true, preferredContact: false, bestTimeToReach: false, custom: {} }

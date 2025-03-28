@@ -44,16 +44,21 @@ export const TicketDetailsStep: React.FC<TicketDetailsStepProps> = ({
   onEditContactInfo,
   onSubmit,
   onCancel,
-  availableCategories,
-  availableDepartments,
+  availableCategories = ["General", "Technical", "Billing", "Feature Request"],
+  availableDepartments = ["Support", "Sales", "Billing", "Product", "Technical"],
   requiredFields,
   optionalFields = {}
 }) => {
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("medium");
-  const [category, setCategory] = useState("general");
-  const [department, setDepartment] = useState("support");
+  // Set initial category and department from the first available options
+  const [category, setCategory] = useState(availableCategories && availableCategories.length > 0 
+    ? availableCategories[0].toLowerCase() 
+    : "general");
+  const [department, setDepartment] = useState(availableDepartments && availableDepartments.length > 0 
+    ? availableDepartments[0] 
+    : "support");
   const [orderNumber, setOrderNumber] = useState("");
   const [urgencyLevel, setUrgencyLevel] = useState("medium");
   const [preferredContact, setPreferredContact] = useState("email");
