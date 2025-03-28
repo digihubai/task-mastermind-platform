@@ -115,6 +115,7 @@ export const ChatbotConfigView: React.FC<ChatbotConfigViewProps> = ({
               triggerSize={newChatbotInfo.triggerSize}
               transparentTrigger={newChatbotInfo.transparentTrigger}
               avatar={newChatbotInfo.avatar}
+              position={newChatbotInfo.position}
             />
           </div>
         </div>
