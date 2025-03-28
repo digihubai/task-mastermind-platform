@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { 
   BrandFacebook, BrandTwitter, BrandWhatsapp, 
-  BrandTelegram, BrandSlack 
+  BrandTelegram, BrandSlack, BrandViber, BrandLine
 } from "@/components/ui/custom-icons";
 import { IntegrationProps } from './types';
 
@@ -26,6 +26,8 @@ const MessagingIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
     slack: false,
     email: false,
     twilio: false,
+    viber: false,
+    line: false,
   });
   
   const [apiKeys, setApiKeys] = useState<{[key: string]: string}>({
@@ -36,6 +38,8 @@ const MessagingIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
     slack: "",
     email: "",
     twilio: "",
+    viber: "",
+    line: "",
   });
 
   const handleInputChange = (service: string, value: string) => {
@@ -95,6 +99,8 @@ const MessagingIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
       slack: "Slack",
       email: "Email",
       twilio: "Twilio",
+      viber: "Viber",
+      line: "LINE",
     };
     return serviceNames[service] || service;
   };
@@ -202,6 +208,26 @@ const MessagingIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
           <BrandTwitter className="h-5 w-5 text-blue-600" />,
           "bg-blue-100",
           "text-blue-600"
+        )}
+        
+        {/* Viber - New */}
+        {renderMessagingCard(
+          "viber",
+          "Viber",
+          "Connect Viber for business messaging",
+          <BrandViber className="h-5 w-5 text-purple-600" />,
+          "bg-purple-100",
+          "text-purple-600"
+        )}
+        
+        {/* LINE - New */}
+        {renderMessagingCard(
+          "line",
+          "LINE",
+          "Connect LINE for customer messaging",
+          <BrandLine className="h-5 w-5 text-green-600" />,
+          "bg-green-100",
+          "text-green-600"
         )}
         
         {/* Telegram */}

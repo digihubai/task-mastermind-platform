@@ -19,7 +19,6 @@ import {
   Search,
   Code
 } from "lucide-react";
-import SEOIntegrations from "@/components/seo/SEOIntegrations";
 import ApiKeysIntegrations from "@/components/settings/integrations/ApiKeysIntegrations";
 import MessagingIntegrations from "@/components/settings/integrations/MessagingIntegrations";
 import CMSIntegrations from "@/components/settings/integrations/CMSIntegrations";
@@ -48,7 +47,6 @@ const SettingsIntegrationsPage = () => {
             <TabsTrigger value="cms">Website & CMS</TabsTrigger>
             <TabsTrigger value="seo-analytics">SEO Analytics</TabsTrigger>
             <TabsTrigger value="messaging">Messaging</TabsTrigger>
-            <TabsTrigger value="seo-tools">SEO Tools</TabsTrigger>
             <TabsTrigger value="api">API Connections</TabsTrigger>
           </TabsList>
           
@@ -62,10 +60,6 @@ const SettingsIntegrationsPage = () => {
           
           <TabsContent value="messaging" className="space-y-4">
             <MessagingIntegrations />
-          </TabsContent>
-          
-          <TabsContent value="seo-tools" className="space-y-4">
-            <SEOIntegrations useCmsConnections={true} />
           </TabsContent>
           
           <TabsContent value="api" className="space-y-4">

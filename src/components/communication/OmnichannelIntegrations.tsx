@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,7 @@ import {
   Settings, CheckCircle2
 } from "lucide-react";
 import { 
-  BrandFacebook, BrandWhatsapp
+  BrandFacebook, BrandWhatsapp, BrandViber, BrandLine
 } from "@/components/ui/custom-icons";
 import { toast } from "@/hooks/use-toast";
 
@@ -64,6 +63,14 @@ const OmnichannelIntegrations: React.FC = () => {
           <TabsTrigger value="sms" className="flex items-center">
             <Phone className="mr-2 h-4 w-4" />
             SMS
+          </TabsTrigger>
+          <TabsTrigger value="viber" className="flex items-center">
+            <BrandViber className="mr-2 h-4 w-4" />
+            Viber
+          </TabsTrigger>
+          <TabsTrigger value="line" className="flex items-center">
+            <BrandLine className="mr-2 h-4 w-4" />
+            LINE
           </TabsTrigger>
           <TabsTrigger value="instagram" className="flex items-center">
             <Instagram className="mr-2 h-4 w-4" />
@@ -272,6 +279,112 @@ const OmnichannelIntegrations: React.FC = () => {
             <Button onClick={() => handleSaveConfig("sms")}>
               Connect SMS Provider
             </Button>
+          </div>
+        </TabsContent>
+
+        {/* Viber Config */}
+        <TabsContent value="viber" className="space-y-6">
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="flex items-center">
+              <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-full mr-3">
+                <BrandViber className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div>
+                <h3 className="font-medium">Viber</h3>
+                <p className="text-xs text-muted-foreground">Connect Viber for business messaging</p>
+              </div>
+            </div>
+            <Switch onCheckedChange={(checked) => handleToggleChannel("viber", checked)} />
+          </div>
+
+          <div className="space-y-4 p-4 border rounded-lg">
+            <h3 className="font-medium">Viber Business API Integration</h3>
+            
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="viber-token">Authentication Token</Label>
+                <Input id="viber-token" placeholder="Enter your Viber auth token" className="mt-1" />
+              </div>
+              
+              <div>
+                <Label htmlFor="viber-account-id">Account ID</Label>
+                <Input id="viber-account-id" placeholder="Enter your Viber account ID" className="mt-1" />
+              </div>
+              
+              <div>
+                <Label htmlFor="viber-webhook">Webhook URL</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input id="viber-webhook" placeholder="https://your-webhook-url.com/viber" readOnly className="flex-1" />
+                  <Button variant="outline" size="sm" onClick={() => {
+                    navigator.clipboard.writeText("https://your-webhook-url.com/viber");
+                    toast({ title: "Copied to clipboard" });
+                  }}>Copy</Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Enter this URL in your Viber Business API settings</p>
+              </div>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button onClick={() => handleSaveConfig("viber")}>
+                Connect Viber Account
+              </Button>
+              <Button variant="outline" className="flex items-center" onClick={() => window.open("https://partners.viber.com/login", "_blank")}>
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Viber Partners Portal
+              </Button>
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* LINE Config */}
+        <TabsContent value="line" className="space-y-6">
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="flex items-center">
+              <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-full mr-3">
+                <BrandLine className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <h3 className="font-medium">LINE</h3>
+                <p className="text-xs text-muted-foreground">Connect LINE for customer messaging</p>
+              </div>
+            </div>
+            <Switch onCheckedChange={(checked) => handleToggleChannel("line", checked)} />
+          </div>
+
+          <div className="space-y-4 p-4 border rounded-lg">
+            <h3 className="font-medium">LINE Business Connect</h3>
+            
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="line-channel-id">Channel ID</Label>
+                <Input id="line-channel-id" placeholder="Enter your LINE channel ID" className="mt-1" />
+              </div>
+              
+              <div>
+                <Label htmlFor="line-channel-secret">Channel Secret</Label>
+                <Input id="line-channel-secret" type="password" placeholder="Enter your LINE channel secret" className="mt-1" />
+              </div>
+              
+              <div>
+                <Label htmlFor="line-token">Channel Access Token</Label>
+                <Input id="line-token" type="password" placeholder="Enter your LINE access token" className="mt-1" />
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch id="line-official" />
+                <Label htmlFor="line-official">This is an official LINE account</Label>
+              </div>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button onClick={() => handleSaveConfig("line")}>
+                Connect LINE Account
+              </Button>
+              <Button variant="outline" className="flex items-center" onClick={() => window.open("https://developers.line.biz/console/", "_blank")}>
+                <ExternalLink className="mr-2 h-4 w-4" />
+                LINE Developers Console
+              </Button>
+            </div>
           </div>
         </TabsContent>
 
