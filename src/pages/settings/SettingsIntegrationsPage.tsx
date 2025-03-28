@@ -37,7 +37,7 @@ const SettingsIntegrationsPage = () => {
         </div>
 
         <Tabs defaultValue="cms" className="w-full">
-          <TabsList className="mb-4">
+          <TabsList className="mb-4 flex flex-wrap">
             <TabsTrigger value="cms">CMS</TabsTrigger>
             <TabsTrigger value="seo-analytics">SEO Analytics</TabsTrigger>
             <TabsTrigger value="messaging">Messaging</TabsTrigger>

@@ -18,17 +18,22 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
-import SEOIntegrations from "@/components/seo/SEOIntegrations";
+import { useNavigate } from "react-router-dom";
 
 const MarketingSEOPage = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("tools");
+  const navigate = useNavigate();
 
   const handleAction = (action: string) => {
     toast({
       title: action,
       description: `${action} feature will be available soon.`
     });
+  };
+
+  const navigateToIntegrations = () => {
+    navigate('/settings/integrations');
   };
 
   return (
@@ -49,10 +54,9 @@ const MarketingSEOPage = () => {
         </div>
         
         <Tabs defaultValue={activeTab} className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3 w-full md:w-auto">
+          <TabsList className="grid grid-cols-2 w-full md:w-auto">
             <TabsTrigger value="tools">SEO Tools</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="integrations">Integrations</TabsTrigger>
           </TabsList>
           
           <div className="mt-6">
@@ -322,6 +326,21 @@ const MarketingSEOPage = () => {
             </TabsContent>
           </div>
         </Tabs>
+        
+        {/* Integration link redirecting to Settings/Integrations */}
+        <Card className="p-6 border border-border/40">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-medium">SEO Integrations</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Connect your SEO tools with CMS platforms and analytics services
+              </p>
+            </div>
+            <Button onClick={navigateToIntegrations}>
+              Manage Integrations
+            </Button>
+          </div>
+        </Card>
       </div>
     </AppLayout>
   );
