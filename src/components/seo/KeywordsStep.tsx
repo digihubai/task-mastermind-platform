@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronRight, Search, Info, Loader } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { generateKeywords } from "@/services/seo";
+import { generateKeywords } from "@/services/seo/keywordService"; // Fixed import path
 import { toast } from "sonner";
 
 interface KeywordsStepProps {

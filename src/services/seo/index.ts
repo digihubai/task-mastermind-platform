@@ -7,3 +7,4 @@ export * from './contentService';
 export * from './linkService';
 export * from './imageService';
 export * from './campaignService';
+export * from './analyticsService';

@@ -1,5 +1,7 @@
 
-// Define the SEO related types
+/**
+ * SEO Campaign interface
+ */
 export interface SEOCampaign {
   id: string;
   name: string;
@@ -15,11 +17,18 @@ export interface SEOCampaign {
   userId: string;
 }
 
+/**
+ * SEO Analytics interface
+ */
 export interface SEOAnalytics {
-  keywordDensity: number;
-  readabilityScore: number;
-  structureScore: number;
-  originalityScore: number;
-  overallScore: number;
-  recommendations: string[];
+  keywordRankings: number;
+  organicTraffic: number;
+  backlinks: number;
+  rankings: {
+    keyword: string;
+    position: number;
+    previous: number;
+    traffic: number;
+    difficulty: string;
+  }[];
 }

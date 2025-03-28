@@ -2,352 +2,149 @@
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { Calendar, TrendingUp, Users, MousePointerClick, ArrowUpRight, FileText, BarChart2, PieChart as PieChartIcon, Loader } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Globe, Search, Link, ChevronDown, Loader, BarChart3 } from "lucide-react";
 import { fetchSEOAnalytics } from "@/services/seoService";
-
-const COLORS = ['#4f46e5', '#06b6d4', '#8b5cf6', '#f97316', '#a3a3a3'];
+import { SEOAnalytics as SEOAnalyticsType } from "@/services/seo/types";
 
 const SEOAnalytics: React.FC = () => {
-  const [timeframe, setTimeframe] = useState("6m");
+  const [analytics, setAnalytics] = useState<SEOAnalyticsType | null>(null);
   const [loading, setLoading] = useState(false);
-  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [timeframe, setTimeframe] = useState("30days");
 
   useEffect(() => {
-    loadAnalyticsData();
+    loadAnalytics();
   }, [timeframe]);
 
-  const loadAnalyticsData = async () => {
+  const loadAnalytics = async () => {
     setLoading(true);
     try {
-      // In a real implementation, we would call the API
-      const data = await fetchSEOAnalytics(timeframe);
-      
-      // If the API call fails or returns no data, use mock data
-      if (!data || Object.keys(data).length === 0) {
-        setMockData();
-      } else {
-        setAnalyticsData(data);
-      }
+      const data = await fetchSEOAnalytics();
+      setAnalytics(data);
     } catch (error) {
-      console.error("Error loading analytics data:", error);
-      setMockData();
+      console.error("Error loading SEO analytics:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const setMockData = () => {
-    // Set mock data based on the timeframe
-    const performance = [
-      { month: 'Jan', visitors: 120, clicks: 45, conversions: 12 },
-      { month: 'Feb', visitors: 160, clicks: 70, conversions: 18 },
-      { month: 'Mar', visitors: 210, clicks: 95, conversions: 25 },
-      { month: 'Apr', visitors: 250, clicks: 120, conversions: 35 },
-      { month: 'May', visitors: 310, clicks: 150, conversions: 42 },
-      { month: 'Jun', visitors: 390, clicks: 185, conversions: 55 },
-    ];
-    
-    const keywordsRanking = [
-      { keyword: 'AI chatbot', position: 3, change: 2, volume: 5400 },
-      { keyword: 'AI assistant', position: 5, change: -1, volume: 3200 },
-      { keyword: 'Customer support AI', position: 2, change: 4, volume: 2100 },
-      { keyword: 'Conversational AI', position: 8, change: 0, volume: 1800 },
-      { keyword: 'AI for business', position: 12, change: 3, volume: 4500 },
-    ];
-    
-    const topContent = [
-      { title: '10 Ways AI Chatbots Are Revolutionizing Customer Support', views: 1245, ctr: 5.2, position: 3 },
-      { title: 'The Ultimate Guide to SEO Content Writing in 2023', views: 980, ctr: 4.8, position: 4 },
-      { title: 'How to Implement AI Solutions for Small Businesses', views: 875, ctr: 3.9, position: 6 },
-      { title: 'Machine Learning vs. Deep Learning: What\'s the Difference?', views: 720, ctr: 3.5, position: 5 },
-    ];
-    
-    const trafficSourcesData = [
-      { name: 'Organic Search', value: 65 },
-      { name: 'Social Media', value: 15 },
-      { name: 'Direct', value: 10 },
-      { name: 'Referral', value: 7 },
-      { name: 'Other', value: 3 },
-    ];
-    
-    setAnalyticsData({
-      performance,
-      keywordsRanking,
-      topContent,
-      trafficSourcesData,
-      totalVisitors: 1440,
-      visitorsChange: 12.5,
-      averageCTR: 4.3,
-      ctrChange: 0.7,
-      publishedContent: 12,
-      lastPublished: '2 days ago'
-    });
-  };
-
-  const getChangeColor = (change: number) => {
-    if (change > 0) return 'text-green-500';
-    if (change < 0) return 'text-red-500';
-    return 'text-gray-500';
-  };
-
-  const getChangeIcon = (change: number) => {
-    if (change > 0) return '↑';
-    if (change < 0) return '↓';
-    return '−';
-  };
-
-  if (loading || !analyticsData) {
+  if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <Loader className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading analytics data...</p>
-        </div>
+      <div className="flex justify-center items-center py-8">
+        <Loader className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!analytics) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">No analytics data available</p>
+        <Button variant="outline" onClick={loadAnalytics} className="mt-4">
+          <BarChart3 size={16} className="mr-2" />
+          Load Analytics
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">SEO Analytics</h2>
-        <Select value={timeframe} onValueChange={setTimeframe}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Select timeframe" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7d">Last 7 days</SelectItem>
-            <SelectItem value="1m">Last month</SelectItem>
-            <SelectItem value="3m">Last 3 months</SelectItem>
-            <SelectItem value="6m">Last 6 months</SelectItem>
-            <SelectItem value="1y">Last year</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+    <Card className="p-6 border border-border/40">
+      <h2 className="text-xl font-semibold mb-6">SEO Performance Analytics</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-5 border border-border/40">
-          <div className="flex items-center space-x-2">
-            <div className="bg-primary/10 p-2 rounded-full">
-              <Users className="h-5 w-5 text-primary" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <Card className="p-4 border border-border/40">
+          <div className="flex items-start gap-3">
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded-full">
+              <Search className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Total Visitors</p>
-              <h3 className="text-2xl font-bold">{analyticsData.totalVisitors.toLocaleString()}</h3>
+              <p className="text-sm text-muted-foreground">Keyword Rankings</p>
+              <h3 className="text-2xl font-bold mt-1">{analytics.keywordRankings}</h3>
+              <p className="text-xs text-green-500 mt-1">+12 this month</p>
             </div>
-          </div>
-          <div className={`mt-4 text-xs ${getChangeColor(analyticsData.visitorsChange)} flex items-center`}>
-            <TrendingUp className="h-3 w-3 mr-1" />
-            <span>{getChangeIcon(analyticsData.visitorsChange)} {Math.abs(analyticsData.visitorsChange)}% from previous period</span>
           </div>
         </Card>
         
-        <Card className="p-5 border border-border/40">
-          <div className="flex items-center space-x-2">
-            <div className="bg-primary/10 p-2 rounded-full">
-              <MousePointerClick className="h-5 w-5 text-primary" />
+        <Card className="p-4 border border-border/40">
+          <div className="flex items-start gap-3">
+            <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded-full">
+              <Globe className="h-5 w-5 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Average CTR</p>
-              <h3 className="text-2xl font-bold">{analyticsData.averageCTR}%</h3>
+              <p className="text-sm text-muted-foreground">Organic Traffic</p>
+              <h3 className="text-2xl font-bold mt-1">{(analytics.organicTraffic / 1000).toFixed(1)}K</h3>
+              <p className="text-xs text-green-500 mt-1">+8.3% from last month</p>
             </div>
-          </div>
-          <div className={`mt-4 text-xs ${getChangeColor(analyticsData.ctrChange)} flex items-center`}>
-            <TrendingUp className="h-3 w-3 mr-1" />
-            <span>{getChangeIcon(analyticsData.ctrChange)} {Math.abs(analyticsData.ctrChange)}% from previous period</span>
           </div>
         </Card>
         
-        <Card className="p-5 border border-border/40">
-          <div className="flex items-center space-x-2">
-            <div className="bg-primary/10 p-2 rounded-full">
-              <Calendar className="h-5 w-5 text-primary" />
+        <Card className="p-4 border border-border/40">
+          <div className="flex items-start gap-3">
+            <div className="bg-purple-50 dark:bg-purple-900/20 p-2 rounded-full">
+              <Link className="h-5 w-5 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Published Content</p>
-              <h3 className="text-2xl font-bold">{analyticsData.publishedContent}</h3>
+              <p className="text-sm text-muted-foreground">Backlinks</p>
+              <h3 className="text-2xl font-bold mt-1">{analytics.backlinks}</h3>
+              <p className="text-xs text-green-500 mt-1">+23 this month</p>
             </div>
-          </div>
-          <div className="mt-4 text-xs text-muted-foreground">
-            Last published: {analyticsData.lastPublished}
           </div>
         </Card>
       </div>
       
-      <Tabs defaultValue="performance" className="w-full">
-        <TabsList className="w-full md:w-auto mb-4">
-          <TabsTrigger value="performance" className="flex items-center">
-            <BarChart2 className="h-4 w-4 mr-2" />
-            Performance
-          </TabsTrigger>
-          <TabsTrigger value="keywords" className="flex items-center">
-            <FileText className="h-4 w-4 mr-2" />
-            Keywords
-          </TabsTrigger>
-          <TabsTrigger value="sources" className="flex items-center">
-            <PieChartIcon className="h-4 w-4 mr-2" />
-            Traffic Sources
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="performance">
-          <Card className="p-5 border border-border/40">
-            <h3 className="text-lg font-medium mb-4">Content Performance</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart
-                data={analyticsData.performance}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="visitors" stroke="#4f46e5" activeDot={{ r: 8 }} />
-                <Line type="monotone" dataKey="clicks" stroke="#06b6d4" />
-                <Line type="monotone" dataKey="conversions" stroke="#8b5cf6" />
-              </LineChart>
-            </ResponsiveContainer>
-          </Card>
-          
-          <div className="mt-6">
-            <h3 className="text-lg font-medium mb-3">Top Performing Content</h3>
-            <Card className="border border-border/40">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Title</th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Views</th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">CTR</th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Position</th>
-                      <th className="text-center py-3 px-4 font-medium text-muted-foreground">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {analyticsData.topContent.map((content, index) => (
-                      <tr key={index} className="border-b hover:bg-muted/50">
-                        <td className="py-3 px-4">
-                          <span className="font-medium">{content.title}</span>
-                        </td>
-                        <td className="py-3 px-4">{content.views.toLocaleString()}</td>
-                        <td className="py-3 px-4">{content.ctr}%</td>
-                        <td className="py-3 px-4">{content.position}</td>
-                        <td className="py-3 px-4 text-center">
-                          <Button variant="ghost" size="sm">
-                            <ArrowUpRight size={16} className="mr-1" />
-                            View
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+      <div className="border-t pt-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-medium">Top Performing Keywords</h3>
+          <div className="flex items-center">
+            <Button variant="outline" size="sm" className="flex items-center gap-1">
+              Last {timeframe === "30days" ? "30" : timeframe === "90days" ? "90" : "7"} Days <ChevronDown size={14} />
+            </Button>
           </div>
-        </TabsContent>
+        </div>
         
-        <TabsContent value="keywords">
-          <Card className="p-5 border border-border/40">
-            <h3 className="text-lg font-medium mb-4">Keyword Rankings</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={analyticsData.keywordsRanking}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="keyword" />
-                <YAxis domain={[0, 'dataMax']} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="volume" fill="#4f46e5" name="Search Volume" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
-          
-          <div className="mt-6">
-            <h3 className="text-lg font-medium mb-3">Ranking Keywords</h3>
-            <Card className="border border-border/40">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Keyword</th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Position</th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Change</th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Volume</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {analyticsData.keywordsRanking.map((keyword, index) => (
-                      <tr key={index} className="border-b hover:bg-muted/50">
-                        <td className="py-3 px-4">
-                          <span className="font-medium">{keyword.keyword}</span>
-                        </td>
-                        <td className="py-3 px-4">{keyword.position}</td>
-                        <td className={`py-3 px-4 ${getChangeColor(keyword.change)}`}>
-                          {getChangeIcon(keyword.change)} {Math.abs(keyword.change)}
-                        </td>
-                        <td className="py-3 px-4">{keyword.volume.toLocaleString()}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+        <div className="overflow-hidden border rounded-lg">
+          <div className="bg-secondary/50 text-sm font-medium grid grid-cols-12 p-3 border-b">
+            <div className="col-span-4">Keyword</div>
+            <div className="col-span-2 text-center">Position</div>
+            <div className="col-span-2 text-center">Previous</div>
+            <div className="col-span-2 text-center">Traffic</div>
+            <div className="col-span-2 text-center">Difficulty</div>
           </div>
-        </TabsContent>
-        
-        <TabsContent value="sources">
-          <Card className="p-5 border border-border/40">
-            <h3 className="text-lg font-medium mb-4">Traffic Sources</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={analyticsData.trafficSourcesData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {analyticsData.trafficSourcesData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              
-              <div className="flex flex-col justify-center">
-                <h4 className="text-md font-medium mb-3">Source Breakdown</h4>
-                <div className="space-y-3">
-                  {analyticsData.trafficSourcesData.map((source, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div 
-                          className="w-3 h-3 rounded-full mr-2"
-                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                        ></div>
-                        <span>{source.name}</span>
-                      </div>
-                      <span className="font-medium">{source.value}%</span>
-                    </div>
-                  ))}
+          
+          <div className="divide-y">
+            {analytics.rankings.map((item, i) => (
+              <div key={i} className="grid grid-cols-12 p-3 text-sm hover:bg-secondary/20 transition-colors">
+                <div className="col-span-4 font-medium">{item.keyword}</div>
+                <div className="col-span-2 text-center">{item.position}</div>
+                <div className="col-span-2 text-center flex items-center justify-center">
+                  {item.previous}
+                  <span className={`text-xs ml-1 ${item.previous > item.position ? 'text-green-500' : item.previous < item.position ? 'text-red-500' : 'text-muted-foreground'}`}>
+                    {item.previous > item.position ? '↑' : item.previous < item.position ? '↓' : '→'}
+                  </span>
+                </div>
+                <div className="col-span-2 text-center">{item.traffic}</div>
+                <div className="col-span-2 text-center">
+                  <Badge variant="outline" className={
+                    item.difficulty === "High" 
+                      ? "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400" 
+                      : item.difficulty === "Medium"
+                      ? "bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400"
+                      : "bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400"
+                  }>
+                    {item.difficulty}
+                  </Badge>
                 </div>
               </div>
-            </div>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+            ))}
+          </div>
+        </div>
+        
+        <div className="flex justify-end mt-4">
+          <Button variant="outline" size="sm">View Full Report</Button>
+        </div>
+      </div>
+    </Card>
   );
 };
 

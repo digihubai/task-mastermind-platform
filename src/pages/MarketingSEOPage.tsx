@@ -21,7 +21,8 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import SEOIntegrations from "@/components/seo/SEOIntegrations";
-import { fetchSEOCampaigns, SEOCampaign } from "@/services/seo";
+import { SEOCampaign } from "@/services/seo/types"; // Fixed import path
+import { fetchSEOCampaigns } from "@/services/seo/campaignService"; // Fixed import path
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

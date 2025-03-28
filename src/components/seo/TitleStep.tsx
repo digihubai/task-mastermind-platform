@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { generateSEOTitles } from "@/services/seo";
+import { generateSEOTitles } from "@/services/seo/titleService";
 
 interface TitleStepProps {
   seoData: any;
