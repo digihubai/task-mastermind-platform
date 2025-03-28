@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Users, ExternalLink } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
-interface SupportDashboardHeaderProps {}
+interface SupportDashboardHeaderProps {
+  onNewTicket?: () => void;
+}
 
-const SupportDashboardHeader: React.FC<SupportDashboardHeaderProps> = () => {
+const SupportDashboardHeader: React.FC<SupportDashboardHeaderProps> = ({ onNewTicket }) => {
   const navigate = useNavigate();
   
   return (
