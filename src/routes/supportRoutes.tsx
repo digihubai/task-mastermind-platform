@@ -9,6 +9,7 @@ import OutboundCallsPage from '@/pages/support/OutboundCallsPage';
 import TicketsPage from '@/pages/support/TicketsPage';
 import CustomerSupportPage from '@/pages/support/CustomerSupportPage';
 import EmbedTicketPage from '@/pages/support/EmbedTicketPage';
+import { EmbeddableTicketForm } from '@/components/support/EmbeddableTicketForm';
 
 const supportRoutes: RouteObject[] = [
   {
