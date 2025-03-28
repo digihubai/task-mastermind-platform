@@ -33,11 +33,14 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, channel }) => {
     : isFromAI 
       ? '/avatars/ai-assistant.png' 
       : '/avatars/support-agent.png';
+
+  // IMPORTANT: AI and human agent messages should be on the right side, customer messages on the left
+  const isAgent = isFromAI || isFromHuman;
   
   return (
     <div className={cn(
       "flex items-start gap-3",
-      isFromCustomer ? "flex-row-reverse" : "flex-row"
+      isAgent ? "flex-row-reverse" : "flex-row"
     )}>
       <Avatar className="h-8 w-8">
         <AvatarImage src={avatarImage} alt={isFromCustomer ? "Customer" : "Support"} />
@@ -46,11 +49,9 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, channel }) => {
       
       <div className={cn(
         "rounded-lg px-4 py-2 max-w-[80%] break-words",
-        isFromCustomer 
+        isAgent 
           ? "bg-primary text-primary-foreground ml-auto" 
-          : isFromAI 
-            ? "bg-secondary text-secondary-foreground"
-            : "bg-muted text-muted-foreground"
+          : "bg-muted text-muted-foreground"
       )}>
         <div className="text-sm">
           {message.content}

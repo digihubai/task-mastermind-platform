@@ -8,6 +8,13 @@ import { Plus, Search } from "lucide-react";
 import ConversationFilter from './ConversationFilter';
 import ConversationList from './ConversationList';
 import type { Conversation } from "@/types/omnichannel";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 interface ConversationSidebarProps {
   conversations: Conversation[];
@@ -34,6 +41,22 @@ const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
     return convo.channel === activeTab;
   });
 
+  // Define all the available channels
+  const channels = [
+    { id: 'all', label: 'All' },
+    { id: 'email', label: 'Email' },
+    { id: 'chat', label: 'Chat' },
+    { id: 'whatsapp', label: 'WhatsApp' },
+    { id: 'messenger', label: 'Messenger' },
+    { id: 'telegram', label: 'Telegram' },
+    { id: 'sms', label: 'SMS' },
+    { id: 'voice', label: 'Voice' },
+  ];
+
+  // Display first 4 channels as tabs, rest in dropdown
+  const visibleChannels = channels.slice(0, 4);
+  const dropdownChannels = channels.slice(4);
+
   return (
     <Card className="h-full">
       <CardHeader className="pb-3">
@@ -59,12 +82,36 @@ const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
       
       <Tabs value={activeTab} className="w-full" onValueChange={onTabChange}>
         <div className="px-4">
-          <TabsList className="w-full">
-            <TabsTrigger value="all" className="flex-1">All</TabsTrigger>
-            <TabsTrigger value="email" className="flex-1">Email</TabsTrigger>
-            <TabsTrigger value="chat" className="flex-1">Chat</TabsTrigger>
-            <TabsTrigger value="phone" className="flex-1">Voice</TabsTrigger>
-          </TabsList>
+          <div className="flex">
+            <TabsList className="flex-1">
+              {visibleChannels.map(channel => (
+                <TabsTrigger key={channel.id} value={channel.id} className="flex-1">
+                  {channel.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            
+            {dropdownChannels.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="ml-1">
+                    More <ChevronDown className="ml-1 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {dropdownChannels.map(channel => (
+                    <DropdownMenuItem 
+                      key={channel.id} 
+                      onClick={() => onTabChange(channel.id)}
+                      className={activeTab === channel.id ? "bg-secondary" : ""}
+                    >
+                      {channel.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
         
         <CardContent className="p-0 pt-3">

@@ -6,15 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Settings, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-// Import platform-specific icons
-import {
-  BrandFacebook,
-  BrandTwitter,
-  BrandWhatsapp,
-  BrandTelegram,
-  BrandSlack
-} from "@/components/ui/custom-icons";
-
 interface IntegrationStatusProps {
   className?: string;
 }
@@ -34,7 +25,7 @@ const integrations = [
     name: 'WhatsApp Business', 
     description: 'Messaging, Voice, Video', 
     status: 'connected',
-    icon: <BrandWhatsapp size={18} />,
+    icon: '📱',
     capabilities: ['chat', 'voice', 'video']
   },
   { 
@@ -42,7 +33,7 @@ const integrations = [
     name: 'Facebook Messenger', 
     description: 'Messaging', 
     status: 'connected',
-    icon: <BrandFacebook size={18} />,
+    icon: '💬',
     capabilities: ['chat']
   },
   { 
@@ -58,7 +49,39 @@ const integrations = [
     name: 'Telegram', 
     description: 'Messaging', 
     status: 'not_connected',
-    icon: <BrandTelegram size={18} />,
+    icon: '📨',
+    capabilities: ['chat']
+  },
+  { 
+    id: 'sms', 
+    name: 'SMS', 
+    description: 'Text messaging', 
+    status: 'connected',
+    icon: '✉️',
+    capabilities: ['sms']
+  },
+  { 
+    id: 'instagram', 
+    name: 'Instagram', 
+    description: 'Direct Messages', 
+    status: 'not_connected',
+    icon: '📸',
+    capabilities: ['chat']
+  },
+  { 
+    id: 'twitter', 
+    name: 'Twitter/X', 
+    description: 'Direct Messages', 
+    status: 'not_connected',
+    icon: '🐦',
+    capabilities: ['chat']
+  },
+  { 
+    id: 'viber', 
+    name: 'Viber', 
+    description: 'Messaging', 
+    status: 'not_connected',
+    icon: '💬',
     capabilities: ['chat']
   }
 ];
@@ -80,7 +103,7 @@ const IntegrationStatus: React.FC<IntegrationStatusProps> = ({ className = '' })
           </div>
           <Button variant="outline" size="sm" onClick={goToIntegrationsSettings}>
             <Settings className="h-4 w-4 mr-2" />
-            Configure Integrations
+            Configure Channels
           </Button>
         </div>
       </CardHeader>
@@ -93,11 +116,7 @@ const IntegrationStatus: React.FC<IntegrationStatusProps> = ({ className = '' })
             >
               <div className="flex items-center">
                 <div className="w-8 h-8 flex items-center justify-center mr-2 bg-primary/10 rounded-md">
-                  {typeof integration.icon === 'string' ? (
-                    <span className="text-lg">{integration.icon}</span>
-                  ) : (
-                    integration.icon
-                  )}
+                  <span className="text-lg">{integration.icon}</span>
                 </div>
                 <div>
                   <div className="font-medium text-sm">{integration.name}</div>
@@ -115,7 +134,7 @@ const IntegrationStatus: React.FC<IntegrationStatusProps> = ({ className = '' })
                 >
                   {integration.status === 'connected' ? 'Connected' : 'Not Connected'}
                 </Badge>
-                <Button variant="ghost" size="sm" onClick={goToIntegrationsSettings}>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={goToIntegrationsSettings}>
                   <ExternalLink className="h-4 w-4" />
                 </Button>
               </div>
