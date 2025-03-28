@@ -4,7 +4,7 @@ export interface ApiIntegration {
   name: string;
   description: string; 
   icon: React.ReactNode;
-  category: 'ai' | 'communication' | 'ecommerce' | 'tools' | 'analytics';
+  category: 'ai' | 'communication' | 'ecommerce' | 'tools' | 'analytics' | 'cms';
   isActive: boolean;
   apiKey?: string;
   credits?: number;
@@ -20,4 +20,10 @@ export interface ApiCreditData {
     used: number; 
     total: number
   }[];
+}
+
+export interface IntegrationProps {
+  onIntegrationToggle?: (id: string, category: ApiIntegration['category']) => void;
+  onApiKeyUpdate?: (id: string, value: string) => void;
+  onConnect?: (id: string) => void;
 }

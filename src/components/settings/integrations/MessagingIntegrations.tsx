@@ -3,14 +3,12 @@ import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { 
-  BrandFacebook, BrandTwitter, BrandWhatsapp, 
-  BrandTelegram, BrandSlack 
-} from "@/components/ui/custom-icons";
 import { Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { BrandFacebook, BrandTwitter, BrandWhatsapp, BrandTelegram, BrandSlack } from "@/components/ui/custom-icons";
+import { IntegrationProps } from './types';
 
-const MessagingIntegrations: React.FC = () => {
+const MessagingIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
   const { toast } = useToast();
   
   const handleConnect = (service: string) => {
@@ -18,6 +16,10 @@ const MessagingIntegrations: React.FC = () => {
       title: "Connection initiated",
       description: `Connecting to ${service}...`,
     });
+    
+    if (onConnect) {
+      onConnect(service.toLowerCase());
+    }
   };
   
   return (
@@ -54,7 +56,7 @@ const MessagingIntegrations: React.FC = () => {
         </div>
         <Input placeholder="Facebook App ID" className="mb-2" />
         <Input placeholder="Facebook App Secret" className="mb-2" />
-        <Button size="sm" className="mt-2" onClick={() => handleConnect("Facebook Messenger")}>Connect</Button>
+        <Button size="sm" className="mt-2" onClick={() => handleConnect("Facebook")}>Connect</Button>
       </div>
       
       <div className="flex flex-col p-4 border border-border rounded-lg">

@@ -3,23 +3,24 @@ import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { 
-  Bot as BotIcon, MessageSquare, ExternalLink, Cpu, 
-  Grid, Braces, Database, Sparkles
-} from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Bot as BotIcon, MessageSquare, ExternalLink, Database, Grid, Cpu, Braces, Sparkles, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { ApiIntegration } from './types';
+import { ApiIntegration, IntegrationProps } from './types';
 
-const AIIntegrations: React.FC = () => {
+const AIIntegrations: React.FC<IntegrationProps> = ({ 
+  onIntegrationToggle, 
+  onApiKeyUpdate, 
+  onConnect 
+}) => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   
-  const [aiServices, setAiServices] = useState<ApiIntegration[]>([
+  const [aiServices] = useState<ApiIntegration[]>([
     {
       id: "openai",
       name: "OpenAI",
@@ -87,56 +88,58 @@ const AIIntegrations: React.FC = () => {
       credits: 1000,
       usageLimit: 5000,
       usageCount: 750
+    },
+    {
+      id: "elevenlabs",
+      name: "ElevenLabs",
+      description: "Text-to-speech voice generation",
+      icon: <Zap size={20} />,
+      category: 'ai',
+      isActive: false
     }
   ]);
-  
-  const handleIntegrationToggle = (id: string) => {
-    setAiServices(prev => 
-      prev.map(service => 
-        service.id === id ? {...service, isActive: !service.isActive} : service
-      )
-    );
 
-    toast({
-      title: `Integration ${aiServices.find(s => s.id === id)?.isActive ? "disabled" : "enabled"}`,
-      description: `${aiServices.find(s => s.id === id)?.name} integration has been ${aiServices.find(s => s.id === id)?.isActive ? "disabled" : "enabled"}.`,
-    });
+  const handleIntegrationToggle = (id: string, category: ApiIntegration['category']) => {
+    if (onIntegrationToggle) {
+      onIntegrationToggle(id, category);
+    } else {
+      toast({
+        title: `Integration ${aiServices.find(s => s.id === id)?.isActive ? "disabled" : "enabled"}`,
+        description: `${aiServices.find(s => s.id === id)?.name} integration has been ${aiServices.find(s => s.id === id)?.isActive ? "disabled" : "enabled"}.`,
+      });
+    }
   };
 
   const handleApiKeyUpdate = (id: string, value: string) => {
-    setAiServices(prev => 
-      prev.map(service => 
-        service.id === id ? {...service, apiKey: value} : service
-      )
-    );
+    if (onApiKeyUpdate) {
+      onApiKeyUpdate(id, value);
+    }
   };
 
   const handleConnect = (id: string) => {
-    toast({
-      title: "Connection initiated",
-      description: `Connecting to ${aiServices.find(s => s.id === id)?.name}...`,
-    });
-    
-    // Simulate API connection
-    setTimeout(() => {
+    if (onConnect) {
+      onConnect(id);
+    } else {
       toast({
-        title: "Connection successful",
-        description: `Successfully connected to ${aiServices.find(s => s.id === id)?.name}.`,
+        title: "Connection initiated",
+        description: `Connecting to ${aiServices.find(s => s.id === id)?.name}...`,
       });
       
-      setAiServices(prev => 
-        prev.map(service => 
-          service.id === id ? {...service, isActive: true} : service
-        )
-      );
-    }, 1500);
+      // Simulate API connection
+      setTimeout(() => {
+        toast({
+          title: "Connection successful",
+          description: `Successfully connected to ${aiServices.find(s => s.id === id)?.name}.`,
+        });
+      }, 1500);
+    }
   };
 
   const filteredAIServices = aiServices.filter(service => 
     service.name.toLowerCase().includes(searchQuery.toLowerCase()) && 
     (filterCategory === "all" || service.category === filterCategory)
   );
-  
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row gap-4 mb-4">
@@ -188,7 +191,7 @@ const AIIntegrations: React.FC = () => {
                 </div>
                 <Switch 
                   checked={service.isActive}
-                  onCheckedChange={() => handleIntegrationToggle(service.id)}
+                  onCheckedChange={() => handleIntegrationToggle(service.id, service.category)}
                 />
               </div>
               
