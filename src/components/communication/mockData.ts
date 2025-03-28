@@ -1,136 +1,211 @@
 
 import { Conversation, Message } from "@/types/omnichannel";
 
-// Mock conversations data
 export const mockConversations: Conversation[] = [
   {
     id: "1",
-    name: "Sarah Johnson",
-    message: "I need help with my recent order #45678",
+    name: "John Smith",
+    message: "I'm having trouble with my recent order #12345",
     unread: true,
-    time: "5m",
-    channel: "email",
+    time: "10:32 AM",
+    channel: "website",
     status: "open",
     priority: "high",
-    agent: null
+    agent: "AI Assistant",
+    isAiHandled: true,
+    assignmentStatus: "ai"
   },
   {
     id: "2",
+    name: "Sarah Johnson",
+    message: "Can you please check the status of my refund?",
+    unread: false,
+    time: "Yesterday",
+    channel: "email",
+    status: "active",
+    priority: "medium",
+    agent: "AI Assistant",
+    isAiHandled: true,
+    assignmentStatus: "ai"
+  },
+  {
+    id: "3",
     name: "Michael Brown",
     message: "When will my subscription renew?",
-    unread: false,
-    time: "25m",
-    channel: "chat",
-    status: "active",
-    priority: "medium",
-    agent: "AI Assistant"
+    unread: true,
+    time: "2 days ago",
+    channel: "whatsapp",
+    status: "waiting",
+    priority: "low",
+    agent: null,
+    assignmentStatus: "unassigned"
   },
   {
-    id: "3",
-    name: "David Wilson",
-    message: "Thank you for your quick response!",
+    id: "4",
+    name: "Emily Wilson",
+    message: "I need to change my shipping address",
     unread: false,
-    time: "1h",
+    time: "Jul 12",
     channel: "sms",
     status: "closed",
-    priority: "low",
-    agent: "John D."
+    priority: "high",
+    agent: "Thomas Anderson",
+    assignmentStatus: "assigned_to_human",
+    assignedHumanAgent: "Thomas Anderson",
+    assignedToHumanAt: "2023-07-12T14:32:00Z"
   },
   {
-    id: "4",
+    id: "5",
+    name: "David Lee",
+    message: "Is there a discount for annual plans?",
+    unread: true,
+    time: "Jul 10",
+    channel: "messenger",
+    status: "open",
+    priority: "medium",
+    agent: null,
+    assignmentStatus: "unassigned"
+  },
+  {
+    id: "6",
     name: "Jennifer Martinez",
     message: "I'd like to upgrade my plan",
-    unread: true,
-    time: "2h",
+    unread: false,
+    time: "Jul 8",
     channel: "instagram",
-    status: "open",
-    priority: "high",
-    agent: null
-  },
-  {
-    id: "5",
-    name: "Robert Davis",
-    message: "Can you explain how the AI features work?",
-    unread: false,
-    time: "3h",
-    channel: "twitter",
     status: "active",
-    priority: "medium",
-    agent: "AI Assistant"
-  },
-  {
-    id: "6",
-    name: "Emily Wilson",
-    message: "I need help setting up my account",
-    unread: false,
-    time: "1d",
-    channel: "facebook",
-    status: "waiting",
-    priority: "medium",
-    agent: null
+    priority: "high",
+    agent: "AI Assistant",
+    isAiHandled: true,
+    assignmentStatus: "ai"
   },
   {
     id: "7",
-    name: "Thomas Anderson",
-    message: "Left a voicemail about subscription issues",
-    unread: true,
-    time: "1d",
-    channel: "phone",
-    status: "open",
-    priority: "high",
-    agent: null
-  }
+    name: "Robert Davis",
+    message: "Can you explain how the API works?",
+    unread: false,
+    time: "Jul 5",
+    channel: "twitter",
+    status: "closed",
+    priority: "low",
+    agent: "Jessica Clark",
+    assignmentStatus: "waiting_for_human"
+  },
 ];
 
-// Mock messages data
 export const mockMessages: Message[] = [
   {
-    id: "1",
-    sender: "customer",
-    content: "Hello, I recently placed an order (#45678) but haven't received a shipping confirmation yet. Can you help me check the status?",
+    id: "msg1",
+    sender: 'customer',
+    content: "Hello, I'm having trouble with my recent order #12345. It was supposed to arrive yesterday but I haven't received it yet.",
+    time: "10:30 AM",
+    channel: "website"
+  },
+  {
+    id: "msg2",
+    sender: 'ai',
+    content: "I'm sorry to hear about the delay with your order. Let me check the status for you right away.",
     time: "10:32 AM",
-    channel: "email"
+    channel: "website"
   },
   {
-    id: "2",
-    sender: "ai",
-    content: "Hi Sarah, thank you for reaching out. I'd be happy to help you check on your order status. Let me look that up for you right away.",
-    time: "10:34 AM",
-    channel: "email"
+    id: "msg3",
+    sender: 'customer',
+    content: "Thank you, I appreciate your help.",
+    time: "10:33 AM",
+    channel: "website"
   },
   {
-    id: "3",
-    sender: "ai",
-    content: "I can see that your order #45678 has been processed and is currently being prepared for shipping. It should be shipped within the next 24 hours, and you'll receive an email confirmation once it's on the way.",
+    id: "msg4",
+    sender: 'ai',
+    content: "I can see that your order #12345 has been processed and is currently being prepared for shipping. It should be shipped within the next 24 hours and you'll receive an email confirmation.",
     time: "10:35 AM",
-    channel: "email"
+    channel: "website"
   },
   {
-    id: "4",
-    sender: "customer",
+    id: "msg5",
+    sender: 'customer',
     content: "That's great to know! Do you have an estimated delivery date?",
     time: "10:38 AM",
-    channel: "email"
+    channel: "website"
   },
   {
-    id: "5",
-    sender: "ai",
-    content: "Based on your location and the shipping method selected (Standard Shipping), your estimated delivery date is June 15-16. Would you like me to provide tracking information once it's available?",
+    id: "msg6",
+    sender: 'ai',
+    content: "Based on your location and the shipping method selected (Standard Shipping), your estimated delivery date is June 15-16. Would you like me to provide tracking information once it is available?",
     time: "10:40 AM",
-    channel: "email"
+    channel: "website"
   },
   {
-    id: "6",
-    sender: "customer",
+    id: "msg7",
+    sender: 'customer',
     content: "Yes, please send me the tracking information when available. Also, is it possible to upgrade to express shipping?",
     time: "10:42 AM",
+    channel: "website"
+  },
+  {
+    id: "msg8",
+    sender: 'human',
+    content: "Hi Sarah, this is John from customer support. I'm taking over from our AI assistant. Yes, we can definitely upgrade your shipping to express. There would be an additional fee of $12.50. Would you like to proceed with the upgrade?",
+    time: "10:45 AM",
+    channel: "website"
+  },
+  // Email Channel
+  {
+    id: "emsg1",
+    sender: 'customer',
+    content: "Hello, can you please check the status of my refund for order #54321? It's been over a week now.",
+    time: "Yesterday",
     channel: "email"
   },
   {
-    id: "7",
-    sender: "human",
-    content: "Hi Sarah, this is John from customer support. I'm taking over from our AI assistant. Yes, we can definitely upgrade your shipping to express. There would be an additional fee of $12.50. Would you like to proceed with the upgrade?",
-    time: "10:45 AM",
+    id: "emsg2",
+    sender: 'ai',
+    content: "Thank you for reaching out about your refund. I'll look into this right away. Could you please confirm the email address associated with your order?",
+    time: "Yesterday",
     channel: "email"
-  }
+  },
+  // WhatsApp Channel
+  {
+    id: "wmsg1",
+    sender: 'customer',
+    content: "Hi there, I wanted to know when my subscription will renew? I'm currently on the monthly plan.",
+    time: "2 days ago",
+    channel: "whatsapp"
+  },
+  // SMS Channel
+  {
+    id: "smsg1",
+    sender: 'customer',
+    content: "Need to change shipping address for order #78901 to 123 New Street, Cityville, State 54321",
+    time: "Jul 12",
+    channel: "sms"
+  },
+  {
+    id: "smsg2",
+    sender: 'human',
+    content: "I've updated the shipping address for your order #78901. Thank you for letting us know before it shipped!",
+    time: "Jul 12",
+    channel: "sms"
+  },
 ];
+
+// Saved replies for quick responses
+export const savedReplies = [
+  { id: "reply1", keyword: "hello", text: "Hello! How can I assist you today?" },
+  { id: "reply2", keyword: "thanks", text: "Thank you for reaching out to us. We appreciate your business!" },
+  { id: "reply3", keyword: "refund", text: "I understand you're asking about a refund. Let me check the status of that for you." },
+  { id: "reply4", keyword: "shipping", text: "Your order is currently being processed and will be shipped within 1-2 business days." },
+  { id: "reply5", keyword: "payment", text: "We accept all major credit cards, PayPal, and Apple Pay as payment methods." },
+  { id: "reply6", keyword: "hours", text: "Our customer support team is available Monday to Friday, 9 AM to 6 PM EST." },
+  { id: "reply7", keyword: "discount", text: "We currently have a 15% discount for first-time customers. Use code WELCOME15 at checkout." },
+  { id: "reply8", keyword: "contact", text: "You can reach our support team at support@example.com or call us at 1-800-123-4567." }
+];
+
+export const queueStats = {
+  currentPosition: 3,
+  estimatedWaitTime: "5 minutes",
+  agentsAvailable: 2,
+  totalInQueue: 7,
+  maxConcurrentChats: 3
+};

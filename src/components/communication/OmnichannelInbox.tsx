@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ConversationSidebar from './conversation-list/ConversationSidebar';
 import ConversationDetail from './conversation-detail/ConversationDetail';
 import { mockConversations, mockMessages } from './mockData';
@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { InfoIcon } from 'lucide-react';
 
 interface OmnichannelInboxProps {
-  onAssignToHuman?: () => void;
+  onAssignToHuman?: (assignedConversation: Conversation) => void;
 }
 
 // Main OmnichannelInbox component that composes all the smaller components
@@ -52,7 +52,7 @@ const OmnichannelInbox: React.FC<OmnichannelInboxProps> = ({ onAssignToHuman }) 
     // Update conversation status
     const updatedConversations = conversations.map(conversation => {
       if (conversation.id === selectedConversationId) {
-        return {
+        const updatedConversation = {
           ...conversation,
           assignmentStatus: 'waiting_for_human' as 'waiting_for_human', // Type assertion to fix error
           assignedToHumanAt: new Date().toISOString(),
@@ -60,6 +60,13 @@ const OmnichannelInbox: React.FC<OmnichannelInboxProps> = ({ onAssignToHuman }) 
           agent: availableAgent ? availableAgent.name : 'Waiting for human',
           status: 'waiting',
         };
+        
+        // Call the parent component's onAssignToHuman with the updated conversation
+        if (onAssignToHuman) {
+          onAssignToHuman(updatedConversation);
+        }
+        
+        return updatedConversation;
       }
       return conversation;
     });
@@ -72,10 +79,6 @@ const OmnichannelInbox: React.FC<OmnichannelInboxProps> = ({ onAssignToHuman }) 
         ? `The conversation has been assigned to ${availableAgent.name}`
         : "The conversation is waiting for the next available human agent",
     });
-    
-    if (onAssignToHuman) {
-      onAssignToHuman();
-    }
   };
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
