@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { ArrowLeft } from "lucide-react";
@@ -115,6 +116,9 @@ const TicketsPage: React.FC = () => {
   const filteringProps = useTicketFiltering(tickets, mockAgents);
   
   const handleCreateTicket = (newTicket: Partial<SupportTicket>) => {
+    console.log('Creating new ticket with data:', newTicket);
+    
+    // Make sure category and department are saved correctly
     const ticket: SupportTicket = {
       ...newTicket,
       id: `ticket-${Date.now()}`,
@@ -123,9 +127,12 @@ const TicketsPage: React.FC = () => {
       status: 'open',
       messages: [],
       tags: newTicket.tags || [],
-      userId: 'user-current'
+      userId: 'user-current',
+      category: newTicket.category || '',
+      department: newTicket.department || ''
     } as SupportTicket;
     
+    console.log('New ticket created:', ticket);
     setTickets([ticket, ...tickets]);
     setShowNewTicketForm(false);
     

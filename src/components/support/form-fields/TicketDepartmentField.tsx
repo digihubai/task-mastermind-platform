@@ -27,17 +27,23 @@ export const TicketDepartmentField: React.FC<TicketDepartmentFieldProps> = ({
     console.log('Current department value:', value);
   }, [availableDepartments, value]);
   
-  // Ensure we have a valid value (in case the selected value is not in the available options)
+  // Set default value if empty and options available
   useEffect(() => {
-    if (availableDepartments.length > 0 && !availableDepartments.includes(value)) {
+    if (!value && availableDepartments.length > 0) {
+      console.log('Setting default department to:', availableDepartments[0]);
       onChange(availableDepartments[0]);
     }
   }, [availableDepartments, value, onChange]);
   
+  const handleChange = (selectedValue: string) => {
+    console.log('Department selected:', selectedValue);
+    onChange(selectedValue);
+  };
+  
   return (
     <div>
       <Label htmlFor="department">Department</Label>
-      <Select value={value} onValueChange={onChange}>
+      <Select value={value} onValueChange={handleChange}>
         <SelectTrigger id="department" className="mt-1">
           <SelectValue placeholder="Select a department" />
         </SelectTrigger>

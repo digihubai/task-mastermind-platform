@@ -27,17 +27,23 @@ export const TicketCategoryField: React.FC<TicketCategoryFieldProps> = ({
     console.log('Current category value:', value);
   }, [availableCategories, value]);
   
-  // Ensure we have a valid value (in case the selected value is not in the available options)
+  // Set default value if empty and options available
   useEffect(() => {
-    if (availableCategories.length > 0 && !availableCategories.includes(value)) {
+    if (!value && availableCategories.length > 0) {
+      console.log('Setting default category to:', availableCategories[0]);
       onChange(availableCategories[0]);
     }
   }, [availableCategories, value, onChange]);
   
+  const handleChange = (selectedValue: string) => {
+    console.log('Category selected:', selectedValue);
+    onChange(selectedValue);
+  };
+  
   return (
     <div>
       <Label htmlFor="category">Category</Label>
-      <Select value={value} onValueChange={onChange}>
+      <Select value={value} onValueChange={handleChange}>
         <SelectTrigger id="category" className="mt-1">
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
