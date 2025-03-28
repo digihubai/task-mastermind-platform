@@ -118,6 +118,7 @@ export const ChatbotConfigView: React.FC<ChatbotConfigViewProps> = ({
               avatar={newChatbotInfo.avatar}
               position={newChatbotInfo.position}
               showDateTime={newChatbotInfo.showDateTime}
+              language={newChatbotInfo.language}
             />
           </div>
         </div>

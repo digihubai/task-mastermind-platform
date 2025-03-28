@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { HexColorPicker } from "react-colorful";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Check, Upload, User, Bot, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -58,11 +59,11 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
   
   // Define avatar options based on the image provided
   const avatars = [
-    { value: "avatar1", icon: <img src="/path-to-avatar1.jpg" alt="Human Avatar 1" className="w-full h-full object-cover" /> },
-    { value: "avatar2", icon: <img src="/path-to-avatar2.jpg" alt="Human Avatar 2" className="w-full h-full object-cover" /> },
-    { value: "avatar3", icon: <User className="text-white" /> },
-    { value: "avatar4", icon: <Bot className="text-white" /> },
-    { value: "avatar5", icon: <MessageCircle className="text-white" /> },
+    { value: "avatar1", icon: <User className="text-white" /> },
+    { value: "avatar2", icon: <User className="text-purple-500" /> },
+    { value: "avatar3", icon: <User className="text-green-500" /> },
+    { value: "avatar4", icon: <User className="text-orange-500" /> },
+    { value: "avatar5", icon: <MessageCircle className="text-blue-500" /> },
   ];
   
   // Define color options based on the image provided
@@ -73,6 +74,22 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
     { value: "#9C27B0", label: "Purple" },
     { value: "#2196F3", label: "Blue" },
     { value: "custom", label: "Custom" },
+  ];
+
+  // Define language options
+  const languageOptions = [
+    { value: "auto", label: "Auto (Browser Default)" },
+    { value: "en", label: "English" },
+    { value: "es", label: "Spanish" },
+    { value: "fr", label: "French" },
+    { value: "de", label: "German" },
+    { value: "pt", label: "Portuguese" },
+    { value: "it", label: "Italian" },
+    { value: "ru", label: "Russian" },
+    { value: "zh", label: "Chinese" },
+    { value: "ja", label: "Japanese" },
+    { value: "ko", label: "Korean" },
+    { value: "ar", label: "Arabic" },
   ];
 
   return (
@@ -106,6 +123,29 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
           </Button>
           <p className="text-xs text-muted-foreground mt-1">No file chosen</p>
         </div>
+      </div>
+      
+      {/* Language Selection */}
+      <div>
+        <Label htmlFor="language">Language</Label>
+        <Select
+          value={chatbotInfo.language}
+          onValueChange={(value) => updateInfo("language", value)}
+        >
+          <SelectTrigger className="w-full mt-2">
+            <SelectValue placeholder="Select language" />
+          </SelectTrigger>
+          <SelectContent>
+            {languageOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground mt-1">
+          This affects date formatting and language detection.
+        </p>
       </div>
       
       {/* Footer Link */}
@@ -269,11 +309,15 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
           onValueChange={(values) => updateInfo("triggerSize", values[0])}
           className="mt-4"
         />
+        <div className="mt-2 flex justify-between text-xs text-muted-foreground">
+          <span>Small</span>
+          <span>Large</span>
+        </div>
       </div>
       
       {/* Position Selection */}
       <div>
-        <Label>Position</Label>
+        <Label>Message Position</Label>
         <div className="grid grid-cols-2 gap-4 mt-4">
           <div 
             className={`border rounded-lg p-6 flex flex-col items-center justify-between gap-2 cursor-pointer relative ${
@@ -281,7 +325,10 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
             }`}
             onClick={() => updateInfo("position", "left")}
           >
-            <div className="w-8 h-8 bg-gray-300 rounded absolute left-4 bottom-4"></div>
+            <div className="w-full space-y-2">
+              <div className="w-3/4 h-8 bg-gray-200 rounded-lg"></div>
+              <div className="w-1/2 h-8 bg-gray-200 rounded-lg self-start"></div>
+            </div>
             <p className="text-sm mt-auto">Left</p>
             {chatbotInfo.position === "left" && (
               <div className="absolute top-2 right-2 bg-primary rounded-md p-1">
@@ -296,7 +343,10 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
             }`}
             onClick={() => updateInfo("position", "right")}
           >
-            <div className="w-8 h-8 bg-gray-300 rounded absolute right-4 bottom-4"></div>
+            <div className="w-full space-y-2 flex flex-col items-end">
+              <div className="w-3/4 h-8 bg-gray-200 rounded-lg"></div>
+              <div className="w-1/2 h-8 bg-gray-200 rounded-lg self-end"></div>
+            </div>
             <p className="text-sm mt-auto">Right</p>
             {chatbotInfo.position === "right" && (
               <div className="absolute top-2 right-2 bg-primary rounded-md p-1">

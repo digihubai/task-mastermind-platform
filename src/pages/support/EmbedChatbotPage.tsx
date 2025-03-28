@@ -20,6 +20,7 @@ const EmbedChatbotPage = () => {
     theme: 'auto',
     position: 'bottom-right',
     model: 'gpt-4o-mini',
+    language: 'auto'
   });
   
   const embedCode = `<div id="digihub-chatbot"></div>
@@ -35,11 +36,12 @@ const EmbedChatbotPage = () => {
     welcomeMessage: "${chatConfig.welcomeMessage}",
     theme: "${chatConfig.theme}",
     position: "${chatConfig.position}",
-    model: "${chatConfig.model}"
+    model: "${chatConfig.model}",
+    language: "${chatConfig.language}"
   });
 </script>`;
 
-  const directLinkUrl = `https://your-app-domain.com/support/chatbot?name=${encodeURIComponent(chatConfig.assistantName)}&welcome=${encodeURIComponent(chatConfig.welcomeMessage)}&theme=${chatConfig.theme}&position=${chatConfig.position}`;
+  const directLinkUrl = `https://your-app-domain.com/support/chatbot?name=${encodeURIComponent(chatConfig.assistantName)}&welcome=${encodeURIComponent(chatConfig.welcomeMessage)}&theme=${chatConfig.theme}&position=${chatConfig.position}&language=${chatConfig.language}`;
   
   const handleCopyCode = () => {
     navigator.clipboard.writeText(embedCode);
@@ -135,6 +137,29 @@ const EmbedChatbotPage = () => {
                     <option value="gemini">Gemini</option>
                   </select>
                 </div>
+
+                <div>
+                  <Label htmlFor="language">Language</Label>
+                  <select 
+                    id="language" 
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={chatConfig.language}
+                    onChange={(e) => setChatConfig({...chatConfig, language: e.target.value})}
+                  >
+                    <option value="auto">Auto (Browser Default)</option>
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="it">Italian</option>
+                    <option value="ru">Russian</option>
+                    <option value="zh">Chinese</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="ar">Arabic</option>
+                  </select>
+                </div>
               </CardContent>
             </Card>
             
@@ -216,6 +241,7 @@ const EmbedChatbotPage = () => {
                     temperature: 0.7
                   }}
                   variant="embedded"
+                  language={chatConfig.language}
                 />
               </CardContent>
             </Card>

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Upload, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -19,6 +19,11 @@ export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const handleFileUploadClick = () => {
+    fileInputRef.current?.click();
+  };
   
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -65,6 +70,11 @@ export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
         title: "File uploaded",
         description: `${file.name} has been uploaded successfully.`,
       });
+      
+      // Reset the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }, 1500);
   };
   
@@ -91,6 +101,16 @@ export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
       description: "The file has been removed from training."
     });
   };
+
+  const handleSelectAll = () => {
+    setUploadedFiles(uploadedFiles.map(file => ({ ...file, selected: true })));
+  };
+
+  const handleToggleSelect = (id: string) => {
+    setUploadedFiles(uploadedFiles.map(file => 
+      file.id === id ? { ...file, selected: !file.selected } : file
+    ));
+  };
   
   return (
     <div className="space-y-6">
@@ -102,8 +122,17 @@ export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
         <p className="text-center text-sm text-muted-foreground mb-5">Upload a File (Max: 25Mb)</p>
         
         <Button 
+          variant="outline"
+          className="w-full max-w-xs bg-white hover:bg-gray-50 border border-gray-200 mb-3"
+          onClick={handleFileUploadClick}
+        >
+          <Plus size={16} className="mr-2" />
+          Choose File
+        </Button>
+        
+        <Button 
           className="w-full max-w-xs bg-emerald-500 hover:bg-emerald-600"
-          onClick={() => document.getElementById('file-upload')?.click()}
+          onClick={handleFileUploadClick}
           disabled={isUploading}
         >
           {isUploading ? (
@@ -113,7 +142,7 @@ export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
             </>
           ) : (
             <>
-              <Plus size={16} className="mr-2" />
+              <Upload size={16} className="mr-2" />
               Upload
             </>
           )}
@@ -125,6 +154,7 @@ export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
           className="hidden"
           onChange={handleFileUpload}
           disabled={isUploading}
+          ref={fileInputRef}
         />
       </div>
       
@@ -136,7 +166,7 @@ export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
                 <span className="h-6 w-6 rounded-full bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300 flex items-center justify-center text-sm">2</span>
                 Manage Files
               </h3>
-              <Button variant="ghost" size="sm" onClick={() => setUploadedFiles(uploadedFiles.map(f => ({...f, selected: true})))}>
+              <Button variant="ghost" size="sm" onClick={handleSelectAll}>
                 Select All
               </Button>
             </div>
@@ -146,7 +176,12 @@ export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
             {uploadedFiles.map((file) => (
               <div key={file.id} className="flex items-center justify-between border rounded-md p-3">
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" className="h-4 w-4" checked={file.selected || false} />
+                  <input 
+                    type="checkbox" 
+                    className="h-4 w-4" 
+                    checked={file.selected || false}
+                    onChange={() => handleToggleSelect(file.id)} 
+                  />
                   <span>{file.name}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -162,7 +197,7 @@ export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
           </div>
           
           <Button className="w-full bg-indigo-600 hover:bg-indigo-700" onClick={handleTrainAll}>
-            Train GPT
+            Train Chatbot
           </Button>
         </>
       )}

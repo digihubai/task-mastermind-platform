@@ -22,6 +22,7 @@ interface ChatInterfaceProps {
   avatar?: string;
   position?: "left" | "right";
   showDateTime?: boolean;
+  language?: string;
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -35,6 +36,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   avatar = "avatar1",
   position = "right",
   showDateTime = true,
+  language = "auto",
 }) => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<{ text: string; isBot: boolean; timestamp: Date }[]>([
@@ -51,12 +53,23 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     scrollToBottom();
   }, [messages]);
 
+  // Set language based on prop or default
+  useEffect(() => {
+    if (language && language !== "auto") {
+      document.documentElement.lang = language;
+    }
+  }, [language]);
+
   const formatMessageTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString(language !== "auto" ? language : undefined, { hour: '2-digit', minute: '2-digit' });
   };
 
   const formatFullDate = (date: Date) => {
-    return `${date.toLocaleDateString()} / ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    const dateOptions = { dateStyle: 'short' } as Intl.DateTimeFormatOptions;
+    const timeOptions = { timeStyle: 'short' } as Intl.DateTimeFormatOptions;
+    
+    return date.toLocaleDateString(language !== "auto" ? language : undefined, dateOptions) + " / " + 
+           date.toLocaleTimeString(language !== "auto" ? language : undefined, timeOptions);
   };
 
   const handleSendMessage = () => {
@@ -151,7 +164,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   ? 'bg-muted text-left ml-0 border border-border/30 shadow-sm' 
                   : 'text-primary-foreground text-right ml-auto shadow-sm'
               }`}
-              style={{ backgroundColor: msg.isBot ? undefined : accentColor }}
+              style={{ backgroundColor: msg.isBot ? undefined : accentColor, 
+                       marginLeft: msg.isBot ? 0 : 'auto',
+                       marginRight: msg.isBot ? 'auto' : 0,
+                     }}
             >
               {msg.text}
             </div>

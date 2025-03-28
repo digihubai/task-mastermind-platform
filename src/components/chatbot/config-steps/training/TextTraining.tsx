@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ interface TextTrainingProps {
 interface SavedContent {
   id: string;
   title: string;
+  content: string;
   trained: boolean;
   selected?: boolean;
 }
@@ -24,6 +25,9 @@ export const TextTraining: React.FC<TextTrainingProps> = ({ onSkip }) => {
   const [textContent, setTextContent] = useState("");
   const [title, setTitle] = useState("");
   const [savedContents, setSavedContents] = useState<SavedContent[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
   
   const handleAddText = () => {
     if (!title.trim()) {
@@ -55,6 +59,7 @@ export const TextTraining: React.FC<TextTrainingProps> = ({ onSkip }) => {
       setSavedContents([...savedContents, {
         id: newContentId,
         title: title,
+        content: textContent,
         trained: false,
         selected: false
       }]);
@@ -92,6 +97,63 @@ export const TextTraining: React.FC<TextTrainingProps> = ({ onSkip }) => {
       title: "Content removed",
       description: "The content has been removed from training."
     });
+  };
+
+  const handleEditContent = (content: SavedContent) => {
+    setEditingId(content.id);
+    setEditTitle(content.title);
+    setEditContent(content.content);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editTitle.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Title required",
+        description: "Please enter a title for this content."
+      });
+      return;
+    }
+    
+    if (!editContent.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Text required",
+        description: "Please enter some text content to continue."
+      });
+      return;
+    }
+
+    setSavedContents(savedContents.map(content => 
+      content.id === editingId 
+        ? { ...content, title: editTitle, content: editContent, trained: false } 
+        : content
+    ));
+
+    setEditingId(null);
+    setEditTitle("");
+    setEditContent("");
+
+    toast({
+      title: "Content updated",
+      description: "Your text content has been updated successfully."
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditTitle("");
+    setEditContent("");
+  };
+
+  const handleSelectAll = () => {
+    setSavedContents(savedContents.map(content => ({ ...content, selected: true })));
+  };
+
+  const handleToggleSelect = (id: string) => {
+    setSavedContents(savedContents.map(content => 
+      content.id === id ? { ...content, selected: !content.selected } : content
+    ));
   };
   
   return (
@@ -152,7 +214,7 @@ export const TextTraining: React.FC<TextTrainingProps> = ({ onSkip }) => {
                 <span className="h-6 w-6 rounded-full bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300 flex items-center justify-center text-sm">2</span>
                 Manage Content
               </h3>
-              <Button variant="ghost" size="sm" onClick={() => setSavedContents(savedContents.map(c => ({...c, selected: true})))}>
+              <Button variant="ghost" size="sm" onClick={handleSelectAll}>
                 Select All
               </Button>
             </div>
@@ -160,25 +222,64 @@ export const TextTraining: React.FC<TextTrainingProps> = ({ onSkip }) => {
           
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {savedContents.map((content) => (
-              <div key={content.id} className="flex items-center justify-between border rounded-md p-3">
-                <div className="flex items-center gap-2">
-                  <input type="checkbox" className="h-4 w-4" checked={content.selected || false} />
-                  <span>{content.title}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs px-2 py-1 rounded-full ${content.trained ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                    {content.trained ? 'Trained' : 'Not Trained'}
-                  </span>
-                  <Button variant="ghost" size="sm" onClick={() => handleDeleteContent(content.id)}>
-                    &times;
-                  </Button>
-                </div>
+              <div key={content.id} className="border rounded-md p-3">
+                {editingId === content.id ? (
+                  <div className="space-y-3">
+                    <Input
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      placeholder="Edit title"
+                    />
+                    <Textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      placeholder="Edit content"
+                      className="h-32 resize-none"
+                    />
+                    <div className="flex justify-end gap-2">
+                      <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                        Cancel
+                      </Button>
+                      <Button size="sm" onClick={handleSaveEdit}>
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="checkbox" 
+                          className="h-4 w-4" 
+                          checked={content.selected || false}
+                          onChange={() => handleToggleSelect(content.id)}
+                        />
+                        <span className="font-medium">{content.title}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs px-2 py-1 rounded-full ${content.trained ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                          {content.trained ? 'Trained' : 'Not Trained'}
+                        </span>
+                        <Button variant="ghost" size="icon" onClick={() => handleEditContent(content)}>
+                          <Edit size={16} />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteContent(content.id)}>
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                      {content.content}
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
           
           <Button className="w-full bg-indigo-600 hover:bg-indigo-700" onClick={handleTrainAll}>
-            Train GPT
+            Train Chatbot
           </Button>
         </>
       )}

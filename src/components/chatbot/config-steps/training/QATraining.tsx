@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,9 @@ export const QATraining: React.FC<QATrainingProps> = ({ onSkip }) => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [savedQAPairs, setSavedQAPairs] = useState<QAPair[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editQuestion, setEditQuestion] = useState("");
+  const [editAnswer, setEditAnswer] = useState("");
   
   const handleAddQA = () => {
     if (!question.trim()) {
@@ -95,6 +98,63 @@ export const QATraining: React.FC<QATrainingProps> = ({ onSkip }) => {
       description: "The question and answer have been removed from training."
     });
   };
+
+  const handleEditPair = (pair: QAPair) => {
+    setEditingId(pair.id);
+    setEditQuestion(pair.question);
+    setEditAnswer(pair.answer);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editQuestion.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Question required",
+        description: "Please enter a question to continue."
+      });
+      return;
+    }
+    
+    if (!editAnswer.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Answer required",
+        description: "Please enter an answer to continue."
+      });
+      return;
+    }
+
+    setSavedQAPairs(savedQAPairs.map(pair => 
+      pair.id === editingId 
+        ? { ...pair, question: editQuestion, answer: editAnswer, trained: false } 
+        : pair
+    ));
+
+    setEditingId(null);
+    setEditQuestion("");
+    setEditAnswer("");
+
+    toast({
+      title: "Q&A pair updated",
+      description: "Your question and answer have been updated successfully."
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditQuestion("");
+    setEditAnswer("");
+  };
+
+  const handleSelectAll = () => {
+    setSavedQAPairs(savedQAPairs.map(pair => ({ ...pair, selected: true })));
+  };
+
+  const handleToggleSelect = (id: string) => {
+    setSavedQAPairs(savedQAPairs.map(pair => 
+      pair.id === id ? { ...pair, selected: !pair.selected } : pair
+    ));
+  };
   
   return (
     <div className="space-y-6">
@@ -154,7 +214,7 @@ export const QATraining: React.FC<QATrainingProps> = ({ onSkip }) => {
                 <span className="h-6 w-6 rounded-full bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300 flex items-center justify-center text-sm">2</span>
                 Manage Q&A Pairs
               </h3>
-              <Button variant="ghost" size="sm" onClick={() => setSavedQAPairs(savedQAPairs.map(p => ({...p, selected: true})))}>
+              <Button variant="ghost" size="sm" onClick={handleSelectAll}>
                 Select All
               </Button>
             </div>
@@ -162,25 +222,64 @@ export const QATraining: React.FC<QATrainingProps> = ({ onSkip }) => {
           
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {savedQAPairs.map((pair) => (
-              <div key={pair.id} className="flex items-center justify-between border rounded-md p-3">
-                <div className="flex items-center gap-2">
-                  <input type="checkbox" className="h-4 w-4" checked={pair.selected || false} />
-                  <span>{pair.question.length > 40 ? pair.question.substring(0, 40) + '...' : pair.question}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs px-2 py-1 rounded-full ${pair.trained ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                    {pair.trained ? 'Trained' : 'Not Trained'}
-                  </span>
-                  <Button variant="ghost" size="sm" onClick={() => handleDeletePair(pair.id)}>
-                    &times;
-                  </Button>
-                </div>
+              <div key={pair.id} className="border rounded-md p-3">
+                {editingId === pair.id ? (
+                  <div className="space-y-3">
+                    <Input
+                      value={editQuestion}
+                      onChange={(e) => setEditQuestion(e.target.value)}
+                      placeholder="Edit question"
+                    />
+                    <Textarea
+                      value={editAnswer}
+                      onChange={(e) => setEditAnswer(e.target.value)}
+                      placeholder="Edit answer"
+                      className="h-32 resize-none"
+                    />
+                    <div className="flex justify-end gap-2">
+                      <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                        Cancel
+                      </Button>
+                      <Button size="sm" onClick={handleSaveEdit}>
+                        Save
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="checkbox" 
+                          className="h-4 w-4" 
+                          checked={pair.selected || false}
+                          onChange={() => handleToggleSelect(pair.id)}
+                        />
+                        <span className="font-medium">{pair.question.length > 40 ? pair.question.substring(0, 40) + '...' : pair.question}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs px-2 py-1 rounded-full ${pair.trained ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                          {pair.trained ? 'Trained' : 'Not Trained'}
+                        </span>
+                        <Button variant="ghost" size="icon" onClick={() => handleEditPair(pair)}>
+                          <Edit size={16} />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeletePair(pair.id)}>
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                      {pair.answer}
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
           
           <Button className="w-full bg-indigo-600 hover:bg-indigo-700" onClick={handleTrainAll}>
-            Train GPT
+            Train Chatbot
           </Button>
         </>
       )}

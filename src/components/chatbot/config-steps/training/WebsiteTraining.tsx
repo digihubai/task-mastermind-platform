@@ -1,8 +1,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus } from "lucide-react";
-import { Label } from "@/components/ui/label";
+import { Loader2, Plus, RefreshCw, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
@@ -10,9 +9,10 @@ interface WebsiteTrainingProps {
   onSkip: () => void;
 }
 
-interface Website {
+interface WebsitePage {
   id: string;
   url: string;
+  title: string;
   depth: number;
   trained: boolean;
   selected?: boolean;
@@ -21,163 +21,187 @@ interface Website {
 export const WebsiteTraining: React.FC<WebsiteTrainingProps> = ({ onSkip }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [websiteUrl, setWebsiteUrl] = useState("");
-  const [crawlingDepth, setCrawlingDepth] = useState<number>(2);
-  const [savedWebsites, setSavedWebsites] = useState<Website[]>([]);
+  const [url, setUrl] = useState("");
+  const [depth, setDepth] = useState<number>(1);
+  const [pages, setPages] = useState<WebsitePage[]>([]);
   
-  const handleAddWebsite = () => {
+  const handleScanWebsite = () => {
+    if (!url.trim()) {
+      toast({
+        variant: "destructive",
+        title: "URL required",
+        description: "Please enter a website URL to continue."
+      });
+      return;
+    }
+    
     // Validate URL format
-    if (!websiteUrl.trim() || !isValidUrl(websiteUrl)) {
+    try {
+      new URL(url);
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "Invalid URL",
-        description: "Please enter a valid website URL."
+        description: "Please enter a valid URL including http:// or https://."
       });
       return;
     }
     
     setIsLoading(true);
     
-    // Simulate website processing
+    // Simulate website scanning
     setTimeout(() => {
       setIsLoading(false);
       
-      // Save the website
-      const newWebsiteId = Date.now().toString();
-      setSavedWebsites([...savedWebsites, {
-        id: newWebsiteId,
-        url: websiteUrl,
-        depth: crawlingDepth,
-        trained: false,
-        selected: false
-      }]);
+      // Generate mock pages for the website
+      const siteName = new URL(url).hostname.replace('www.', '');
+      const mockPages: WebsitePage[] = [
+        // Generate some mock pages based on common site structure
+        ...Array(Math.floor(Math.random() * 5) + 3).fill(null).map((_, i) => ({
+          id: Date.now().toString() + i,
+          url: `${url}${i === 0 ? '' : '/' + ['about', 'contact', 'services', 'products', 'blog', 'faq'][i % 6]}`,
+          title: `${siteName} | ${i === 0 ? 'Home' : ['About', 'Contact', 'Services', 'Products', 'Blog', 'FAQ'][i % 6]}`,
+          depth: 1,
+          trained: false,
+          selected: false
+        }))
+      ];
       
-      // Reset input fields
-      setWebsiteUrl("");
+      setPages(mockPages);
       
       toast({
-        title: "Website added",
-        description: "Website has been added for crawling and training."
+        title: "Website scanned",
+        description: `Found ${mockPages.length} pages on ${siteName}.`
       });
-    }, 1500);
+    }, 2000);
   };
   
   const handleTrainAll = () => {
     // Simulate training process
     toast({
-      title: "Crawling and training started",
-      description: "Your websites are being crawled and processed for training."
+      title: "Training started",
+      description: "Your web pages are being processed for training."
     });
     
     setTimeout(() => {
-      setSavedWebsites(savedWebsites.map(website => ({...website, trained: true})));
+      setPages(pages.map(page => ({...page, trained: true})));
       toast({
         title: "Training complete",
-        description: "All websites have been successfully crawled and trained."
+        description: "All web pages have been successfully trained."
       });
     }, 2000);
   };
   
-  const handleDeleteWebsite = (id: string) => {
-    setSavedWebsites(savedWebsites.filter(website => website.id !== id));
+  const handleDeletePage = (id: string) => {
+    setPages(pages.filter(page => page.id !== id));
     toast({
-      title: "Website removed",
-      description: "The website has been removed from training."
+      title: "Page removed",
+      description: "The page has been removed from training."
     });
   };
-  
-  const isValidUrl = (url: string) => {
-    try {
-      new URL(url);
-      return true;
-    } catch (error) {
-      return false;
-    }
+
+  const handleSelectAll = () => {
+    setPages(pages.map(page => ({ ...page, selected: true })));
+  };
+
+  const handleToggleSelect = (id: string) => {
+    setPages(pages.map(page => 
+      page.id === id ? { ...page, selected: !page.selected } : page
+    ));
   };
   
   return (
     <div className="space-y-6">
       <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg mb-4">
-        <h3 className="text-base font-medium flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <span className="h-6 w-6 rounded-full bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300 flex items-center justify-center text-sm">1</span>
-          Add Website
-        </h3>
+          <h3 className="text-base font-medium">Add URL</h3>
+        </div>
       </div>
       
       <div className="space-y-4">
-        <div>
-          <Label htmlFor="website-url" className="mb-2 block">Website URL</Label>
-          <Input 
-            id="website-url"
-            placeholder="https://example.com"
-            value={websiteUrl}
-            onChange={(e) => setWebsiteUrl(e.target.value)}
-          />
-        </div>
-        
-        <div>
-          <Label htmlFor="crawling-depth" className="mb-2 block">Crawling Depth</Label>
-          <select
-            id="crawling-depth"
-            className="w-full p-2 border rounded-md"
-            value={crawlingDepth}
-            onChange={(e) => setCrawlingDepth(Number(e.target.value))}
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <div className="flex space-x-1 mb-2">
+              <button 
+                className={`px-2 py-1 text-xs ${!url.includes('/') || new URL(url || 'https://example.com').pathname === '/' ? 'bg-purple-100 text-purple-800 font-medium rounded' : 'text-gray-500'}`}
+                onClick={() => setUrl(url.split('/').slice(0, 3).join('/'))}
+              >
+                Website
+              </button>
+              <button 
+                className={`px-2 py-1 text-xs ${url.includes('/') && new URL(url || 'https://example.com').pathname !== '/' ? 'bg-purple-100 text-purple-800 font-medium rounded' : 'text-gray-500'}`}
+                onClick={() => {
+                  if (!url.includes('/') || new URL(url || 'https://example.com').pathname === '/') {
+                    setUrl(url + '/page');
+                  }
+                }}
+              >
+                Single URL
+              </button>
+            </div>
+            <div className="relative">
+              <Input 
+                placeholder="https://www.digihub.ai"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                className="pr-10"
+              />
+              {url && (
+                <button
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  onClick={() => setUrl("")}
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+          </div>
+          <Button 
+            className="self-end"
+            onClick={handleScanWebsite}
+            disabled={isLoading}
           >
-            <option value={1}>1 - Homepage only</option>
-            <option value={2}>2 - Homepage + linked pages</option>
-            <option value={3}>3 - Deep crawl</option>
-          </select>
-          <p className="text-xs text-muted-foreground mt-1">
-            Higher depth means more pages will be crawled, but will take longer.
-          </p>
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+          </Button>
         </div>
-        
-        <Button 
-          className="w-full"
-          onClick={handleAddWebsite}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 size={16} className="mr-2 animate-spin" />
-              Processing...
-            </>
-          ) : (
-            <>
-              <Plus size={16} className="mr-2" />
-              Add
-            </>
-          )}
-        </Button>
       </div>
       
-      {savedWebsites.length > 0 && (
+      {pages.length > 0 && (
         <>
-          <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg mb-4 mt-8">
+          <div className="bg-purple-50 dark:bg-purple-950/20 p-4 rounded-lg mb-4">
             <div className="flex justify-between items-center">
               <h3 className="text-base font-medium flex items-center gap-2">
                 <span className="h-6 w-6 rounded-full bg-purple-200 dark:bg-purple-800 text-purple-700 dark:text-purple-300 flex items-center justify-center text-sm">2</span>
-                Manage Websites
+                Select Pages
               </h3>
-              <Button variant="ghost" size="sm" onClick={() => setSavedWebsites(savedWebsites.map(w => ({...w, selected: true})))}>
+              <Button variant="ghost" size="sm" onClick={handleSelectAll}>
                 Select All
               </Button>
             </div>
           </div>
           
           <div className="space-y-2 max-h-60 overflow-y-auto">
-            {savedWebsites.map((website) => (
-              <div key={website.id} className="flex items-center justify-between border rounded-md p-3">
-                <div className="flex items-center gap-2">
-                  <input type="checkbox" className="h-4 w-4" checked={website.selected || false} />
-                  <span>{website.url}</span>
+            {pages.map((page) => (
+              <div key={page.id} className="flex items-center justify-between border rounded-md p-3">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <input 
+                    type="checkbox" 
+                    className="h-4 w-4" 
+                    checked={page.selected || false}
+                    onChange={() => handleToggleSelect(page.id)}
+                  />
+                  <div className="truncate">
+                    <span className="font-medium text-sm block truncate">{page.title}</span>
+                    <span className="text-xs text-muted-foreground truncate">{page.url}</span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs px-2 py-1 rounded-full ${website.trained ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                    {website.trained ? 'Trained' : 'Not Trained'}
+                  <span className={`text-xs px-2 py-1 rounded-full ${page.trained ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                    {page.trained ? 'Trained' : 'Not Trained'}
                   </span>
-                  <Button variant="ghost" size="sm" onClick={() => handleDeleteWebsite(website.id)}>
-                    &times;
+                  <Button variant="ghost" size="sm" onClick={() => handleDeletePage(page.id)}>
+                    <X size={16} />
                   </Button>
                 </div>
               </div>
@@ -185,7 +209,7 @@ export const WebsiteTraining: React.FC<WebsiteTrainingProps> = ({ onSkip }) => {
           </div>
           
           <Button className="w-full bg-indigo-600 hover:bg-indigo-700" onClick={handleTrainAll}>
-            Train GPT
+            Train Chatbot
           </Button>
         </>
       )}
