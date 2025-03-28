@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Globe } from "lucide-react";
@@ -8,6 +8,7 @@ import ContentDisplay from "./ContentDisplay";
 import AddLinksDialog from "./AddLinksDialog";
 import PublishToCMSDialog from "./PublishToCMSDialog";
 import { useContentGeneration } from "@/hooks/useContentGeneration";
+import { toast } from "sonner";
 
 interface ContentGenerationStepProps {
   seoData: any;
@@ -25,6 +26,25 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
   onRegenerateContent
 }) => {
   const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
+  
+  useEffect(() => {
+    // Debug logging to identify issues
+    console.log("ContentGenerationStep rendered with data:", {
+      content: seoData.generatedContent,
+      title: seoData.selectedTitle,
+      outline: seoData.selectedOutline || seoData.outline,
+      keywords: seoData.selectedKeywords,
+      images: seoData.selectedImages
+    });
+    
+    // If no content but we have required data, suggest regeneration
+    if (!seoData.generatedContent && 
+        seoData.selectedTitle && 
+        (seoData.selectedOutline || seoData.outline) && 
+        seoData.selectedKeywords?.length > 0) {
+      toast.info("Content ready to be generated. Click 'Generate Content Now' to proceed.");
+    }
+  }, [seoData]);
   
   const {
     linkType,

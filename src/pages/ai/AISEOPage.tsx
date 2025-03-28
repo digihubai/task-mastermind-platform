@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { generateContentWithImages } from "@/services/seo";
@@ -63,6 +62,14 @@ const AISEOPage = () => {
   };
 
   const handleGenerateContent = async () => {
+    // Debug the input data
+    console.log("Generating content with:", {
+      title: seoData.selectedTitle,
+      outline: seoData.selectedOutline || seoData.outline,
+      keywords: seoData.selectedKeywords,
+      images: seoData.selectedImages
+    });
+    
     // Validate required inputs
     if (!seoData.selectedTitle) {
       toast.error("Please select a title first");
@@ -95,6 +102,8 @@ const AISEOPage = () => {
         seoData.internalLinks || [],
         seoData.externalLinks || []
       );
+      
+      console.log("Content successfully generated:", generatedContent);
       
       handleDataChange("generatedContent", generatedContent);
       toast.success("Content successfully generated!");

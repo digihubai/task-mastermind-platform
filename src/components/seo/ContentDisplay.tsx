@@ -32,10 +32,13 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <Globe className="h-12 w-12 text-primary/50 mb-4" />
         <h3 className="text-lg font-medium mb-2">No content generated yet</h3>
-        <p className="text-muted-foreground max-w-md">
-          Click "Generate" to create SEO-optimized content based on your selected title and outline.
+        <p className="text-muted-foreground max-w-md mb-4">
+          Click the button below to create SEO-optimized content based on your selected title and outline.
         </p>
-        <Button className="mt-4" onClick={onRegenerateContent}>
+        <Button 
+          onClick={onRegenerateContent}
+          className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white"
+        >
           Generate Content Now
         </Button>
       </div>

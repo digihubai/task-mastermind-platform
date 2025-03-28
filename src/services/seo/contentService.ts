@@ -87,6 +87,16 @@ export const generateContentWithImages = async (
   internalLinks: any[] = [],
   externalLinks: any[] = []
 ) => {
+  console.log("generateContentWithImages called with:", {
+    topic, 
+    keywords, 
+    title,
+    outline,
+    imageCount: images?.length,
+    internalLinkCount: internalLinks?.length,
+    externalLinkCount: externalLinks?.length
+  });
+  
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 2000));
   
@@ -114,10 +124,13 @@ In today's digital landscape, ${formattedTopic} has become increasingly importan
     content += `\n![${formattedTopic} image](${images[0]})\n\n`;
   }
 
+  console.log("Processing outline of type:", typeof outline);
+  
   // Process the outline to create content sections
   if (outline) {
     // Handle string outlines (from the outline step)
     if (typeof outline === 'string') {
+      console.log("Processing string outline:", outline);
       const outlineLines = outline.split('\n').filter((line: string) => line.trim());
       
       // Process the outline based on markdown structure
@@ -125,6 +138,7 @@ In today's digital landscape, ${formattedTopic} has become increasingly importan
       
       for (let i = 0; i < outlineLines.length; i++) {
         const line = outlineLines[i].trim();
+        console.log("Processing outline line:", line);
         
         if (line.startsWith('# ')) {
           // Main title (skip)
@@ -163,6 +177,7 @@ In today's digital landscape, ${formattedTopic} has become increasingly importan
         }
       }
     } else if (typeof outline === 'object' && outline.sections) {
+      console.log("Processing object outline with sections:", Object.keys(outline.sections));
       // Handle object-based outlines
       Object.entries(outline.sections).forEach(([key, section]: [string, any]) => {
         content += `## ${section.title}\n\n`;
@@ -273,5 +288,6 @@ Mastering ${formattedTopic} requires ongoing education, experimentation, and ada
     });
   }
 
+  console.log("Generated content length:", content.length);
   return content;
 };
