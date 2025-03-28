@@ -8,6 +8,7 @@ import CMSFilter from './cms/CMSFilter';
 
 const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
   const [filter, setFilter] = useState<'all' | 'cms' | 'ecommerce'>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   
   const {
     urls,
@@ -27,7 +28,9 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
       
       <CMSFilter 
         filter={filter} 
+        searchQuery={searchQuery}
         onFilterChange={setFilter} 
+        onSearchChange={setSearchQuery}
       />
       
       <CMSGrid
@@ -38,6 +41,7 @@ const CMSIntegrations: React.FC<IntegrationProps> = ({ onConnect }) => {
         onConnect={handleConnect}
         onDisconnect={handleDisconnect}
         filter={filter}
+        searchQuery={searchQuery}
       />
       
       <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">

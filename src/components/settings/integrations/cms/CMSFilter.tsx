@@ -1,39 +1,59 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Globe, ShoppingCart } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Globe, ShoppingCart, Search } from "lucide-react";
 
 interface CMSFilterProps {
   filter: 'all' | 'cms' | 'ecommerce';
+  searchQuery: string;
   onFilterChange: (filter: 'all' | 'cms' | 'ecommerce') => void;
+  onSearchChange: (query: string) => void;
 }
 
-const CMSFilter: React.FC<CMSFilterProps> = ({ filter, onFilterChange }) => {
+const CMSFilter: React.FC<CMSFilterProps> = ({ 
+  filter, 
+  searchQuery, 
+  onFilterChange,
+  onSearchChange 
+}) => {
   return (
-    <div className="flex flex-wrap gap-2 mb-4">
-      <Button
-        variant={filter === 'all' ? 'default' : 'outline'} 
-        size="sm"
-        onClick={() => onFilterChange('all')}
-      >
-        All Platforms
-      </Button>
-      <Button
-        variant={filter === 'cms' ? 'default' : 'outline'}
-        size="sm"
-        onClick={() => onFilterChange('cms')}
-      >
-        <Globe className="mr-1 h-4 w-4" />
-        CMS Only
-      </Button>
-      <Button
-        variant={filter === 'ecommerce' ? 'default' : 'outline'}
-        size="sm"
-        onClick={() => onFilterChange('ecommerce')}
-      >
-        <ShoppingCart className="mr-1 h-4 w-4" />
-        eCommerce Only
-      </Button>
+    <div className="space-y-3 mb-4">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search platforms..."
+          className="pl-9"
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
+      </div>
+      
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant={filter === 'all' ? 'default' : 'outline'} 
+          size="sm"
+          onClick={() => onFilterChange('all')}
+        >
+          All Platforms
+        </Button>
+        <Button
+          variant={filter === 'cms' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => onFilterChange('cms')}
+        >
+          <Globe className="mr-1 h-4 w-4" />
+          CMS Only
+        </Button>
+        <Button
+          variant={filter === 'ecommerce' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => onFilterChange('ecommerce')}
+        >
+          <ShoppingCart className="mr-1 h-4 w-4" />
+          eCommerce Only
+        </Button>
+      </div>
     </div>
   );
 };
