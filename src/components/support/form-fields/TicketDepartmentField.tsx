@@ -12,11 +12,16 @@ import {
 interface TicketDepartmentFieldProps {
   value: string;
   onChange: (value: string) => void;
+  availableDepartments?: string[];
 }
 
-export const TicketDepartmentField: React.FC<TicketDepartmentFieldProps> = ({ value, onChange }) => {
-  // Enhanced departments
-  const departments = [
+export const TicketDepartmentField: React.FC<TicketDepartmentFieldProps> = ({ 
+  value, 
+  onChange,
+  availableDepartments
+}) => {
+  // Default departments if none provided
+  const defaultDepartments = [
     { value: "Support", label: "Support" },
     { value: "Sales", label: "Sales" },
     { value: "Billing", label: "Billing" },
@@ -25,6 +30,11 @@ export const TicketDepartmentField: React.FC<TicketDepartmentFieldProps> = ({ va
     { value: "Engineering", label: "Engineering" },
     { value: "Customer Success", label: "Customer Success" }
   ];
+  
+  // Use provided departments if available, or fall back to defaults
+  const departments = availableDepartments
+    ? availableDepartments.map(dept => ({ value: dept, label: dept }))
+    : defaultDepartments;
 
   return (
     <div>

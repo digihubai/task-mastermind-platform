@@ -12,11 +12,16 @@ import {
 interface TicketCategoryFieldProps {
   value: string;
   onChange: (value: string) => void;
+  availableCategories?: string[];
 }
 
-export const TicketCategoryField: React.FC<TicketCategoryFieldProps> = ({ value, onChange }) => {
-  // Enhanced categories
-  const categories = [
+export const TicketCategoryField: React.FC<TicketCategoryFieldProps> = ({ 
+  value, 
+  onChange,
+  availableCategories 
+}) => {
+  // Default categories if none provided
+  const defaultCategories = [
     { value: "general", label: "General" },
     { value: "account", label: "Account" },
     { value: "billing", label: "Billing" },
@@ -26,6 +31,11 @@ export const TicketCategoryField: React.FC<TicketCategoryFieldProps> = ({ value,
     { value: "integration", label: "Integration" },
     { value: "security", label: "Security" }
   ];
+  
+  // Use provided categories if available, or fall back to defaults
+  const categories = availableCategories 
+    ? availableCategories.map(cat => ({ value: cat.toLowerCase(), label: cat }))
+    : defaultCategories;
 
   return (
     <div>

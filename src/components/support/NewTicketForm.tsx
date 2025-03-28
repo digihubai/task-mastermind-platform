@@ -13,12 +13,16 @@ export interface NewTicketFormProps {
   onSubmit: (newTicket: Partial<SupportTicket>) => void;
   onCancel: () => void;
   isCustomer?: boolean;
+  availableCategories?: string[];
+  availableDepartments?: string[];
 }
 
 export const NewTicketForm: React.FC<NewTicketFormProps> = ({ 
   onSubmit, 
   onCancel,
-  isCustomer = false
+  isCustomer = false,
+  availableCategories,
+  availableDepartments
 }) => {
   const [formData, setFormData] = useState<Partial<SupportTicket>>({
     subject: "",
@@ -69,6 +73,7 @@ export const NewTicketForm: React.FC<NewTicketFormProps> = ({
             <TicketCategoryField
               value={formData.category || "general"}
               onChange={(value) => handleChange("category", value)}
+              availableCategories={availableCategories}
             />
           </div>
           
@@ -76,6 +81,7 @@ export const NewTicketForm: React.FC<NewTicketFormProps> = ({
             <TicketDepartmentField
               value={formData.department || "Support"}
               onChange={(value) => handleChange("department", value)}
+              availableDepartments={availableDepartments}
             />
           )}
           
