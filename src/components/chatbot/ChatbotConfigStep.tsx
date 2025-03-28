@@ -1,12 +1,13 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Smartphone, MessageSquare, ShoppingCart } from "lucide-react";
+import { PlusCircle, Smartphone, MessageCircle, ShoppingCart, UserCircle, Check } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 
 interface ChatbotConfigStepProps {
   step: number;
@@ -16,6 +17,14 @@ interface ChatbotConfigStepProps {
     welcomeMessage: string;
     instructions: string;
     language: string;
+    showLogo: boolean;
+    showDateTime: boolean;
+    transparentTrigger: boolean;
+    triggerSize: number;
+    position: "left" | "right";
+    color: string;
+    avatar: string;
+    footerLink: string;
   };
   setNewChatbotInfo: (info: any) => void;
 }
@@ -25,6 +34,31 @@ export const ChatbotConfigStep: React.FC<ChatbotConfigStepProps> = ({
   newChatbotInfo,
   setNewChatbotInfo,
 }) => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+  
+  const avatarOptions = [
+    { id: "avatar1", icon: <UserCircle className="text-blue-500" /> },
+    { id: "avatar2", icon: <UserCircle className="text-purple-500" /> },
+    { id: "avatar3", icon: <UserCircle className="text-green-500" /> },
+    { id: "avatar4", icon: <UserCircle className="text-orange-500" /> },
+    { id: "avatar5", icon: <MessageCircle className="text-blue-500" /> },
+  ];
+  
+  const colorOptions = [
+    { id: "black", color: "#202123" },
+    { id: "green", color: "#4CAF50" },
+    { id: "orange", color: "#FF9800" },
+    { id: "purple", color: "#9C27B0" },
+    { id: "blue", color: "#2196F3" },
+    { id: "custom", color: "multicolor" },
+  ];
+  
   switch (step) {
     case 1:
       return (
@@ -109,39 +143,171 @@ export const ChatbotConfigStep: React.FC<ChatbotConfigStepProps> = ({
         <div className="space-y-6">
           <h2 className="text-2xl font-semibold">Customize</h2>
           <p className="text-muted-foreground">
-            Customize the appearance and behavior of your chatbot.
+            Create and configure a chatbot that interacts with your users, ensuring it delivers accurate information.
           </p>
           
-          <div className="space-y-4 mt-6">
+          <div className="space-y-6 mt-6">
             <div className="space-y-2">
-              <Label>Theme Color</Label>
-              <div className="flex gap-2">
-                {["bg-blue-500", "bg-purple-500", "bg-green-500", "bg-red-500", "bg-yellow-500"].map((color) => (
+              <Label>Upload Logo</Label>
+              <div className="flex w-full items-center relative">
+                <Input
+                  type="file"
+                  id="logo-upload"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  accept="image/*"
+                />
+                <div className="border rounded-md flex items-center justify-between p-2 w-full">
+                  <span className="text-sm text-muted-foreground">
+                    {selectedFile ? selectedFile.name : 'No file chosen'}
+                  </span>
+                  <Label 
+                    htmlFor="logo-upload" 
+                    className="bg-secondary hover:bg-secondary/80 text-sm px-3 py-1 rounded cursor-pointer"
+                  >
+                    Choose File
+                  </Label>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="footer-link">Footer Link</Label>
+              <Input 
+                id="footer-link" 
+                value={newChatbotInfo.footerLink} 
+                onChange={(e) => setNewChatbotInfo({...newChatbotInfo, footerLink: e.target.value})}
+                placeholder="https://digihub.ai"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Avatar</Label>
+              <p className="text-sm text-muted-foreground mb-2">Select an avatar for your chatbot.</p>
+              <div className="flex gap-2 flex-wrap">
+                {avatarOptions.map((avatar) => (
                   <div 
-                    key={color} 
-                    className={`h-8 w-8 rounded-full ${color} cursor-pointer border-2 ${color === "bg-blue-500" ? "border-black dark:border-white" : "border-transparent"}`}
-                  />
+                    key={avatar.id}
+                    className={`h-12 w-12 rounded-full flex items-center justify-center cursor-pointer ${
+                      newChatbotInfo.avatar === avatar.id 
+                        ? 'ring-2 ring-primary' 
+                        : 'border border-border'
+                    }`}
+                    onClick={() => setNewChatbotInfo({...newChatbotInfo, avatar: avatar.id})}
+                  >
+                    {avatar.icon}
+                  </div>
+                ))}
+                <div className="h-12 w-12 rounded-full border border-dashed border-border flex items-center justify-center cursor-pointer">
+                  <PlusCircle className="h-5 w-5 text-muted-foreground" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Color</Label>
+              <p className="text-sm text-muted-foreground mb-2">Choose an accent color that represents your brand.</p>
+              <div className="flex gap-2 flex-wrap">
+                {colorOptions.map((colorOpt) => (
+                  <div 
+                    key={colorOpt.id}
+                    className={`h-8 w-8 rounded-full cursor-pointer ${
+                      newChatbotInfo.color === colorOpt.color 
+                        ? 'ring-2 ring-black dark:ring-white' 
+                        : ''
+                    }`}
+                    style={{ 
+                      backgroundColor: colorOpt.color !== 'multicolor' ? colorOpt.color : undefined,
+                      background: colorOpt.color === 'multicolor' ? 'linear-gradient(90deg, #f44336, #ff9800, #ffeb3b, #4caf50, #2196f3, #9c27b0)' : undefined
+                    }}
+                    onClick={() => setNewChatbotInfo({...newChatbotInfo, color: colorOpt.color})}
+                  >
+                    {newChatbotInfo.color === colorOpt.color && (
+                      <Check className="h-5 w-5 text-white mx-auto my-1.5" />
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
             
             <div className="space-y-2">
-              <Label>Chatbot Icon</Label>
-              <div className="flex gap-2">
-                <div className="h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center">
-                  <MessageSquare className="text-white" />
-                </div>
-                <Button variant="outline" size="sm" className="h-8">
-                  Upload Custom
-                </Button>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="show-logo">Show Logo</Label>
+                <Switch 
+                  id="show-logo"
+                  checked={newChatbotInfo.showLogo}
+                  onCheckedChange={(checked) => setNewChatbotInfo({...newChatbotInfo, showLogo: checked})}
+                />
               </div>
             </div>
             
             <div className="space-y-2">
-              <Label>Chat Window Position</Label>
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex-1">Left</Button>
-                <Button variant="default" className="flex-1">Right</Button>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="show-datetime">Show Date and Time</Label>
+                <Switch 
+                  id="show-datetime"
+                  checked={newChatbotInfo.showDateTime}
+                  onCheckedChange={(checked) => setNewChatbotInfo({...newChatbotInfo, showDateTime: checked})}
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="transparent-trigger">Transparent Trigger</Label>
+                <Switch 
+                  id="transparent-trigger"
+                  checked={newChatbotInfo.transparentTrigger}
+                  onCheckedChange={(checked) => setNewChatbotInfo({...newChatbotInfo, transparentTrigger: checked})}
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Trigger Avatar Size</Label>
+              <div className="flex items-center gap-4">
+                <Slider
+                  value={[newChatbotInfo.triggerSize]}
+                  min={40}
+                  max={80}
+                  step={1}
+                  onValueChange={(value) => setNewChatbotInfo({...newChatbotInfo, triggerSize: value[0]})}
+                  className="flex-1"
+                />
+                <span className="text-sm w-12 text-center">{newChatbotInfo.triggerSize}px</span>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Position</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div 
+                  className={`border rounded-md p-4 flex items-center justify-center cursor-pointer ${
+                    newChatbotInfo.position === 'left' ? 'bg-muted' : ''
+                  }`}
+                  onClick={() => setNewChatbotInfo({...newChatbotInfo, position: 'left'})}
+                >
+                  <div className="relative w-28 h-20 bg-muted/40 rounded">
+                    <div className="absolute left-1 bottom-1 w-6 h-6 bg-gray-400 rounded-full"></div>
+                  </div>
+                  <div className="mt-2 text-center text-sm">Left</div>
+                </div>
+                <div 
+                  className={`border rounded-md p-4 flex items-center justify-center cursor-pointer ${
+                    newChatbotInfo.position === 'right' ? 'bg-muted' : ''
+                  }`}
+                  onClick={() => setNewChatbotInfo({...newChatbotInfo, position: 'right'})}
+                >
+                  <div className="relative w-28 h-20 bg-muted/40 rounded">
+                    <div className="absolute right-1 bottom-1 w-6 h-6 bg-gray-400 rounded-full"></div>
+                    {newChatbotInfo.position === 'right' && (
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <Check className="h-5 w-5 text-primary" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-2 text-center text-sm">Right</div>
+                </div>
               </div>
             </div>
           </div>
@@ -213,7 +379,7 @@ export const ChatbotConfigStep: React.FC<ChatbotConfigStepProps> = ({
                   WhatsApp
                 </Button>
                 <Button variant="outline" className="h-10">
-                  <MessageSquare size={16} className="mr-2" />
+                  <MessageCircle size={16} className="mr-2" />
                   Messenger
                 </Button>
                 <Button variant="outline" className="h-10">

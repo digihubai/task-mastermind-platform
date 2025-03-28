@@ -11,11 +11,19 @@ const ChatbotPage = () => {
   const [selectedChatbot, setSelectedChatbot] = useState<string | null>(null);
   const [configStep, setConfigStep] = useState(1);
   const [newChatbotInfo, setNewChatbotInfo] = useState({
-    title: "",
+    title: "digibot",
     bubbleMessage: "Hey there, how can I help you?",
     welcomeMessage: "Hi, how can I help you?",
     instructions: "",
-    language: "auto"
+    language: "auto",
+    showLogo: true,
+    showDateTime: true,
+    transparentTrigger: false,
+    triggerSize: 60,
+    position: "right" as "left" | "right",
+    color: "#2196F3",
+    avatar: "avatar1",
+    footerLink: "https://digihub.ai"
   });
   
   const activeChatbots = [

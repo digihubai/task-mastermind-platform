@@ -15,6 +15,14 @@ interface ChatbotConfigViewProps {
     welcomeMessage: string;
     instructions: string;
     language: string;
+    showLogo: boolean;
+    showDateTime: boolean;
+    transparentTrigger: boolean;
+    triggerSize: number;
+    position: "left" | "right";
+    color: string;
+    avatar: string;
+    footerLink: string;
   };
   setNewChatbotInfo: (info: any) => void;
   handleNextStep: () => void;
@@ -42,7 +50,7 @@ export const ChatbotConfigView: React.FC<ChatbotConfigViewProps> = ({
           <ArrowLeft size={16} className="mr-1" />
           Close Customizer
         </Button>
-        <span className="text-muted-foreground">Editing: {selectedChatbot ? "digibot" : "New Chatbot"}</span>
+        <span className="text-muted-foreground">Editing: {selectedChatbot ? selectedChatbot : "New Chatbot"}</span>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -53,7 +61,7 @@ export const ChatbotConfigView: React.FC<ChatbotConfigViewProps> = ({
                 key={step} 
                 className={`flex-1 text-center pb-2 border-b-2 ${
                   configStep === step ? 'border-primary text-primary' : 'border-muted text-muted-foreground'
-                }`}
+                } cursor-pointer`}
                 onClick={() => setConfigStep(step)}
               >
                 <span className="mr-1">{step}</span>
@@ -70,7 +78,17 @@ export const ChatbotConfigView: React.FC<ChatbotConfigViewProps> = ({
             setNewChatbotInfo={setNewChatbotInfo}
           />
           
-          <div className="mt-8 flex justify-end">
+          <div className="mt-8 flex justify-between">
+            {configStep > 1 && (
+              <Button 
+                variant="outline" 
+                onClick={() => setConfigStep(configStep - 1)}
+                className="px-6"
+              >
+                Back
+              </Button>
+            )}
+            <div className="flex-1"></div>
             <Button 
               variant="default" 
               onClick={handleNextStep}
@@ -92,7 +110,8 @@ export const ChatbotConfigView: React.FC<ChatbotConfigViewProps> = ({
                 temperature: 0.7
               }}
               variant="embedded"
-              showBranding={true}
+              showBranding={newChatbotInfo.showLogo}
+              accentColor={newChatbotInfo.color}
             />
           </div>
         </div>
