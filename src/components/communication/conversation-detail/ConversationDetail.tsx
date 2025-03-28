@@ -23,7 +23,7 @@ const ConversationDetail: React.FC<ConversationDetailProps> = ({
   onSendMessage,
   onAssignToHuman
 }) => {
-  // Filter messages for the selected conversation by customer ID instead of just channel
+  // Filter messages for the selected conversation by customerId
   // This allows us to show messages from all channels for the same customer
   const conversationMessages = selectedConversation 
     ? messages.filter(m => m.customerId === selectedConversation.customerId) 

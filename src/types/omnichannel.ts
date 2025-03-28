@@ -14,6 +14,7 @@ export interface Conversation {
   assignmentStatus?: 'ai' | 'waiting_for_human' | 'assigned_to_human' | 'unassigned';
   assignedToHumanAt?: string;
   assignedHumanAgent?: string;
+  customerId: string; // Added customerId to link conversations across channels
 }
 
 export interface Message {
@@ -23,6 +24,7 @@ export interface Message {
   time: string;
   channel: string; // Must match the conversation channel to properly filter messages
   isRead?: boolean;
+  customerId: string; // Added customerId to link messages to conversations
   attachments?: Array<{
     type: string;
     url: string;
