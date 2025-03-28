@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { 
   Loader, 
@@ -14,7 +13,7 @@ import {
   ListOrdered, 
   Link, 
   Image, 
-  Blockquote,
+  Quote,
   Code,
   AlignLeft,
   AlignCenter,
@@ -404,7 +403,7 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
                     className="h-8 w-8" 
                     onClick={() => execCommand('formatBlock', '<blockquote>')}
                   >
-                    <Blockquote className="h-4 w-4" />
+                    <Quote className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Blockquote</TooltipContent>
@@ -744,4 +743,3 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
 };
 
 export default ContentDisplay;
-
