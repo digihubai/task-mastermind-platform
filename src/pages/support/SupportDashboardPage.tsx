@@ -1,16 +1,17 @@
 
 import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import SupportStats from "@/components/support/SupportStats";
-import { Button } from "@/components/ui/button";
-import { PlusCircle, TicketIcon, MessageSquare, Phone, Users, ExternalLink } from "lucide-react";
-import OmnichannelInbox from "@/components/communication/OmnichannelInbox";
 import { useNavigate } from 'react-router-dom';
-import { TicketList } from "@/components/support/TicketList";
 import { SupportTicket } from "@/types/support";
 import { toast } from "@/hooks/use-toast";
+import SupportDashboardHeader from "@/components/support/dashboard/SupportDashboardHeader";
+import SupportTabList from "@/components/support/dashboard/SupportTabList";
+import OverviewTabContent from "@/components/support/dashboard/OverviewTabContent";
+import TicketsTabContent from "@/components/support/dashboard/TicketsTabContent";
+import InboxTabContent from "@/components/support/dashboard/InboxTabContent";
+import CallsTabContent from "@/components/support/dashboard/CallsTabContent";
 
 // Mock data for recent tickets
 const recentTickets: SupportTicket[] = [
@@ -69,7 +70,7 @@ const recentTickets: SupportTicket[] = [
   }
 ];
 
-const SupportDashboardPage = () => {
+const SupportDashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("overview");
   const navigate = useNavigate();
 
@@ -92,136 +93,32 @@ const SupportDashboardPage = () => {
   return (
     <AppLayout showModuleName moduleName="Support Dashboard">
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-semibold">Support Dashboard</h1>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => navigate('/support/embed')}>
-              <ExternalLink className="mr-2 h-4 w-4" />
-              Embed Form
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/support/tickets')}>
-              <Users className="mr-2 h-4 w-4" />
-              All Tickets
-            </Button>
-            <Button onClick={handleNewTicket}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              New Ticket
-            </Button>
-          </div>
-        </div>
-
+        <SupportDashboardHeader onNewTicket={handleNewTicket} />
         <SupportStats />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="tickets">
-              <TicketIcon className="h-4 w-4 mr-2" />
-              Tickets
-            </TabsTrigger>
-            <TabsTrigger value="inbox">
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Inbox
-            </TabsTrigger>
-            <TabsTrigger value="calls">
-              <Phone className="h-4 w-4 mr-2" />
-              Calls
-            </TabsTrigger>
-          </TabsList>
+          <SupportTabList activeTab={activeTab} />
           
           <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="col-span-1">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Recent Tickets</CardTitle>
-                  <Button variant="link" size="sm" onClick={() => navigate('/support/tickets')}>
-                    View all
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  {recentTickets.length > 0 ? (
-                    <TicketList 
-                      tickets={recentTickets} 
-                      onViewTicket={handleViewTicket}
-                    />
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No recent tickets found. Create a new ticket to get started.
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-              
-              <Card className="col-span-1">
-                <CardHeader>
-                  <CardTitle>Team Performance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-muted/20 p-4 rounded-md">
-                      <h3 className="text-sm font-medium">Resolution Rate</h3>
-                      <p className="text-2xl font-bold mt-2">87%</p>
-                      <p className="text-xs text-muted-foreground mt-1">+5% from last month</p>
-                    </div>
-                    <div className="bg-muted/20 p-4 rounded-md">
-                      <h3 className="text-sm font-medium">Avg. Response Time</h3>
-                      <p className="text-2xl font-bold mt-2">3.2h</p>
-                      <p className="text-xs text-muted-foreground mt-1">-10% from last month</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <OverviewTabContent 
+              tickets={recentTickets}
+              onViewTicket={handleViewTicket}
+            />
           </TabsContent>
           
           <TabsContent value="tickets" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>All Support Tickets</CardTitle>
-                <Button size="sm" onClick={() => navigate('/support/tickets')}>
-                  View all tickets
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <TicketList 
-                  tickets={recentTickets} 
-                  onViewTicket={handleViewTicket}
-                />
-              </CardContent>
-            </Card>
+            <TicketsTabContent
+              tickets={recentTickets}
+              onViewTicket={handleViewTicket}
+            />
           </TabsContent>
           
           <TabsContent value="inbox" className="space-y-4 h-[calc(100vh-22rem)]">
-            <Card className="h-full">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Communication Inbox</CardTitle>
-                <Button size="sm" onClick={() => navigate('/support/omnichannel')}>
-                  Full Inbox
-                </Button>
-              </CardHeader>
-              <CardContent className="h-[calc(100%-4rem)]">
-                <OmnichannelInbox />
-              </CardContent>
-            </Card>
+            <InboxTabContent />
           </TabsContent>
           
           <TabsContent value="calls" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Call Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  View all call center activity here.
-                </p>
-                <div className="mt-4">
-                  <Button variant="outline" onClick={() => navigate('/support/call-center')}>
-                    <Phone className="mr-2 h-4 w-4" />
-                    Go to Call Center
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <CallsTabContent />
           </TabsContent>
         </Tabs>
       </div>
