@@ -3,6 +3,7 @@ import React from 'react';
 import { BarChart, LineChart, PieChart } from 'lucide-react';
 import MetricsCard from '@/components/analytics/MetricsCard';
 import { AnalyticsChartCard } from '@/components/analytics/AnalyticsChartCard';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ReportsTabContentProps {
   loading: boolean;
@@ -16,8 +17,50 @@ interface ReportsTabContentProps {
 }
 
 const ReportsTabContent: React.FC<ReportsTabContentProps> = ({ loading, summary, data }) => {
-  if (loading || !summary) {
-    return <div className="p-4 text-center">Loading reports data...</div>;
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((item) => (
+            <div key={item} className="border rounded-lg p-6">
+              <div className="flex justify-between items-start">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[100px]" />
+                  <Skeleton className="h-8 w-[80px]" />
+                </div>
+                <Skeleton className="h-10 w-10 rounded-full" />
+              </div>
+              <Skeleton className="h-4 w-[100px] mt-4" />
+            </div>
+          ))}
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="border rounded-lg">
+            <div className="p-6">
+              <Skeleton className="h-6 w-[200px]" />
+              <Skeleton className="h-4 w-[300px] mt-2" />
+            </div>
+            <div className="px-6 pb-6">
+              <Skeleton className="h-[300px] w-full" />
+            </div>
+          </div>
+          <div className="border rounded-lg">
+            <div className="p-6">
+              <Skeleton className="h-6 w-[200px]" />
+              <Skeleton className="h-4 w-[300px] mt-2" />
+            </div>
+            <div className="px-6 pb-6">
+              <Skeleton className="h-[300px] w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!summary) {
+    return <div className="p-4 text-center">No reports data available.</div>;
   }
 
   return (
