@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Copy, ExternalLink } from "lucide-react";
-import { EmbeddableTicketForm, FormCustomizationInterface } from '@/components/support/EmbeddableTicketForm';
+import { 
+  EmbeddableTicketForm, 
+  FormCustomizationInterface 
+} from '@/components/support/EmbeddableTicketForm';
 
 const EmbedTicketPage = () => {
   const { toast } = useToast();
