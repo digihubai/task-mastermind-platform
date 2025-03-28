@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Search, Filter, ArrowDown, ArrowUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -72,10 +72,12 @@ export const TicketFilters: React.FC<TicketFiltersProps> = ({
   const hasActiveFilters = !!(priorityFilter || categoryFilter || departmentFilter || agentFilter);
   
   // Debug what categories and departments are available
-  console.log('Available categories in filters:', categories);
-  console.log('Available departments in filters:', departments);
-  console.log('Current category filter:', categoryFilter);
-  console.log('Current department filter:', departmentFilter);
+  useEffect(() => {
+    console.log('Available categories in filters:', categories);
+    console.log('Available departments in filters:', departments);
+    console.log('Current category filter:', categoryFilter);
+    console.log('Current department filter:', departmentFilter);
+  }, [categories, departments, categoryFilter, departmentFilter]);
   
   return (
     <>

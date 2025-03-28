@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -21,20 +21,16 @@ export const TicketCategoryField: React.FC<TicketCategoryFieldProps> = ({
   onChange,
   availableCategories = ["General", "Technical", "Billing", "Feature Request"]
 }) => {
-  const handleChange = (newValue: string) => {
-    // Store the value exactly as provided without converting to lowercase
-    // This will preserve the display format while ensuring consistent comparison
-    onChange(newValue);
-  };
-  
   // Debug the categories
-  console.log('Available categories in field:', availableCategories);
-  console.log('Current category value:', value);
+  useEffect(() => {
+    console.log('Available categories in field:', availableCategories);
+    console.log('Current category value:', value);
+  }, [availableCategories, value]);
   
   return (
     <div>
       <Label htmlFor="category">Category</Label>
-      <Select value={value} onValueChange={handleChange}>
+      <Select value={value} onValueChange={onChange}>
         <SelectTrigger id="category" className="mt-1">
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>

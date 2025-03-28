@@ -108,12 +108,14 @@ export const useTicketFiltering = (
         return false;
       }
       
+      // Use exact match for category without converting case
       if (categoryFilter && categoryFilter !== "all") {
         if (ticket.category !== categoryFilter) {
           return false;
         }
       }
       
+      // Use exact match for department without converting case
       if (departmentFilter && departmentFilter !== "all") {
         if (ticket.department !== departmentFilter) {
           return false;

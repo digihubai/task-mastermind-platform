@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SupportTicket } from "@/types/support";
 import { TicketCategoryField } from "../form-fields/TicketCategoryField";
 import { TicketDepartmentField } from "../form-fields/TicketDepartmentField";
@@ -54,17 +54,25 @@ export const TicketDetailsStep: React.FC<TicketDetailsStepProps> = ({
   const [priority, setPriority] = useState("medium");
   // Set initial category and department from the first available options
   const [category, setCategory] = useState(availableCategories && availableCategories.length > 0 
-    ? availableCategories[0].toLowerCase() 
-    : "general");
+    ? availableCategories[0]
+    : "General");
   const [department, setDepartment] = useState(availableDepartments && availableDepartments.length > 0 
     ? availableDepartments[0] 
-    : "support");
+    : "Support");
   const [orderNumber, setOrderNumber] = useState("");
   const [urgencyLevel, setUrgencyLevel] = useState("medium");
   const [preferredContact, setPreferredContact] = useState("email");
   const [bestTimeToReach, setBestTimeToReach] = useState("");
   const [customFields, setCustomFields] = useState<{[key: string]: string}>({});
   const [files, setFiles] = useState<FileList | null>(null);
+
+  // Debug initial values and available options
+  useEffect(() => {
+    console.log('TicketDetailsStep - Available categories:', availableCategories);
+    console.log('TicketDetailsStep - Selected category:', category);
+    console.log('TicketDetailsStep - Available departments:', availableDepartments);
+    console.log('TicketDetailsStep - Selected department:', department);
+  }, [availableCategories, category, availableDepartments, department]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -111,7 +119,8 @@ export const TicketDetailsStep: React.FC<TicketDetailsStepProps> = ({
       metadata.attachments = fileNames;
     }
 
-    onSubmit({
+    // Log the final ticket data before submission
+    const ticketData = {
       subject,
       description,
       priority,
@@ -119,7 +128,10 @@ export const TicketDetailsStep: React.FC<TicketDetailsStepProps> = ({
       department,
       status: "new",
       metadata: Object.keys(metadata).length > 0 ? metadata : undefined
-    });
+    };
+    
+    console.log('Submitting ticket data:', ticketData);
+    onSubmit(ticketData);
   };
 
   return (
