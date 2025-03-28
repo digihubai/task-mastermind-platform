@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import ConversationSidebar from './conversation-list/ConversationSidebar';
 import ConversationDetail from './conversation-detail/ConversationDetail';
-import { mockConversations, mockMessages } from './mockData';
+import { mockConversations, mockMessages } from './mock-data';
 import { toast } from "@/hooks/use-toast";
 import { Conversation } from '@/types/omnichannel';
 import { Alert, AlertDescription } from '@/components/ui/alert';

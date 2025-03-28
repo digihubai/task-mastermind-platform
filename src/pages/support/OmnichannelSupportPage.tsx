@@ -12,7 +12,7 @@ import { TicketList } from '@/components/support/TicketList';
 import { SupportTicket } from '@/types/support';
 import { toast } from "@/hooks/use-toast";
 import AIAssistantSettings from '@/components/support/AIAssistantSettings';
-import { mockConversations } from '@/components/communication/mockData';
+import { mockConversations } from '@/components/communication/mock-data';
 import { Conversation } from '@/types/omnichannel';
 import { Badge } from "@/components/ui/badge";
 

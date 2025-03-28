@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import ConversationHeader from './ConversationHeader';
@@ -8,7 +7,7 @@ import { MessageSquare, Clock, Users } from "lucide-react";
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import type { Conversation, Message } from "@/types/omnichannel";
-import { queueStats } from '../mockData';
+import { queueStats } from '../mock-data';
 
 interface ConversationDetailProps {
   selectedConversation: Conversation | undefined;
