@@ -11,9 +11,14 @@ import {
   BarChart3, 
   MessageSquare,
   Image,
-  Bot
+  Bot,
+  Phone,
+  Mail,
+  MessageCircle,
+  MessagesSquare
 } from "lucide-react";
 import SEOIntegrations from "@/components/seo/SEOIntegrations";
+import OmnichannelIntegrations from "@/components/communication/OmnichannelIntegrations";
 
 const SettingsIntegrationsPage = () => {
   return (
@@ -29,6 +34,7 @@ const SettingsIntegrationsPage = () => {
         <Tabs defaultValue="api" className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="api">API Connections</TabsTrigger>
+            <TabsTrigger value="omnichannel">Omnichannel</TabsTrigger>
             <TabsTrigger value="seo">SEO Tools</TabsTrigger>
             <TabsTrigger value="vision">Vision AI</TabsTrigger>
             <TabsTrigger value="chat">Chat Services</TabsTrigger>
@@ -88,6 +94,10 @@ const SettingsIntegrationsPage = () => {
                 </div>
               </div>
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="omnichannel" className="space-y-4">
+            <OmnichannelIntegrations />
           </TabsContent>
           
           <TabsContent value="seo">
