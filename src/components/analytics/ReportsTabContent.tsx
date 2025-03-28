@@ -4,9 +4,11 @@ import { BarChart, LineChart, PieChart } from 'lucide-react';
 import MetricsCard from '@/components/analytics/MetricsCard';
 import { AnalyticsChartCard } from '@/components/analytics/AnalyticsChartCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import AnalyticsErrorState from '@/components/analytics/AnalyticsErrorState';
 
 interface ReportsTabContentProps {
   loading: boolean;
+  error: Error | null;
   summary: {
     totalPageViews: number;
     totalVisitors: number;
@@ -14,9 +16,21 @@ interface ReportsTabContentProps {
     totalConversions: number;
   } | null;
   data: any[];
+  onRetry?: () => void;
 }
 
-const ReportsTabContent: React.FC<ReportsTabContentProps> = ({ loading, summary, data }) => {
+const ReportsTabContent: React.FC<ReportsTabContentProps> = ({ 
+  loading, 
+  error, 
+  summary, 
+  data, 
+  onRetry 
+}) => {
+  // If there's an error, show the error state component
+  if (error) {
+    return <AnalyticsErrorState message={error.message} onRetry={onRetry} />;
+  }
+
   if (loading) {
     return (
       <div className="space-y-4">

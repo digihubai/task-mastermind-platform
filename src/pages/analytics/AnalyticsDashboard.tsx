@@ -38,7 +38,13 @@ const AnalyticsDashboard = () => {
           </TabsList>
           
           <TabsContent value="reports" className="space-y-4">
-            <ReportsTabContent loading={loading} summary={summary} data={data} />
+            <ReportsTabContent 
+              loading={loading} 
+              error={error} 
+              summary={summary} 
+              data={data}
+              onRetry={refreshData} 
+            />
           </TabsContent>
           
           <TabsContent value="performance" className="space-y-4">
