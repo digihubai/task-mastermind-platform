@@ -22,7 +22,7 @@ export const TriggerSizeSlider: React.FC<TriggerSizeSliderProps> = ({
   return (
     <div>
       <div className="flex items-center justify-between">
-        <Label htmlFor="triggerSize">Trigger Button Size</Label>
+        <Label htmlFor="triggerSize">Floating Button Size</Label>
         <span className="text-sm text-muted-foreground">{triggerSize}px</span>
       </div>
       <p className="text-sm text-muted-foreground mb-2">

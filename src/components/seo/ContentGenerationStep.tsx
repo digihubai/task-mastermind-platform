@@ -1,128 +1,38 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Copy, Globe, Calendar, Sparkles, RotateCw, Plus } from "lucide-react";
+import { ChevronLeft, Copy, Globe, Calendar, Sparkles, RotateCw, Plus, Loader } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { createSEOContent } from "@/services/seoService";
 
 interface ContentGenerationStepProps {
   seoData: any;
+  isGenerating: boolean;
   onDataChange: (field: string, value: any) => void;
   onPrev: () => void;
+  onRegenerateContent: () => void;
 }
 
-const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({ seoData, onDataChange, onPrev }) => {
+const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({ 
+  seoData, 
+  isGenerating, 
+  onDataChange, 
+  onPrev,
+  onRegenerateContent
+}) => {
   const { toast } = useToast();
-  const [isGenerating, setIsGenerating] = useState(false);
   const [publishType, setPublishType] = useState("immediate");
   const [scheduleDate, setScheduleDate] = useState("");
   const [scheduleTime, setScheduleTime] = useState("");
-  const [showPublishOptions, setShowPublishOptions] = useState(false);
+  const [showPublishOptions, setShowPublishOptions] = useState(true);
   const [showConnectCMSDialog, setShowConnectCMSDialog] = useState(false);
-  const [hasCMS, setHasCMS] = useState(true); // Mock state to simulate CMS connection
+  const [hasCMS, setHasCMS] = useState(false);
+  const [publishLoading, setPublishLoading] = useState(false);
 
-  // Auto-generate content when component mounts
-  useEffect(() => {
-    generateContent();
-  }, []);
-
-  const generateContent = () => {
-    if (!seoData.selectedOutline) {
-      toast({
-        title: "No outline selected",
-        description: "Please go back and select an outline for your content",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setIsGenerating(true);
-    
-    // Simulate API call for content generation
-    setTimeout(() => {
-      const title = seoData.selectedTitle;
-      const mainKeyword = seoData.selectedKeywords[0] || "chatbot";
-      const outline = seoData.selectedOutline;
-      
-      // Generate a mock article using the selected title and outline
-      const generatedArticle = `# ${title}
-
-## Introduction to AI and ${mainKeyword}s
-The rapid advancement of artificial intelligence (AI) has significantly transformed the way businesses interact with customers. ${mainKeyword}s, powered by AI, are reshaping conversations, providing a gateway for automated customer support and engagement. They simulate human-like dialogue, improving accessibility and efficiency in communication.
-
-## Understanding Conversational AI
-Conversational AI refers to technologies that facilitate human-like interactions through speech or text. ${mainKeyword}s serve as a primary application of conversational AI, designed to understand, process, and respond to user queries seamlessly. By using natural language processing (NLP), these systems can interpret user intent and provide relevant responses.
-
-## How ${mainKeyword}s Function
-Modern ${mainKeyword}s utilize a combination of machine learning, natural language understanding, and dialogue management to process and respond to user inquiries. The system analyzes the user's input, determines intent, and generates appropriate responses based on programming or learned patterns.
-
-## Benefits of Using ${mainKeyword}s in Business
-Implementing ${mainKeyword}s offers numerous advantages:
-- 24/7 availability for customer support
-- Reduced operational costs
-- Consistent service quality
-- Handling multiple inquiries simultaneously
-- Gathering valuable customer data
-- Freeing human agents for more complex tasks
-
-## Common Applications of ${mainKeyword}s
-${mainKeyword}s are versatile tools used across various industries:
-- Customer service and support
-- E-commerce product recommendations
-- Healthcare patient screening
-- Banking and financial services
-- Travel booking and information
-- Educational assistance
-
-## Challenges in ${mainKeyword} Development
-Despite their benefits, developing effective ${mainKeyword}s presents challenges:
-- Understanding complex user queries
-- Handling context switches in conversations
-- Maintaining personality consistency
-- Integrating with existing business systems
-- Ensuring data privacy and security
-
-## Future Trends in Conversational AI
-The field of conversational AI continues to evolve rapidly:
-- Multimodal interactions combining text, voice, and visuals
-- Improved emotional intelligence and empathy
-- More sophisticated personalization capabilities
-- Integration with IoT devices
-- Enhanced multilingual support
-
-## The Role of Natural Language Processing
-NLP advancements have significantly improved ${mainKeyword} capabilities:
-- Better understanding of colloquialisms and slang
-- More accurate sentiment analysis
-- Improved context retention across conversations
-- Enhanced entity recognition and information extraction
-- More natural-sounding responses
-
-## User Experience and ${mainKeyword} Design
-Creating an effective ${mainKeyword} requires thoughtful design:
-- Clear conversation flows
-- Appropriate personality and tone
-- Transparent limitations and fallback mechanisms
-- Simple user interfaces
-- Accessible design for diverse users
-
-## Conclusion on the Impact of ${mainKeyword}s
-As AI technology continues to advance, ${mainKeyword}s will play an increasingly important role in business communications. Organizations that effectively implement these tools gain competitive advantages through improved customer experiences, operational efficiencies, and valuable customer insights. The future of ${mainKeyword}s lies in creating even more personalized, context-aware, and human-like interactions.`;
-
-      onDataChange("generatedContent", generatedArticle);
-      setIsGenerating(false);
-      setShowPublishOptions(true);
-      
-      toast({
-        title: "Content generated",
-        description: "Your SEO-optimized content has been generated successfully!",
-      });
-    }, 3000);
-  };
-  
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(seoData.generatedContent);
     toast({
@@ -131,7 +41,7 @@ As AI technology continues to advance, ${mainKeyword}s will play an increasingly
     });
   };
   
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!hasCMS) {
       setShowConnectCMSDialog(true);
       return;
@@ -149,33 +59,57 @@ As AI technology continues to advance, ${mainKeyword}s will play an increasingly
     const publishAction = publishType === "immediate" ? "Publishing" : "Scheduling";
     const scheduledInfo = publishType === "scheduled" ? ` for ${scheduleDate} at ${scheduleTime}` : "";
     
-    toast({
-      title: `${publishAction} to site`,
-      description: `${publishAction} to your website${scheduledInfo}...`,
-    });
+    setPublishLoading(true);
     
-    // Simulate publishing process
-    setTimeout(() => {
+    // Create a record in the database
+    try {
+      const contentData = {
+        title: seoData.selectedTitle,
+        content: seoData.generatedContent,
+        keywords: seoData.selectedKeywords,
+        status: publishType === "immediate" ? "published" : "scheduled",
+        publishDate: publishType === "scheduled" ? `${scheduleDate}T${scheduleTime}:00` : new Date().toISOString(),
+        wordCount: seoData.generatedContent.split(/\s+/).length,
+        seoScore: Math.floor(Math.random() * 15) + 80,
+        userId: "user123" // In a real app, we would get this from authentication
+      };
+      
+      // Simulate API call
+      setTimeout(async () => {
+        toast({
+          title: "Success!",
+          description: `Successfully ${publishType === "immediate" ? "published" : "scheduled"} to your site${scheduledInfo}`,
+        });
+        setPublishLoading(false);
+      }, 1500);
+    } catch (error) {
+      console.error("Error publishing content:", error);
       toast({
-        title: "Success!",
-        description: `Successfully ${publishType === "immediate" ? "published" : "scheduled"} to your site${scheduledInfo}`,
+        title: "Error publishing",
+        description: "There was an error publishing your content. Please try again.",
+        variant: "destructive"
       });
-    }, 1500);
+      setPublishLoading(false);
+    }
   };
 
-  const handleConnectCMS = () => {
+  const handleConnectCMS = (cmsType: string) => {
+    setPublishLoading(true);
+    
     // Simulate connection to CMS
     toast({
       title: "CMS connection",
-      description: "Connecting to your content management system...",
+      description: `Connecting to ${cmsType}...`,
     });
     
     setTimeout(() => {
       setHasCMS(true);
       setShowConnectCMSDialog(false);
+      setPublishLoading(false);
+      
       toast({
         title: "Connected!",
-        description: "Your CMS has been successfully connected",
+        description: `Your ${cmsType} has been successfully connected`,
       });
     }, 1500);
   };
@@ -191,7 +125,7 @@ As AI technology continues to advance, ${mainKeyword}s will play an increasingly
           </p>
           
           <div className="flex items-center gap-2">
-            <RotateCw className="h-5 w-5 animate-spin text-primary" />
+            <Loader className="h-5 w-5 animate-spin text-primary" />
             <span>Please wait, this may take a moment</span>
           </div>
           
@@ -213,7 +147,7 @@ As AI technology continues to advance, ${mainKeyword}s will play an increasingly
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={generateContent}
+                  onClick={onRegenerateContent}
                   className="flex items-center gap-1"
                 >
                   <RotateCw className="h-4 w-4" />
@@ -294,8 +228,14 @@ As AI technology continues to advance, ${mainKeyword}s will play an increasingly
                   onClick={handlePublish}
                   className="w-full gap-2"
                   variant="default"
+                  disabled={publishLoading}
                 >
-                  {publishType === "immediate" ? (
+                  {publishLoading ? (
+                    <>
+                      <Loader className="h-4 w-4 animate-spin mr-2" />
+                      Processing...
+                    </>
+                  ) : publishType === "immediate" ? (
                     <>
                       <Globe className="h-4 w-4" />
                       Publish to Site
@@ -321,29 +261,65 @@ As AI technology continues to advance, ${mainKeyword}s will play an increasingly
               </DialogHeader>
               
               <div className="grid grid-cols-2 gap-4 py-4">
-                <Button variant="outline" className="flex flex-col h-24 items-center justify-center gap-2" onClick={handleConnectCMS}>
-                  <Globe className="h-8 w-8 text-blue-500" />
+                <Button 
+                  variant="outline" 
+                  className="flex flex-col h-24 items-center justify-center gap-2" 
+                  onClick={() => handleConnectCMS("WordPress")}
+                  disabled={publishLoading}
+                >
+                  {publishLoading ? (
+                    <Loader className="h-6 w-6 animate-spin text-blue-500" />
+                  ) : (
+                    <Globe className="h-8 w-8 text-blue-500" />
+                  )}
                   <span>WordPress</span>
                 </Button>
                 
-                <Button variant="outline" className="flex flex-col h-24 items-center justify-center gap-2" onClick={handleConnectCMS}>
-                  <Globe className="h-8 w-8 text-purple-500" />
+                <Button 
+                  variant="outline" 
+                  className="flex flex-col h-24 items-center justify-center gap-2" 
+                  onClick={() => handleConnectCMS("Webflow")}
+                  disabled={publishLoading}
+                >
+                  {publishLoading ? (
+                    <Loader className="h-6 w-6 animate-spin text-purple-500" />
+                  ) : (
+                    <Globe className="h-8 w-8 text-purple-500" />
+                  )}
                   <span>Webflow</span>
                 </Button>
                 
-                <Button variant="outline" className="flex flex-col h-24 items-center justify-center gap-2" onClick={handleConnectCMS}>
-                  <Globe className="h-8 w-8 text-yellow-500" />
+                <Button 
+                  variant="outline" 
+                  className="flex flex-col h-24 items-center justify-center gap-2" 
+                  onClick={() => handleConnectCMS("Contentful")}
+                  disabled={publishLoading}
+                >
+                  {publishLoading ? (
+                    <Loader className="h-6 w-6 animate-spin text-yellow-500" />
+                  ) : (
+                    <Globe className="h-8 w-8 text-yellow-500" />
+                  )}
                   <span>Contentful</span>
                 </Button>
                 
-                <Button variant="outline" className="flex flex-col h-24 items-center justify-center gap-2" onClick={handleConnectCMS}>
-                  <Plus className="h-8 w-8 text-gray-500" />
+                <Button 
+                  variant="outline" 
+                  className="flex flex-col h-24 items-center justify-center gap-2" 
+                  onClick={() => handleConnectCMS("Custom CMS")}
+                  disabled={publishLoading}
+                >
+                  {publishLoading ? (
+                    <Loader className="h-6 w-6 animate-spin text-gray-500" />
+                  ) : (
+                    <Plus className="h-8 w-8 text-gray-500" />
+                  )}
                   <span>Custom CMS</span>
                 </Button>
               </div>
               
               <DialogFooter>
-                <Button variant="outline" onClick={() => setShowConnectCMSDialog(false)}>Cancel</Button>
+                <Button variant="outline" onClick={() => setShowConnectCMSDialog(false)} disabled={publishLoading}>Cancel</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>

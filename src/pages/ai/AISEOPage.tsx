@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RotateCw } from "lucide-react";
+import { ArrowLeft, RotateCw, Loader } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
@@ -12,11 +12,13 @@ import TitleStep from "@/components/seo/TitleStep";
 import OutlineStep from "@/components/seo/OutlineStep";
 import ImageStep from "@/components/seo/ImageStep";
 import ContentGenerationStep from "@/components/seo/ContentGenerationStep";
+import { generateSEOContent } from "@/services/seoService";
 
 const AISEOPage = () => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // SEO content data
   const [seoData, setSeoData] = useState({
@@ -40,11 +42,65 @@ const AISEOPage = () => {
     generatedContent: "",
   });
 
-  const updateSeoData = (field, value) => {
+  // Simulate keyword generation when topic changes
+  useEffect(() => {
+    if (seoData.topic && seoData.topic.length > 3 && seoData.keywords.length === 0) {
+      generateKeywords();
+    }
+  }, [seoData.topic]);
+
+  const updateSeoData = async (field, value) => {
     setSeoData((prev) => ({
       ...prev,
       [field]: value,
     }));
+
+    // If updating keywords, we should also update the topics
+    if (field === 'selectedKeywords' && value.length > 0 && seoData.titles.length === 0 && step === 1) {
+      setIsProcessing(true);
+      // Simulate API call to generate titles based on selected keywords
+      setTimeout(() => {
+        const mockTitles = [
+          `Top 10 Ways to Master ${value[0]} for Beginners`,
+          `The Complete Guide to ${value[0]} in ${new Date().getFullYear()}`,
+          `How ${value[0]} Is Revolutionizing Business Today`,
+          `Why ${value[0]} Matters: Expert Insights and Tips`,
+          `${value[0]}: Best Practices and Advanced Strategies`
+        ];
+        
+        setSeoData(prev => ({
+          ...prev,
+          titles: mockTitles
+        }));
+        setIsProcessing(false);
+      }, 1500);
+    }
+  };
+
+  const generateKeywords = () => {
+    setIsProcessing(true);
+    // Simulate API call to generate keywords based on topic
+    setTimeout(() => {
+      const topic = seoData.topic.toLowerCase();
+      const baseKeywords = [
+        topic,
+        `best ${topic}`,
+        `${topic} guide`,
+        `${topic} examples`,
+        `${topic} benefits`,
+        `${topic} vs traditional`,
+        `${topic} implementation`,
+        `${topic} strategies`,
+        `${topic} for business`,
+        `${topic} trends ${new Date().getFullYear()}`
+      ];
+      
+      setSeoData(prev => ({
+        ...prev,
+        keywords: baseKeywords
+      }));
+      setIsProcessing(false);
+    }, 1500);
   };
 
   const handleNextStep = () => {
@@ -77,6 +133,67 @@ const AISEOPage = () => {
     }
 
     setStep(step + 1);
+
+    // Generate content when moving to the final step
+    if (step === 4) {
+      generateContent();
+    }
+  };
+
+  const generateContent = async () => {
+    setIsGenerating(true);
+    
+    try {
+      const content = await generateSEOContent(
+        seoData.topic, 
+        seoData.selectedKeywords
+      );
+      
+      if (content) {
+        setSeoData(prev => ({
+          ...prev,
+          generatedContent: content
+        }));
+      } else {
+        throw new Error("Failed to generate content");
+      }
+    } catch (error) {
+      console.error("Error generating content:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate content. Please try again.",
+        variant: "destructive"
+      });
+      
+      // Fallback to simulated content generation if the API fails
+      setTimeout(() => {
+        const mockContent = `# ${seoData.selectedTitle}
+        
+## Introduction
+This is an automatically generated introduction about ${seoData.topic}...
+
+## ${seoData.selectedOutline?.sections[0] || 'First Section'}
+Content for the first section goes here...
+
+## ${seoData.selectedOutline?.sections[1] || 'Second Section'}
+Content for the second section goes here...
+
+## ${seoData.selectedOutline?.sections[2] || 'Third Section'}
+Content for the third section goes here...
+
+## Conclusion
+In conclusion, ${seoData.topic} is an important topic to understand...`;
+        
+        setSeoData(prev => ({
+          ...prev,
+          generatedContent: mockContent
+        }));
+        
+        setIsGenerating(false);
+      }, 3000);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handlePreviousStep = () => {
@@ -144,7 +261,7 @@ const AISEOPage = () => {
         </div>
         
         <div className="flex items-center mb-6">
-          <div className="grid grid-cols-4 gap-4 w-full max-w-md">
+          <div className="grid grid-cols-5 gap-4 w-full max-w-md">
             <div className="flex flex-col items-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium mb-2 ${step === 1 ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground'}`}>
                 1
@@ -172,8 +289,27 @@ const AISEOPage = () => {
               </div>
               <span className={`text-xs font-medium ${step === 4 ? 'text-primary' : 'text-muted-foreground'}`}>Image</span>
             </div>
+            
+            <div className="flex flex-col items-center">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium mb-2 ${step === 5 ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground'}`}>
+                5
+              </div>
+              <span className={`text-xs font-medium ${step === 5 ? 'text-primary' : 'text-muted-foreground'}`}>Content</span>
+            </div>
           </div>
         </div>
+        
+        {isProcessing && (
+          <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
+            <Card className="p-6 max-w-md flex flex-col items-center">
+              <Loader className="h-8 w-8 animate-spin text-primary mb-4" />
+              <h3 className="text-lg font-medium">Processing</h3>
+              <p className="text-sm text-muted-foreground mt-2">
+                Please wait while we analyze your topic and generate suggestions...
+              </p>
+            </Card>
+          </div>
+        )}
         
         <div className="grid grid-cols-1 gap-6">
           {step === 1 && (
@@ -214,9 +350,11 @@ const AISEOPage = () => {
           
           {step === 5 && (
             <ContentGenerationStep 
-              seoData={seoData} 
+              seoData={seoData}
+              isGenerating={isGenerating} 
               onDataChange={updateSeoData}
               onPrev={handlePreviousStep}
+              onRegenerateContent={generateContent}
             />
           )}
         </div>

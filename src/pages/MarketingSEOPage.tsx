@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,27 +14,154 @@ import {
   ArrowRight,
   Target,
   Link,
-  ChevronDown
+  ChevronDown,
+  Loader
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import SEOIntegrations from "@/components/seo/SEOIntegrations";
+import { fetchSEOCampaigns, SEOCampaign } from "@/services/seoService";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 const MarketingSEOPage = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("tools");
   const navigate = useNavigate();
+  const [campaigns, setCampaigns] = useState<SEOCampaign[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showNewCampaignDialog, setShowNewCampaignDialog] = useState(false);
+  const [newCampaign, setNewCampaign] = useState({
+    name: '',
+    keywordCount: 0,
+    pageCount: 0,
+    startDate: new Date().toISOString().slice(0, 10),
+    endDate: ''
+  });
+
+  useEffect(() => {
+    loadCampaigns();
+  }, []);
+
+  const loadCampaigns = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchSEOCampaigns();
+      setCampaigns(data);
+    } catch (error) {
+      console.error("Error loading campaigns:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load SEO campaigns. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAction = (action: string) => {
+    if (action === "Create SEO Campaign") {
+      setShowNewCampaignDialog(true);
+    } else {
+      toast({
+        title: action,
+        description: `${action} feature will be implemented soon.`
+      });
+    }
+  };
+
+  const handleCreateCampaign = async () => {
+    if (!newCampaign.name) {
+      toast({
+        title: "Campaign name required",
+        description: "Please enter a name for your SEO campaign",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    // In a real implementation, we would call the API to create the campaign
+    // For now, we'll just simulate it
+    setTimeout(() => {
+      const mockCampaign: SEOCampaign = {
+        id: Math.random().toString(36).substring(2, 11),
+        name: newCampaign.name,
+        keywordCount: newCampaign.keywordCount || 10,
+        pageCount: newCampaign.pageCount || 4,
+        status: "active",
+        startDate: newCampaign.startDate,
+        endDate: newCampaign.endDate || null,
+        metrics: {
+          backlinks: Math.floor(Math.random() * 100),
+          avgPosition: Math.floor(Math.random() * 10) + 1
+        },
+        userId: "user123"
+      };
+      
+      setCampaigns([mockCampaign, ...campaigns]);
+      setShowNewCampaignDialog(false);
+      setNewCampaign({
+        name: '',
+        keywordCount: 0,
+        pageCount: 0,
+        startDate: new Date().toISOString().slice(0, 10),
+        endDate: ''
+      });
+      setLoading(false);
+      
+      toast({
+        title: "Campaign created",
+        description: "Your SEO campaign has been created successfully."
+      });
+    }, 1000);
+  };
+
+  const navigateToKeywordResearch = () => {
     toast({
-      title: action,
-      description: `${action} feature will be available soon.`
+      title: "Keyword Research",
+      description: "Navigating to Keyword Research tool..."
+    });
+    setTimeout(() => navigate("/marketing/seo/tools"), 500);
+  };
+
+  const navigateToContentAudit = () => {
+    toast({
+      title: "Content Audit",
+      description: "Navigating to Content Audit tool..."
+    });
+    setTimeout(() => navigate("/marketing/seo/tools"), 500);
+  };
+
+  const navigateToRankTracker = () => {
+    toast({
+      title: "Rank Tracker",
+      description: "Navigating to Rank Tracker tool..."
+    });
+    setTimeout(() => navigate("/marketing/seo/tools"), 500);
+  };
+
+  const navigateToSEOAnalytics = () => {
+    setActiveTab("analytics");
+    toast({
+      title: "SEO Analytics",
+      description: "Switched to SEO Analytics tab"
     });
   };
 
-  const navigateToIntegrations = () => {
-    navigate('/settings/integrations');
+  const navigateToCampaignDetails = (campaignId: string) => {
+    toast({
+      title: "Campaign Details",
+      description: "Navigating to campaign details page..."
+    });
+    // In a real app, we would navigate to the campaign details page
+    setTimeout(() => {
+      navigate(`/marketing/seo/campaigns/${campaignId}`);
+    }, 500);
   };
 
   return (
@@ -114,7 +241,7 @@ const MarketingSEOPage = () => {
                     <Button 
                       variant="outline" 
                       className="justify-start"
-                      onClick={() => handleAction("Keyword Research")}
+                      onClick={navigateToKeywordResearch}
                     >
                       <Search className="mr-2 h-4 w-4" />
                       Keyword Research
@@ -122,7 +249,7 @@ const MarketingSEOPage = () => {
                     <Button 
                       variant="outline" 
                       className="justify-start"
-                      onClick={() => handleAction("Content Audit")}
+                      onClick={navigateToContentAudit}
                     >
                       <FileText className="mr-2 h-4 w-4" />
                       Content Audit
@@ -130,7 +257,7 @@ const MarketingSEOPage = () => {
                     <Button 
                       variant="outline" 
                       className="justify-start"
-                      onClick={() => handleAction("Rank Tracker")}
+                      onClick={navigateToRankTracker}
                     >
                       <Globe className="mr-2 h-4 w-4" />
                       Rank Tracker
@@ -138,7 +265,7 @@ const MarketingSEOPage = () => {
                     <Button 
                       variant="outline" 
                       className="justify-start"
-                      onClick={() => handleAction("SEO Analytics")}
+                      onClick={navigateToSEOAnalytics}
                     >
                       <BarChart3 className="mr-2 h-4 w-4" />
                       SEO Analytics
@@ -150,70 +277,86 @@ const MarketingSEOPage = () => {
               <Card className="p-6 border border-border/40">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-medium">Recent SEO Campaigns</h3>
-                  <Button variant="outline" size="sm" onClick={() => handleAction("View All Campaigns")}>View All</Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => toast({
+                      title: "View All Campaigns",
+                      description: "Viewing all campaigns feature will be available soon."
+                    })}
+                  >
+                    View All
+                  </Button>
                 </div>
                 
-                <div className="space-y-4">
-                  <div className="border rounded-lg p-4 hover:bg-accent/50 transition-colors cursor-pointer">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3">
-                        <div className="bg-primary/10 p-2 rounded-full">
-                          <Target className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium">Q4 Product Landing Pages</h4>
-                          <p className="text-sm text-muted-foreground mt-1">10 keywords • 4 pages</p>
-                        </div>
-                      </div>
-                      <Badge className="bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400">Active</Badge>
-                    </div>
-                    <div className="mt-4 flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm">
-                        <div className="flex items-center gap-1">
-                          <Globe className="h-4 w-4 text-muted-foreground" />
-                          <span>42 backlinks</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Search className="h-4 w-4 text-muted-foreground" />
-                          <span>Pos. 3.2 avg</span>
-                        </div>
-                      </div>
-                      <Button size="sm" variant="ghost" className="gap-1">
-                        View details <ArrowRight size={14} />
-                      </Button>
-                    </div>
+                {loading ? (
+                  <div className="flex justify-center items-center py-8">
+                    <Loader className="h-8 w-8 animate-spin text-muted-foreground" />
                   </div>
-                  
-                  <div className="border rounded-lg p-4 hover:bg-accent/50 transition-colors cursor-pointer">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3">
-                        <div className="bg-primary/10 p-2 rounded-full">
-                          <Globe className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium">Blog Content Strategy</h4>
-                          <p className="text-sm text-muted-foreground mt-1">24 keywords • 12 articles</p>
-                        </div>
-                      </div>
-                      <Badge className="bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400">In Progress</Badge>
-                    </div>
-                    <div className="mt-4 flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm">
-                        <div className="flex items-center gap-1">
-                          <FileText className="h-4 w-4 text-muted-foreground" />
-                          <span>6/12 complete</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Search className="h-4 w-4 text-muted-foreground" />
-                          <span>3 ranking</span>
-                        </div>
-                      </div>
-                      <Button size="sm" variant="ghost" className="gap-1">
-                        View details <ArrowRight size={14} />
-                      </Button>
-                    </div>
+                ) : campaigns.length === 0 ? (
+                  <div className="text-center py-8 border rounded-lg">
+                    <p className="text-muted-foreground">No SEO campaigns yet</p>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowNewCampaignDialog(true)}
+                      className="mt-4"
+                    >
+                      <PlusCircle size={16} className="mr-2" />
+                      Create your first campaign
+                    </Button>
                   </div>
-                </div>
+                ) : (
+                  <div className="space-y-4">
+                    {campaigns.map((campaign) => (
+                      <div key={campaign.id} className="border rounded-lg p-4 hover:bg-accent/50 transition-colors cursor-pointer">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start gap-3">
+                            <div className="bg-primary/10 p-2 rounded-full">
+                              <Target className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <h4 className="font-medium">{campaign.name}</h4>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {campaign.keywordCount} keywords • {campaign.pageCount} pages
+                              </p>
+                            </div>
+                          </div>
+                          <Badge className={
+                            campaign.status === "active" 
+                              ? "bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400"
+                              : campaign.status === "in_progress" 
+                              ? "bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400"
+                              : "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
+                          }>
+                            {campaign.status === "active" ? "Active" : 
+                             campaign.status === "in_progress" ? "In Progress" : 
+                             campaign.status === "completed" ? "Completed" : "Inactive"}
+                          </Badge>
+                        </div>
+                        <div className="mt-4 flex items-center justify-between">
+                          <div className="flex items-center gap-4 text-sm">
+                            <div className="flex items-center gap-1">
+                              <Globe className="h-4 w-4 text-muted-foreground" />
+                              <span>{campaign.metrics.backlinks} backlinks</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Search className="h-4 w-4 text-muted-foreground" />
+                              <span>Pos. {campaign.metrics.avgPosition} avg</span>
+                            </div>
+                          </div>
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="gap-1"
+                            onClick={() => navigateToCampaignDetails(campaign.id)}
+                          >
+                            View details <ArrowRight size={14} />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </Card>
             </TabsContent>
             
@@ -327,22 +470,94 @@ const MarketingSEOPage = () => {
             </TabsContent>
           </div>
         </Tabs>
-        
-        {/* Integration link redirecting to Settings/Integrations */}
-        <Card className="p-6 border border-border/40">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="text-lg font-medium">SEO Integrations</h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                Connect your SEO tools with CMS platforms and analytics services
-              </p>
-            </div>
-            <Button onClick={navigateToIntegrations}>
-              Manage Integrations
-            </Button>
-          </div>
-        </Card>
       </div>
+
+      <Dialog open={showNewCampaignDialog} onOpenChange={setShowNewCampaignDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Create New SEO Campaign</DialogTitle>
+            <DialogDescription>
+              Create a new SEO campaign to track and optimize your content
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="campaign-name">Campaign Name</Label>
+              <Input 
+                id="campaign-name" 
+                placeholder="Q4 Product Landing Pages" 
+                value={newCampaign.name}
+                onChange={(e) => setNewCampaign({...newCampaign, name: e.target.value})}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="keyword-count">Number of Keywords</Label>
+                <Input 
+                  id="keyword-count" 
+                  type="number" 
+                  min={1}
+                  placeholder="10" 
+                  value={newCampaign.keywordCount || ''}
+                  onChange={(e) => setNewCampaign({...newCampaign, keywordCount: parseInt(e.target.value) || 0})}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="page-count">Number of Pages</Label>
+                <Input 
+                  id="page-count" 
+                  type="number"
+                  min={1}
+                  placeholder="4" 
+                  value={newCampaign.pageCount || ''}
+                  onChange={(e) => setNewCampaign({...newCampaign, pageCount: parseInt(e.target.value) || 0})}
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="start-date">Start Date</Label>
+                <Input 
+                  id="start-date" 
+                  type="date" 
+                  value={newCampaign.startDate}
+                  onChange={(e) => setNewCampaign({...newCampaign, startDate: e.target.value})}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="end-date">End Date (Optional)</Label>
+                <Input 
+                  id="end-date" 
+                  type="date" 
+                  value={newCampaign.endDate}
+                  onChange={(e) => setNewCampaign({...newCampaign, endDate: e.target.value})}
+                />
+              </div>
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="campaign-notes">Campaign Notes (Optional)</Label>
+              <Textarea 
+                id="campaign-notes" 
+                placeholder="Add any additional notes or goals for this campaign"
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNewCampaignDialog(false)}>Cancel</Button>
+            <Button onClick={handleCreateCampaign} disabled={loading}>
+              {loading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
+              Create Campaign
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 };

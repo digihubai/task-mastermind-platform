@@ -1,0 +1,11 @@
+
+project_id = "tlvpxtwkwesbivkiejxy"
+# Specify the functions to include
+[functions.generate-seo-content]
+verify_jwt = false
+
+[functions.analyze-seo]
+verify_jwt = false
+
+[functions.track-keyword-rankings]
+verify_jwt = false
