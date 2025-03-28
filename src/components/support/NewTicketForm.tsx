@@ -17,11 +17,13 @@ import {
 export interface NewTicketFormProps {
   onSubmit: (newTicket: Partial<SupportTicket>) => void;
   onCancel: () => void;
+  isCustomer?: boolean;
 }
 
 export const NewTicketForm: React.FC<NewTicketFormProps> = ({ 
   onSubmit, 
-  onCancel
+  onCancel,
+  isCustomer = false
 }) => {
   const [formData, setFormData] = useState<Partial<SupportTicket>>({
     subject: "",
@@ -47,7 +49,9 @@ export const NewTicketForm: React.FC<NewTicketFormProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create New Support Ticket</CardTitle>
+        <CardTitle>
+          {isCustomer ? "Submit Support Request" : "Create New Support Ticket"}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -78,7 +82,7 @@ export const NewTicketForm: React.FC<NewTicketFormProps> = ({
             />
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="priority" className="block text-sm font-medium mb-1">
                 Priority
@@ -124,35 +128,37 @@ export const NewTicketForm: React.FC<NewTicketFormProps> = ({
             </div>
           </div>
           
-          <div>
-            <label htmlFor="department" className="block text-sm font-medium mb-1">
-              Department
-            </label>
-            <Select 
-              value={formData.department} 
-              onValueChange={(value) => handleChange("department", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select department" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="Support">Support</SelectItem>
-                  <SelectItem value="Sales">Sales</SelectItem>
-                  <SelectItem value="Billing">Billing</SelectItem>
-                  <SelectItem value="Product">Product</SelectItem>
-                  <SelectItem value="Technical">Technical</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+          {!isCustomer && (
+            <div>
+              <label htmlFor="department" className="block text-sm font-medium mb-1">
+                Department
+              </label>
+              <Select 
+                value={formData.department} 
+                onValueChange={(value) => handleChange("department", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select department" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="Support">Support</SelectItem>
+                    <SelectItem value="Sales">Sales</SelectItem>
+                    <SelectItem value="Billing">Billing</SelectItem>
+                    <SelectItem value="Product">Product</SelectItem>
+                    <SelectItem value="Technical">Technical</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           
           <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
             </Button>
             <Button type="submit">
-              Submit Ticket
+              {isCustomer ? "Submit Request" : "Create Ticket"}
             </Button>
           </div>
         </form>

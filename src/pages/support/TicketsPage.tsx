@@ -282,19 +282,19 @@ const TicketsPage: React.FC = () => {
         return false;
       }
       
-      if (priorityFilter && ticket.priority !== priorityFilter) {
+      if (priorityFilter && priorityFilter !== "all" && ticket.priority !== priorityFilter) {
         return false;
       }
       
-      if (categoryFilter && ticket.category !== categoryFilter) {
+      if (categoryFilter && categoryFilter !== "all" && ticket.category !== categoryFilter) {
         return false;
       }
       
-      if (departmentFilter && ticket.department !== departmentFilter) {
+      if (departmentFilter && departmentFilter !== "all" && ticket.department !== departmentFilter) {
         return false;
       }
       
-      if (agentFilter && ticket.assignedTo !== agentFilter) {
+      if (agentFilter && agentFilter !== "all" && ticket.assignedTo !== agentFilter) {
         return false;
       }
       
@@ -308,6 +308,13 @@ const TicketsPage: React.FC = () => {
         const dateA = new Date(a[sortField as keyof SupportTicket] as string).getTime();
         const dateB = new Date(b[sortField as keyof SupportTicket] as string).getTime();
         return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+      
+      if (sortField === 'priority') {
+        const priorityValues = { 'low': 1, 'medium': 2, 'high': 3, 'urgent': 4 };
+        const priorityA = priorityValues[a.priority as keyof typeof priorityValues] || 0;
+        const priorityB = priorityValues[b.priority as keyof typeof priorityValues] || 0;
+        return sortOrder === 'asc' ? priorityA - priorityB : priorityB - priorityA;
       }
       
       const valueA = String(a[sortField as keyof SupportTicket]);
@@ -357,7 +364,7 @@ const TicketsPage: React.FC = () => {
           <h1 className="text-3xl font-semibold">Support Tickets</h1>
           <Button onClick={() => setShowNewTicketForm(true)}>
             <PlusCircle className="mr-2 h-4 w-4" />
-            New Ticket
+            Create Internal Ticket
           </Button>
         </div>
 
