@@ -9,11 +9,13 @@ import { mockSavedReplies } from '../mock-data/saved-replies';
 interface MessageInputProps {
   onSendMessage: (message: string) => void;
   placeholder?: string;
+  channel?: string; // Added channel as an optional prop
 }
 
 const MessageInput: React.FC<MessageInputProps> = ({ 
   onSendMessage,
-  placeholder = "Type your message..."
+  placeholder = "Type your message...",
+  channel // Added channel prop
 }) => {
   const [message, setMessage] = useState("");
 
@@ -38,6 +40,22 @@ const MessageInput: React.FC<MessageInputProps> = ({
     });
   };
 
+  // Get channel-specific placeholder text if needed
+  const getChannelSpecificPlaceholder = () => {
+    if (!channel) return placeholder;
+    
+    switch (channel.toLowerCase()) {
+      case 'email':
+        return "Type your email response...";
+      case 'whatsapp':
+        return "Type your WhatsApp message...";
+      case 'sms':
+        return "Type your SMS (160 char limit)...";
+      default:
+        return placeholder;
+    }
+  };
+
   return (
     <div className="border-t pt-4">
       <div className="flex items-center space-x-2 mb-2">
@@ -57,9 +75,10 @@ const MessageInput: React.FC<MessageInputProps> = ({
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={getChannelSpecificPlaceholder()}
           className="flex-1 resize-none"
           rows={3}
+          maxLength={channel?.toLowerCase() === 'sms' ? 160 : undefined}
         />
         <Button 
           onClick={handleSendMessage} 
