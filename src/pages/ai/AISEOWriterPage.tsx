@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
@@ -43,7 +42,6 @@ const AISEOWriterPage = () => {
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [selectedCMS, setSelectedCMS] = useState("wordpress");
   
-  // List of connected CMS platforms (in a real app, this would come from an API)
   const [connectedCMS, setConnectedCMS] = useState({
     wordpress: true,
     shopify: false,
@@ -52,7 +50,6 @@ const AISEOWriterPage = () => {
     wix: false
   });
   
-  // Publication settings
   const [publicationSettings, setPublicationSettings] = useState({
     addFeaturedImage: true,
     addTags: true,
@@ -69,7 +66,6 @@ const AISEOWriterPage = () => {
     
     setIsGenerating(true);
     
-    // Simulate AI generation process
     setTimeout(() => {
       const content = generateMockSEOContent(keyword, [keyword]);
       setGeneratedContent(content);
@@ -114,7 +110,6 @@ const AISEOWriterPage = () => {
     
     toast.success(`${publishAction} to ${platformName}${scheduledInfo}...`);
     
-    // Simulate publishing process
     setTimeout(() => {
       toast.success(`Successfully ${publishType === "immediate" ? "published" : "scheduled"} to ${platformName}${scheduledInfo}`);
       setPublishDialogOpen(false);
@@ -288,7 +283,6 @@ const AISEOWriterPage = () => {
               </Tabs>
             </Card>
 
-            {/* Add SEO Content Preview Component */}
             {generatedContent && (
               <SEOContentPreview content={generatedContent} />
             )}
@@ -363,7 +357,6 @@ const AISEOWriterPage = () => {
               </ul>
             </Card>
             
-            {/* Connected CMS Panel */}
             <Card className="p-6 border border-border/40">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium">Connected CMS</h3>
@@ -402,7 +395,6 @@ const AISEOWriterPage = () => {
           </div>
         </div>
 
-        {/* CMS Publishing Dialog */}
         <Dialog open={publishDialogOpen} onOpenChange={setPublishDialogOpen}>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
@@ -445,20 +437,21 @@ const AISEOWriterPage = () => {
               
               <div>
                 <Label>Publication Type</Label>
-                <Select 
-                  value={publishType} 
-                  onValueChange={setPublishType}
-                  className="mt-1"
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select publication type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="immediate">Publish Immediately</SelectItem>
-                    <SelectItem value="scheduled">Schedule Publication</SelectItem>
-                    <SelectItem value="draft">Save as Draft</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="mt-1">
+                  <Select 
+                    value={publishType} 
+                    onValueChange={setPublishType}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select publication type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="immediate">Publish Immediately</SelectItem>
+                      <SelectItem value="scheduled">Schedule Publication</SelectItem>
+                      <SelectItem value="draft">Save as Draft</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               
               {publishType === "scheduled" && (
@@ -576,7 +569,6 @@ const AISEOWriterPage = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Add SEO tools and integrations tabs section */}
         <Tabs defaultValue="seo-tools" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4 max-w-md">
             <TabsTrigger value="seo-tools">SEO Tools</TabsTrigger>

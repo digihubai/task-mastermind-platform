@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 export interface SEOCampaign {
@@ -129,4 +128,56 @@ export const useSEOCampaigns = () => {
   }, []);
 
   return { campaigns, loading, error };
+};
+
+export const fetchSEOAnalytics = async (timeframe: string): Promise<any> => {
+  // Simulate API call with mock data
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const performance = [
+        { month: 'Jan', visitors: 120, clicks: 45, conversions: 12 },
+        { month: 'Feb', visitors: 160, clicks: 70, conversions: 18 },
+        { month: 'Mar', visitors: 210, clicks: 95, conversions: 25 },
+        { month: 'Apr', visitors: 250, clicks: 120, conversions: 35 },
+        { month: 'May', visitors: 310, clicks: 150, conversions: 42 },
+        { month: 'Jun', visitors: 390, clicks: 185, conversions: 55 },
+      ];
+      
+      const keywordsRanking = [
+        { keyword: 'AI chatbot', position: 3, change: 2, volume: 5400 },
+        { keyword: 'AI assistant', position: 5, change: -1, volume: 3200 },
+        { keyword: 'Customer support AI', position: 2, change: 4, volume: 2100 },
+        { keyword: 'Conversational AI', position: 8, change: 0, volume: 1800 },
+        { keyword: 'AI for business', position: 12, change: 3, volume: 4500 },
+      ];
+      
+      const topContent = [
+        { title: '10 Ways AI Chatbots Are Revolutionizing Customer Support', views: 1245, ctr: 5.2, position: 3 },
+        { title: 'The Ultimate Guide to SEO Content Writing in 2023', views: 980, ctr: 4.8, position: 4 },
+        { title: 'How to Implement AI Solutions for Small Businesses', views: 875, ctr: 3.9, position: 6 },
+        { title: 'Machine Learning vs. Deep Learning: What\'s the Difference?', views: 720, ctr: 3.5, position: 5 },
+      ];
+      
+      const trafficSourcesData = [
+        { name: 'Organic Search', value: 65 },
+        { name: 'Social Media', value: 15 },
+        { name: 'Direct', value: 10 },
+        { name: 'Referral', value: 7 },
+        { name: 'Other', value: 3 },
+      ];
+      
+      resolve({
+        performance,
+        keywordsRanking,
+        topContent,
+        trafficSourcesData,
+        totalVisitors: 1440,
+        visitorsChange: 12.5,
+        averageCTR: 4.3,
+        ctrChange: 0.7,
+        publishedContent: 12,
+        lastPublished: '2 days ago'
+      });
+    }, 800);
+  });
 };
