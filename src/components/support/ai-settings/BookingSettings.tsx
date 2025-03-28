@@ -71,6 +71,34 @@ const BookingSettings: React.FC<BookingSettingsProps> = ({
               </Button>
             )}
           </div>
+          
+          {hasCalendarIntegration && (
+            <div className="mt-4 space-y-2">
+              <h4 className="text-sm font-medium">Connected Calendar Integrations</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span>
+                  <span>Google Calendar sync</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span>
+                  <span>Outlook Calendar sync</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span>
+                  <span>Zoom integration</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span>
+                  <span>MS Teams integration</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span>
+                  <span>Google Meet integration</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

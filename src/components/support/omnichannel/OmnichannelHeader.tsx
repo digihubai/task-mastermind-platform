@@ -25,7 +25,7 @@ const OmnichannelHeader: React.FC<OmnichannelHeaderProps> = ({ onSettingsClick, 
           <ExternalLink className="mr-2 h-4 w-4" />
           Embed Form
         </Button>
-        <Button variant="outline" onClick={() => navigate('/support/embed-chatbot')}>
+        <Button variant="outline" onClick={() => navigate('/ai/chatbots')}>
           <MessageSquare className="mr-2 h-4 w-4" />
           Embed AI Chatbot
         </Button>

@@ -9,8 +9,8 @@ import OutboundCallsPage from '@/pages/support/OutboundCallsPage';
 import TicketsPage from '@/pages/support/TicketsPage';
 import CustomerSupportPage from '@/pages/support/CustomerSupportPage';
 import EmbedTicketPage from '@/pages/support/EmbedTicketPage';
-import EmbedChatbotPage from '@/pages/support/EmbedChatbotPage';
 import { EmbeddableTicketForm } from '@/components/support/EmbeddableTicketForm';
+import { Navigate } from 'react-router-dom';
 
 const supportRoutes: RouteObject[] = [
   {
@@ -51,7 +51,7 @@ const supportRoutes: RouteObject[] = [
   },
   {
     path: '/support/embed-chatbot',
-    element: <EmbedChatbotPage />,
+    element: <Navigate to="/ai/chatbots" replace />,
   },
   {
     path: '/support/ticket-form',
