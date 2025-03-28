@@ -8,8 +8,8 @@ import { BarChart, LineChart, PieChart, Calendar, Download, RefreshCw } from 'lu
 import { useAnalytics } from '@/hooks/useAnalytics';
 import AppLayout from '@/components/layout/AppLayout';
 import { AnalyticsChartCard } from '@/components/analytics/AnalyticsChartCard';
-import { MetricsCard } from '@/components/analytics/MetricsCard';
-import { CrossChannelDashboard } from '@/components/analytics/CrossChannelDashboard';
+import MetricsCard from '@/components/analytics/MetricsCard';
+import CrossChannelDashboard from '@/components/analytics/CrossChannelDashboard';
 
 const AnalyticsDashboard = () => {
   const [period, setPeriod] = useState<'day' | 'week' | 'month'>('week');
@@ -73,31 +73,30 @@ const AnalyticsDashboard = () => {
                   <MetricsCard
                     title="Total Page Views"
                     value={summary.totalPageViews}
-                    percentageChange={8.2}
+                    change="8.2%"
                     trend="up"
-                    icon={<BarChart className="h-4 w-4" />}
+                    icon={<BarChart size={20} />}
                   />
                   <MetricsCard
                     title="Unique Visitors"
                     value={summary.totalVisitors}
-                    percentageChange={4.1}
+                    change="4.1%"
                     trend="up"
-                    icon={<LineChart className="h-4 w-4" />}
+                    icon={<LineChart size={20} />}
                   />
                   <MetricsCard
                     title="Bounce Rate"
                     value={`${summary.averageBounceRate.toFixed(2)}%`}
-                    percentageChange={-2.3}
+                    change="2.3%"
                     trend="down"
-                    trendDesired="down"
-                    icon={<PieChart className="h-4 w-4" />}
+                    icon={<PieChart size={20} />}
                   />
                   <MetricsCard
                     title="Conversions"
                     value={summary.totalConversions}
-                    percentageChange={12.6}
+                    change="12.6%"
                     trend="up"
-                    icon={<LineChart className="h-4 w-4" />}
+                    icon={<LineChart size={20} />}
                   />
                 </>
               )}
@@ -132,7 +131,7 @@ const AnalyticsDashboard = () => {
           
           <TabsContent value="performance" className="space-y-4">
             {/* Performance Section Content */}
-            <CrossChannelDashboard loading={loading} />
+            <CrossChannelDashboard dateRange={period} />
           </TabsContent>
           
           <TabsContent value="customer-insights" className="space-y-4">
