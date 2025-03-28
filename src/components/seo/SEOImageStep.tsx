@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, Image, RefreshCw, SkipForward } from "lucide-react";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface SEOImageStepProps {
   seoData: any;
@@ -19,8 +20,32 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState("");
+  const [imageSource, setImageSource] = useState("ai");
 
-  const mockImages = [
+  // Stock images with different topics
+  const stockImages = {
+    tech: [
+      "https://via.placeholder.com/500x300/1F2937/FFFFFF?text=Tech+Stock+1",
+      "https://via.placeholder.com/500x300/1F2937/FFFFFF?text=Tech+Stock+2",
+      "https://via.placeholder.com/500x300/1F2937/FFFFFF?text=Tech+Stock+3",
+      "https://via.placeholder.com/500x300/1F2937/FFFFFF?text=Tech+Stock+4"
+    ],
+    business: [
+      "https://via.placeholder.com/500x300/065F46/FFFFFF?text=Business+Stock+1",
+      "https://via.placeholder.com/500x300/065F46/FFFFFF?text=Business+Stock+2",
+      "https://via.placeholder.com/500x300/065F46/FFFFFF?text=Business+Stock+3",
+      "https://via.placeholder.com/500x300/065F46/FFFFFF?text=Business+Stock+4"
+    ],
+    creative: [
+      "https://via.placeholder.com/500x300/7C2D12/FFFFFF?text=Creative+Stock+1",
+      "https://via.placeholder.com/500x300/7C2D12/FFFFFF?text=Creative+Stock+2",
+      "https://via.placeholder.com/500x300/7C2D12/FFFFFF?text=Creative+Stock+3",
+      "https://via.placeholder.com/500x300/7C2D12/FFFFFF?text=Creative+Stock+4"
+    ]
+  };
+
+  // AI generated mock images
+  const aiImages = [
     "https://via.placeholder.com/500x300/4F46E5/FFFFFF?text=AI+Chatbot+Image+1",
     "https://via.placeholder.com/500x300/4F46E5/FFFFFF?text=AI+Chatbot+Image+2",
     "https://via.placeholder.com/500x300/4F46E5/FFFFFF?text=AI+Chatbot+Image+3",
@@ -47,16 +72,34 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
       }
     }
     
-    // Simulate API call
+    // Determine which images to use based on the selected source
     setTimeout(() => {
-      setGeneratedImages(mockImages);
-      if (mockImages.length > 0) {
-        setSelectedImage(mockImages[0]);
-        onDataChange("featuredImage", mockImages[0]);
-        onDataChange("selectedImages", [mockImages[0]]);
+      let images = [];
+      
+      if (imageSource === "ai") {
+        images = aiImages;
+      } else {
+        // Select stock images based on the topic
+        const topic = seoData.topic.toLowerCase();
+        if (topic.includes("tech") || topic.includes("ai") || topic.includes("chatbot")) {
+          images = stockImages.tech;
+        } else if (topic.includes("business") || topic.includes("marketing")) {
+          images = stockImages.business;
+        } else {
+          images = stockImages.creative;
+        }
+      }
+      
+      setGeneratedImages(images);
+      if (images.length > 0) {
+        setSelectedImage(images[0]);
+        onDataChange("featuredImage", images[0]);
+        onDataChange("selectedImages", [images[0]]);
       }
       setIsGenerating(false);
-      toast.success("Generated AI images based on your content");
+      
+      const sourceType = imageSource === "ai" ? "AI" : "stock";
+      toast.success(`Generated ${sourceType} images based on your content`);
     }, 1500);
   };
   
@@ -84,21 +127,52 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
       <Card className="p-6 border border-border/40">
         <h2 className="text-xl font-semibold mb-4">Generate Images</h2>
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Image Description</label>
-            <Textarea 
-              placeholder="Describe the image you want to generate..."
-              value={seoData.imagePrompt || ""}
-              onChange={(e) => onDataChange("imagePrompt", e.target.value)}
-              className="min-h-[100px]"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              If left empty, we'll use your topic and keywords to generate relevant images.
-            </p>
-          </div>
+          <Tabs defaultValue="ai" onValueChange={setImageSource}>
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="ai">AI Generated</TabsTrigger>
+              <TabsTrigger value="stock">Stock Photos</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="ai" className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Image Description</label>
+                <Textarea 
+                  placeholder="Describe the image you want to generate..."
+                  value={seoData.imagePrompt || ""}
+                  onChange={(e) => onDataChange("imagePrompt", e.target.value)}
+                  className="min-h-[100px]"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  If left empty, we'll use your topic and keywords to generate relevant images.
+                </p>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="stock" className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Stock Photo Category</label>
+                <Select
+                  defaultValue="tech"
+                  onValueChange={(val) => onDataChange("stockCategory", val)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="tech">Technology & AI</SelectItem>
+                    <SelectItem value="business">Business & Marketing</SelectItem>
+                    <SelectItem value="creative">Creative & Design</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Choose a category that matches your content's theme.
+                </p>
+              </div>
+            </TabsContent>
+          </Tabs>
           
           <div>
-            <label className="block text-sm font-medium mb-1">Size (Optional)</label>
+            <label className="block text-sm font-medium mb-1">Size</label>
             <Select
               value={seoData.imageSize || "square"}
               onValueChange={(val) => onDataChange("imageSize", val)}

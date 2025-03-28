@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
@@ -11,16 +10,16 @@ import {
   FileEdit,
   Image as ImageIcon,
   RefreshCw,
-  Loader
+  Loader,
+  Link
 } from "lucide-react";
 import { generateContentWithImages, generateKeywords, generateSEOTitles } from "@/services/seo";
 import { toast } from "sonner";
 import SEOKeywordStep from "@/components/seo/SEOKeywordStep";
 import SEOImageStep from "@/components/seo/SEOImageStep";
 import ContentGenerationStep from "@/components/seo/ContentGenerationStep";
+import SEOLinksStep from "@/components/seo/SEOLinksStep";
 
-// Import other components based on your implementation
-// You may need to adjust these imports based on your exact folder structure
 const TopicStep = (props: any) => {
   return (
     <div className="space-y-6">
@@ -351,10 +350,16 @@ const AISEOPage = () => {
     maxTitleLength: 70,
     outlines: [],
     selectedOutline: null,
+    outline: "",
     numberOfOutlineSections: 3,
     maxOutlineDepth: 2,
     selectedImages: [],
-    generatedContent: ""
+    internalLinks: [],
+    externalLinks: [],
+    generatedContent: "",
+    imageSize: "square",
+    imageCount: 4,
+    imagePrompt: ""
   });
 
   const handleDataChange = (field: string, value: any) => {
@@ -382,7 +387,7 @@ const AISEOPage = () => {
       return;
     }
     
-    if (!seoData.selectedOutline) {
+    if (!seoData.selectedOutline && !seoData.outline) {
       toast.error("Please select an outline first");
       return;
     }
@@ -393,22 +398,25 @@ const AISEOPage = () => {
     }
     
     setIsGenerating(true);
+    toast.info("Generating comprehensive SEO content...");
     
     try {
-      // Generate content with integrated images
+      // Generate content with integrated images and links
       const generatedContent = await generateContentWithImages(
         seoData.topic,
         seoData.selectedKeywords,
         seoData.selectedTitle,
-        seoData.selectedOutline,
-        seoData.selectedImages
+        seoData.selectedOutline || seoData.outline,
+        seoData.selectedImages,
+        seoData.internalLinks,
+        seoData.externalLinks
       );
       
       handleDataChange("generatedContent", generatedContent);
       toast.success("Content successfully generated!");
       
       // Auto-navigate to the content step
-      setActiveStep(6);
+      setActiveStep(7);
     } catch (error) {
       console.error("Error generating content:", error);
       toast.error("Failed to generate content. Please try again.");
@@ -465,6 +473,15 @@ const AISEOPage = () => {
         );
       case 6:
         return (
+          <SEOLinksStep 
+            seoData={seoData}
+            onDataChange={handleDataChange}
+            onNext={handleNext}
+            onPrev={handlePrev}
+          />
+        );
+      case 7:
+        return (
           <ContentGenerationStep 
             seoData={seoData}
             isGenerating={isGenerating}
@@ -500,7 +517,8 @@ const AISEOPage = () => {
                     { step: 3, label: "Title", icon: BookOpen },
                     { step: 4, label: "Outline", icon: ArrowRight },
                     { step: 5, label: "Images", icon: ImageIcon },
-                    { step: 6, label: "Content", icon: Globe }
+                    { step: 6, label: "Links", icon: Link },
+                    { step: 7, label: "Content", icon: Globe }
                   ].map(({ step, label, icon: Icon }) => (
                     <button
                       key={step}
@@ -538,7 +556,7 @@ const AISEOPage = () => {
             
             {renderStep()}
             
-            {activeStep === 5 && !isGenerating && seoData.selectedImages?.length > 0 && (
+            {activeStep === 6 && !isGenerating && !seoData.generatedContent && (
               <Button 
                 className="w-full"
                 onClick={handleGenerateContent}
@@ -565,8 +583,10 @@ const AISEOPage = () => {
     if (!seoData.topic) return 1;
     if (seoData.selectedKeywords.length === 0) return 2;
     if (!seoData.selectedTitle) return 3;
-    if (!seoData.selectedOutline) return 4;
-    return 6; // Allow skipping images
+    if (!seoData.selectedOutline && !seoData.outline) return 4;
+    if (!seoData.selectedImages || seoData.selectedImages.length === 0) return 5;
+    if (!seoData.internalLinks || !seoData.externalLinks) return 6;
+    return 7;
   }
 };
 

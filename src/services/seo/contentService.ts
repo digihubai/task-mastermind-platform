@@ -77,14 +77,16 @@ export const fetchSEOAnalytics = async (contentId: string) => {
 };
 
 /**
- * Generates content with images
+ * Generates content with images and links
  */
 export const generateContentWithImages = async (
   topic: string,
   keywords: string[],
   title: string,
   outline: any,
-  images: string[]
+  images: string[],
+  internalLinks: any[] = [],
+  externalLinks: any[] = []
 ) => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 2000));
@@ -137,6 +139,39 @@ ${subsection.content || `${subsection.title} is a crucial component of ${formatt
 
       return sectionContent;
     }).join('\n\n');
+  } else if (outline) {
+    // If outline is a string (from the outline step)
+    const outlineLines = outline.split('\n').filter((line: string) => line.trim());
+    
+    // Process the outline
+    let currentMainSection = null;
+    
+    for (let i = 0; i < outlineLines.length; i++) {
+      const line = outlineLines[i].trim();
+      
+      if (line.startsWith('# ')) {
+        // Main title (skip)
+        continue;
+      } else if (line.startsWith('## ')) {
+        // Main section
+        currentMainSection = line.replace('## ', '');
+        content += `\n## ${currentMainSection}\n\n`;
+        content += `This section explores key aspects of ${currentMainSection} and how it relates to ${formattedTopic}. Understanding these principles will help you develop more effective strategies.\n\n`;
+        
+        // Add image to some sections if available
+        if (images && images.length > 1 && Math.random() > 0.7) {
+          const imageIndex = Math.floor(Math.random() * (images.length - 1)) + 1;
+          if (images[imageIndex]) {
+            content += `![${currentMainSection} visualization](${images[imageIndex]})\n\n`;
+          }
+        }
+      } else if (line.startsWith('### ') && currentMainSection) {
+        // Subsection
+        const subsection = line.replace('### ', '');
+        content += `### ${subsection}\n\n`;
+        content += `${subsection} is a crucial component of ${currentMainSection} that can significantly impact your ${formattedTopic} results. Companies that excel in this area typically see higher engagement rates and better ROI.\n\n`;
+      }
+    }
   }
 
   // Add more substantive content
@@ -179,5 +214,55 @@ Mastering ${formattedTopic} requires ongoing education, experimentation, and ada
 
 `;
 
+  // Insert links if available
+  if (internalLinks && internalLinks.length > 0) {
+    // Find keywords in the content and replace with links
+    internalLinks.forEach(link => {
+      const linkText = link.title;
+      const linkWords = linkText.toLowerCase().split(/\s+/).filter(word => word.length > 4);
+      
+      for (const word of linkWords) {
+        // Don't add link if already has one
+        if (!content.includes(`<a href`) && content.toLowerCase().includes(word.toLowerCase())) {
+          const regex = new RegExp(`\\b${word}\\b`, 'i');
+          const match = content.match(regex);
+          
+          if (match && match.index !== undefined) {
+            const originalWord = match[0];
+            content = content.substring(0, match.index) + 
+                     `<a href="${link.url}">${originalWord}</a>` + 
+                     content.substring(match.index + originalWord.length);
+            break;
+          }
+        }
+      }
+    });
+  }
+  
+  if (externalLinks && externalLinks.length > 0) {
+    // Add external links with proper attribution
+    externalLinks.forEach(link => {
+      const linkText = link.title;
+      const linkWords = linkText.toLowerCase().split(/\s+/).filter(word => word.length > 4);
+      
+      for (const word of linkWords) {
+        // Don't add link if already has one
+        if (!content.includes(`<a href="${link.url}"`) && content.toLowerCase().includes(word.toLowerCase())) {
+          const regex = new RegExp(`\\b${word}\\b`, 'i');
+          const match = content.match(regex);
+          
+          if (match && match.index !== undefined) {
+            const originalWord = match[0];
+            content = content.substring(0, match.index) + 
+                     `<a href="${link.url}" target="_blank" rel="noopener noreferrer">${originalWord}</a>` + 
+                     content.substring(match.index + originalWord.length);
+            break;
+          }
+        }
+      }
+    });
+  }
+
   return content;
 };
+

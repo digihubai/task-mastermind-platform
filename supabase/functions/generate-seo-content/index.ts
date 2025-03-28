@@ -15,7 +15,7 @@ serve(async (req) => {
 
   try {
     // Get request body
-    const { topic, keywords, title, outline } = await req.json();
+    const { topic, keywords, title, outline, images, internalLinks, externalLinks } = await req.json();
     
     // Validate inputs
     if (!topic) {
@@ -36,7 +36,7 @@ serve(async (req) => {
 
     // In a real implementation, you would call an AI model API here
     // For this example, we'll return enhanced mock data
-    const seoContent = generateEnhancedSEOContent(formattedTopic, formattedKeywords, title, outline);
+    const seoContent = generateEnhancedSEOContent(formattedTopic, formattedKeywords, title, outline, images, internalLinks, externalLinks);
     
     // Create a response with the generated content
     return new Response(
@@ -67,7 +67,15 @@ serve(async (req) => {
 });
 
 // Enhanced helper function to generate mock SEO content
-function generateEnhancedSEOContent(topic, keywords = [], title = "", outline = null): string {
+function generateEnhancedSEOContent(
+  topic, 
+  keywords = [], 
+  title = "", 
+  outline = null, 
+  images = [],
+  internalLinks = [],
+  externalLinks = []
+): string {
   const formattedKeywords = keywords.length > 0 ? keywords.join(', ') : 'SEO, optimization';
   const currentYear = new Date().getFullYear();
   const contentTitle = title || `Complete Guide to ${topic} in ${currentYear}`;
@@ -78,25 +86,66 @@ function generateEnhancedSEOContent(topic, keywords = [], title = "", outline = 
 In this comprehensive guide, we'll explore everything you need to know about ${topic}. 
 This guide covers the essential aspects of ${formattedKeywords}, with strategies that have proven effective in ${currentYear}.
 
-## Understanding ${topic}
+`;
+
+  // Add first image if available
+  if (images && images.length > 0) {
+    content += `![${topic} overview image](${images[0]})\n\n`;
+  }
+
+  content += `## Understanding ${topic}
 ${topic} has become increasingly important in today's digital landscape. 
 As more businesses focus on online presence, implementing effective strategies for ${formattedKeywords} is crucial for success and competitive advantage.
 
 `;
 
   // Add outline-based content if available
-  if (outline && outline.sections) {
-    Object.entries(outline.sections).forEach(([key, section]: [string, any]) => {
-      content += `## ${section.title}\n\n`;
-      content += `${section.content || `This section explores key aspects of ${section.title} and its significant impact on ${topic} strategy. Understanding these elements is critical for achieving optimal results.`}\n\n`;
+  if (outline) {
+    if (typeof outline === 'object' && outline.sections) {
+      Object.entries(outline.sections).forEach(([key, section]: [string, any]) => {
+        content += `## ${section.title}\n\n`;
+        content += `${section.content || `This section explores key aspects of ${section.title} and its significant impact on ${topic} strategy. Understanding these elements is critical for achieving optimal results.`}\n\n`;
+        
+        if (section.subsections && section.subsections.length > 0) {
+          section.subsections.forEach((subsection: any) => {
+            content += `### ${subsection.title}\n\n`;
+            content += `${subsection.content || `${subsection.title} represents a crucial component of effective ${topic} strategy. Organizations that master this element typically see superior performance metrics and stronger market positioning.`}\n\n`;
+          });
+        }
+      });
+    } else if (typeof outline === 'string') {
+      // Parse string outline
+      const outlineLines = outline.split('\n').filter(line => line.trim());
       
-      if (section.subsections && section.subsections.length > 0) {
-        section.subsections.forEach((subsection: any) => {
-          content += `### ${subsection.title}\n\n`;
-          content += `${subsection.content || `${subsection.title} represents a crucial component of effective ${topic} strategy. Organizations that master this element typically see superior performance metrics and stronger market positioning.`}\n\n`;
-        });
+      let currentMainSection = null;
+      
+      for (let i = 0; i < outlineLines.length; i++) {
+        const line = outlineLines[i].trim();
+        
+        if (line.startsWith('# ')) {
+          // Main title (skip)
+          continue;
+        } else if (line.startsWith('## ')) {
+          // Main section
+          currentMainSection = line.replace('## ', '');
+          content += `## ${currentMainSection}\n\n`;
+          content += `This section explores key aspects of ${currentMainSection} and how it relates to ${topic}. Understanding these principles will help you develop more effective strategies.\n\n`;
+          
+          // Add image to some sections if available
+          if (images && images.length > 1 && Math.random() > 0.7) {
+            const imageIndex = Math.floor(Math.random() * (images.length - 1)) + 1;
+            if (images[imageIndex]) {
+              content += `![${currentMainSection} visualization](${images[imageIndex]})\n\n`;
+            }
+          }
+        } else if (line.startsWith('### ') && currentMainSection) {
+          // Subsection
+          const subsection = line.replace('### ', '');
+          content += `### ${subsection}\n\n`;
+          content += `${subsection} is a crucial component of ${currentMainSection} that can significantly impact your ${topic} results. Companies that excel in this area typically see higher engagement rates and better ROI.\n\n`;
+        }
       }
-    });
+    }
   } else {
     // Add default sections if no outline provided
     content += `## Best Practices for ${topic}
@@ -125,6 +174,11 @@ For those looking to take their ${topic} to the next level:
 - Focus on Core Web Vitals and technical performance metrics
 
 `;
+
+    // Add second image if available
+    if (images && images.length > 1) {
+      content += `![${topic} strategies visualization](${images[1]})\n\n`;
+    }
   }
 
   content += `## Case Studies: Real Results
@@ -136,6 +190,55 @@ A local business focusing on ${keywords[0] || topic} achieved first-page ranking
 
 ## Conclusion
 ${topic} continues to evolve, but the fundamentals remain constant: create value for users, optimize for search engines, and measure your results. By following the strategies outlined in this guide, you'll be well-positioned to succeed with ${formattedKeywords} in ${currentYear} and beyond.`;
+
+  // Insert links if available
+  if (internalLinks && internalLinks.length > 0) {
+    // Find keywords in the content and replace with links
+    internalLinks.forEach((link: any) => {
+      const linkText = link.title;
+      const linkWords = linkText.toLowerCase().split(/\s+/).filter((word: string) => word.length > 4);
+      
+      for (const word of linkWords) {
+        // Don't add link if already has one
+        if (!content.includes(`<a href`) && content.toLowerCase().includes(word.toLowerCase())) {
+          const regex = new RegExp(`\\b${word}\\b`, 'i');
+          const match = content.match(regex);
+          
+          if (match && match.index !== undefined) {
+            const originalWord = match[0];
+            content = content.substring(0, match.index) + 
+                     `<a href="${link.url}">${originalWord}</a>` + 
+                     content.substring(match.index + originalWord.length);
+            break;
+          }
+        }
+      }
+    });
+  }
+  
+  if (externalLinks && externalLinks.length > 0) {
+    // Add external links with proper attribution
+    externalLinks.forEach((link: any) => {
+      const linkText = link.title;
+      const linkWords = linkText.toLowerCase().split(/\s+/).filter((word: string) => word.length > 4);
+      
+      for (const word of linkWords) {
+        // Don't add link if already has one
+        if (!content.includes(`<a href="${link.url}"`) && content.toLowerCase().includes(word.toLowerCase())) {
+          const regex = new RegExp(`\\b${word}\\b`, 'i');
+          const match = content.match(regex);
+          
+          if (match && match.index !== undefined) {
+            const originalWord = match[0];
+            content = content.substring(0, match.index) + 
+                     `<a href="${link.url}" target="_blank" rel="noopener noreferrer">${originalWord}</a>` + 
+                     content.substring(match.index + originalWord.length);
+            break;
+          }
+        }
+      }
+    });
+  }
 
   return content;
 }
