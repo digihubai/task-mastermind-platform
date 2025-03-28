@@ -57,6 +57,10 @@ const supportRoutes: RouteObject[] = [
     path: '/support/ticket-form',
     element: <EmbeddableTicketForm />,
   },
+  {
+    path: '/support/analytics',
+    element: <Navigate to="/analytics/support" replace />,
+  }
 ];
 
 export default supportRoutes;

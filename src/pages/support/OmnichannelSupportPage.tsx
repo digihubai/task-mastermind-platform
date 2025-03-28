@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -84,14 +83,6 @@ const OmnichannelSupportPage: React.FC = () => {
   );
   const navigate = useNavigate();
 
-  const handleNewTicket = () => {
-    navigate('/support/tickets', { state: { showNewTicketForm: true } });
-    toast({
-      title: "New ticket form",
-      description: "Create a new support ticket"
-    });
-  };
-
   const handleViewTicket = (ticket: SupportTicket) => {
     navigate('/support/tickets', { state: { selectedTicketId: ticket.id } });
     toast({
@@ -143,7 +134,6 @@ const OmnichannelSupportPage: React.FC = () => {
       <div className="space-y-6">
         <OmnichannelHeader 
           onSettingsClick={() => setShowSettings(!showSettings)} 
-          onNewTicket={handleNewTicket}
         />
         
         {showSettings ? (

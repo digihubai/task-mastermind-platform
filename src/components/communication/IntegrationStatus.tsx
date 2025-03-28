@@ -2,8 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Settings, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface IntegrationStatusProps {
@@ -18,71 +17,27 @@ const integrations = [
     description: 'Voice, SMS, Video', 
     status: 'connected', 
     icon: '🔊',
-    capabilities: ['voice', 'sms', 'video']
   },
   { 
     id: 'whatsapp', 
-    name: 'WhatsApp Business', 
-    description: 'Messaging, Voice, Video', 
+    name: 'WhatsApp', 
+    description: 'Messaging', 
     status: 'connected',
     icon: '📱',
-    capabilities: ['chat', 'voice', 'video']
   },
   { 
     id: 'messenger', 
-    name: 'Facebook Messenger', 
+    name: 'Facebook', 
     description: 'Messaging', 
     status: 'connected',
     icon: '💬',
-    capabilities: ['chat']
   },
   { 
-    id: 'smtp', 
-    name: 'Email (SMTP)', 
-    description: 'Email communications', 
+    id: 'email', 
+    name: 'Email', 
+    description: 'Email', 
     status: 'connected',
     icon: '📧',
-    capabilities: ['email']
-  },
-  { 
-    id: 'telegram', 
-    name: 'Telegram', 
-    description: 'Messaging', 
-    status: 'not_connected',
-    icon: '📨',
-    capabilities: ['chat']
-  },
-  { 
-    id: 'sms', 
-    name: 'SMS', 
-    description: 'Text messaging', 
-    status: 'connected',
-    icon: '✉️',
-    capabilities: ['sms']
-  },
-  { 
-    id: 'instagram', 
-    name: 'Instagram', 
-    description: 'Direct Messages', 
-    status: 'not_connected',
-    icon: '📸',
-    capabilities: ['chat']
-  },
-  { 
-    id: 'twitter', 
-    name: 'Twitter/X', 
-    description: 'Direct Messages', 
-    status: 'not_connected',
-    icon: '🐦',
-    capabilities: ['chat']
-  },
-  { 
-    id: 'viber', 
-    name: 'Viber', 
-    description: 'Messaging', 
-    status: 'not_connected',
-    icon: '💬',
-    capabilities: ['chat']
   }
 ];
 
@@ -94,49 +49,47 @@ const IntegrationStatus: React.FC<IntegrationStatusProps> = ({ className = '' })
   };
   
   return (
-    <Card className={className}>
+    <Card className={`${className} h-full`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle className="text-lg">Communication Channels</CardTitle>
-            <CardDescription>Active integrations for omnichannel support</CardDescription>
+            <CardTitle className="text-lg">Channels</CardTitle>
+            <CardDescription>Active integrations</CardDescription>
           </div>
-          <Button variant="outline" size="sm" onClick={goToIntegrationsSettings}>
-            <Settings className="h-4 w-4 mr-2" />
-            Configure Channels
-          </Button>
+          <Badge 
+            variant="outline" 
+            className="cursor-pointer hover:bg-primary/10"
+            onClick={goToIntegrationsSettings}
+          >
+            {integrations.filter(i => i.status === 'connected').length} active
+            <ExternalLink className="ml-1 h-3 w-3" />
+          </Badge>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-2">
           {integrations.map((integration) => (
             <div 
               key={integration.id} 
-              className="flex items-center justify-between bg-secondary/30 p-2 rounded-md"
+              className="flex items-center bg-secondary/30 p-2 rounded-md"
             >
-              <div className="flex items-center">
-                <div className="w-8 h-8 flex items-center justify-center mr-2 bg-primary/10 rounded-md">
-                  <span className="text-lg">{integration.icon}</span>
-                </div>
-                <div>
-                  <div className="font-medium text-sm">{integration.name}</div>
-                  <div className="text-xs text-muted-foreground">{integration.description}</div>
-                </div>
+              <div className="w-6 h-6 flex items-center justify-center mr-1 bg-primary/10 rounded-md">
+                <span className="text-sm">{integration.icon}</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div>
+                <div className="font-medium text-xs">{integration.name}</div>
+              </div>
+              <div className="ml-auto">
                 <Badge 
-                  variant={integration.status === 'connected' ? 'default' : 'outline'}
+                  variant="outline"
                   className={
                     integration.status === 'connected' 
-                      ? 'bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-100 dark:bg-gray-900/20 dark:text-gray-400'
+                      ? 'bg-green-100 text-green-700 text-[10px] py-0 px-1.5 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400'
+                      : 'bg-gray-100 text-gray-700 text-[10px] py-0 px-1.5 hover:bg-gray-100 dark:bg-gray-900/20 dark:text-gray-400'
                   }
                 >
-                  {integration.status === 'connected' ? 'Connected' : 'Not Connected'}
+                  {integration.status === 'connected' ? 'ON' : 'OFF'}
                 </Badge>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={goToIntegrationsSettings}>
-                  <ExternalLink className="h-4 w-4" />
-                </Button>
               </div>
             </div>
           ))}

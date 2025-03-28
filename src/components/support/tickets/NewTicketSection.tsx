@@ -52,9 +52,6 @@ export const NewTicketSection: React.FC<NewTicketSectionProps> = ({
     return (
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Support Tickets</h1>
-        <Button onClick={() => setShowNewTicketForm(true)}>
-          Create New Ticket
-        </Button>
       </div>
     );
   }

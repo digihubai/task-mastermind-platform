@@ -1,14 +1,12 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Users, ExternalLink } from "lucide-react";
+import { Users, ExternalLink } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
-interface SupportDashboardHeaderProps {
-  onNewTicket: () => void;
-}
+interface SupportDashboardHeaderProps {}
 
-const SupportDashboardHeader: React.FC<SupportDashboardHeaderProps> = ({ onNewTicket }) => {
+const SupportDashboardHeader: React.FC<SupportDashboardHeaderProps> = () => {
   const navigate = useNavigate();
   
   return (
@@ -22,10 +20,6 @@ const SupportDashboardHeader: React.FC<SupportDashboardHeaderProps> = ({ onNewTi
         <Button variant="outline" onClick={() => navigate('/support/tickets')}>
           <Users className="mr-2 h-4 w-4" />
           All Tickets
-        </Button>
-        <Button onClick={onNewTicket}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          New Ticket
         </Button>
       </div>
     </div>
