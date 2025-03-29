@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import {
   Search, 
   Edit, 
   Copy, 
-  RotateCcw,
+  RotateCw,
   Sparkles,
   Globe,
   BarChart3,
@@ -20,30 +20,149 @@ import {
   RefreshCw,
   CheckCircle2,
   MessageSquare,
-  Settings
+  Settings,
+  Download,
+  FileDown,
+  ArrowUpDown
 } from "lucide-react";
 import { toast } from "sonner";
 import SEOContentPreview from "@/components/seo/SEOContentPreview";
-import { generateSEOTitles, generateMockSEOContent } from "@/services/seoService"; // Fixed import
+import { generateSEOTitles, generateMockSEOContent } from "@/services/seoService";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 
+// Language options available for content generation
+const LANGUAGES = [
+  { code: 'en', name: 'English' },
+  { code: 'es', name: 'Spanish' },
+  { code: 'fr', name: 'French' },
+  { code: 'de', name: 'German' },
+  { code: 'it', name: 'Italian' },
+  { code: 'pt', name: 'Portuguese' },
+  { code: 'nl', name: 'Dutch' },
+  { code: 'ru', name: 'Russian' },
+  { code: 'ja', name: 'Japanese' },
+  { code: 'zh', name: 'Chinese (Simplified)' },
+  { code: 'zh-TW', name: 'Chinese (Traditional)' },
+  { code: 'ko', name: 'Korean' },
+  { code: 'ar', name: 'Arabic' },
+  { code: 'hi', name: 'Hindi' },
+  { code: 'tr', name: 'Turkish' },
+  { code: 'pl', name: 'Polish' },
+  { code: 'sv', name: 'Swedish' },
+  { code: 'no', name: 'Norwegian' },
+  { code: 'fi', name: 'Finnish' },
+  { code: 'da', name: 'Danish' },
+  { code: 'cs', name: 'Czech' },
+  { code: 'el', name: 'Greek' },
+  { code: 'hu', name: 'Hungarian' },
+  { code: 'ro', name: 'Romanian' },
+  { code: 'th', name: 'Thai' },
+  { code: 'vi', name: 'Vietnamese' },
+  { code: 'id', name: 'Indonesian' },
+  { code: 'ms', name: 'Malay' },
+  { code: 'fil', name: 'Filipino' },
+  { code: 'he', name: 'Hebrew' }
+];
+
+// Content type options
+const CONTENT_TYPES = [
+  'Blog Post', 
+  'Landing Page', 
+  'Product Description', 
+  'Service Page', 
+  'How-to Guide', 
+  'Comparison Article'
+];
+
+// Word count options
+const WORD_COUNTS = [
+  '500-750',
+  '750-1000',
+  '1000-1500',
+  '1500-2000',
+  '2000+'
+];
+
+// Heading structure options
+const HEADING_STRUCTURES = [
+  'H1 + H2',
+  'H1 + H2 + H3',
+  'Complete hierarchy'
+];
+
+// Voice options
+const VOICE_OPTIONS = [
+  'Informative',
+  'Conversational',
+  'Professional',
+  'Persuasive'
+];
+
+// Expertise level options
+const EXPERTISE_LEVELS = [
+  'Beginner',
+  'Intermediate',
+  'Expert'
+];
+
+// Brand personality options
+const BRAND_PERSONALITIES = [
+  'Friendly',
+  'Authoritative',
+  'Innovative',
+  'Traditional'
+];
+
 const AISEOWriterPage = () => {
-  const [keyword, setKeyword] = useState("");
-  const [contentType, setContentType] = useState("blogPost");
-  const [tone, setTone] = useState("professional");
-  const [wordCount, setWordCount] = useState("500");
+  const [formData, setFormData] = useState({
+    topic: '',
+    language: 'en',
+    contentType: 'Blog Post',
+    wordCount: '1000-1500',
+    headingStructure: 'H1 + H2 + H3',
+    includeTOC: false,
+    includeFAQ: false,
+    includeCTA: false,
+    includeCustomSections: '',
+    primaryKeyword: '',
+    secondaryKeywordsGeneration: 'auto', // auto or manual
+    secondaryKeywords: '',
+    keywordDensity: 'Medium',
+    metaDescriptionType: 'auto', // auto or manual
+    metaDescriptionValue: '',
+    includeInternalLinking: false,
+    voice: 'Conversational',
+    expertiseLevel: 'Intermediate',
+    brandPersonality: 'Friendly',
+    semanticEnrichment: 'Advanced',
+    lsiKeywords: true,
+    serpTargeting: 'Featured Snippets',
+    uniquenessLevel: 'High',
+    searchIntent: 'Mixed',
+    includeImagePlacement: true,
+    includeVideoSuggestions: false,
+    includeInfographics: false,
+    analyzeCompetitors: true,
+    includeContentGaps: true,
+    includeUSPs: true
+  });
+  
   const [generatedContent, setGeneratedContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [publishType, setPublishType] = useState("immediate");
   const [scheduleDate, setScheduleDate] = useState("");
   const [scheduleTime, setScheduleTime] = useState("");
-  const [showCMSOptions, setShowCMSOptions] = useState(false);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
-  const [selectedCMS, setSelectedCMS] = useState("wordpress");
   const [publishPlatform, setPublishPlatform] = useState("wordpress");
-  
+  const [activeTab, setActiveTab] = useState("input");
+  const [readabilityScore, setReadabilityScore] = useState(0);
+  const [wordCount, setWordCount] = useState(0);
+  const [metaDescription, setMetaDescription] = useState("");
+  const [generatedTitle, setGeneratedTitle] = useState("");
+  const [error, setError] = useState(null);
+
   const [connectedCMS, setConnectedCMS] = useState({
     wordpress: true,
     shopify: false,
@@ -59,31 +178,124 @@ const AISEOWriterPage = () => {
     enableComments: true,
     socialShare: true
   });
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+  
+  const constructPrompt = (data) => {
+    const languageName = LANGUAGES.find(lang => lang.code === data.language)?.name || "English";
+    
+    return `Generate SEO-optimized ${data.contentType} about ${data.topic} in ${languageName}.
+    
+Primary keyword: ${data.primaryKeyword}
+Secondary keywords: ${data.secondaryKeywordsGeneration === 'auto' ? 'Generate relevant secondary keywords automatically' : data.secondaryKeywords}
+Word count: ${data.wordCount}
+Heading structure: ${data.headingStructure}
+Include Table of Contents: ${data.includeTOC ? 'Yes' : 'No'}
+Include FAQ Section: ${data.includeFAQ ? 'Yes' : 'No'}
+Include Call to Action: ${data.includeCTA ? 'Yes' : 'No'}
+Custom sections: ${data.includeCustomSections}
+Keyword density: ${data.keywordDensity}
+Voice: ${data.voice}
+Expertise level: ${data.expertiseLevel}
+Brand personality: ${data.brandPersonality}
+Semantic enrichment: ${data.semanticEnrichment}
+LSI keyword integration: ${data.lsiKeywords ? 'Yes' : 'No'}
+SERP feature targeting: ${data.serpTargeting}
+Content uniqueness level: ${data.uniquenessLevel}
+Search intent focus: ${data.searchIntent}
+Analyze competitors: ${data.analyzeCompetitors ? 'Yes' : 'No'}
+Include content gaps: ${data.includeContentGaps ? 'Yes' : 'No'}
+Include unique selling points: ${data.includeUSPs ? 'Yes' : 'No'}
+
+Generate comprehensive, original content that adheres to current SEO best practices while maintaining natural readability and providing genuine value to the target audience.`;
+  };
   
   const handleGenerateContent = () => {
-    if (!keyword.trim()) {
-      toast.error("Please enter a target keyword");
+    if (!formData.topic.trim() || !formData.primaryKeyword.trim()) {
+      toast.error("Topic and primary keyword are required");
       return;
     }
     
     setIsGenerating(true);
+    setError(null);
+    
+    // Generate a mock title based on the topic and primary keyword
+    const title = `${formData.topic} - Complete Guide [${formData.primaryKeyword}]`;
+    setGeneratedTitle(title);
+    
+    // Set the active tab to output to show content generation
+    setActiveTab("output");
     
     setTimeout(() => {
-      const content = generateMockSEOContent(keyword, [keyword]);
-      setGeneratedContent(content);
-      setIsGenerating(false);
-      setShowCMSOptions(true);
-      toast.success("SEO content generated!");
-    }, 2000);
+      try {
+        // In a real implementation, this would be an API call to generate content
+        // For now, we'll use a mock function
+        const content = generateMockSEOContent(formData.topic, [formData.primaryKeyword]);
+        setGeneratedContent(content);
+        
+        // Generate a meta description
+        setMetaDescription(`Learn about ${formData.primaryKeyword} in our comprehensive ${formData.contentType.toLowerCase()}. Discover best practices, tips, and strategies for success in ${formData.topic}.`);
+        
+        // Calculate word count (simplified)
+        const estimatedWordCount = Math.floor(Math.random() * 500) + parseInt(formData.wordCount.split('-')[0]);
+        setWordCount(estimatedWordCount);
+        
+        // Generate a readability score (0-100)
+        const score = Math.floor(Math.random() * 30) + 65;
+        setReadabilityScore(score);
+        
+        toast.success("SEO content generated!");
+      } catch (err) {
+        console.error("Error generating content:", err);
+        setError("Failed to generate content. Please try again.");
+        toast.error("Failed to generate content");
+      } finally {
+        setIsGenerating(false);
+      }
+    }, 3000);
   };
   
   const handleReset = () => {
-    setKeyword("");
-    setContentType("blogPost");
-    setTone("professional");
-    setWordCount("500");
+    setFormData({
+      topic: '',
+      language: 'en',
+      contentType: 'Blog Post',
+      wordCount: '1000-1500',
+      headingStructure: 'H1 + H2 + H3',
+      includeTOC: false,
+      includeFAQ: false,
+      includeCTA: false,
+      includeCustomSections: '',
+      primaryKeyword: '',
+      secondaryKeywordsGeneration: 'auto',
+      secondaryKeywords: '',
+      keywordDensity: 'Medium',
+      metaDescriptionType: 'auto',
+      metaDescriptionValue: '',
+      includeInternalLinking: false,
+      voice: 'Conversational',
+      expertiseLevel: 'Intermediate',
+      brandPersonality: 'Friendly',
+      semanticEnrichment: 'Advanced',
+      lsiKeywords: true,
+      serpTargeting: 'Featured Snippets',
+      uniquenessLevel: 'High',
+      searchIntent: 'Mixed',
+      includeImagePlacement: true,
+      includeVideoSuggestions: false,
+      includeInfographics: false,
+      analyzeCompetitors: true,
+      includeContentGaps: true,
+      includeUSPs: true
+    });
     setGeneratedContent("");
-    setShowCMSOptions(false);
+    setActiveTab("input");
     toast.info("All fields have been reset");
   };
   
@@ -108,7 +320,7 @@ const AISEOWriterPage = () => {
 
     const publishAction = publishType === "immediate" ? "Publishing" : "Scheduling";
     const scheduledInfo = publishType === "scheduled" ? ` for ${scheduleDate} at ${scheduleTime}` : "";
-    const platformName = selectedCMS.charAt(0).toUpperCase() + selectedCMS.slice(1);
+    const platformName = publishPlatform.charAt(0).toUpperCase() + publishPlatform.slice(1);
     
     toast.success(`${publishAction} to ${platformName}${scheduledInfo}...`);
     
@@ -118,17 +330,42 @@ const AISEOWriterPage = () => {
     }, 1500);
   };
 
-  const handleSettingChange = (setting: keyof typeof publicationSettings) => {
+  const handleSettingChange = (setting) => {
     setPublicationSettings(prev => ({
       ...prev,
       [setting]: !prev[setting]
     }));
   };
   
-  const openIntegrationSettings = () => {
-    toast.info("Redirecting to integrations settings...");
-    // In a real app, you would navigate to the settings page
-    // navigate("/settings/integrations", { state: { activeTab: "cms" } });
+  const downloadContent = (format = 'html') => {
+    if (!generatedContent) {
+      toast.error("Please generate content first");
+      return;
+    }
+    
+    const filename = `seo-content-${new Date().toISOString().slice(0, 10)}.${format === 'markdown' ? 'md' : 'html'}`;
+    const fileContent = format === 'markdown' 
+      ? generatedContent.replace(/<h1>(.*?)<\/h1>/g, '# $1')
+                       .replace(/<h2>(.*?)<\/h2>/g, '## $1')
+                       .replace(/<h3>(.*?)<\/h3>/g, '### $1')
+                       .replace(/<p>(.*?)<\/p>/g, '$1\n\n')
+                       .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
+                       .replace(/<em>(.*?)<\/em>/g, '*$1*')
+                       .replace(/<ul>(.*?)<\/ul>/gs, '$1')
+                       .replace(/<li>(.*?)<\/li>/g, '- $1\n')
+      : generatedContent;
+    
+    const blob = new Blob([fileContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast.success(`Content downloaded as ${format.toUpperCase()}`);
   };
   
   return (
@@ -144,148 +381,446 @@ const AISEOWriterPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <Card className="p-6 border border-border/40">
-              <Tabs defaultValue="input" className="w-full">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-4">
                   <TabsTrigger value="input">Input Parameters</TabsTrigger>
                   <TabsTrigger value="output">Generated Content</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="input">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium mb-1.5 block">Target Keyword</label>
-                      <Input 
-                        placeholder="Enter your main SEO keyword or phrase" 
-                        value={keyword}
-                        onChange={(e) => setKeyword(e.target.value)}
-                      />
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium">1. Content Creation Settings</h3>
+                      
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="topic">Topic</Label>
+                            <Input 
+                              id="topic"
+                              name="topic"
+                              value={formData.topic}
+                              onChange={handleInputChange}
+                              placeholder="Enter your content topic" 
+                              className="mt-1"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="language">Output Language</Label>
+                            <Select 
+                              value={formData.language} 
+                              onValueChange={(value) => setFormData({...formData, language: value})}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select language" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {LANGUAGES.map((language) => (
+                                  <SelectItem key={language.code} value={language.code}>
+                                    {language.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="contentType">Content Type</Label>
+                            <Select 
+                              value={formData.contentType} 
+                              onValueChange={(value) => setFormData({...formData, contentType: value})}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select content type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {CONTENT_TYPES.map((type) => (
+                                  <SelectItem key={type} value={type}>{type}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="wordCount">Word Count</Label>
+                            <Select 
+                              value={formData.wordCount} 
+                              onValueChange={(value) => setFormData({...formData, wordCount: value})}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select word count" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {WORD_COUNTS.map((count) => (
+                                  <SelectItem key={count} value={count}>{count} words</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="headingStructure">Heading Structure</Label>
+                            <Select 
+                              value={formData.headingStructure} 
+                              onValueChange={(value) => setFormData({...formData, headingStructure: value})}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select heading structure" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {HEADING_STRUCTURES.map((structure) => (
+                                  <SelectItem key={structure} value={structure}>{structure}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div>
+                            <Label>Include Sections</Label>
+                            <div className="mt-3 space-y-2">
+                              <div className="flex items-center space-x-2">
+                                <Checkbox 
+                                  id="includeTOC" 
+                                  checked={formData.includeTOC} 
+                                  onCheckedChange={(checked) => setFormData({...formData, includeTOC: !!checked})} 
+                                />
+                                <label htmlFor="includeTOC" className="text-sm">
+                                  Table of Contents
+                                </label>
+                              </div>
+                              
+                              <div className="flex items-center space-x-2">
+                                <Checkbox 
+                                  id="includeFAQ" 
+                                  checked={formData.includeFAQ} 
+                                  onCheckedChange={(checked) => setFormData({...formData, includeFAQ: !!checked})} 
+                                />
+                                <label htmlFor="includeFAQ" className="text-sm">
+                                  FAQ Section
+                                </label>
+                              </div>
+                              
+                              <div className="flex items-center space-x-2">
+                                <Checkbox 
+                                  id="includeCTA" 
+                                  checked={formData.includeCTA} 
+                                  onCheckedChange={(checked) => setFormData({...formData, includeCTA: !!checked})} 
+                                />
+                                <label htmlFor="includeCTA" className="text-sm">
+                                  Call to Action
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="text-sm font-medium mb-1.5 block">Content Type</label>
-                        <Select 
-                          value={contentType} 
-                          onValueChange={setContentType}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select content type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="blogPost">Blog Post</SelectItem>
-                            <SelectItem value="metaDescription">Meta Description</SelectItem>
-                            <SelectItem value="productDescription">Product Description</SelectItem>
-                            <SelectItem value="landingPage">Landing Page</SelectItem>
-                            <SelectItem value="socialPost">Social Media Post</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                    <div className="space-y-4 pt-4 border-t">
+                      <h3 className="text-lg font-medium">2. SEO Parameters</h3>
                       
-                      <div>
-                        <label className="text-sm font-medium mb-1.5 block">Tone</label>
-                        <Select 
-                          value={tone} 
-                          onValueChange={setTone}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select tone" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="professional">Professional</SelectItem>
-                            <SelectItem value="conversational">Conversational</SelectItem>
-                            <SelectItem value="persuasive">Persuasive</SelectItem>
-                            <SelectItem value="educational">Educational</SelectItem>
-                            <SelectItem value="enthusiastic">Enthusiastic</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div>
-                        <label className="text-sm font-medium mb-1.5 block">Word Count</label>
-                        <Select 
-                          value={wordCount} 
-                          onValueChange={setWordCount}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select length" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="100">Short (~100 words)</SelectItem>
-                            <SelectItem value="300">Brief (~300 words)</SelectItem>
-                            <SelectItem value="500">Standard (~500 words)</SelectItem>
-                            <SelectItem value="1000">Long (~1000 words)</SelectItem>
-                            <SelectItem value="2000">Comprehensive (~2000 words)</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="primaryKeyword">Primary Keyword</Label>
+                            <Input 
+                              id="primaryKeyword"
+                              name="primaryKeyword"
+                              value={formData.primaryKeyword}
+                              onChange={handleInputChange}
+                              placeholder="Enter primary keyword" 
+                              className="mt-1"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="keywordDensity">Keyword Density</Label>
+                            <Select 
+                              value={formData.keywordDensity} 
+                              onValueChange={(value) => setFormData({...formData, keywordDensity: value})}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select keyword density" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Low">Low (0.5-1%)</SelectItem>
+                                <SelectItem value="Medium">Medium (1-2%)</SelectItem>
+                                <SelectItem value="High">High (2-3%)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <Label>Secondary Keywords</Label>
+                          <div className="mt-1 space-y-3">
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="radio"
+                                id="auto-keywords"
+                                name="secondaryKeywordsGeneration"
+                                value="auto"
+                                checked={formData.secondaryKeywordsGeneration === 'auto'}
+                                onChange={handleInputChange}
+                                className="h-4 w-4"
+                              />
+                              <label htmlFor="auto-keywords" className="text-sm">
+                                Generate automatically using AI
+                              </label>
+                            </div>
+                            
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="radio"
+                                id="manual-keywords"
+                                name="secondaryKeywordsGeneration"
+                                value="manual"
+                                checked={formData.secondaryKeywordsGeneration === 'manual'}
+                                onChange={handleInputChange}
+                                className="h-4 w-4"
+                              />
+                              <label htmlFor="manual-keywords" className="text-sm">
+                                Enter manually
+                              </label>
+                            </div>
+                            
+                            {formData.secondaryKeywordsGeneration === 'manual' && (
+                              <Textarea
+                                id="secondaryKeywords"
+                                name="secondaryKeywords"
+                                value={formData.secondaryKeywords}
+                                onChange={handleInputChange}
+                                placeholder="Enter secondary keywords separated by commas"
+                                className="mt-2"
+                              />
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 mt-2">
+                          <Checkbox 
+                            id="includeInternalLinking" 
+                            checked={formData.includeInternalLinking} 
+                            onCheckedChange={(checked) => setFormData({...formData, includeInternalLinking: !!checked})} 
+                          />
+                          <label htmlFor="includeInternalLinking" className="text-sm">
+                            Include internal linking suggestions
+                          </label>
+                        </div>
                       </div>
                     </div>
                     
-                    <Button 
-                      className="w-full mt-4 gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white"
-                      onClick={handleGenerateContent}
-                      disabled={isGenerating || !keyword.trim()}
-                    >
-                      {isGenerating ? (
-                        <>
-                          <RefreshCw size={16} className="animate-spin" />
-                          Generating content...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles size={16} />
-                          Generate SEO Content
-                        </>
-                      )}
-                    </Button>
+                    <div className="space-y-4 pt-4 border-t">
+                      <h3 className="text-lg font-medium">3. Content Tone & Style</h3>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="voice">Voice</Label>
+                          <Select 
+                            value={formData.voice} 
+                            onValueChange={(value) => setFormData({...formData, voice: value})}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Select voice" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {VOICE_OPTIONS.map((voice) => (
+                                <SelectItem key={voice} value={voice}>{voice}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="expertiseLevel">Industry Expertise Level</Label>
+                          <Select 
+                            value={formData.expertiseLevel} 
+                            onValueChange={(value) => setFormData({...formData, expertiseLevel: value})}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Select expertise level" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {EXPERTISE_LEVELS.map((level) => (
+                                <SelectItem key={level} value={level}>{level}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="brandPersonality">Brand Personality</Label>
+                          <Select 
+                            value={formData.brandPersonality} 
+                            onValueChange={(value) => setFormData({...formData, brandPersonality: value})}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Select brand personality" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {BRAND_PERSONALITIES.map((personality) => (
+                                <SelectItem key={personality} value={personality}>{personality}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-center">
+                      <Button 
+                        onClick={handleGenerateContent} 
+                        className="w-full md:w-auto px-8 gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+                        disabled={isGenerating || !formData.topic.trim() || !formData.primaryKeyword.trim()}
+                      >
+                        {isGenerating ? (
+                          <>
+                            <RefreshCw size={16} className="animate-spin" />
+                            Generating content...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles size={16} />
+                            Generate SEO Content
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </TabsContent>
                 
                 <TabsContent value="output">
-                  <Textarea
-                    placeholder="SEO-optimized content will appear here..."
-                    className="min-h-[300px] resize-none font-mono text-sm"
-                    value={generatedContent}
-                    readOnly
-                  />
-                  
-                  {generatedContent && (
-                    <div className="flex flex-col gap-4 mt-4">
-                      <div className="flex flex-wrap justify-between gap-2">
-                        <Button 
-                          variant="outline" 
-                          onClick={handleReset}
-                          className="gap-2"
-                        >
-                          <RotateCcw size={16} />
-                          Reset
-                        </Button>
+                  {isGenerating ? (
+                    <div className="flex flex-col items-center justify-center py-10">
+                      <RefreshCw size={36} className="animate-spin text-primary mb-4" />
+                      <h3 className="text-lg font-medium mb-1">Generating SEO Content</h3>
+                      <p className="text-muted-foreground text-center max-w-md">
+                        Creating high-quality, optimized content based on your inputs...
+                      </p>
+                    </div>
+                  ) : generatedContent ? (
+                    <>
+                      <div className="mb-4 bg-muted/30 rounded-lg p-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                          <div>
+                            <p className="text-muted-foreground">Word Count</p>
+                            <p className="font-medium">{wordCount} words</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Readability</p>
+                            <p className={`font-medium ${
+                              readabilityScore > 80 ? 'text-green-600' : 
+                              readabilityScore > 60 ? 'text-amber-600' : 'text-red-600'
+                            }`}>
+                              {readabilityScore}/100
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Language</p>
+                            <p className="font-medium">
+                              {LANGUAGES.find(lang => lang.code === formData.language)?.name || "English"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">SEO Score</p>
+                            <p className="font-medium text-green-600">92/100</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <Label className="text-muted-foreground text-xs">GENERATED TITLE</Label>
+                        <h3 className="text-lg font-medium">{generatedTitle}</h3>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <Label className="text-muted-foreground text-xs">META DESCRIPTION</Label>
+                        <p className="text-sm border p-2 rounded bg-muted/20">{metaDescription}</p>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <Label className="text-muted-foreground text-xs">CONTENT</Label>
+                        <div className="min-h-[300px] max-h-[500px] overflow-y-auto border rounded-lg p-4">
+                          <div className="prose prose-sm max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: generatedContent }} />
+                        </div>
                         
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
+                          <Button 
+                            variant="outline" 
+                            onClick={handleReset}
+                            className="gap-1"
+                            size="sm"
+                          >
+                            <RotateCw size={14} />
+                            Reset
+                          </Button>
+                          
                           <Button 
                             variant="outline" 
                             onClick={handleCopyToClipboard}
-                            className="gap-2"
+                            className="gap-1"
+                            size="sm"
                           >
-                            <Copy size={16} />
+                            <Copy size={14} />
                             Copy
                           </Button>
                           
                           <Button 
-                            onClick={handleOpenPublishDialog}
-                            className="gap-2"
+                            variant="outline" 
+                            onClick={() => downloadContent('html')}
+                            className="gap-1"
+                            size="sm"
                           >
-                            <Globe size={16} />
+                            <FileDown size={14} />
+                            Download HTML
+                          </Button>
+                          
+                          <Button 
+                            variant="outline" 
+                            onClick={() => downloadContent('markdown')}
+                            className="gap-1"
+                            size="sm"
+                          >
+                            <Download size={14} />
+                            Download Markdown
+                          </Button>
+                          
+                          <Button 
+                            onClick={handleOpenPublishDialog}
+                            className="gap-1"
+                            size="sm"
+                          >
+                            <Globe size={14} />
                             Publish to CMS
                           </Button>
                         </div>
                       </div>
+                    </>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-10">
+                      <FileDown size={36} className="text-muted-foreground/30 mb-4" />
+                      <h3 className="text-lg font-medium mb-1">No Content Generated Yet</h3>
+                      <p className="text-muted-foreground text-center max-w-md mb-6">
+                        Fill in the parameters and generate SEO-optimized content.
+                      </p>
+                      <Button 
+                        onClick={() => setActiveTab("input")} 
+                        variant="outline"
+                      >
+                        Go to Parameters
+                      </Button>
                     </div>
                   )}
                 </TabsContent>
               </Tabs>
             </Card>
 
-            {generatedContent && (
+            {generatedContent && activeTab === "output" && (
               <SEOContentPreview content={generatedContent} />
             )}
           </div>
@@ -362,7 +897,7 @@ const AISEOWriterPage = () => {
             <Card className="p-6 border border-border/40">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium">Connected CMS</h3>
-                <Button variant="outline" size="sm" onClick={openIntegrationSettings}>
+                <Button variant="outline" size="sm">
                   <Settings size={16} className="mr-2" />
                   Settings
                 </Button>
@@ -560,96 +1095,6 @@ const AISEOWriterPage = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
-        <Tabs defaultValue="seo-tools" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4 max-w-md">
-            <TabsTrigger value="seo-tools">SEO Tools</TabsTrigger>
-            <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="seo-tools">
-            <Card className="p-6 border border-border/40">
-              <h3 className="text-lg font-medium mb-4">Advanced SEO Tools</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="p-4 hover:bg-accent/50 transition-colors cursor-pointer">
-                  <div className="flex flex-col items-center text-center gap-2">
-                    <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-full">
-                      <Search className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <h4 className="font-medium">Keyword Research</h4>
-                    <p className="text-xs text-muted-foreground">Find high-value keywords for your content</p>
-                  </div>
-                </Card>
-                
-                <Card className="p-4 hover:bg-accent/50 transition-colors cursor-pointer">
-                  <div className="flex flex-col items-center text-center gap-2">
-                    <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-full">
-                      <BarChart3 className="h-5 w-5 text-green-600 dark:text-green-400" />
-                    </div>
-                    <h4 className="font-medium">SERP Analysis</h4>
-                    <p className="text-xs text-muted-foreground">Analyze top-ranking content for any keyword</p>
-                  </div>
-                </Card>
-                
-                <Card className="p-4 hover:bg-accent/50 transition-colors cursor-pointer">
-                  <div className="flex flex-col items-center text-center gap-2">
-                    <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-full">
-                      <Edit className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <h4 className="font-medium">Content Audit</h4>
-                    <p className="text-xs text-muted-foreground">Evaluate and optimize your existing content</p>
-                  </div>
-                </Card>
-              </div>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="integrations">
-            <Card className="p-6 border border-border/40">
-              <h3 className="text-lg font-medium mb-4">Content Distribution</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="p-4 border border-border/40">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded-full">
-                      <Globe className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium">WordPress</h4>
-                      <p className="text-xs text-muted-foreground mt-1">Direct publishing to WordPress sites</p>
-                      <p className="text-xs text-green-600 mt-2">Connected</p>
-                    </div>
-                  </div>
-                </Card>
-                
-                <Card className="p-4 border border-border/40">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-purple-50 dark:bg-purple-900/20 p-2 rounded-full">
-                      <Edit className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Medium</h4>
-                      <p className="text-xs text-muted-foreground mt-1">Publish articles to Medium</p>
-                      <Button variant="outline" size="sm" className="mt-2 h-7 text-xs">Connect</Button>
-                    </div>
-                  </div>
-                </Card>
-                
-                <Card className="p-4 border border-border/40">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded-full">
-                      <MessageSquare className="h-5 w-5 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Webflow</h4>
-                      <p className="text-xs text-muted-foreground mt-1">Publish to Webflow CMS</p>
-                      <Button variant="outline" size="sm" className="mt-2 h-7 text-xs">Connect</Button>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            </Card>
-          </TabsContent>
-        </Tabs>
       </div>
     </AppLayout>
   );
