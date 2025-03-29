@@ -9,22 +9,6 @@ interface LanguageSelectorProps {
 }
 
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ language, updateInfo }) => {
-  // Define language options
-  const languageOptions = [
-    { value: "auto", label: "Auto (Browser Default)" },
-    { value: "en", label: "English" },
-    { value: "es", label: "Spanish" },
-    { value: "fr", label: "French" },
-    { value: "de", label: "German" },
-    { value: "pt", label: "Portuguese" },
-    { value: "it", label: "Italian" },
-    { value: "ru", label: "Russian" },
-    { value: "zh", label: "Chinese" },
-    { value: "ja", label: "Japanese" },
-    { value: "ko", label: "Korean" },
-    { value: "ar", label: "Arabic" },
-  ];
-
   return (
     <div>
       <Label htmlFor="language">Language</Label>
@@ -32,20 +16,23 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ language, up
         value={language}
         onValueChange={(value) => updateInfo("language", value)}
       >
-        <SelectTrigger className="w-full mt-2">
-          <SelectValue placeholder="Select language" />
+        <SelectTrigger className="mt-2">
+          <SelectValue placeholder="Select a language" />
         </SelectTrigger>
         <SelectContent>
-          {languageOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
+          <SelectItem value="auto">Auto</SelectItem>
+          <SelectItem value="en">English</SelectItem>
+          <SelectItem value="es">Spanish</SelectItem>
+          <SelectItem value="fr">French</SelectItem>
+          <SelectItem value="de">German</SelectItem>
+          <SelectItem value="it">Italian</SelectItem>
+          <SelectItem value="pt">Portuguese</SelectItem>
+          <SelectItem value="ru">Russian</SelectItem>
+          <SelectItem value="zh">Chinese</SelectItem>
+          <SelectItem value="ja">Japanese</SelectItem>
+          <SelectItem value="ko">Korean</SelectItem>
         </SelectContent>
       </Select>
-      <p className="text-xs text-muted-foreground mt-1">
-        This affects date formatting and language detection.
-      </p>
     </div>
   );
 };

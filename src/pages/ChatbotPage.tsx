@@ -89,7 +89,7 @@ const ChatbotPage = () => {
       
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">digi</h1>
+          <h1 className="text-3xl font-bold tracking-tight">AI Chatbots</h1>
           <p className="text-muted-foreground">
             View and manage external chatbots
           </p>

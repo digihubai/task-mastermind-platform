@@ -1,13 +1,10 @@
 
-import React, { useRef, useEffect } from "react";
+import React from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageBubble } from "./MessageBubble";
 
 interface MessageListProps {
-  messages: Array<{
-    text: string;
-    isBot: boolean;
-    timestamp: Date;
-  }>;
+  messages: { text: string; isBot: boolean; timestamp: Date }[];
   position: "left" | "right";
   showDateTime: boolean;
   accentColor: string;
@@ -21,29 +18,22 @@ export const MessageList: React.FC<MessageListProps> = ({
   accentColor,
   language
 }) => {
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-  
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
   return (
-    <div className="chat-messages p-4 h-[calc(100%-110px)] overflow-y-auto flex flex-col gap-3">
-      {messages.map((message, index) => (
-        <MessageBubble
-          key={index}
-          message={message}
-          position={position}
-          showDateTime={showDateTime}
-          accentColor={accentColor}
-          language={language}
-        />
-      ))}
-      <div ref={messagesEndRef} />
-    </div>
+    <ScrollArea className="flex-1 px-4 py-3">
+      <div className="space-y-4">
+        {messages.map((message, index) => (
+          <MessageBubble
+            key={index}
+            message={message.text}
+            isBot={message.isBot}
+            timestamp={message.timestamp}
+            position={position}
+            showDateTime={showDateTime}
+            accentColor={accentColor}
+            language={language}
+          />
+        ))}
+      </div>
+    </ScrollArea>
   );
 };

@@ -11,14 +11,13 @@ export const EmbedStep: React.FC = () => {
   const [copied, setCopied] = useState(false);
   
   const copyCode = () => {
-    const code = `<script src="https://digihub.ai/widget/digibot.js" id="digihub-widget" data-chatbot-id="12345"></script>`;
+    const code = `<script defer src="https://digihub.ai/vendor/chatbot/js/external-chatbot.js" data-chatbot-uuid="89aa4a9c-1119-4eef-b0d0-52ff31a4c222" data-iframe-width="420" data-iframe-height="745" data-language="en" ></script>`;
     navigator.clipboard.writeText(code);
     setCopied(true);
     toast({
       title: "Code copied!",
       description: "The embed code has been copied to your clipboard.",
     });
-    
     setTimeout(() => setCopied(false), 2000);
   };
   
@@ -34,9 +33,9 @@ export const EmbedStep: React.FC = () => {
   
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold">Embed Your Chatbot</h2>
+      <h2 className="text-2xl font-semibold">Test and Embed</h2>
       <p className="text-muted-foreground">
-        Add your chatbot to your website or other platforms.
+        Your external AI chatbot has been successfully created! You can now integrate it into your website and start engaging with your audience.
       </p>
       
       <div className="space-y-4 mt-6">
@@ -44,7 +43,7 @@ export const EmbedStep: React.FC = () => {
           <h3 className="font-medium text-lg mb-3">Website Embed</h3>
           <p className="text-sm text-muted-foreground mb-3">Add this code to your website</p>
           <div className="bg-muted p-4 rounded-md text-sm font-mono overflow-x-auto relative">
-            &lt;script src="https://digihub.ai/widget/digibot.js" id="digihub-widget" data-chatbot-id="12345"&gt;&lt;/script&gt;
+            &lt;script defer src="https://digihub.ai/vendor/chatbot/js/external-chatbot.js" data-chatbot-uuid="89aa4a9c-1119-4eef-b0d0-52ff31a4c222" data-iframe-width="420" data-iframe-height="745" data-language="en" &gt;&lt;/script&gt;
           </div>
           <Button 
             variant="outline" 
@@ -64,6 +63,36 @@ export const EmbedStep: React.FC = () => {
               </>
             )}
           </Button>
+        </div>
+        
+        <div className="border rounded-lg p-5 bg-card transition-all hover:shadow-md">
+          <h3 className="font-medium text-lg mb-3">Width</h3>
+          <div className="flex items-center space-x-4">
+            <input
+              type="range"
+              min="300"
+              max="600"
+              step="10"
+              defaultValue="420"
+              className="w-full"
+            />
+            <span className="font-mono text-sm">420px</span>
+          </div>
+        </div>
+        
+        <div className="border rounded-lg p-5 bg-card transition-all hover:shadow-md">
+          <h3 className="font-medium text-lg mb-3">Height</h3>
+          <div className="flex items-center space-x-4">
+            <input
+              type="range"
+              min="400"
+              max="900"
+              step="10"
+              defaultValue="745"
+              className="w-full"
+            />
+            <span className="font-mono text-sm">745px</span>
+          </div>
         </div>
         
         <div className="border rounded-lg p-5 bg-card transition-all hover:shadow-md">
@@ -98,6 +127,13 @@ export const EmbedStep: React.FC = () => {
             </Button>
           </div>
         </div>
+      </div>
+      
+      <div className="border-t mt-6 pt-4">
+        <h4 className="font-medium mb-2">Need help?</h4>
+        <p className="text-sm text-muted-foreground">
+          Paste this code just before the closing &lt;/body&gt; tag in your HTML file, then save the changes. Refresh your site to ensure your chatbot works correctly.
+        </p>
       </div>
     </div>
   );
