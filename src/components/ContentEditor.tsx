@@ -7,9 +7,12 @@ import { toast } from 'sonner';
 import {
   Bold,
   Italic,
+  Underline,
   List,
+  ListOrdered,
   Heading1,
   Heading2,
+  Heading3,
   Link,
   Image as ImageIcon,
   AlignLeft,
@@ -21,7 +24,8 @@ import {
   Code,
   Save,
   Download,
-  Copy
+  Copy,
+  Maximize2
 } from 'lucide-react';
 
 interface ContentEditorProps {
@@ -36,6 +40,7 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ initialContent, onContent
   const editorRef = useRef<HTMLDivElement>(null);
   const [historyStack, setHistoryStack] = useState<string[]>([initialContent || '']);
   const [historyIndex, setHistoryIndex] = useState(0);
+  const [fullscreen, setFullscreen] = useState(false);
   
   useEffect(() => {
     // Initialize editor content
@@ -57,6 +62,18 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ initialContent, onContent
       setHistoryIndex(0);
     }
   }, [initialContent]);
+  
+  // Handle fullscreen mode
+  useEffect(() => {
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && fullscreen) {
+        setFullscreen(false);
+      }
+    };
+    
+    window.addEventListener('keydown', handleEscKey);
+    return () => window.removeEventListener('keydown', handleEscKey);
+  }, [fullscreen]);
   
   const handleEditorChange = () => {
     if (editorRef.current) {
@@ -82,24 +99,7 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ initialContent, onContent
   };
   
   const insertHeading = (level: 1 | 2 | 3) => {
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      const selectedContent = range.toString();
-      
-      // Create heading element
-      const heading = document.createElement(`h${level}`);
-      heading.textContent = selectedContent;
-      
-      // Replace the selection with the heading
-      range.deleteContents();
-      range.insertNode(heading);
-      
-      // Update editor content
-      handleEditorChange();
-    } else {
-      executeCommand('formatBlock', `<h${level}>`);
-    }
+    executeCommand('formatBlock', `<h${level}>`);
   };
   
   const insertLink = () => {
@@ -160,48 +160,64 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ initialContent, onContent
     toast.success("Content downloaded as HTML");
   };
   
+  const toggleFullscreen = () => {
+    setFullscreen(!fullscreen);
+  };
+  
   return (
-    <Card className="border shadow-sm">
+    <Card className={`border shadow-sm ${fullscreen ? 'fixed inset-0 z-50 p-4' : ''}`}>
       <div className="border-b p-2 bg-muted/40">
         <div className="flex flex-wrap gap-1">
-          <Button variant="ghost" size="icon" onClick={() => executeCommand('bold')}>
+          <Button variant="ghost" size="icon" onClick={() => executeCommand('bold')} title="Bold">
             <Bold className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => executeCommand('italic')}>
+          <Button variant="ghost" size="icon" onClick={() => executeCommand('italic')} title="Italic">
             <Italic className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => insertHeading(1)}>
+          <Button variant="ghost" size="icon" onClick={() => executeCommand('underline')} title="Underline">
+            <Underline className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => insertHeading(1)} title="Heading 1">
             <Heading1 className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => insertHeading(2)}>
+          <Button variant="ghost" size="icon" onClick={() => insertHeading(2)} title="Heading 2">
             <Heading2 className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => executeCommand('insertUnorderedList')}>
+          <Button variant="ghost" size="icon" onClick={() => insertHeading(3)} title="Heading 3">
+            <Heading3 className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => executeCommand('insertUnorderedList')} title="Bullet List">
             <List className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={insertLink}>
+          <Button variant="ghost" size="icon" onClick={() => executeCommand('insertOrderedList')} title="Numbered List">
+            <ListOrdered className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={insertLink} title="Insert Link">
             <Link className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={insertImage}>
+          <Button variant="ghost" size="icon" onClick={insertImage} title="Insert Image">
             <ImageIcon className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => executeCommand('justifyLeft')}>
+          <Button variant="ghost" size="icon" onClick={() => executeCommand('justifyLeft')} title="Align Left">
             <AlignLeft className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => executeCommand('justifyCenter')}>
+          <Button variant="ghost" size="icon" onClick={() => executeCommand('justifyCenter')} title="Align Center">
             <AlignCenter className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => executeCommand('justifyRight')}>
+          <Button variant="ghost" size="icon" onClick={() => executeCommand('justifyRight')} title="Align Right">
             <AlignRight className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => executeCommand('formatBlock', '<pre>')}>
+          <Button variant="ghost" size="icon" onClick={() => executeCommand('formatBlock', '<pre>')} title="Code Block">
             <Code className="h-4 w-4" />
           </Button>
           <div className="ml-auto flex gap-1">
-            <Button variant="ghost" size="icon" onClick={undo} disabled={historyIndex <= 0}>
+            <Button variant="ghost" size="icon" onClick={toggleFullscreen} title={fullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+              <Maximize2 className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={undo} disabled={historyIndex <= 0} title="Undo">
               <Undo className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={redo} disabled={historyIndex >= historyStack.length - 1}>
+            <Button variant="ghost" size="icon" onClick={redo} disabled={historyIndex >= historyStack.length - 1} title="Redo">
               <Redo className="h-4 w-4" />
             </Button>
           </div>
@@ -219,7 +235,7 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ initialContent, onContent
         <TabsContent value="edit" className="m-0">
           <div
             ref={editorRef}
-            className="min-h-[400px] p-4 outline-none prose dark:prose-invert max-w-none"
+            className={`min-h-[${fullscreen ? '80vh' : '400px'}] p-4 outline-none prose dark:prose-invert max-w-none`}
             contentEditable
             onInput={handleEditorChange}
             dangerouslySetInnerHTML={{ __html: content }}
@@ -228,23 +244,23 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ initialContent, onContent
         
         <TabsContent value="preview" className="m-0">
           <div 
-            className="min-h-[400px] p-4 prose dark:prose-invert max-w-none"
+            className={`min-h-[${fullscreen ? '80vh' : '400px'}] p-4 prose dark:prose-invert max-w-none`}
             dangerouslySetInnerHTML={{ __html: content }}
           />
         </TabsContent>
       </Tabs>
       
       <div className="border-t p-2 flex justify-end gap-2">
-        <Button variant="outline" size="sm" onClick={handleCopyToClipboard}>
+        <Button variant="outline" size="sm" onClick={handleCopyToClipboard} title="Copy to Clipboard">
           <Copy className="h-4 w-4 mr-2" />
           Copy
         </Button>
-        <Button variant="outline" size="sm" onClick={handleDownload}>
+        <Button variant="outline" size="sm" onClick={handleDownload} title="Download as HTML">
           <Download className="h-4 w-4 mr-2" />
           Download
         </Button>
         {onSave && (
-          <Button size="sm" onClick={onSave}>
+          <Button size="sm" onClick={onSave} title="Save Content">
             <Save className="h-4 w-4 mr-2" />
             Save
           </Button>

@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RefreshCw } from "lucide-react";
+import { ArrowLeft, RefreshCw, Maximize2, Copy, Download, Save } from "lucide-react";
 import ContentEditor from '@/components/ContentEditor';
+import ContentEditorDialog from './ContentEditorDialog';
+import { toast } from "sonner";
 
 interface ContentGenerationStepProps {
   seoData: any;
@@ -20,20 +22,66 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
   onPrev,
   onRegenerateContent
 }) => {
+  const [isFullscreenEdit, setIsFullscreenEdit] = useState(false);
+
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(seoData.generatedContent || "");
+    toast.success("Content copied to clipboard");
+  };
+  
+  const handleDownload = () => {
+    const blob = new Blob([seoData.generatedContent || ""], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `seo-content-${new Date().toISOString().slice(0, 10)}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("Content downloaded as HTML");
+  };
+
   return (
     <div className="space-y-6">
       <Card className="p-6 border border-border/40">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold">Generated Content</h2>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={onRegenerateContent}
-            disabled={isGenerating}
-          >
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Regenerate
-          </Button>
+          <div className="flex space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setIsFullscreenEdit(true)}
+              title="Edit in Fullscreen"
+            >
+              <Maximize2 className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleCopyToClipboard}
+              title="Copy to Clipboard"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleDownload}
+              title="Download as HTML"
+            >
+              <Download className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={onRegenerateContent}
+              disabled={isGenerating}
+              title="Regenerate Content"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         
         {isGenerating ? (
@@ -62,7 +110,22 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
           <ArrowLeft className="mr-2 h-4 w-4" />
           Previous Step
         </Button>
+        <Button variant="default" onClick={() => toast.success("Content saved successfully")}>
+          <Save className="mr-2 h-4 w-4" />
+          Save Content
+        </Button>
       </div>
+
+      {/* Fullscreen Editor Dialog */}
+      <ContentEditorDialog 
+        isOpen={isFullscreenEdit}
+        onClose={() => setIsFullscreenEdit(false)}
+        content={seoData.generatedContent || ""}
+        onSave={(content) => {
+          onDataChange("generatedContent", content);
+          setIsFullscreenEdit(false);
+        }}
+      />
     </div>
   );
 };
