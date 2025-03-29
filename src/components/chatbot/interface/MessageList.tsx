@@ -24,9 +24,7 @@ export const MessageList: React.FC<MessageListProps> = ({
         {messages.map((message, index) => (
           <MessageBubble
             key={index}
-            message={message.text}
-            isBot={message.isBot}
-            timestamp={message.timestamp}
+            message={message}
             position={position}
             showDateTime={showDateTime}
             accentColor={accentColor}
