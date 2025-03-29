@@ -6,27 +6,28 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronRight, Search, Info, Loader } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { generateKeywords } from "@/services/seo/keywordService"; // Fixed import path
+import { generateKeywords } from "@/services/seo/keywordService"; 
 import { toast } from "sonner";
 
 interface KeywordsStepProps {
-  topic: string;
-  keywordCount: number;
-  keywords: string[];
-  selectedKeywords: string[];
+  seoData: {
+    topic: string;
+    keywords: string[];
+    selectedKeywords: string[];
+    keywordCount?: number;
+  };
   onDataChange: (field: string, value: any) => void;
   onNext: () => void;
   onPrev: () => void;
+  generateKeywords: (topic: string) => Promise<string[]>;
 }
 
 const KeywordsStep: React.FC<KeywordsStepProps> = ({ 
-  topic, 
-  keywordCount, 
-  keywords, 
-  selectedKeywords, 
+  seoData, 
   onDataChange, 
   onNext, 
-  onPrev 
+  onPrev,
+  generateKeywords
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Generating keywords...");
@@ -34,13 +35,13 @@ const KeywordsStep: React.FC<KeywordsStepProps> = ({
 
   // Effect to auto-generate keywords when topic changes and it's not empty
   useEffect(() => {
-    if (topic.trim() && keywords.length === 0) {
+    if (seoData.topic && seoData.topic.trim() && seoData.keywords.length === 0) {
       handleGenerateKeywords();
     }
-  }, [topic]);
+  }, [seoData.topic]);
 
   const handleGenerateKeywords = async () => {
-    if (!topic.trim()) {
+    if (!seoData.topic || !seoData.topic.trim()) {
       toast.error("Please enter a topic first");
       return;
     }
@@ -65,10 +66,9 @@ const KeywordsStep: React.FC<KeywordsStepProps> = ({
       }, 800);
       
       // Generate keywords based on the topic
-      // For this example, let's create better topic-related keywords
       let generatedKeywords = [];
       
-      if (topic.toLowerCase().includes("ai chatbot")) {
+      if (seoData.topic.toLowerCase().includes("ai chatbot")) {
         generatedKeywords = [
           "AI chatbot", "conversational AI", "chatbot development", 
           "natural language processing", "NLP", "customer service chatbot",
@@ -77,8 +77,8 @@ const KeywordsStep: React.FC<KeywordsStepProps> = ({
           "AI dialogue system", "automated support", "chatbot platform"
         ];
       } else {
-        // Use the service for other topics
-        generatedKeywords = await generateKeywords(topic, keywordCount);
+        // Use the provided generateKeywords function
+        generatedKeywords = await generateKeywords(seoData.topic);
       }
       
       clearInterval(messageInterval);
@@ -87,7 +87,7 @@ const KeywordsStep: React.FC<KeywordsStepProps> = ({
       onDataChange("keywords", generatedKeywords);
       
       // If no keywords are selected yet, select the first 3 by default
-      if (selectedKeywords.length === 0) {
+      if (seoData.selectedKeywords.length === 0) {
         onDataChange("selectedKeywords", generatedKeywords.slice(0, 3));
       }
       
@@ -102,13 +102,15 @@ const KeywordsStep: React.FC<KeywordsStepProps> = ({
   };
   
   const handleKeywordSelect = (keyword: string) => {
-    const selected = [...selectedKeywords];
+    const selected = [...seoData.selectedKeywords];
     if (selected.includes(keyword)) {
       onDataChange("selectedKeywords", selected.filter(k => k !== keyword));
     } else {
       onDataChange("selectedKeywords", [...selected, keyword]);
     }
   };
+
+  const keywordCount = seoData.keywordCount || 10;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -119,7 +121,7 @@ const KeywordsStep: React.FC<KeywordsStepProps> = ({
             <label className="block text-sm font-medium mb-1">What is this article about?</label>
             <Textarea 
               placeholder="Describe your article topic in detail..."
-              value={topic}
+              value={seoData.topic}
               onChange={(e) => onDataChange("topic", e.target.value)}
               className="min-h-[120px]"
             />
@@ -138,7 +140,7 @@ const KeywordsStep: React.FC<KeywordsStepProps> = ({
           
           <Button 
             onClick={handleGenerateKeywords} 
-            disabled={!topic.trim() || isGenerating}
+            disabled={!seoData.topic || !seoData.topic.trim() || isGenerating}
             className="w-full"
           >
             {isGenerating ? (
@@ -194,18 +196,18 @@ const KeywordsStep: React.FC<KeywordsStepProps> = ({
             <h3 className="text-lg font-medium mb-1">{loadingMessage}</h3>
             <p className="max-w-xs">We're finding the best keywords for your topic.</p>
           </div>
-        ) : keywords.length > 0 ? (
+        ) : seoData.keywords.length > 0 ? (
           <>
             <p className="text-sm text-muted-foreground mb-4">
               Select relevant keywords for your content. Selected keywords will receive more emphasis.
             </p>
             
             <div className="flex flex-wrap gap-2 mb-6">
-              {keywords.map((keyword: string, index: number) => (
+              {seoData.keywords.map((keyword: string, index: number) => (
                 <button
                   key={index}
                   className={`px-3 py-1.5 rounded-full text-sm ${
-                    selectedKeywords.includes(keyword)
+                    seoData.selectedKeywords.includes(keyword)
                     ? "bg-primary text-white"
                     : "bg-secondary hover:bg-secondary/80"
                   }`}
@@ -219,7 +221,7 @@ const KeywordsStep: React.FC<KeywordsStepProps> = ({
             <div className="mt-auto pt-4">
               <Button 
                 onClick={onNext} 
-                disabled={selectedKeywords.length === 0}
+                disabled={seoData.selectedKeywords.length === 0}
                 className="w-full flex justify-between items-center"
               >
                 <span>Continue to Title</span>

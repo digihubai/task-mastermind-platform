@@ -17,7 +17,7 @@ import { AlertCircle } from 'lucide-react';
 interface SEOContentGeneratorProps {
   generateKeywords: (topic: string) => Promise<string[]>;
   generateTitles: (topic: string, keywords: string[]) => Promise<string[]>;
-  generateOutline: (title: string, keywords: string[]) => Promise<any[]>;
+  generateOutline: (topic: string, keywords: string[], title: string) => Promise<any>;
 }
 
 const SEOContentGenerator: React.FC<SEOContentGeneratorProps> = ({
@@ -32,6 +32,7 @@ const SEOContentGenerator: React.FC<SEOContentGeneratorProps> = ({
     topic: '',
     keywords: [],
     selectedKeywords: [],
+    keywordCount: 10,
     numberOfTitles: 5,
     titles: [],
     selectedTitle: '',
@@ -148,6 +149,7 @@ const SEOContentGenerator: React.FC<SEOContentGeneratorProps> = ({
             onDataChange={handleDataChange}
             onNext={handleNext}
             onPrev={handlePrev}
+            generateOutline={generateOutline}
           />
         )}
         
