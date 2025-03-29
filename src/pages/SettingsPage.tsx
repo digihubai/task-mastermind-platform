@@ -1,296 +1,246 @@
 
-import React, { useState } from 'react';
-import AppLayout from '@/components/layout/AppLayout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card } from '@/components/ui/card';
-import GeneralTab from '@/components/settings/GeneralTab';
-import IntegrationsTab from '@/components/settings/IntegrationsTab';
-import FeaturesTab from '@/components/settings/FeaturesTab';
-import LocalizationTab from '@/components/settings/LocalizationTab';
-import PricingTab from '@/components/settings/PricingTab';
-import { AIModelsTab } from '@/components/settings/AIModelsTab';
-import { 
+import React, { useState } from "react";
+import AppLayout from "@/components/layout/AppLayout";
+import {
   Settings,
-  Puzzle,
-  Globe,
+  UserCog,
+  Users,
   CreditCard,
+  Bell,
+  PlugZap,
+  Palette,
+  Globe,
+  Lock,
   Bot,
-  ChevronRight
-} from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { FeatureCategory, PricingPlan } from '@/types/settings';
-
-// Mock data for feature categories
-const mockFeatureCategories: FeatureCategory[] = [
-  {
-    name: "Core Features",
-    features: [
-      { id: "feature-1", name: "AI Assistance", description: "Get help from AI assistants", included: true },
-      { id: "feature-2", name: "Document Management", description: "Store and manage documents", included: true },
-      { id: "feature-3", name: "Team Collaboration", description: "Work together with your team", included: false }
-    ]
-  },
-  {
-    name: "Advanced Features",
-    features: [
-      { id: "feature-4", name: "API Access", description: "Integrate with external systems", included: false },
-      { id: "feature-5", name: "Custom Workflows", description: "Create your own automation workflows", included: false }
-    ]
-  }
-];
-
-// Mock data for pricing plans
-const mockPricingPlans: PricingPlan[] = [
-  {
-    id: "plan-1",
-    name: "Basic",
-    description: "For individuals and small teams",
-    price: 9.99,
-    billingPeriod: "monthly",
-    isPopular: false,
-    features: [
-      { id: "feature-1", included: true, limits: { type: "limited", value: 100, unit: "uses/month" } },
-      { id: "feature-2", included: true, limits: { type: "limited", value: 5, unit: "GB" } },
-      { id: "feature-3", included: false },
-      { id: "feature-4", included: false },
-      { id: "feature-5", included: false }
-    ]
-  },
-  {
-    id: "plan-2",
-    name: "Pro",
-    description: "For professionals and growing businesses",
-    price: 29.99,
-    billingPeriod: "monthly",
-    isPopular: true,
-    features: [
-      { id: "feature-1", included: true, limits: { type: "unlimited" } },
-      { id: "feature-2", included: true, limits: { type: "limited", value: 20, unit: "GB" } },
-      { id: "feature-3", included: true, limits: { type: "limited", value: 10, unit: "members" } },
-      { id: "feature-4", included: true, limits: { type: "limited", value: 1000, unit: "requests/day" } },
-      { id: "feature-5", included: false }
-    ]
-  }
-];
+  Sparkles,
+} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import useRoleBasedSettings from "@/hooks/use-role-based-settings";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getOpenAIApiKey } from "@/services/ai/contentGenerationAI";
+import { useNavigate } from "react-router-dom";
 
 const SettingsPage = () => {
-  const [activeTab, setActiveTab] = useState('general');
-  const [featureCategories, setFeatureCategories] = useState<FeatureCategory[]>(mockFeatureCategories);
-  const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>(mockPricingPlans);
-  const { toast } = useToast();
+  const { userRole, availableSettings } = useRoleBasedSettings();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<string>("account");
+  const hasOpenAiKey = !!getOpenAIApiKey();
+  
+  const isAdmin = userRole === "admin" || userRole === "super_admin";
 
-  // Feature management handlers
-  const handleToggleFeature = (categoryIndex: number, featureIndex: number) => {
-    const updatedCategories = [...featureCategories];
-    const feature = updatedCategories[categoryIndex].features[featureIndex];
-    feature.included = !feature.included;
-    setFeatureCategories(updatedCategories);
-    
-    toast({
-      title: `Feature ${feature.included ? 'enabled' : 'disabled'}`,
-      description: `"${feature.name}" has been ${feature.included ? 'enabled' : 'disabled'}.`
-    });
-  };
+  const openAITabDescription = isAdmin
+    ? "Configure organization-wide AI settings including API keys and model preferences"
+    : "View AI capabilities available to your account";
 
-  const handleDeleteFeature = (categoryIndex: number, featureIndex: number) => {
-    const updatedCategories = [...featureCategories];
-    const featureName = updatedCategories[categoryIndex].features[featureIndex].name;
-    updatedCategories[categoryIndex].features.splice(featureIndex, 1);
-    setFeatureCategories(updatedCategories);
-    
-    toast({
-      title: "Feature deleted",
-      description: `"${featureName}" has been removed.`
-    });
-  };
-
-  const handleAddFeature = (name: string, description: string, categoryName: string) => {
-    const updatedCategories = [...featureCategories];
-    const categoryIndex = updatedCategories.findIndex(cat => cat.name === categoryName);
-    
-    if (categoryIndex > -1) {
-      updatedCategories[categoryIndex].features.push({
-        id: `feature-${Date.now()}`,
-        name,
-        description,
-        included: false
-      });
-      setFeatureCategories(updatedCategories);
-      
-      toast({
-        title: "Feature added",
-        description: `"${name}" has been added to ${categoryName}.`
-      });
-    }
-  };
-
-  // Pricing plan handlers
-  const handlePlanChange = (planId: string, field: keyof PricingPlan, value: any) => {
-    const updatedPlans = pricingPlans.map(plan => 
-      plan.id === planId ? { ...plan, [field]: value } : plan
-    );
-    setPricingPlans(updatedPlans);
-  };
-
-  const handlePlanFeatureToggle = (planId: string, featureId: string) => {
-    const updatedPlans = pricingPlans.map(plan => {
-      if (plan.id === planId) {
-        const features = plan.features.map(feature => {
-          if (feature.id === featureId) {
-            return { ...feature, included: !feature.included };
-          }
-          return feature;
-        });
-        return { ...plan, features };
-      }
-      return plan;
-    });
-    setPricingPlans(updatedPlans);
-  };
-
-  const handleAddPlan = () => {
-    const newPlan: PricingPlan = {
-      id: `plan-${Date.now()}`,
-      name: "New Plan",
-      description: "Description for the new plan",
-      price: 0,
-      billingPeriod: "monthly",
-      isPopular: false,
-      features: featureCategories.flatMap(category => 
-        category.features.map(feature => ({
-          id: feature.id,
-          included: false
-        }))
-      )
-    };
-    
-    setPricingPlans([...pricingPlans, newPlan]);
-    
-    toast({
-      title: "Plan added",
-      description: "A new pricing plan has been added."
-    });
-  };
-
-  const handleDeletePlan = (planId: string) => {
-    const planToDelete = pricingPlans.find(plan => plan.id === planId);
-    const updatedPlans = pricingPlans.filter(plan => plan.id !== planId);
-    setPricingPlans(updatedPlans);
-    
-    toast({
-      title: "Plan deleted",
-      description: `"${planToDelete?.name}" has been removed.`
-    });
+  const handleNavigate = (path: string) => {
+    navigate(path);
   };
 
   return (
     <AppLayout>
-      <div className="container py-8 max-w-7xl">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
-            <p className="text-muted-foreground mt-1">
-              Manage your account settings and preferences
-            </p>
-          </div>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
+          <p className="text-muted-foreground mt-1">
+            Manage your account settings and preferences
+          </p>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="w-full md:w-1/4">
-            <Card className="p-4">
-              <Tabs
-                orientation="vertical"
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="w-full"
-              >
-                <TabsList className="flex flex-col h-auto w-full bg-transparent p-0 space-y-1">
-                  <TabsTrigger
-                    value="general"
-                    className="w-full justify-start px-3 py-3"
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>General</span>
-                    <ChevronRight className="ml-auto h-4 w-4" />
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="integrations"
-                    className="w-full justify-start px-3 py-3"
-                  >
-                    <Puzzle className="mr-2 h-4 w-4" />
-                    <span>Integrations</span>
-                    <ChevronRight className="ml-auto h-4 w-4" />
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="features"
-                    className="w-full justify-start px-3 py-3"
-                  >
-                    <Bot className="mr-2 h-4 w-4" />
-                    <span>Features</span>
-                    <ChevronRight className="ml-auto h-4 w-4" />
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="localization"
-                    className="w-full justify-start px-3 py-3"
-                  >
-                    <Globe className="mr-2 h-4 w-4" />
-                    <span>Localization</span>
-                    <ChevronRight className="ml-auto h-4 w-4" />
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="ai-models"
-                    className="w-full justify-start px-3 py-3"
-                  >
-                    <Bot className="mr-2 h-4 w-4" />
-                    <span>AI Models</span>
-                    <ChevronRight className="ml-auto h-4 w-4" />
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="billing"
-                    className="w-full justify-start px-3 py-3"
-                  >
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    <span>Billing & Plans</span>
-                    <ChevronRight className="ml-auto h-4 w-4" />
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
+        <Tabs 
+          defaultValue={activeTab} 
+          className="space-y-4"
+          value={activeTab} 
+          onValueChange={setActiveTab}
+        >
+          <TabsList>
+            <TabsTrigger value="account">Account</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="ai">AI Settings</TabsTrigger>
+            {isAdmin && <TabsTrigger value="admin">Admin</TabsTrigger>}
+          </TabsList>
+          
+          <TabsContent value="account" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Personal Information</CardTitle>
+                <CardDescription>Update your personal details</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-8">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <Avatar className="h-20 w-20">
+                    <AvatarImage src="/placeholders/user-01.jpg" alt="User" />
+                    <AvatarFallback>JD</AvatarFallback>
+                  </Avatar>
+                  <div className="space-y-1">
+                    <h3 className="font-medium">{userRole === "super_admin" ? "Super Admin" : userRole === "admin" ? "Administrator" : "John Doe"}</h3>
+                    <p className="text-sm text-muted-foreground">{userRole === "super_admin" || userRole === "admin" ? "admin@digihub.com" : "user@example.com"}</p>
+                    <Button variant="outline" size="sm">Change Avatar</Button>
+                  </div>
+                </div>
+              </CardContent>
             </Card>
-          </div>
 
-          <div className="w-full md:w-3/4">
-            <TabsContent value="general" className="m-0">
-              <GeneralTab />
+            <Card>
+              <CardHeader>
+                <CardTitle>Password</CardTitle>
+                <CardDescription>Update your password</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline">Change Password</Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="notifications" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Notification Preferences</CardTitle>
+                <CardDescription>Manage how you receive notifications</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">Notification settings will be available soon.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="integrations" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="col-span-1 md:col-span-3">
+                <CardHeader>
+                  <CardTitle>Available Integrations</CardTitle>
+                  <CardDescription>Connect with external services and platforms</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button onClick={() => handleNavigate("/settings/integrations")}>
+                    Manage Integrations
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="ai" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="col-span-3">
+                <CardHeader>
+                  <CardTitle>
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-purple-500" />
+                      AI Configuration
+                    </div>
+                  </CardTitle>
+                  <CardDescription>{openAITabDescription}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Bot className="h-4 w-4 text-muted-foreground" />
+                        <span>OpenAI Integration</span>
+                      </div>
+                      <div>
+                        {hasOpenAiKey ? (
+                          <span className="text-sm bg-green-100 text-green-800 rounded-full px-2 py-0.5 dark:bg-green-900/30 dark:text-green-400">
+                            Configured
+                          </span>
+                        ) : (
+                          <span className="text-sm bg-amber-100 text-amber-800 rounded-full px-2 py-0.5 dark:bg-amber-900/30 dark:text-amber-400">
+                            Not Configured
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      onClick={() => handleNavigate("/settings/ai-configuration")}
+                      className={isAdmin ? "bg-purple-600 hover:bg-purple-700" : ""}
+                    >
+                      {isAdmin ? "Configure AI Settings" : "View AI Settings"}
+                    </Button>
+                    
+                    {!hasOpenAiKey && isAdmin && (
+                      <p className="text-sm text-amber-600 mt-2">
+                        <span className="font-medium">Important:</span> You need to configure your OpenAI API key to use AI features.
+                      </p>
+                    )}
+                    
+                    {!isAdmin && !hasOpenAiKey && (
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Contact your administrator to enable AI features.
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          
+          {isAdmin && (
+            <TabsContent value="admin" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Administrator Settings</CardTitle>
+                  <CardDescription>Manage organization-wide settings</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <Link to="/settings/teams" className="block">
+                      <Card className="h-full hover:bg-accent/50 transition-colors cursor-pointer">
+                        <CardHeader>
+                          <CardTitle className="flex items-center text-lg">
+                            <Users className="h-5 w-5 mr-2" />
+                            Teams
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">
+                            Manage team members and permissions
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                    
+                    <Link to="/settings/ai-configuration" className="block">
+                      <Card className="h-full hover:bg-accent/50 transition-colors cursor-pointer">
+                        <CardHeader>
+                          <CardTitle className="flex items-center text-lg">
+                            <Sparkles className="h-5 w-5 mr-2 text-purple-500" />
+                            AI Configuration
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">
+                            Set up AI models and API keys
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                    
+                    <Link to="/settings/integrations" className="block">
+                      <Card className="h-full hover:bg-accent/50 transition-colors cursor-pointer">
+                        <CardHeader>
+                          <CardTitle className="flex items-center text-lg">
+                            <PlugZap className="h-5 w-5 mr-2" />
+                            Integrations
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">
+                            Connect external services and APIs
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
-            <TabsContent value="integrations" className="m-0">
-              <IntegrationsTab />
-            </TabsContent>
-            <TabsContent value="features" className="m-0">
-              <FeaturesTab 
-                featureCategories={featureCategories}
-                onToggleFeature={handleToggleFeature}
-                onDeleteFeature={handleDeleteFeature}
-                onAddFeature={handleAddFeature}
-              />
-            </TabsContent>
-            <TabsContent value="localization" className="m-0">
-              <LocalizationTab />
-            </TabsContent>
-            <TabsContent value="ai-models" className="m-0">
-              <AIModelsTab />
-            </TabsContent>
-            <TabsContent value="billing" className="m-0">
-              <PricingTab 
-                pricingPlans={pricingPlans}
-                featureCategories={featureCategories}
-                onPlanChange={handlePlanChange}
-                onPlanFeatureToggle={handlePlanFeatureToggle}
-                onAddPlan={handleAddPlan}
-                onDeletePlan={handleDeletePlan}
-              />
-            </TabsContent>
-          </div>
-        </div>
+          )}
+        </Tabs>
       </div>
     </AppLayout>
   );

@@ -38,7 +38,12 @@ export const setOpenAIApiKey = (key: string) => {
 };
 
 export const getOpenAIApiKey = () => {
-  return openaiApiKey;
+  return openaiApiKey || localStorage.getItem('openai_api_key') || '';
+};
+
+export const clearOpenAIApiKey = () => {
+  openaiApiKey = '';
+  localStorage.removeItem('openai_api_key');
 };
 
 export const validateAPIKey = async (key: string): Promise<boolean> => {
@@ -57,19 +62,24 @@ export const validateAPIKey = async (key: string): Promise<boolean> => {
       toast.success("API key validated successfully");
       return true;
     } else {
-      toast.error("Invalid API key");
+      if (response.status === 401) {
+        toast.error("Invalid API key");
+      } else {
+        toast.error(`API error: ${response.status}`);
+      }
       return false;
     }
   } catch (error) {
     console.error("Error validating API key:", error);
-    toast.error("Error validating API key");
+    toast.error("Error validating API key. Please check your internet connection.");
     return false;
   }
 };
 
 // Generate keywords based on topic using AI
 export const generateKeywordsAI = async (topic: string, count: number = 10): Promise<string[]> => {
-  if (!openaiApiKey) {
+  const apiKey = getOpenAIApiKey();
+  if (!apiKey) {
     toast.error("Please set your OpenAI API key in the admin settings");
     return mockKeywords(topic, count);
   }
@@ -78,10 +88,12 @@ export const generateKeywordsAI = async (topic: string, count: number = 10): Pro
     const prompt = `Generate ${count} SEO-optimized keywords and phrases related to "${topic}". 
     Focus on a mix of short-tail and long-tail keywords. Return only the keywords as a JSON array.`;
     
+    console.log("Generating keywords for topic:", topic);
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -94,16 +106,19 @@ export const generateKeywordsAI = async (topic: string, count: number = 10): Pro
       }),
     });
     
-    const data = await response.json();
-    
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Failed to generate keywords');
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || `API error: ${response.status}`);
     }
+    
+    const data = await response.json();
     
     // Parse the response content which should be a JSON array
     let keywords: string[] = [];
     try {
       const content = data.choices[0].message.content;
+      console.log("Raw keyword response:", content);
+      
       // Extract the JSON array if it's wrapped in code blocks or other text
       const jsonMatch = content.match(/\[.*\]/s);
       if (jsonMatch) {
@@ -129,20 +144,24 @@ export const generateKeywordsAI = async (topic: string, count: number = 10): Pro
 
 // Generate titles based on topic and keywords using AI
 export const generateTitlesAI = async (topic: string, keywords: string[], count: number = 5): Promise<string[]> => {
-  if (!openaiApiKey) {
+  const apiKey = getOpenAIApiKey();
+  if (!apiKey) {
     toast.error("Please set your OpenAI API key in the admin settings");
     return mockTitles(topic, keywords, count);
   }
   
   try {
+    const keywordsToUse = keywords.slice(0, 5).join(', ');
     const prompt = `Generate ${count} engaging and SEO-optimized titles for an article about "${topic}" 
-    that incorporate these keywords: ${keywords.slice(0, 5).join(', ')}. 
+    that incorporate these keywords: ${keywordsToUse}. 
     Each title should be less than 70 characters. Return only the titles as a JSON array.`;
+    
+    console.log("Generating titles with keywords:", keywordsToUse);
     
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -155,16 +174,19 @@ export const generateTitlesAI = async (topic: string, keywords: string[], count:
       }),
     });
     
-    const data = await response.json();
-    
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Failed to generate titles');
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || `API error: ${response.status}`);
     }
+    
+    const data = await response.json();
     
     // Parse the response content
     let titles: string[] = [];
     try {
       const content = data.choices[0].message.content;
+      console.log("Raw title response:", content);
+      
       // Extract the JSON array if it's wrapped in code blocks or other text
       const jsonMatch = content.match(/\[.*\]/s);
       if (jsonMatch) {
@@ -190,20 +212,24 @@ export const generateTitlesAI = async (topic: string, keywords: string[], count:
 
 // Generate content outline based on topic and keywords using AI
 export const generateOutlineAI = async (topic: string, keywords: string[], title: string): Promise<string> => {
-  if (!openaiApiKey) {
+  const apiKey = getOpenAIApiKey();
+  if (!apiKey) {
     toast.error("Please set your OpenAI API key in the admin settings");
     return mockOutline(topic, title);
   }
   
   try {
+    const keywordsToUse = keywords.slice(0, 5).join(', ');
     const prompt = `Create a detailed content outline for an article titled "${title}" about "${topic}".
-    Include main sections and subsections that cover these keywords: ${keywords.slice(0, 5).join(', ')}.
+    Include main sections and subsections that cover these keywords: ${keywordsToUse}.
     Format the outline with markdown using # for main sections and ## for subsections.`;
+    
+    console.log("Generating outline for title:", title);
     
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -216,12 +242,12 @@ export const generateOutlineAI = async (topic: string, keywords: string[], title
       }),
     });
     
-    const data = await response.json();
-    
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Failed to generate outline');
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || `API error: ${response.status}`);
     }
     
+    const data = await response.json();
     return data.choices[0].message.content;
   } catch (error) {
     console.error("Error generating outline:", error);
@@ -232,24 +258,28 @@ export const generateOutlineAI = async (topic: string, keywords: string[], title
 
 // Generate full content based on outline using AI
 export const generateContentAI = async (title: string, outline: string, keywords: string[]): Promise<string> => {
-  if (!openaiApiKey) {
+  const apiKey = getOpenAIApiKey();
+  if (!apiKey) {
     toast.error("Please set your OpenAI API key in the admin settings");
     return mockContent(title, outline);
   }
   
   try {
+    const keywordsToUse = keywords.slice(0, 5).join(', ');
     const prompt = `Write a comprehensive, engaging article with the title "${title}" following this outline:
     
     ${outline}
     
-    Incorporate these keywords naturally: ${keywords.slice(0, 5).join(', ')}.
+    Incorporate these keywords naturally: ${keywordsToUse}.
     Format the content with proper HTML tags for headings (<h1>, <h2>, etc.), paragraphs (<p>), and lists (<ul>, <li>).
     Include a compelling introduction and conclusion.`;
+    
+    console.log("Generating content for title:", title);
     
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -263,12 +293,12 @@ export const generateContentAI = async (title: string, outline: string, keywords
       }),
     });
     
-    const data = await response.json();
-    
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Failed to generate content');
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || `API error: ${response.status}`);
     }
     
+    const data = await response.json();
     return data.choices[0].message.content;
   } catch (error) {
     console.error("Error generating content:", error);
@@ -279,20 +309,24 @@ export const generateContentAI = async (title: string, outline: string, keywords
 
 // Generate image suggestions based on content and keywords
 export const generateImageSuggestionsAI = async (title: string, keywords: string[], count: number = 4): Promise<AIImageSuggestion[]> => {
-  if (!openaiApiKey) {
+  const apiKey = getOpenAIApiKey();
+  if (!apiKey) {
     toast.error("Please set your OpenAI API key in the admin settings");
     return mockImageSuggestions(title, keywords, count);
   }
   
   try {
-    const prompt = `Generate ${count} detailed image prompts for an article titled "${title}" about keywords: ${keywords.slice(0, 5).join(', ')}.
+    const keywordsToUse = keywords.slice(0, 5).join(', ');
+    const prompt = `Generate ${count} detailed image prompts for an article titled "${title}" about keywords: ${keywordsToUse}.
     For each image prompt, provide a short description of what the image should contain and how it relates to the content.
     Return a JSON array with each object having 'prompt' and 'description' fields.`;
+    
+    console.log("Generating image suggestions for:", title);
     
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -305,16 +339,19 @@ export const generateImageSuggestionsAI = async (title: string, keywords: string
       }),
     });
     
-    const data = await response.json();
-    
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Failed to generate image suggestions');
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || `API error: ${response.status}`);
     }
+    
+    const data = await response.json();
     
     // Parse the response content
     let suggestions: AIImageSuggestion[] = [];
     try {
       const content = data.choices[0].message.content;
+      console.log("Raw image suggestions:", content);
+      
       // Try to extract JSON from the response
       const jsonMatch = content.match(/\[.*\]/s);
       if (jsonMatch) {

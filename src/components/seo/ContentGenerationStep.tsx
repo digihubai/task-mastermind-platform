@@ -2,14 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RefreshCw, Maximize2, Copy, Download, Save, AlertCircle } from "lucide-react";
+import { ArrowLeft, RefreshCw, Maximize2, Copy, Download, Save, AlertCircle, Wand } from "lucide-react";
 import ContentEditor from '@/components/ContentEditor';
 import ContentEditorDialog from './ContentEditorDialog';
 import { toast } from "sonner";
 import { Link } from 'react-router-dom';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import useRoleBasedSettings from "@/hooks/use-role-based-settings";
-import { getOpenAIApiKey } from "@/services/ai/contentGenerationAI";
+import { getOpenAIApiKey, generateContentAI } from "@/services/ai/contentGenerationAI";
+import { useContentGeneration } from "@/hooks/useContentGeneration";
 
 interface ContentGenerationStepProps {
   seoData: any;
@@ -29,19 +30,67 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
   const [isFullscreenEdit, setIsFullscreenEdit] = useState(false);
   const { userRole, hasAccess } = useRoleBasedSettings();
   const hasApiKey = !!getOpenAIApiKey();
+  const [generating, setGenerating] = useState(false);
+  
+  const { 
+    handleCopyToClipboard, 
+    handleFixFormatting 
+  } = useContentGeneration({ seoData, onDataChange });
   
   // Auto-generate content when component mounts if we have API key
   // and we don't already have content
   useEffect(() => {
-    if (hasApiKey && !seoData.generatedContent && !isGenerating) {
+    if (hasApiKey && !seoData.generatedContent && !isGenerating && !generating) {
       console.log("Auto-triggering content generation");
-      onRegenerateContent();
+      setGenerating(true);
+      handleGenerateContent();
     }
   }, []);
 
-  const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(seoData.generatedContent || "");
-    toast.success("Content copied to clipboard");
+  const handleGenerateContent = async () => {
+    if (!hasApiKey) {
+      toast.error("API key is required for content generation");
+      return;
+    }
+    
+    setGenerating(true);
+    
+    try {
+      if (!seoData.selectedTitle) {
+        toast.error("Please select a title first");
+        setGenerating(false);
+        return;
+      }
+
+      const outlineContent = seoData.selectedOutline || seoData.outline;
+      if (!outlineContent) {
+        toast.error("Please select an outline first");
+        setGenerating(false);
+        return;
+      }
+
+      if (!Array.isArray(seoData.selectedKeywords) || seoData.selectedKeywords.length === 0) {
+        toast.error("Please select at least one keyword");
+        setGenerating(false);
+        return;
+      }
+      
+      toast.info("Generating SEO-optimized content...");
+      
+      const generatedContent = await generateContentAI(
+        seoData.selectedTitle,
+        outlineContent,
+        seoData.selectedKeywords
+      );
+      
+      onDataChange("generatedContent", generatedContent);
+      toast.success("Content successfully generated!");
+    } catch (error) {
+      console.error("Error generating content:", error);
+      toast.error("Failed to generate content. Please try again.");
+    } finally {
+      setGenerating(false);
+    }
   };
   
   const handleDownload = () => {
@@ -119,15 +168,15 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
               variant="outline" 
               size="sm"
               onClick={onRegenerateContent}
-              disabled={isGenerating || !hasApiKey}
+              disabled={isGenerating || generating || !hasApiKey}
               title="Regenerate Content"
             >
-              <RefreshCw className={`h-4 w-4 ${isGenerating ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-4 w-4 ${(isGenerating || generating) ? "animate-spin" : ""}`} />
             </Button>
           </div>
         </div>
         
-        {isGenerating ? (
+        {(isGenerating || generating) ? (
           <div className="flex flex-col items-center justify-center py-12 space-y-4">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             <p className="text-center text-lg font-medium">Generating SEO-optimized content...</p>
@@ -136,14 +185,32 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
             </p>
           </div>
         ) : seoData.generatedContent ? (
-          <ContentEditor
-            initialContent={seoData.generatedContent}
-            onContentChange={(content) => onDataChange("generatedContent", content)}
-          />
+          <div className="space-y-4">
+            <ContentEditor
+              initialContent={seoData.generatedContent}
+              onContentChange={(content) => onDataChange("generatedContent", content)}
+            />
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleFixFormatting}
+                title="Fix any formatting issues"
+              >
+                <Wand className="h-4 w-4 mr-2" />
+                Fix Formatting
+              </Button>
+            </div>
+          </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 space-y-4">
             <p className="text-center text-lg font-medium">Content hasn't been generated yet</p>
-            <Button onClick={onRegenerateContent} disabled={!hasApiKey}>
+            <Button 
+              onClick={handleGenerateContent} 
+              disabled={!hasApiKey || generating}
+              className="gap-2"
+            >
+              <Wand className="h-4 w-4" />
               {hasApiKey ? "Generate Content Now" : "API Key Required"}
             </Button>
           </div>
