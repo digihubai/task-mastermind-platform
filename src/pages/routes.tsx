@@ -24,6 +24,7 @@ import ChatbotConfigPage from "@/pages/ai/ChatbotConfigPage";
 import authRoutes from "@/routes/authRoutes";
 import mainRoutes from "@/routes/mainRoutes";
 import aiRoutes from "@/routes/aiRoutes";
+import adminRoutes from "@/routes/adminRoutes";
 import marketingRoutes from "@/routes/marketingRoutes";
 import supportRoutes from "@/routes/supportRoutes";
 import financeRoutes from "@/routes/financeRoutes";
@@ -143,6 +144,7 @@ const routes: RouteObject[] = [
   ...mainRoutes,
   ...authRoutes,
   ...aiRoutes,
+  ...adminRoutes,
   ...marketingRoutes,
   ...supportRoutes,
   ...financeRoutes,

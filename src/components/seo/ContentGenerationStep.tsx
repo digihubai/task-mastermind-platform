@@ -6,7 +6,7 @@ import { ArrowLeft, RefreshCw, Maximize2, Copy, Download, Save, AlertCircle, Wan
 import ContentEditor from '@/components/ContentEditor';
 import ContentEditorDialog from './ContentEditorDialog';
 import { toast } from "sonner";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import useRoleBasedSettings from "@/hooks/use-role-based-settings";
 import { getOpenAIApiKey, generateContentAI } from "@/services/ai/contentGenerationAI";
@@ -31,6 +31,7 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
   const { userRole, hasAccess } = useRoleBasedSettings();
   const hasApiKey = !!getOpenAIApiKey();
   const [generating, setGenerating] = useState(false);
+  const navigate = useNavigate();
   
   const { 
     handleCopyToClipboard, 
@@ -42,10 +43,9 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
   useEffect(() => {
     if (hasApiKey && !seoData.generatedContent && !isGenerating && !generating) {
       console.log("Auto-triggering content generation");
-      setGenerating(true);
       handleGenerateContent();
     }
-  }, []);
+  }, [hasApiKey, seoData.generatedContent, isGenerating]);
 
   const handleGenerateContent = async () => {
     if (!hasApiKey) {
@@ -77,17 +77,25 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
       
       toast.info("Generating SEO-optimized content...");
       
+      // Log the actual data we're sending to make debugging easier
+      console.log("Generating content with:", {
+        title: seoData.selectedTitle,
+        outline: outlineContent,
+        keywords: seoData.selectedKeywords
+      });
+      
       const generatedContent = await generateContentAI(
         seoData.selectedTitle,
         outlineContent,
         seoData.selectedKeywords
       );
       
+      console.log("Content generated successfully!");
       onDataChange("generatedContent", generatedContent);
       toast.success("Content successfully generated!");
     } catch (error) {
       console.error("Error generating content:", error);
-      toast.error("Failed to generate content. Please try again.");
+      toast.error("Failed to generate content: " + (error.message || "Unknown error"));
     } finally {
       setGenerating(false);
     }
@@ -111,6 +119,10 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
     // In a real app, this would save the content to a database
   };
 
+  const handleConfigureAI = () => {
+    navigate('/settings/ai-configuration');
+  };
+
   return (
     <div className="space-y-6">
       {!hasApiKey && (
@@ -120,10 +132,18 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
           <AlertDescription>
             {(userRole === "admin" || userRole === "super_admin") ? (
               <>
-                To generate content, you need to configure your OpenAI API key.{" "}
-                <Link to="/settings/ai-configuration" className="font-medium underline">
-                  Configure API key now
-                </Link>
+                <div className="mb-2">
+                  To generate content, you need to configure your OpenAI API key.
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    onClick={handleConfigureAI}
+                  >
+                    Configure API Key Now
+                  </Button>
+                </div>
               </>
             ) : (
               <>
@@ -143,6 +163,7 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
               size="sm"
               onClick={() => setIsFullscreenEdit(true)}
               title="Edit in Fullscreen"
+              disabled={!seoData.generatedContent}
             >
               <Maximize2 className="h-4 w-4" />
             </Button>
@@ -213,6 +234,16 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
               <Wand className="h-4 w-4" />
               {hasApiKey ? "Generate Content Now" : "API Key Required"}
             </Button>
+            
+            {!hasApiKey && userRole !== 'user' && (
+              <Button 
+                variant="outline" 
+                onClick={handleConfigureAI}
+                className="mt-2"
+              >
+                Configure AI Settings
+              </Button>
+            )}
           </div>
         )}
       </Card>

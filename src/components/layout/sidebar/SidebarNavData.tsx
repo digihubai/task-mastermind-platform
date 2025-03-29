@@ -7,11 +7,13 @@ import {
   analyticsSection,
   aiToolsSection,
   coreModulesSection,
-  settingsSection
+  settingsSection,
+  adminSection
 } from "./data";
 import { useLocation } from "react-router-dom";
 import { SidebarSectionType } from "@/types/sidebar";
 import { useSidebarNavigation } from "@/hooks/use-sidebar-navigation";
+import useRoleBasedSettings from "@/hooks/use-role-based-settings";
 
 // Export these items for MainSidebar.tsx
 export const userMenuItems = [
@@ -46,11 +48,15 @@ export const sidebarSections: SidebarSectionType[] = [
   analyticsSection,
   aiToolsSection,
   coreModulesSection,
-  settingsSection
+  settingsSection,
+  adminSection
 ];
 
 export const SidebarNavData = () => {
   const { pathname } = useLocation();
+  const { userRole } = useRoleBasedSettings();
+  const isAdmin = userRole === "admin" || userRole === "super_admin";
+  
   // We'll use our navigation hook to get expanded sections and other utilities
   const {
     expandedSections,
@@ -110,6 +116,18 @@ export const SidebarNavData = () => {
         isPathActive={isPathActive}
         isExactPathActive={isExactPathActive}
       />
+      
+      {isAdmin && (
+        <SidebarMenuItem
+          key="admin"
+          section={adminSection}
+          pathname={pathname}
+          expandedSections={expandedSections}
+          toggleSection={toggleSection}
+          isPathActive={isPathActive}
+          isExactPathActive={isExactPathActive}
+        />
+      )}
       
       <SidebarMenuItem
         key="settings"
