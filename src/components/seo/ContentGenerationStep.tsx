@@ -2,10 +2,14 @@
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RefreshCw, Maximize2, Copy, Download, Save } from "lucide-react";
+import { ArrowLeft, RefreshCw, Maximize2, Copy, Download, Save, AlertCircle } from "lucide-react";
 import ContentEditor from '@/components/ContentEditor';
 import ContentEditorDialog from './ContentEditorDialog';
 import { toast } from "sonner";
+import { Link } from 'react-router-dom';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import useRoleBasedSettings from "@/hooks/use-role-based-settings";
+import { getOpenAIApiKey } from "@/services/ai/contentGenerationAI";
 
 interface ContentGenerationStepProps {
   seoData: any;
@@ -23,6 +27,8 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
   onRegenerateContent
 }) => {
   const [isFullscreenEdit, setIsFullscreenEdit] = useState(false);
+  const { userRole, hasAccess } = useRoleBasedSettings();
+  const hasApiKey = !!getOpenAIApiKey();
 
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(seoData.generatedContent || "");
@@ -44,6 +50,27 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
 
   return (
     <div className="space-y-6">
+      {!hasApiKey && (
+        <Alert variant="warning" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>API Key Required</AlertTitle>
+          <AlertDescription>
+            {(userRole === "admin" || userRole === "super_admin") ? (
+              <>
+                To generate content, you need to configure your OpenAI API key.{" "}
+                <Link to="/settings/ai-configuration" className="font-medium underline">
+                  Configure API key now
+                </Link>
+              </>
+            ) : (
+              <>
+                The AI content generation feature requires an API key. Please contact your administrator to set up the API key.
+              </>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <Card className="p-6 border border-border/40">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold">Generated Content</h2>
@@ -76,7 +103,7 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
               variant="outline" 
               size="sm"
               onClick={onRegenerateContent}
-              disabled={isGenerating}
+              disabled={isGenerating || !hasApiKey}
               title="Regenerate Content"
             >
               <RefreshCw className="h-4 w-4" />
@@ -100,7 +127,9 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
         ) : (
           <div className="flex flex-col items-center justify-center py-12 space-y-4">
             <p className="text-center text-lg font-medium">Content hasn't been generated yet</p>
-            <Button onClick={onRegenerateContent}>Generate Content Now</Button>
+            <Button onClick={onRegenerateContent} disabled={!hasApiKey}>
+              {hasApiKey ? "Generate Content Now" : "API Key Required"}
+            </Button>
           </div>
         )}
       </Card>

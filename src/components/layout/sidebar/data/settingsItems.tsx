@@ -25,6 +25,7 @@ export const settingsItems = [
   { name: "Security", path: "/settings/security", icon: <Lock size={20} /> },
   { name: "Appearance", path: "/settings/appearance", icon: <Palette size={20} /> },
   { name: "API Settings", path: "/settings/api", icon: <Bot size={20} /> },
+  { name: "AI Configuration", path: "/settings/ai-configuration", icon: <Bot size={20} /> },
 ];
 
 // Settings section for sidebar
@@ -80,6 +81,11 @@ export const settingsSection = {
           title: "Appearance",
           href: "/settings/appearance",
           icon: <Palette size={18} />,
+        },
+        {
+          title: "AI Configuration",
+          href: "/settings/ai-configuration",
+          icon: <Bot size={18} />,
         },
       ],
     },

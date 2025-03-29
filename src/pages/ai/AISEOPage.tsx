@@ -24,14 +24,24 @@ import {
   SEOLinksStep,
   ContentGenerationStep,
   StepIndicator,
-  SEOSidebar,
-  AIKeyConfig
+  SEOSidebar
 } from "@/components/seo";
 
 const AISEOPage = () => {
   const [activeStep, setActiveStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasValidApiKey, setHasValidApiKey] = useState(!!getOpenAIApiKey());
+  
+  useEffect(() => {
+    const checkApiKey = () => {
+      setHasValidApiKey(!!getOpenAIApiKey());
+    };
+    
+    checkApiKey();
+    const interval = setInterval(checkApiKey, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const [seoData, setSeoData] = useState({
     topic: "",
@@ -82,7 +92,7 @@ const AISEOPage = () => {
 
   const handleGenerateContent = async () => {
     if (!hasValidApiKey) {
-      toast.error("Please set your OpenAI API key in the settings first");
+      toast.error("No API key configured. Please contact your administrator.");
       return;
     }
 
@@ -130,18 +140,6 @@ const AISEOPage = () => {
       setIsGenerating(false);
     }
   };
-
-  useEffect(() => {
-    if (activeStep === 7 && 
-        !seoData.generatedContent && 
-        !isGenerating && 
-        seoData.selectedTitle && 
-        (seoData.selectedOutline || seoData.outline) && 
-        seoData.selectedKeywords?.length > 0) {
-      console.log("Auto-triggering content generation on step 7 load");
-      handleGenerateContent();
-    }
-  }, [activeStep, seoData, isGenerating]);
 
   const handleGenerateKeywords = async () => {
     if (!hasValidApiKey || !seoData.topic) return;
@@ -206,18 +204,13 @@ const AISEOPage = () => {
     switch (activeStep) {
       case 1:
         return (
-          <>
-            {!hasValidApiKey && (
-              <AIKeyConfig onValidKeySet={() => setHasValidApiKey(true)} />
-            )}
-            <TopicStep 
-              topic={seoData.topic} 
-              onTopicChange={(value: string) => handleDataChange("topic", value)} 
-              onNext={handleNext}
-              advancedSettings={seoData.advancedSettings}
-              onAdvancedSettingsChange={(settings) => handleDataChange("advancedSettings", settings)}
-            />
-          </>
+          <TopicStep 
+            topic={seoData.topic} 
+            onTopicChange={(value: string) => handleDataChange("topic", value)} 
+            onNext={handleNext}
+            advancedSettings={seoData.advancedSettings}
+            onAdvancedSettingsChange={(settings) => handleDataChange("advancedSettings", settings)}
+          />
         );
       case 2:
         return (
@@ -314,7 +307,7 @@ const AISEOPage = () => {
                 onClick={handleGenerateContent}
                 disabled={!hasValidApiKey}
               >
-                {hasValidApiKey ? "Generate SEO Content" : "Set API Key to Generate Content"}
+                {hasValidApiKey ? "Generate SEO Content" : "API Key Required (Contact Admin)"}
               </Button>
             )}
           </div>

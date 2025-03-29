@@ -4,6 +4,7 @@ import { RouteObject } from "react-router-dom";
 import SettingsPage from "@/pages/SettingsPage";
 import SettingsIntegrationsPage from "@/pages/settings/SettingsIntegrationsPage";
 import SEOImageIntegrations from "@/pages/admin/SEOImageIntegrations";
+import AdminAISettings from "@/pages/admin/AdminAISettings";
 
 const settingsRoutes: RouteObject[] = [
   {
@@ -17,6 +18,10 @@ const settingsRoutes: RouteObject[] = [
   {
     path: "/settings/seo-image-integrations",
     element: <SEOImageIntegrations />,
+  },
+  {
+    path: "/settings/ai-configuration",
+    element: <AdminAISettings />,
   },
 ];
 
