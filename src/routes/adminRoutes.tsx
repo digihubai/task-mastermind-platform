@@ -28,6 +28,9 @@ import CheckoutRegistration from "@/pages/admin/settings/CheckoutRegistration";
 import ThumbnailSystem from "@/pages/admin/settings/ThumbnailSystem";
 import PrivacyPolicy from "@/pages/admin/settings/PrivacyPolicy";
 import AdminSettingsPage from "@/pages/admin/AdminSettingsPage";
+import CRMIntegrations from "@/pages/admin/CRMIntegrations";
+import MarketingIntegrations from "@/pages/admin/MarketingIntegrations";
+import ProjectIntegrations from "@/pages/admin/ProjectIntegrations";
 
 const adminRoutes: RouteObject[] = [
   {
@@ -97,6 +100,18 @@ const adminRoutes: RouteObject[] = [
   {
     path: "/admin/api-integration",
     element: <APIIntegration />,
+  },
+  {
+    path: "/admin/crm-integrations",
+    element: <CRMIntegrations />,
+  },
+  {
+    path: "/admin/marketing-integrations",
+    element: <MarketingIntegrations />,
+  },
+  {
+    path: "/admin/project-integrations",
+    element: <ProjectIntegrations />,
   },
   {
     path: "/admin/settings",

@@ -1,9 +1,10 @@
+
 export interface ApiIntegration {
   id: string;
   name: string;
   description: string; 
   icon: React.ReactNode;
-  category: 'ai' | 'communication' | 'ecommerce' | 'tools' | 'analytics' | 'cms' | 'seo';
+  category: 'ai' | 'communication' | 'ecommerce' | 'tools' | 'analytics' | 'cms' | 'seo' | 'crm' | 'project' | 'marketing';
   isActive: boolean;
   apiKey?: string;
   credits?: number;
@@ -28,4 +29,15 @@ export interface IntegrationProps {
   onConfigured?: () => void;
   onDeleted?: () => void;
   isAdmin?: boolean;
+}
+
+export interface CRMIntegration extends ApiIntegration {
+  connectedAccounts?: number;
+  lastSync?: string;
+}
+
+export interface MarketingIntegration extends ApiIntegration {
+  platform?: string;
+  capabilities?: string[];
+  requiredScopes?: string[];
 }
