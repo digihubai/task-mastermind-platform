@@ -15,7 +15,6 @@ import AIRewriterPage from "@/pages/ai/AIRewriterPage";
 import AIToolsHub from "@/pages/ai/AIToolsHub";
 import AIVisionPage from "@/pages/ai/AIVisionPage";
 import AISEOPage from "@/pages/ai/AISEOPage";
-import AISEOWriterPage from "@/pages/ai/AISEOWriterPage";
 import PDFInsightPage from "@/pages/ai/PDFInsightPage";
 import AICopywriterPage from "@/pages/ai/AICopywriterPage";
 import ChatbotsPage from "@/pages/ai/ChatbotsPage";
@@ -117,10 +116,6 @@ const routes: RouteObject[] = [
   {
     path: "/ai/seo",
     element: <AISEOPage />,
-  },
-  {
-    path: "/ai/seo-writer",
-    element: <AISEOWriterPage />,
   },
   {
     path: "/ai/pdf",

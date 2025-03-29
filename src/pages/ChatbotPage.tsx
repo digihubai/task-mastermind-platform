@@ -3,73 +3,52 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, MoreVertical } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 const ChatbotPage = () => {
   const navigate = useNavigate();
-  const [activeChatbots, setActiveChatbots] = useState([
+  const [selectedChatbot, setSelectedChatbot] = useState<string | null>(null);
+  
+  const activeChatbots = [
     {
       id: "1",
       name: "digibot",
-      avatar: "/lovable-uploads/a61b541c-3a12-44eb-b261-3e4f9d6890cc.png",
-      createdAt: "3 hours ago"
+      avatar: "👤",
+      createdAt: "16 hours ago"
     },
     {
       id: "2",
       name: "digibot",
-      avatar: "/lovable-uploads/43312f87-4a35-4053-a70d-db7e1ece3498.png",
-      createdAt: "4 hours ago"
+      avatar: "👩",
+      createdAt: "18 hours ago"
     },
     {
       id: "3",
       name: "digibot",
-      avatar: "/lovable-uploads/e63cd7f0-808e-4ee8-882e-f37b4a7333b4.png",
-      createdAt: "21 hours ago"
+      avatar: "👩",
+      createdAt: "19 hours ago"
     },
     {
       id: "4",
       name: "digibot",
-      avatar: "/lovable-uploads/a61b541c-3a12-44eb-b261-3e4f9d6890cc.png",
-      createdAt: "23 hours ago"
+      avatar: "💬",
+      createdAt: "20 hours ago"
     },
     {
       id: "5",
       name: "digibot",
-      avatar: "/lovable-uploads/43312f87-4a35-4053-a70d-db7e1ece3498.png",
-      createdAt: "1 day ago"
+      avatar: "💬",
+      createdAt: "20 hours ago"
     },
     {
       id: "6",
       name: "digibot",
-      avatar: "/lovable-uploads/e63cd7f0-808e-4ee8-882e-f37b4a7333b4.png",
-      createdAt: "1 day ago"
-    },
-    {
-      id: "7",
-      name: "digibot",
-      avatar: "/lovable-uploads/a61b541c-3a12-44eb-b261-3e4f9d6890cc.png",
-      createdAt: "1 day ago"
-    },
-    {
-      id: "8",
-      name: "digibot",
-      avatar: "/lovable-uploads/43312f87-4a35-4053-a70d-db7e1ece3498.png",
-      createdAt: "5 days ago"
-    },
-    {
-      id: "9",
-      name: "digibot",
-      avatar: "/lovable-uploads/e63cd7f0-808e-4ee8-882e-f37b4a7333b4.png",
-      createdAt: "5 days ago"
-    },
-    {
-      id: "10",
-      name: "digibot",
-      avatar: "/lovable-uploads/a61b541c-3a12-44eb-b261-3e4f9d6890cc.png",
-      createdAt: "5 days ago"
+      avatar: "👤",
+      createdAt: "4 days ago"
     }
-  ]);
+  ];
 
   const handleChatHistory = () => {
     navigate("/support/omnichannel");
@@ -108,15 +87,15 @@ const ChatbotPage = () => {
         </Button>
       </div>
       
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold">digi</h1>
+          <h1 className="text-3xl font-bold tracking-tight">AI Chatbots</h1>
           <p className="text-muted-foreground">
             View and manage external chatbots
           </p>
         </div>
         
-        <div className="flex space-x-3">
+        <div className="flex space-x-3 mt-4 md:mt-0">
           <Button 
             variant="outline" 
             onClick={handleChatHistory}
@@ -125,7 +104,7 @@ const ChatbotPage = () => {
           </Button>
           
           <Button 
-            className="bg-indigo-600 hover:bg-indigo-700 text-white"
+            className="bg-indigo-600 hover:bg-indigo-700"
             onClick={handleAddNewChatbot}
           >
             <Plus size={16} className="mr-2" />
@@ -136,13 +115,12 @@ const ChatbotPage = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Card className="p-8 flex flex-col items-center text-center">
-          <div className="w-24 h-24 mb-4 bg-purple-100 rounded-full flex items-center justify-center">
-            <img src="/lovable-uploads/a61b541c-3a12-44eb-b261-3e4f9d6890cc.png" alt="Create chatbot" className="w-16 h-16 object-contain" />
+          <div className="w-24 h-24 mb-4">
+            <img src="/lovable-uploads/08f90115-7958-43e2-b379-88702703af59.png" alt="Create chatbot" className="w-full h-full object-contain" />
           </div>
           <h3 className="text-xl font-medium mb-2">Create and configure a chatbot that interacts with your users.</h3>
           <Button 
-            variant="outline"
-            className="mt-4 flex items-center"
+            className="mt-4"
             onClick={handleAddNewChatbot}
           >
             <Plus size={16} className="mr-2" />
@@ -151,8 +129,8 @@ const ChatbotPage = () => {
         </Card>
         
         <Card className="p-8 flex flex-col items-center text-center">
-          <div className="w-24 h-24 mb-4 bg-purple-100 rounded-full flex items-center justify-center">
-            <img src="/lovable-uploads/43312f87-4a35-4053-a70d-db7e1ece3498.png" alt="Recent conversations" className="w-16 h-16 object-contain" />
+          <div className="w-24 h-24 mb-4">
+            <img src="/lovable-uploads/a057c0b0-315a-4e15-9e99-c63a421be55a.png" alt="Recent conversations" className="w-full h-full object-contain" />
           </div>
           <h3 className="text-xl font-medium mb-2">Explore recent conversations from your users.</h3>
           <Button 
@@ -173,25 +151,25 @@ const ChatbotPage = () => {
             <div className="p-4 flex justify-between items-start">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center">
-                  <img src={bot.avatar} alt={bot.name} className="w-6 h-6" />
+                  <span className="text-lg">{bot.avatar}</span>
                 </div>
                 <div>
                   <h3 className="font-medium">{bot.name}</h3>
                   <p className="text-xs text-muted-foreground">Created {bot.createdAt}</p>
                 </div>
               </div>
-              <button className="text-gray-400 hover:text-gray-600">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 3.33334C8.73333 3.33334 9.33333 2.73334 9.33333 2.00001C9.33333 1.26667 8.73333 0.666672 8 0.666672C7.26667 0.666672 6.66667 1.26667 6.66667 2.00001C6.66667 2.73334 7.26667 3.33334 8 3.33334ZM8 6.00001C7.26667 6.00001 6.66667 6.60001 6.66667 7.33334C6.66667 8.06668 7.26667 8.66668 8 8.66668C8.73333 8.66668 9.33333 8.06668 9.33333 7.33334C9.33333 6.60001 8.73333 6.00001 8 6.00001ZM8 11.3333C7.26667 11.3333 6.66667 11.9333 6.66667 12.6667C6.66667 13.4 7.26667 14 8 14C8.73333 14 9.33333 13.4 9.33333 12.6667C9.33333 11.9333 8.73333 11.3333 8 11.3333Z" fill="currentColor"/>
-                </svg>
-              </button>
+              <Button variant="ghost" size="icon">
+                <MoreVertical size={16} />
+              </Button>
             </div>
             <div className="px-4 pb-4">
               <div className="flex items-center">
-                <div className="px-2 py-0.5 text-xs rounded-full bg-green-50 text-green-600 border border-green-200 flex items-center">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1"></span>
-                  Active
-                </div>
+                <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 px-2 py-0.5 text-xs">
+                  <span className="flex items-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1"></span>
+                    Active
+                  </span>
+                </Badge>
               </div>
               <div className="mt-4 flex gap-2">
                 <Button 
@@ -204,7 +182,7 @@ const ChatbotPage = () => {
                 </Button>
                 <Button 
                   size="sm" 
-                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white"
+                  className="flex-1"
                   onClick={() => handleConfigureChatbot(bot.id)}
                 >
                   Configure

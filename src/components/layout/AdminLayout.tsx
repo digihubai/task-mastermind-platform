@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { 
@@ -25,16 +25,14 @@ import {
   Activity, 
   Sparkles, 
   Coins,
-  ArrowLeft,
-  ChevronRight,
-  ChevronDown
+  ArrowLeft
 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import useRoleBasedSettings from "@/hooks/use-role-based-settings";
 import { toast } from "sonner";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -46,19 +44,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description 
   const { userRole } = useRoleBasedSettings();
   const location = useLocation();
   const navigate = useNavigate();
-  const [openSettings, setOpenSettings] = useState(false);
 
   // Only super_admin and admin can access admin pages
   const isAuthorized = userRole === "super_admin" || userRole === "admin";
 
-  // Check if current path is under settings
-  useEffect(() => {
-    if (location.pathname.includes("/admin/settings")) {
-      setOpenSettings(true);
-    }
-  }, [location.pathname]);
-
-  useEffect(() => {
+  React.useEffect(() => {
     if (!isAuthorized) {
       toast.error("You don't have permission to access admin pages");
       navigate("/dashboard");
@@ -83,15 +73,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description 
     { path: "/admin/coupons", icon: <Tag size={18} />, label: "Coupons" },
     { path: "/admin/email-templates", icon: <Mail size={18} />, label: "Email Templates" },
     { path: "/admin/api-integration", icon: <FileJson size={18} />, label: "API Integration" },
-  ];
-
-  const settingsSubItems = [
-    { path: "/admin/settings", label: "General Settings" },
-    { path: "/admin/settings/maintenance", label: "Maintenance" },
-    { path: "/admin/settings/ai-models", label: "AI Models" },
-    { path: "/admin/settings/checkout-registration", label: "Checkout Registration" },
-    { path: "/admin/settings/thumbnail-system", label: "Thumbnail System" },
-    { path: "/admin/settings/privacy-policy", label: "Privacy Policy and Terms" },
+    { path: "/admin/settings", icon: <Settings size={18} />, label: "Settings" },
+    { path: "/admin/site-health", icon: <Activity size={18} />, label: "Site Health" },
+    { path: "/admin/ai-settings", icon: <Sparkles size={18} className="text-purple-500" />, label: "AI Settings" },
+    { path: "/admin/credits", icon: <Coins size={18} />, label: "Credits" },
   ];
 
   return (
@@ -131,91 +116,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description 
                     <span>{item.label}</span>
                   </Link>
                 ))}
-
-                {/* Settings with submenu */}
-                <Collapsible 
-                  open={openSettings} 
-                  onOpenChange={setOpenSettings}
-                  className="w-full"
-                >
-                  <CollapsibleTrigger asChild>
-                    <div
-                      className={cn(
-                        "flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors cursor-pointer",
-                        location.pathname.includes("/admin/settings")
-                          ? "bg-primary text-primary-foreground"
-                          : "hover:bg-accent"
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Settings size={18} />
-                        <span>Settings</span>
-                      </div>
-                      {openSettings ? (
-                        <ChevronDown size={16} className="transition-transform" />
-                      ) : (
-                        <ChevronRight size={16} className="transition-transform" />
-                      )}
-                    </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="space-y-1 pl-6 mt-1">
-                      {settingsSubItems.map((subItem) => (
-                        <Link
-                          key={subItem.path}
-                          to={subItem.path}
-                          className={cn(
-                            "flex items-center rounded-md px-3 py-1.5 text-sm transition-colors",
-                            location.pathname === subItem.path
-                              ? "bg-primary text-primary-foreground"
-                              : "hover:bg-accent text-muted-foreground"
-                          )}
-                        >
-                          <span>{subItem.label}</span>
-                        </Link>
-                      ))}
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-
-                <Link
-                  to="/admin/site-health"
-                  className={cn(
-                    "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
-                    location.pathname === "/admin/site-health"
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-accent"
-                  )}
-                >
-                  <Activity size={18} />
-                  <span>Site Health</span>
-                </Link>
-
-                <Link
-                  to="/admin/ai-settings"
-                  className={cn(
-                    "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
-                    location.pathname === "/admin/ai-settings"
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-accent"
-                  )}
-                >
-                  <Sparkles size={18} className="text-purple-500" />
-                  <span>AI Settings</span>
-                </Link>
-
-                <Link
-                  to="/admin/credits"
-                  className={cn(
-                    "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors",
-                    location.pathname === "/admin/credits"
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-accent"
-                  )}
-                >
-                  <Coins size={18} />
-                  <span>Credits</span>
-                </Link>
               </div>
             </Card>
           </div>

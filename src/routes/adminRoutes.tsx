@@ -2,12 +2,9 @@
 import React from "react";
 import { RouteObject } from "react-router-dom";
 import Dashboard from "@/pages/admin/Dashboard";
-import UserManagement from "@/pages/admin/UserManagement";
-import Settings from "@/pages/admin/Settings";
-import AdminAISettings from "@/pages/admin/AdminAISettings";
-import SiteHealth from "@/pages/admin/SiteHealth";
 import Marketplace from "@/pages/admin/Marketplace";
 import Themes from "@/pages/admin/Themes";
+import UserManagement from "@/pages/admin/UserManagement";
 import Announcements from "@/pages/admin/Announcements";
 import GoogleAdsense from "@/pages/admin/GoogleAdsense";
 import SupportRequests from "@/pages/admin/SupportRequests";
@@ -21,16 +18,10 @@ import Affiliates from "@/pages/admin/Affiliates";
 import Coupons from "@/pages/admin/Coupons";
 import EmailTemplates from "@/pages/admin/EmailTemplates";
 import APIIntegration from "@/pages/admin/APIIntegration";
+import Settings from "@/pages/admin/Settings";
+import SiteHealth from "@/pages/admin/SiteHealth";
+import AdminAISettings from "@/pages/admin/AdminAISettings";
 import Credits from "@/pages/admin/Credits";
-import Maintenance from "@/pages/admin/settings/Maintenance";
-import AIModels from "@/pages/admin/settings/AIModels";
-import CheckoutRegistration from "@/pages/admin/settings/CheckoutRegistration";
-import ThumbnailSystem from "@/pages/admin/settings/ThumbnailSystem";
-import PrivacyPolicy from "@/pages/admin/settings/PrivacyPolicy";
-import AdminSettingsPage from "@/pages/admin/AdminSettingsPage";
-import CRMIntegrations from "@/pages/admin/CRMIntegrations";
-import MarketingIntegrations from "@/pages/admin/MarketingIntegrations";
-import ProjectIntegrations from "@/pages/admin/ProjectIntegrations";
 
 const adminRoutes: RouteObject[] = [
   {
@@ -102,40 +93,8 @@ const adminRoutes: RouteObject[] = [
     element: <APIIntegration />,
   },
   {
-    path: "/admin/crm-integrations",
-    element: <CRMIntegrations />,
-  },
-  {
-    path: "/admin/marketing-integrations",
-    element: <MarketingIntegrations />,
-  },
-  {
-    path: "/admin/project-integrations",
-    element: <ProjectIntegrations />,
-  },
-  {
     path: "/admin/settings",
     element: <Settings />,
-  },
-  {
-    path: "/admin/settings/maintenance",
-    element: <Maintenance />,
-  },
-  {
-    path: "/admin/settings/ai-models",
-    element: <AIModels />,
-  },
-  {
-    path: "/admin/settings/checkout-registration",
-    element: <CheckoutRegistration />,
-  },
-  {
-    path: "/admin/settings/thumbnail-system",
-    element: <ThumbnailSystem />,
-  },
-  {
-    path: "/admin/settings/privacy-policy",
-    element: <PrivacyPolicy />,
   },
   {
     path: "/admin/site-health",
@@ -149,10 +108,6 @@ const adminRoutes: RouteObject[] = [
     path: "/admin/credits",
     element: <Credits />,
   },
-  {
-    path: "/admin/settings-page",
-    element: <AdminSettingsPage />,
-  }
 ];
 
 export default adminRoutes;
