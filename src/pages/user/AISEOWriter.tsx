@@ -38,6 +38,7 @@ import {
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import { 
   generateSEOContent, 
   ContentGenerationParams, 
