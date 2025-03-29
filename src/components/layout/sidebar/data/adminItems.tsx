@@ -20,7 +20,8 @@ import {
   Mail,
   FileJson,
   Palette,
-  Coins
+  Coins,
+  LifeBuoy
 } from "lucide-react";
 import { SidebarItemType } from "@/types/sidebar";
 
