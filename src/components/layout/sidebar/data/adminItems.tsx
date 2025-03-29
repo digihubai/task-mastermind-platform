@@ -18,7 +18,9 @@ import {
   Share2,
   Tag,
   Mail,
-  FileJson
+  FileJson,
+  Palette,
+  Coins
 } from "lucide-react";
 import { SidebarItemType } from "@/types/sidebar";
 
@@ -46,24 +48,39 @@ export const adminSection = {
           icon: <LayoutDashboard size={18} />,
         },
         {
-          title: "User Management",
-          href: "/admin/user-management",
-          icon: <Users size={18} />,
-        },
-        {
-          title: "AI Settings",
-          href: "/admin/ai-settings",
-          icon: <Sparkles size={18} className="text-purple-500" />,
-        },
-        {
           title: "Marketplace",
           href: "/admin/marketplace",
           icon: <ShoppingBag size={18} />,
         },
         {
-          title: "Frontend",
-          href: "/admin/frontend",
-          icon: <Globe size={18} />,
+          title: "Themes",
+          href: "/admin/themes",
+          icon: <Palette size={18} />,
+        },
+        {
+          title: "User Management",
+          href: "/admin/user-management",
+          icon: <Users size={18} />,
+        },
+        {
+          title: "Announcements",
+          href: "/admin/announcements",
+          icon: <Bell size={18} />,
+        },
+        {
+          title: "Google Adsense",
+          href: "/admin/google-adsense",
+          icon: <DollarSign size={18} />,
+        },
+        {
+          title: "Support Requests",
+          href: "/admin/support-requests",
+          icon: <LifeBuoy size={18} />,
+        },
+        {
+          title: "Templates",
+          href: "/admin/templates",
+          icon: <FileText size={18} />,
         },
         {
           title: "Chat Settings",
@@ -71,9 +88,9 @@ export const adminSection = {
           icon: <MessageSquare size={18} />,
         },
         {
-          title: "Templates",
-          href: "/admin/templates",
-          icon: <FileText size={18} />,
+          title: "Frontend",
+          href: "/admin/frontend",
+          icon: <Globe size={18} />,
         },
         {
           title: "Finance",
@@ -114,11 +131,53 @@ export const adminSection = {
           title: "Settings",
           href: "/admin/settings",
           icon: <Settings size={18} />,
+          subItems: [
+            {
+              title: "General Settings",
+              href: "/admin/settings",
+              icon: <Settings size={16} />,
+            },
+            {
+              title: "Maintenance",
+              href: "/admin/settings/maintenance",
+              icon: <Activity size={16} />,
+            },
+            {
+              title: "AI Models",
+              href: "/admin/settings/ai-models",
+              icon: <Sparkles size={16} className="text-purple-500" />,
+            },
+            {
+              title: "Checkout Registration",
+              href: "/admin/settings/checkout-registration",
+              icon: <DollarSign size={16} />,
+            },
+            {
+              title: "Thumbnail System",
+              href: "/admin/settings/thumbnail-system",
+              icon: <FileCode size={16} />,
+            },
+            {
+              title: "Privacy Policy and Terms",
+              href: "/admin/settings/privacy-policy",
+              icon: <FileText size={16} />,
+            },
+          ],
         },
         {
           title: "Site Health",
           href: "/admin/site-health",
           icon: <Activity size={18} />,
+        },
+        {
+          title: "AI Settings",
+          href: "/admin/ai-settings",
+          icon: <Sparkles size={18} className="text-purple-500" />,
+        },
+        {
+          title: "Credits",
+          href: "/admin/credits",
+          icon: <Coins size={18} />,
         },
       ],
     },

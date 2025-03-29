@@ -22,6 +22,11 @@ import Settings from "@/pages/admin/Settings";
 import SiteHealth from "@/pages/admin/SiteHealth";
 import AdminAISettings from "@/pages/admin/AdminAISettings";
 import Credits from "@/pages/admin/Credits";
+import Maintenance from "@/pages/admin/settings/Maintenance";
+import AIModels from "@/pages/admin/settings/AIModels";
+import CheckoutRegistration from "@/pages/admin/settings/CheckoutRegistration";
+import ThumbnailSystem from "@/pages/admin/settings/ThumbnailSystem";
+import PrivacyPolicy from "@/pages/admin/settings/PrivacyPolicy";
 
 const adminRoutes: RouteObject[] = [
   {
@@ -95,6 +100,26 @@ const adminRoutes: RouteObject[] = [
   {
     path: "/admin/settings",
     element: <Settings />,
+  },
+  {
+    path: "/admin/settings/maintenance",
+    element: <Maintenance />,
+  },
+  {
+    path: "/admin/settings/ai-models",
+    element: <AIModels />,
+  },
+  {
+    path: "/admin/settings/checkout-registration",
+    element: <CheckoutRegistration />,
+  },
+  {
+    path: "/admin/settings/thumbnail-system",
+    element: <ThumbnailSystem />,
+  },
+  {
+    path: "/admin/settings/privacy-policy",
+    element: <PrivacyPolicy />,
   },
   {
     path: "/admin/site-health",
