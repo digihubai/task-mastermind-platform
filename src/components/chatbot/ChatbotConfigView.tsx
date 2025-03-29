@@ -25,6 +25,8 @@ interface ChatbotConfigViewProps {
     avatar: string;
     footerLink: string;
     personality: string;
+    iframeWidth?: number;
+    iframeHeight?: number;
   };
   setNewChatbotInfo: (info: any) => void;
   handleNextStep: () => void;
@@ -124,6 +126,8 @@ export const ChatbotConfigView: React.FC<ChatbotConfigViewProps> = ({
               position={newChatbotInfo.position}
               showDateTime={newChatbotInfo.showDateTime}
               language={newChatbotInfo.language}
+              width={newChatbotInfo.iframeWidth}
+              height={newChatbotInfo.iframeHeight}
             />
           </div>
         </div>

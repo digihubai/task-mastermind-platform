@@ -23,6 +23,8 @@ const NewChatbotPage = () => {
     avatar: "avatar1",
     footerLink: "https://digihub.ai",
     personality: "helpful",
+    iframeWidth: 420,
+    iframeHeight: 745,
   });
 
   const handleBackToDashboard = () => {

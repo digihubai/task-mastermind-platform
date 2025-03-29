@@ -169,7 +169,7 @@ const EmbedChatbotPage = () => {
                       max="600"
                       step="10"
                       value={chatConfig.iframeWidth}
-                      onChange={(e) => setChatConfig({...chatConfig, iframeWidth: parseInt(e.target.value)})}
+                      onChange={handleWidthChange}
                       className="w-full"
                     />
                     <span className="font-mono text-sm">{chatConfig.iframeWidth}px</span>
@@ -185,7 +185,7 @@ const EmbedChatbotPage = () => {
                       max="900"
                       step="10"
                       value={chatConfig.iframeHeight}
-                      onChange={(e) => setChatConfig({...chatConfig, iframeHeight: parseInt(e.target.value)})}
+                      onChange={handleHeightChange}
                       className="w-full"
                     />
                     <span className="font-mono text-sm">{chatConfig.iframeHeight}px</span>
@@ -273,6 +273,8 @@ const EmbedChatbotPage = () => {
                   }}
                   variant="embedded"
                   language={chatConfig.language}
+                  width={chatConfig.iframeWidth}
+                  height={chatConfig.iframeHeight}
                 />
               </CardContent>
             </Card>

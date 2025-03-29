@@ -47,14 +47,13 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
   // Handle direct color picker changes
   const handleColorChange = (color: string) => {
     setHexInputValue(color);
+    // Apply color directly when picked
+    updateInfo("color", color);
   };
   
-  // Close the popover and apply the color when done
+  // Close the popover
   const handleCloseColorPicker = () => {
     setColorPickerOpen(false);
-    // Apply the current color value when closing
-    updateInfo("color", hexInputValue);
-    toast.success("Color updated successfully");
   };
   
   // Define color options
@@ -124,7 +123,7 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
                       className="w-full" 
                       onClick={handleCloseColorPicker}
                     >
-                      Apply Color
+                      Close
                     </Button>
                   </div>
                 </PopoverContent>

@@ -5,15 +5,31 @@ import { Smartphone, MessageCircle, ArrowRight, Copy, Check, ExternalLink } from
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
-export const EmbedStep: React.FC = () => {
+interface EmbedStepProps {
+  newChatbotInfo: any;
+  setNewChatbotInfo: (info: any) => void;
+}
+
+export const EmbedStep: React.FC<EmbedStepProps> = ({ newChatbotInfo, setNewChatbotInfo }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
-  const [width, setWidth] = useState(420);
-  const [height, setHeight] = useState(745);
+  
+  // Initialize with existing values or defaults
+  const [width, setWidth] = useState(newChatbotInfo.iframeWidth || 420);
+  const [height, setHeight] = useState(newChatbotInfo.iframeHeight || 745);
+  
+  // Update parent component when width or height changes
+  useEffect(() => {
+    setNewChatbotInfo({ 
+      ...newChatbotInfo, 
+      iframeWidth: width, 
+      iframeHeight: height 
+    });
+  }, [width, height]);
   
   const getEmbedCode = () => {
-    return `<script defer src="https://digihub.ai/vendor/chatbot/js/external-chatbot.js" data-chatbot-uuid="89aa4a9c-1119-4eef-b0d0-52ff31a4c222" data-iframe-width="${width}" data-iframe-height="${height}" data-language="en" ></script>`;
+    return `<script defer src="https://digihub.ai/vendor/chatbot/js/external-chatbot.js" data-chatbot-uuid="89aa4a9c-1119-4eef-b0d0-52ff31a4c222" data-iframe-width="${width}" data-iframe-height="${height}" data-language="${newChatbotInfo.language || 'en'}" ></script>`;
   };
   
   const copyCode = () => {
@@ -37,11 +53,13 @@ export const EmbedStep: React.FC = () => {
   };
   
   const handleWidthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setWidth(parseInt(e.target.value));
+    const newWidth = parseInt(e.target.value);
+    setWidth(newWidth);
   };
   
   const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setHeight(parseInt(e.target.value));
+    const newHeight = parseInt(e.target.value);
+    setHeight(newHeight);
   };
   
   return (

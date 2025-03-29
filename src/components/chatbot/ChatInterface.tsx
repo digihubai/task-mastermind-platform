@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { ChatHeader } from "./interface/ChatHeader";
 import { MessageList } from "./interface/MessageList";
@@ -23,6 +22,8 @@ interface ChatInterfaceProps {
   position?: "left" | "right";
   showDateTime?: boolean;
   language?: string;
+  width?: number;
+  height?: number;
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -37,12 +38,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   position = "right",
   showDateTime = true,
   language = "auto",
+  width = 420,
+  height = 745,
 }) => {
   const [messages, setMessages] = useState<{ text: string; isBot: boolean; timestamp: Date }[]>([
     { text: config.initialMessage || "Hello! How can I help you today?", isBot: true, timestamp: new Date() }
   ]);
   
-  // Set language based on prop or default
   useEffect(() => {
     if (language && language !== "auto") {
       document.documentElement.lang = language;
@@ -50,10 +52,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }, [language]);
 
   const handleSendMessage = (message: string) => {
-    // Add user message with timestamp
     setMessages([...messages, { text: message, isBot: false, timestamp: new Date() }]);
     
-    // Simulate bot response with emoji
     setTimeout(() => {
       const botResponses = [
         "I understand your question about that! 😊 Let me help you with it.",
@@ -77,7 +77,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   return (
-    <div className={`chat-interface ${variant === "embedded" ? "h-[500px] w-full" : "h-full w-full"} border rounded-lg bg-background flex flex-col shadow-sm hover:shadow-md transition-all duration-300`}>
+    <div 
+      className={`chat-interface ${variant === "embedded" ? "h-[500px] w-full" : "h-full w-full"} border rounded-lg bg-background flex flex-col shadow-sm hover:shadow-md transition-all duration-300`}
+      style={{ 
+        width: variant === "embedded" ? `${width}px` : undefined,
+        height: variant === "embedded" ? `${height}px` : undefined 
+      }}
+    >
       <ChatHeader 
         title={title} 
         accentColor={accentColor} 
@@ -99,7 +105,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         showBranding={showBranding}
       />
 
-      {/* Floating trigger button preview based on position */}
       {variant === "embedded" && (
         <FloatingTrigger 
           position={position}
