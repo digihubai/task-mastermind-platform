@@ -14,6 +14,7 @@ import { AIKeyConfig } from "@/components/seo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { getOpenAIApiKey } from "@/services/ai/contentGenerationAI";
+import { useNavigate } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -29,6 +30,7 @@ import AdminLayout from "@/components/layout/AdminLayout";
 
 const AdminAISettings = () => {
   const { userRole, hasAccess } = useRoleBasedSettings();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("apikeys");
   const [hasConfiguredKey, setHasConfiguredKey] = useState(!!getOpenAIApiKey());
   const [defaultAIEngine, setDefaultAIEngine] = useState("OpenAI");
@@ -71,7 +73,7 @@ const AdminAISettings = () => {
       toast.error("You don't have permission to access this page");
       navigate("/dashboard");
     }
-  }, [hasAccess]);
+  }, [hasAccess, navigate]);
 
   const handleValidKeySet = () => {
     setHasConfiguredKey(true);

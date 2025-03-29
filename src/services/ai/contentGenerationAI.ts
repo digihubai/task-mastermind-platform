@@ -59,6 +59,30 @@ export const testOpenAIApiKey = async (key: string): Promise<boolean> => {
   }
 };
 
+// Validate the API key - this function is used by multiple components
+export const validateAPIKey = async (key: string): Promise<boolean> => {
+  if (!isValidOpenAIApiKey(key)) {
+    toast.error("Invalid API key format. OpenAI keys start with 'sk-'");
+    return false;
+  }
+
+  try {
+    const isValid = await testOpenAIApiKey(key);
+    
+    if (isValid) {
+      setOpenAIApiKey(key);
+      return true;
+    } else {
+      toast.error("API key validation failed. Please check your key and try again.");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error validating API key:", error);
+    toast.error("Error validating API key. Please try again later.");
+    return false;
+  }
+};
+
 // Generate content based on title, outline, and keywords
 export const generateContentAI = async (
   title: string,
@@ -138,8 +162,8 @@ export const generateContentAI = async (
   }
 };
 
-// Generate keyword suggestions
-export const generateKeywordSuggestions = async (topic: string): Promise<string[]> => {
+// Generate keyword suggestions based on a topic
+export const generateKeywordsAI = async (topic: string, count: number = 10): Promise<string[]> => {
   const apiKey = getOpenAIApiKey();
   
   if (!apiKey) {
@@ -148,7 +172,7 @@ export const generateKeywordSuggestions = async (topic: string): Promise<string[
   
   try {
     const prompt = `
-      Generate 10 SEO-optimized keyword suggestions for the topic: "${topic}".
+      Generate ${count} SEO-optimized keyword suggestions for the topic: "${topic}".
       
       Include:
       - Primary keywords
@@ -165,7 +189,7 @@ export const generateKeywordSuggestions = async (topic: string): Promise<string[
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo", // Using 3.5 for cost savings on simpler tasks
+        model: "gpt-3.5-turbo",
         messages: [
           {
             role: "system",
@@ -203,8 +227,12 @@ export const generateKeywordSuggestions = async (topic: string): Promise<string[
   }
 };
 
-// Generate content outline
-export const generateContentOutline = async (title: string, keywords: string[]): Promise<string> => {
+// Generate titles based on topic and keywords
+export const generateTitlesAI = async (
+  topic: string, 
+  keywords: string[], 
+  count: number = 5
+): Promise<string[]> => {
   const apiKey = getOpenAIApiKey();
   
   if (!apiKey) {
@@ -213,67 +241,7 @@ export const generateContentOutline = async (title: string, keywords: string[]):
   
   try {
     const prompt = `
-      Create a detailed outline for an SEO article titled: "${title}"
-      
-      Important keywords to include: ${keywords.join(", ")}
-      
-      The outline should include:
-      - Introduction
-      - 4-6 main sections with subsections
-      - Conclusion
-      
-      Format the outline with proper HTML heading tags (<h2>, <h3>) and use <ul> for bullet points.
-    `;
-    
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo", // Using 3.5 for cost savings on simpler tasks
-        messages: [
-          {
-            role: "system",
-            content: "You are an expert content strategist. Create organized, logical outlines for SEO content."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        temperature: 0.6,
-        max_tokens: 1000
-      })
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`OpenAI API request failed: ${errorData.error?.message || response.statusText}`);
-    }
-    
-    const data = await response.json();
-    const outline = data.choices[0].message.content;
-    
-    return outline;
-  } catch (error) {
-    console.error("Error generating content outline:", error);
-    throw error;
-  }
-};
-
-// Generate title suggestions
-export const generateTitleSuggestions = async (topic: string, keywords: string[]): Promise<string[]> => {
-  const apiKey = getOpenAIApiKey();
-  
-  if (!apiKey) {
-    throw new Error("OpenAI API key is not configured");
-  }
-  
-  try {
-    const prompt = `
-      Generate 5 catchy, SEO-optimized title suggestions for an article about: "${topic}"
+      Generate ${count} catchy, SEO-optimized title suggestions for an article about: "${topic}"
       
       Important keywords to include where appropriate: ${keywords.join(", ")}
       
@@ -293,7 +261,7 @@ export const generateTitleSuggestions = async (topic: string, keywords: string[]
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo", // Using 3.5 for cost savings on simpler tasks
+        model: "gpt-3.5-turbo",
         messages: [
           {
             role: "system",
@@ -331,6 +299,71 @@ export const generateTitleSuggestions = async (topic: string, keywords: string[]
   }
 };
 
+// Generate outline based on title, topic and keywords
+export const generateOutlineAI = async (
+  topic: string,
+  keywords: string[],
+  title: string
+): Promise<string> => {
+  const apiKey = getOpenAIApiKey();
+  
+  if (!apiKey) {
+    throw new Error("OpenAI API key is not configured");
+  }
+  
+  try {
+    const prompt = `
+      Create a detailed outline for an SEO article titled: "${title}"
+      
+      Topic: ${topic}
+      Important keywords to include: ${keywords.join(", ")}
+      
+      The outline should include:
+      - Introduction
+      - 4-6 main sections with subsections
+      - Conclusion
+      
+      Format the outline with proper HTML heading tags (<h2>, <h3>) and use <ul> for bullet points.
+    `;
+    
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert content strategist. Create organized, logical outlines for SEO content."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.6,
+        max_tokens: 1000
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`OpenAI API request failed: ${errorData.error?.message || response.statusText}`);
+    }
+    
+    const data = await response.json();
+    const outline = data.choices[0].message.content;
+    
+    return outline;
+  } catch (error) {
+    console.error("Error generating content outline:", error);
+    throw error;
+  }
+};
+
 // Search for relevant stock photos
 export const searchStockPhotos = async (query: string): Promise<string[]> => {
   // This is a mock function - in a real implementation, you'd call Unsplash, Pexels, etc.
@@ -357,9 +390,10 @@ export default {
   clearOpenAIApiKey,
   isValidOpenAIApiKey,
   testOpenAIApiKey,
+  validateAPIKey,
   generateContentAI,
-  generateKeywordSuggestions,
-  generateContentOutline,
-  generateTitleSuggestions,
+  generateKeywordsAI,
+  generateTitlesAI,
+  generateOutlineAI,
   searchStockPhotos,
 };
