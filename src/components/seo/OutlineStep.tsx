@@ -17,15 +17,13 @@ interface OutlineStepProps {
   onDataChange: (field: string, value: any) => void;
   onNext: () => void;
   onPrev: () => void;
-  generateOutline: (topic: string, keywords: string[], title: string) => Promise<string>;
 }
 
 const OutlineStep: React.FC<OutlineStepProps> = ({ 
   seoData, 
   onDataChange, 
   onNext, 
-  onPrev,
-  generateOutline
+  onPrev 
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
 

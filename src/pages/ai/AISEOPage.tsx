@@ -1,4 +1,3 @@
-
 import React from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import SEOContentGenerator from '@/components/seo/SEOContentGenerator';
@@ -6,7 +5,7 @@ import {
   generateKeywordsAI, 
   generateTitlesAI, 
   generateOutlineAI 
-} from '@/services/ai';
+} from '@/services/ai/contentGenerationAI';
 
 const AISEOPage = () => {
   return (
