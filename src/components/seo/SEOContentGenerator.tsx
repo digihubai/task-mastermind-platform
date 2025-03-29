@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,19 +11,21 @@ import TitleStep from './TitleStep';
 import OutlineStep from './OutlineStep';
 import ImageStep from './ImageStep';
 import ContentGenerationStep from './ContentGenerationStep';
-import AIKeyConfig from './AIKeyConfig';
 import { AlertCircle } from 'lucide-react';
+import { getOpenAIApiKey } from '@/services/ai/contentGenerationAI';
 
 interface SEOContentGeneratorProps {
-  generateKeywords: (topic: string) => Promise<string[]>;
-  generateTitles: (topic: string, keywords: string[]) => Promise<string[]>;
+  generateKeywords: (topic: string, count?: number) => Promise<string[]>;
+  generateTitles: (topic: string, keywords: string[], count?: number) => Promise<string[]>;
   generateOutline: (topic: string, keywords: string[], title: string) => Promise<any>;
+  generateContent: (title: string, outline: string, keywords: string[]) => Promise<string>;
 }
 
 const SEOContentGenerator: React.FC<SEOContentGeneratorProps> = ({
   generateKeywords,
   generateTitles,
-  generateOutline
+  generateOutline,
+  generateContent
 }) => {
   const [activeStep, setActiveStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -43,6 +45,8 @@ const SEOContentGenerator: React.FC<SEOContentGeneratorProps> = ({
     links: [],
     generatedContent: ''
   });
+
+  const hasApiKey = !!getOpenAIApiKey();
 
   const handleDataChange = (field: string, value: any) => {
     setSeoData(prev => ({ ...prev, [field]: value }));
@@ -78,27 +82,55 @@ const SEOContentGenerator: React.FC<SEOContentGeneratorProps> = ({
   };
 
   const handleRegenerateContent = async () => {
+    if (!hasApiKey) {
+      toast.error("API key not configured. Please contact your administrator.");
+      return;
+    }
+    
     setIsGenerating(true);
     setActiveStep(7); // Move to content generation step
     
     try {
-      // In a real implementation, we would regenerate content here
-      // For now, just simulate a delay and set a placeholder
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setSeoData(prev => ({ 
-        ...prev, 
-        generatedContent: `# ${prev.selectedTitle}\n\n${prev.selectedOutline?.sections.map(section => 
-          `## ${section}\n\nGenerated content for ${section}. This is a placeholder for regenerated content.\n\n`
-        ).join('')}`
-      }));
-      toast.success("Content regenerated successfully");
+      if (seoData.selectedOutline) {
+        const outlineSections = seoData.selectedOutline.sections.join("\n");
+        const content = await generateContent(
+          seoData.selectedTitle,
+          outlineSections,
+          seoData.selectedKeywords
+        );
+        
+        setSeoData(prev => ({ ...prev, generatedContent: content }));
+        toast.success("Content generated successfully");
+      }
     } catch (error) {
-      console.error("Error regenerating content:", error);
-      toast.error("Failed to regenerate content");
+      console.error("Error generating content:", error);
+      toast.error("Failed to generate content");
     } finally {
       setIsGenerating(false);
     }
   };
+
+  if (!hasApiKey) {
+    return (
+      <div className="container max-w-5xl mx-auto pb-10">
+        <div className="space-y-8">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight mb-2">AI SEO Content Generator</h1>
+            <p className="text-muted-foreground">
+              Generate SEO-optimized content with AI assistance.
+            </p>
+          </div>
+          
+          <Alert className="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+            <AlertDescription>
+              The AI content generator requires an API key. Please contact your administrator to set up the AI integration in Admin Settings.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container max-w-5xl mx-auto pb-10">
@@ -140,6 +172,7 @@ const SEOContentGenerator: React.FC<SEOContentGeneratorProps> = ({
             onDataChange={handleDataChange}
             onNext={handleNext}
             onPrev={handlePrev}
+            generateTitles={generateTitles}
           />
         )}
         
@@ -183,14 +216,10 @@ const SEOContentGenerator: React.FC<SEOContentGeneratorProps> = ({
           />
         )}
         
-        <Tabs defaultValue="api-settings" className="mt-8">
+        <Tabs defaultValue="history" className="mt-8">
           <TabsList>
-            <TabsTrigger value="api-settings">AI API Settings</TabsTrigger>
             <TabsTrigger value="history">History</TabsTrigger>
           </TabsList>
-          <TabsContent value="api-settings" className="mt-4">
-            <AIKeyConfig />
-          </TabsContent>
           <TabsContent value="history" className="mt-4">
             <Alert>
               <AlertCircle className="h-4 w-4" />
