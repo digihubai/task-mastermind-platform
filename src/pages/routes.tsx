@@ -1,3 +1,4 @@
+
 import React from "react";
 import { RouteObject, Navigate } from "react-router-dom";
 import DashboardPage from "@/pages/DashboardPage";
@@ -17,6 +18,9 @@ import AISEOPage from "@/pages/ai/AISEOPage";
 import PDFInsightPage from "@/pages/ai/PDFInsightPage";
 import AICopywriterPage from "@/pages/ai/AICopywriterPage";
 import ChatbotsPage from "@/pages/ai/ChatbotsPage";
+import NewChatbotPage from "@/pages/ai/NewChatbotPage";
+import ChatbotEditPage from "@/pages/ai/ChatbotEditPage";
+import ChatbotConfigPage from "@/pages/ai/ChatbotConfigPage";
 import authRoutes from "@/routes/authRoutes";
 import mainRoutes from "@/routes/mainRoutes";
 import aiRoutes from "@/routes/aiRoutes";
@@ -124,6 +128,18 @@ const routes: RouteObject[] = [
     path: "/ai/chatbots",
     element: <ChatbotsPage />,
   },
+  {
+    path: "/ai/chatbots/new",
+    element: <NewChatbotPage />,
+  },
+  {
+    path: "/ai/chatbots/edit/:id",
+    element: <ChatbotEditPage />,
+  },
+  {
+    path: "/ai/chatbots/configure/:id",
+    element: <ChatbotConfigPage />,
+  },
   ...mainRoutes,
   ...authRoutes,
   ...aiRoutes,
@@ -131,7 +147,7 @@ const routes: RouteObject[] = [
   ...supportRoutes,
   ...financeRoutes,
   ...crmRoutes,
-  ...automationRoutes, // Include automation routes
+  ...automationRoutes,
   {
     path: "*",
     element: <NotFound />,

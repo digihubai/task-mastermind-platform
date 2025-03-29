@@ -5,10 +5,12 @@ import { ArrowLeft } from "lucide-react";
 
 interface ChatbotEditViewProps {
   handleBackToDashboard: () => void;
+  chatbotId: string;
 }
 
 export const ChatbotEditView: React.FC<ChatbotEditViewProps> = ({
   handleBackToDashboard,
+  chatbotId,
 }) => {
   return (
     <div>
@@ -22,6 +24,7 @@ export const ChatbotEditView: React.FC<ChatbotEditViewProps> = ({
       </Button>
       
       <h1 className="text-2xl font-semibold mb-4">Edit Chatbot</h1>
+      <p>Editing chatbot ID: {chatbotId}</p>
       {/* Edit form would go here */}
     </div>
   );

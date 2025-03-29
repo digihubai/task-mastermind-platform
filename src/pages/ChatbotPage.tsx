@@ -51,15 +51,27 @@ const ChatbotPage = () => {
   ];
 
   const handleChatHistory = () => {
-    toast.info("Viewing chat history");
+    navigate("/support/omnichannel");
+    toast.info("Viewing chat history in omnichannel support");
   };
 
   const handleAddNewChatbot = () => {
+    navigate("/ai/chatbots/new");
     toast.info("Adding new chatbot");
   };
 
   const handleBackToDashboard = () => {
     navigate("/dashboard");
+  };
+
+  const handleEditChatbot = (id: string) => {
+    navigate(`/ai/chatbots/edit/${id}`);
+    toast.info(`Editing chatbot ${id}`);
+  };
+
+  const handleConfigureChatbot = (id: string) => {
+    navigate(`/ai/chatbots/configure/${id}`);
+    toast.info(`Configuring chatbot ${id}`);
   };
 
   return (
@@ -164,12 +176,14 @@ const ChatbotPage = () => {
                   variant="outline" 
                   size="sm" 
                   className="flex-1"
+                  onClick={() => handleEditChatbot(bot.id)}
                 >
                   Edit
                 </Button>
                 <Button 
                   size="sm" 
                   className="flex-1"
+                  onClick={() => handleConfigureChatbot(bot.id)}
                 >
                   Configure
                 </Button>
