@@ -32,12 +32,14 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
     const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
     if (hexRegex.test(hexInputValue)) {
       updateInfo("color", hexInputValue);
+      setColorPickerOpen(false); // Close after saving
       toast.success("Color updated successfully");
     } else if (hexInputValue.match(/^([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)) {
       // If it's missing the # but is otherwise valid
       const colorWithHash = `#${hexInputValue}`;
       updateInfo("color", colorWithHash);
       setHexInputValue(colorWithHash);
+      setColorPickerOpen(false); // Close after saving
       toast.success("Color updated successfully");
     } else {
       toast.error("Invalid color format. Please use a valid hex code.");
@@ -49,11 +51,6 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
     setHexInputValue(color);
     // Apply color directly when picked
     updateInfo("color", color);
-  };
-  
-  // Close the popover
-  const handleCloseColorPicker = () => {
-    setColorPickerOpen(false);
   };
   
   // Define color options
@@ -118,13 +115,6 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
                       className="w-full h-8 rounded"
                       style={{ backgroundColor: hexInputValue }}
                     />
-                    
-                    <Button 
-                      className="w-full" 
-                      onClick={handleCloseColorPicker}
-                    >
-                      Close
-                    </Button>
                   </div>
                 </PopoverContent>
               </Popover>
