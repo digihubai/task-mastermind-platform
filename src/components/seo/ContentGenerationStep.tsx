@@ -45,9 +45,11 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
       ) : seoData.generatedContent ? (
         <div className="space-y-6">
           <div className="border rounded-lg p-6 bg-muted/30">
-            <ReactMarkdown className="prose dark:prose-invert max-w-none">
-              {seoData.generatedContent}
-            </ReactMarkdown>
+            <div className="prose dark:prose-invert max-w-none">
+              <ReactMarkdown>
+                {seoData.generatedContent}
+              </ReactMarkdown>
+            </div>
           </div>
           
           <div className="flex justify-between">
