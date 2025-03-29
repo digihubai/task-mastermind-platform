@@ -1,26 +1,38 @@
-
 import React, { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
-import { generateContentWithImages } from "@/services/seo";
 import { toast } from "sonner";
+import { 
+  generateKeywordsAI, 
+  generateTitlesAI, 
+  generateOutlineAI, 
+  generateContentAI,
+  getOpenAIApiKey
+} from "@/services/ai/contentGenerationAI";
 
-// Import all step components
-import TopicStep from "@/components/seo/TopicStep";
-import SEOKeywordStep from "@/components/seo/SEOKeywordStep";
-import TitleStep from "@/components/seo/TitleStep";
-import SimplifiedOutlineStep from "@/components/seo/SimplifiedOutlineStep";
-import SEOOutlineStep from "@/components/seo/SEOOutlineStep";
-import SEOImageStep from "@/components/seo/SEOImageStep";
-import SEOLinksStep from "@/components/seo/SEOLinksStep";
-import ContentGenerationStep from "@/components/seo/ContentGenerationStep";
-import StepIndicator from "@/components/seo/StepIndicator";
-import SEOSidebar from "@/components/seo/SEOSidebar";
+import { 
+  generateContentWithImages
+} from "@/services/seo";
+
+import { 
+  TopicStep,
+  SEOKeywordStep,
+  TitleStep,
+  SimplifiedOutlineStep,
+  SEOOutlineStep,
+  SEOImageStep,
+  SEOLinksStep,
+  ContentGenerationStep,
+  StepIndicator,
+  SEOSidebar,
+  AIKeyConfig
+} from "@/components/seo";
 
 const AISEOPage = () => {
   const [activeStep, setActiveStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
-  
+  const [hasValidApiKey, setHasValidApiKey] = useState(!!getOpenAIApiKey());
+
   const [seoData, setSeoData] = useState({
     topic: "",
     keywordCount: 10,
@@ -52,65 +64,61 @@ const AISEOPage = () => {
       [field]: value
     }));
   };
-  
+
   const handleNext = () => {
     window.scrollTo(0, 0);
     const nextStep = activeStep + 1;
     setActiveStep(nextStep);
     
-    // Auto-generate content when moving from Links step (6) to Content step (7)
     if (nextStep === 7 && !seoData.generatedContent) {
       handleGenerateContent();
     }
   };
-  
+
   const handlePrev = () => {
     window.scrollTo(0, 0);
     setActiveStep(prev => prev - 1);
   };
 
   const handleGenerateContent = async () => {
-    // Debug the input data
+    if (!hasValidApiKey) {
+      toast.error("Please set your OpenAI API key in the settings first");
+      return;
+    }
+
     console.log("Generating content with:", {
       title: seoData.selectedTitle,
       outline: seoData.selectedOutline || seoData.outline,
       keywords: seoData.selectedKeywords,
       images: seoData.selectedImages?.length
     });
-    
-    // Validate required inputs
+
     if (!seoData.selectedTitle) {
       toast.error("Please select a title first");
       return;
     }
-    
-    // Check both selectedOutline and outline for backwards compatibility
+
     const outlineContent = seoData.selectedOutline || seoData.outline;
     if (!outlineContent) {
       toast.error("Please select an outline first");
       return;
     }
-    
+
     if (!Array.isArray(seoData.selectedKeywords) || seoData.selectedKeywords.length === 0) {
       toast.error("Please select at least one keyword");
       return;
     }
-    
+
     setIsGenerating(true);
     toast.info("Generating comprehensive SEO content...");
-    
+
     try {
-      // Generate content with integrated images and links
-      const generatedContent = await generateContentWithImages(
-        seoData.topic,
-        seoData.selectedKeywords,
+      const generatedContent = await generateContentAI(
         seoData.selectedTitle,
         outlineContent,
-        seoData.selectedImages || [],
-        seoData.internalLinks || [],
-        seoData.externalLinks || []
+        seoData.selectedKeywords
       );
-      
+
       console.log("Content successfully generated:", generatedContent?.substring(0, 100) + "...");
       
       handleDataChange("generatedContent", generatedContent);
@@ -122,8 +130,7 @@ const AISEOPage = () => {
       setIsGenerating(false);
     }
   };
-  
-  // Auto-generate content when navigating directly to the content step
+
   useEffect(() => {
     if (activeStep === 7 && 
         !seoData.generatedContent && 
@@ -135,25 +142,82 @@ const AISEOPage = () => {
       handleGenerateContent();
     }
   }, [activeStep, seoData, isGenerating]);
-  
-  // Auto-generate content when moving from Links (step 6) to Content (step 7)
-  useEffect(() => {
-    if (activeStep === 6) {
-      console.log("Preparing for auto-generation when moving to step 7");
+
+  const handleGenerateKeywords = async () => {
+    if (!hasValidApiKey || !seoData.topic) return;
+    
+    try {
+      const keywords = await generateKeywordsAI(seoData.topic, seoData.keywordCount);
+      handleDataChange("keywords", keywords);
+    } catch (error) {
+      console.error("Error generating keywords:", error);
     }
-  }, [activeStep]);
-  
+  };
+
+  const handleGenerateTitles = async () => {
+    if (!hasValidApiKey || seoData.selectedKeywords.length === 0) return;
+    
+    try {
+      const titles = await generateTitlesAI(
+        seoData.topic, 
+        seoData.selectedKeywords, 
+        seoData.numberOfTitles
+      );
+      handleDataChange("titles", titles);
+    } catch (error) {
+      console.error("Error generating titles:", error);
+    }
+  };
+
+  const handleGenerateOutline = async () => {
+    if (!hasValidApiKey || !seoData.selectedTitle) return;
+    
+    try {
+      const outline = await generateOutlineAI(
+        seoData.topic,
+        seoData.selectedKeywords,
+        seoData.selectedTitle
+      );
+      handleDataChange("outline", outline);
+    } catch (error) {
+      console.error("Error generating outline:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (seoData.topic && hasValidApiKey && seoData.keywords.length === 0) {
+      handleGenerateKeywords();
+    }
+  }, [seoData.topic, hasValidApiKey]);
+
+  useEffect(() => {
+    if (seoData.selectedKeywords.length > 0 && hasValidApiKey && seoData.titles.length === 0) {
+      handleGenerateTitles();
+    }
+  }, [seoData.selectedKeywords, hasValidApiKey]);
+
+  useEffect(() => {
+    if (seoData.selectedTitle && hasValidApiKey && !seoData.outline) {
+      handleGenerateOutline();
+    }
+  }, [seoData.selectedTitle, hasValidApiKey]);
+
   const renderStep = () => {
     switch (activeStep) {
       case 1:
         return (
-          <TopicStep 
-            topic={seoData.topic} 
-            onTopicChange={(value: string) => handleDataChange("topic", value)} 
-            onNext={handleNext}
-            advancedSettings={seoData.advancedSettings}
-            onAdvancedSettingsChange={(settings) => handleDataChange("advancedSettings", settings)}
-          />
+          <>
+            {!hasValidApiKey && (
+              <AIKeyConfig onValidKeySet={() => setHasValidApiKey(true)} />
+            )}
+            <TopicStep 
+              topic={seoData.topic} 
+              onTopicChange={(value: string) => handleDataChange("topic", value)} 
+              onNext={handleNext}
+              advancedSettings={seoData.advancedSettings}
+              onAdvancedSettingsChange={(settings) => handleDataChange("advancedSettings", settings)}
+            />
+          </>
         );
       case 2:
         return (
@@ -223,7 +287,7 @@ const AISEOPage = () => {
     if (!seoData.selectedImages || seoData.selectedImages.length === 0) return 5;
     return 7; // Allow proceeding to content generation even without links
   };
-  
+
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -248,8 +312,9 @@ const AISEOPage = () => {
               <Button 
                 className="w-full"
                 onClick={handleGenerateContent}
+                disabled={!hasValidApiKey}
               >
-                Generate SEO Content
+                {hasValidApiKey ? "Generate SEO Content" : "Set API Key to Generate Content"}
               </Button>
             )}
           </div>

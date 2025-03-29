@@ -1,15 +1,9 @@
 
-import React, { useState, useEffect } from "react";
+import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Globe, AlertCircle } from "lucide-react";
-import ContentActionButtons from "./ContentActionButtons";
-import ContentDisplay from "./ContentDisplay";
-import AddLinksDialog from "./AddLinksDialog";
-import PublishToCMSDialog from "./PublishToCMSDialog";
-import { useContentGeneration } from "@/hooks/useContentGeneration";
-import { validateImageURLs } from "@/services/seo/imageService";
-import { toast } from "sonner";
+import { ArrowLeft, RefreshCw } from "lucide-react";
+import ContentEditor from '@/components/ContentEditor';
 
 interface ContentGenerationStepProps {
   seoData: any;
@@ -26,136 +20,49 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
   onPrev,
   onRegenerateContent
 }) => {
-  const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
-  const [contentError, setContentError] = useState<string | null>(null);
-  
-  useEffect(() => {
-    // Debug logging to identify issues
-    console.log("ContentGenerationStep rendered with data:", {
-      content: seoData.generatedContent ? `${seoData.generatedContent.slice(0, 50)}...` : null,
-      title: seoData.selectedTitle,
-      outline: seoData.selectedOutline ? `${seoData.selectedOutline.slice(0, 50)}...` : null,
-      keywords: seoData.selectedKeywords,
-      images: seoData.selectedImages?.length || 0
-    });
-    
-    // Validate images to ensure they're accessible
-    if (seoData.selectedImages && seoData.selectedImages.length > 0) {
-      const validatedImages = validateImageURLs(seoData.selectedImages);
-      if (validatedImages.length !== seoData.selectedImages.length) {
-        onDataChange("selectedImages", validatedImages);
-      }
-    }
-    
-    // Automatically trigger content generation if we have required data but no content
-    if (!seoData.generatedContent && 
-        seoData.selectedTitle && 
-        (seoData.selectedOutline || seoData.outline) && 
-        seoData.selectedKeywords?.length > 0 &&
-        !isGenerating) {
-      console.log("Auto-triggering content generation");
-      onRegenerateContent();
-    }
-    
-    // Check if content has repetitive placeholders
-    if (seoData.generatedContent && 
-        seoData.generatedContent.includes("This section explores key aspects of") && 
-        seoData.generatedContent.match(/This section explores key aspects of/g)?.length > 2) {
-      setContentError("We detected repetitive content in the generated text. Please regenerate for better quality.");
-    } else {
-      setContentError(null);
-    }
-  }, [seoData, isGenerating, onRegenerateContent, onDataChange]);
-  
-  const handleContentChange = (newContent: string) => {
-    onDataChange("generatedContent", newContent);
-  };
-  
-  const {
-    linkType,
-    setLinkType,
-    showLinkDialog,
-    setShowLinkDialog,
-    externalLinks,
-    internalLinks,
-    isLoadingLinks,
-    handleCopyToClipboard,
-    handleOpenLinkDialog,
-    handleAddLinks,
-    handleFixFormatting
-  } = useContentGeneration({
-    seoData,
-    onDataChange
-  });
-  
   return (
     <div className="space-y-6">
       <Card className="p-6 border border-border/40">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Generated SEO Content</h2>
-          
-          <ContentActionButtons 
-            isGenerating={isGenerating}
-            content={seoData.generatedContent}
-            onCopy={handleCopyToClipboard}
-            onAddLinks={handleOpenLinkDialog}
-            onRegenerateContent={onRegenerateContent}
-            onFixFormatting={handleFixFormatting}
-          />
+          <h2 className="text-xl font-semibold">Generated Content</h2>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={onRegenerateContent}
+            disabled={isGenerating}
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Regenerate
+          </Button>
         </div>
         
-        {contentError && (
-          <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-md p-3 mb-4 flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-amber-500" />
-            <p className="text-sm">{contentError}</p>
+        {isGenerating ? (
+          <div className="flex flex-col items-center justify-center py-12 space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            <p className="text-center text-lg font-medium">Generating SEO-optimized content...</p>
+            <p className="text-center text-muted-foreground text-sm">
+              This may take a minute or two. We're crafting high-quality content based on your inputs.
+            </p>
+          </div>
+        ) : seoData.generatedContent ? (
+          <ContentEditor
+            initialContent={seoData.generatedContent}
+            onContentChange={(content) => onDataChange("generatedContent", content)}
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 space-y-4">
+            <p className="text-center text-lg font-medium">Content hasn't been generated yet</p>
+            <Button onClick={onRegenerateContent}>Generate Content Now</Button>
           </div>
         )}
-        
-        <ContentDisplay 
-          isGenerating={isGenerating}
-          content={seoData.generatedContent}
-          onRegenerateContent={onRegenerateContent}
-          onContentChange={handleContentChange}
-        />
       </Card>
       
       <div className="flex justify-between">
-        <Button variant="outline" onClick={onPrev} className="gap-1">
-          <ChevronLeft size={16} />
-          Back to Links
+        <Button variant="outline" onClick={onPrev}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Previous Step
         </Button>
-        
-        {seoData.generatedContent && (
-          <Button onClick={() => setIsPublishDialogOpen(true)} disabled={isGenerating} className="gap-2">
-            <Globe size={16} />
-            Publish to CMS
-          </Button>
-        )}
       </div>
-      
-      {isPublishDialogOpen && (
-        <PublishToCMSDialog 
-          isOpen={isPublishDialogOpen} 
-          onClose={() => setIsPublishDialogOpen(false)}
-          seoContent={{
-            title: seoData.selectedTitle,
-            content: seoData.generatedContent,
-            keywords: seoData.selectedKeywords,
-            images: seoData.selectedImages
-          }}
-        />
-      )}
-      
-      <AddLinksDialog 
-        isOpen={showLinkDialog}
-        onClose={() => setShowLinkDialog(false)}
-        linkType={linkType}
-        setLinkType={setLinkType}
-        internalLinks={internalLinks}
-        externalLinks={externalLinks}
-        isLoadingLinks={isLoadingLinks}
-        onAddLinks={handleAddLinks}
-      />
     </div>
   );
 };
