@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Smartphone, MessageCircle, ArrowRight, Copy, Check, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -9,10 +9,15 @@ export const EmbedStep: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
+  const [width, setWidth] = useState(420);
+  const [height, setHeight] = useState(745);
+  
+  const getEmbedCode = () => {
+    return `<script defer src="https://digihub.ai/vendor/chatbot/js/external-chatbot.js" data-chatbot-uuid="89aa4a9c-1119-4eef-b0d0-52ff31a4c222" data-iframe-width="${width}" data-iframe-height="${height}" data-language="en" ></script>`;
+  };
   
   const copyCode = () => {
-    const code = `<script defer src="https://digihub.ai/vendor/chatbot/js/external-chatbot.js" data-chatbot-uuid="89aa4a9c-1119-4eef-b0d0-52ff31a4c222" data-iframe-width="420" data-iframe-height="745" data-language="en" ></script>`;
-    navigator.clipboard.writeText(code);
+    navigator.clipboard.writeText(getEmbedCode());
     setCopied(true);
     toast({
       title: "Code copied!",
@@ -31,6 +36,14 @@ export const EmbedStep: React.FC = () => {
     });
   };
   
+  const handleWidthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWidth(parseInt(e.target.value));
+  };
+  
+  const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setHeight(parseInt(e.target.value));
+  };
+  
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Test and Embed</h2>
@@ -43,7 +56,7 @@ export const EmbedStep: React.FC = () => {
           <h3 className="font-medium text-lg mb-3">Website Embed</h3>
           <p className="text-sm text-muted-foreground mb-3">Add this code to your website</p>
           <div className="bg-muted p-4 rounded-md text-sm font-mono overflow-x-auto relative">
-            &lt;script defer src="https://digihub.ai/vendor/chatbot/js/external-chatbot.js" data-chatbot-uuid="89aa4a9c-1119-4eef-b0d0-52ff31a4c222" data-iframe-width="420" data-iframe-height="745" data-language="en" &gt;&lt;/script&gt;
+            {getEmbedCode()}
           </div>
           <Button 
             variant="outline" 
@@ -73,10 +86,11 @@ export const EmbedStep: React.FC = () => {
               min="300"
               max="600"
               step="10"
-              defaultValue="420"
+              value={width}
+              onChange={handleWidthChange}
               className="w-full"
             />
-            <span className="font-mono text-sm">420px</span>
+            <span className="font-mono text-sm">{width}px</span>
           </div>
         </div>
         
@@ -88,10 +102,11 @@ export const EmbedStep: React.FC = () => {
               min="400"
               max="900"
               step="10"
-              defaultValue="745"
+              value={height}
+              onChange={handleHeightChange}
               className="w-full"
             />
-            <span className="font-mono text-sm">745px</span>
+            <span className="font-mono text-sm">{height}px</span>
           </div>
         </div>
         

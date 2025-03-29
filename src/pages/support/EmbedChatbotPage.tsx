@@ -163,28 +163,32 @@ const EmbedChatbotPage = () => {
                 <div>
                   <Label htmlFor="width">Width</Label>
                   <div className="flex items-center gap-2">
-                    <Input 
-                      id="width" 
-                      type="number" 
-                      value={chatConfig.iframeWidth} 
-                      onChange={handleWidthChange}
+                    <input
+                      type="range"
+                      min="300"
+                      max="600"
+                      step="10"
+                      value={chatConfig.iframeWidth}
+                      onChange={(e) => setChatConfig({...chatConfig, iframeWidth: parseInt(e.target.value)})}
                       className="w-full"
                     />
-                    <span className="text-sm text-muted-foreground">px</span>
+                    <span className="font-mono text-sm">{chatConfig.iframeWidth}px</span>
                   </div>
                 </div>
 
                 <div>
                   <Label htmlFor="height">Height</Label>
                   <div className="flex items-center gap-2">
-                    <Input 
-                      id="height" 
-                      type="number" 
-                      value={chatConfig.iframeHeight} 
-                      onChange={handleHeightChange}
+                    <input
+                      type="range"
+                      min="400"
+                      max="900"
+                      step="10"
+                      value={chatConfig.iframeHeight}
+                      onChange={(e) => setChatConfig({...chatConfig, iframeHeight: parseInt(e.target.value)})}
                       className="w-full"
                     />
-                    <span className="text-sm text-muted-foreground">px</span>
+                    <span className="font-mono text-sm">{chatConfig.iframeHeight}px</span>
                   </div>
                 </div>
               </CardContent>

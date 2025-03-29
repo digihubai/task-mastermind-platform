@@ -47,7 +47,6 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
   // Handle direct color picker changes
   const handleColorChange = (color: string) => {
     setHexInputValue(color);
-    updateInfo("color", color);
   };
   
   // Close the popover and apply the color when done
@@ -55,6 +54,7 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
     setColorPickerOpen(false);
     // Apply the current color value when closing
     updateInfo("color", hexInputValue);
+    toast.success("Color updated successfully");
   };
   
   // Define color options
@@ -66,6 +66,8 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
     { value: "#2196F3", label: "Blue" },
     { value: "custom", label: "Custom" },
   ];
+
+  const isSelectedColorInPresets = colorOptions.some(color => color.value === selectedColor && color.value !== "custom");
 
   return (
     <div>
@@ -84,15 +86,11 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
                     className="w-10 h-10 rounded-full cursor-pointer border border-muted flex items-center justify-center"
                     style={{ background: "conic-gradient(red, yellow, lime, aqua, blue, magenta, red)" }}
                   >
-                    {selectedColor !== colorOptions[0].value &&
-                     selectedColor !== colorOptions[1].value &&
-                     selectedColor !== colorOptions[2].value &&
-                     selectedColor !== colorOptions[3].value &&
-                     selectedColor !== colorOptions[4].value && (
+                    {!isSelectedColorInPresets && (
                       <div className="absolute -top-1 -right-1 bg-primary text-white rounded-full w-4 h-4 flex items-center justify-center">
                         <Check size={12} />
                       </div>
-                     )}
+                    )}
                   </div>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-3">
@@ -150,6 +148,16 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
           </div>
         ))}
       </div>
+      
+      {!isSelectedColorInPresets && (
+        <div className="mt-4 flex items-center gap-2">
+          <div 
+            className="w-6 h-6 rounded-full border border-muted"
+            style={{ backgroundColor: selectedColor }}
+          ></div>
+          <span className="text-sm font-mono">{selectedColor}</span>
+        </div>
+      )}
     </div>
   );
 };
