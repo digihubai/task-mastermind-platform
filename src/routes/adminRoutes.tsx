@@ -2,9 +2,12 @@
 import React from "react";
 import { RouteObject } from "react-router-dom";
 import Dashboard from "@/pages/admin/Dashboard";
+import UserManagement from "@/pages/admin/UserManagement";
+import Settings from "@/pages/admin/Settings";
+import AdminAISettings from "@/pages/admin/AdminAISettings";
+import SiteHealth from "@/pages/admin/SiteHealth";
 import Marketplace from "@/pages/admin/Marketplace";
 import Themes from "@/pages/admin/Themes";
-import UserManagement from "@/pages/admin/UserManagement";
 import Announcements from "@/pages/admin/Announcements";
 import GoogleAdsense from "@/pages/admin/GoogleAdsense";
 import SupportRequests from "@/pages/admin/SupportRequests";
@@ -18,15 +21,13 @@ import Affiliates from "@/pages/admin/Affiliates";
 import Coupons from "@/pages/admin/Coupons";
 import EmailTemplates from "@/pages/admin/EmailTemplates";
 import APIIntegration from "@/pages/admin/APIIntegration";
-import Settings from "@/pages/admin/Settings";
-import SiteHealth from "@/pages/admin/SiteHealth";
-import AdminAISettings from "@/pages/admin/AdminAISettings";
 import Credits from "@/pages/admin/Credits";
 import Maintenance from "@/pages/admin/settings/Maintenance";
 import AIModels from "@/pages/admin/settings/AIModels";
 import CheckoutRegistration from "@/pages/admin/settings/CheckoutRegistration";
 import ThumbnailSystem from "@/pages/admin/settings/ThumbnailSystem";
 import PrivacyPolicy from "@/pages/admin/settings/PrivacyPolicy";
+import AdminSettingsPage from "@/pages/admin/AdminSettingsPage";
 
 const adminRoutes: RouteObject[] = [
   {
@@ -133,6 +134,10 @@ const adminRoutes: RouteObject[] = [
     path: "/admin/credits",
     element: <Credits />,
   },
+  {
+    path: "/admin/settings-page",
+    element: <AdminSettingsPage />,
+  }
 ];
 
 export default adminRoutes;

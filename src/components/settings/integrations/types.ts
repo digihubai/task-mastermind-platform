@@ -1,4 +1,3 @@
-
 export interface ApiIntegration {
   id: string;
   name: string;
@@ -26,4 +25,7 @@ export interface IntegrationProps {
   onIntegrationToggle?: (id: string, category: ApiIntegration['category']) => void;
   onApiKeyUpdate?: (id: string, value: string) => void;
   onConnect?: (id: string) => void;
+  onConfigured?: () => void;
+  onDeleted?: () => void;
+  isAdmin?: boolean;
 }

@@ -26,14 +26,15 @@ import {
   Sparkles, 
   Coins,
   ArrowLeft,
-  ChevronRight
+  ChevronRight,
+  ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import useRoleBasedSettings from "@/hooks/use-role-based-settings";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -45,12 +46,19 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description 
   const { userRole } = useRoleBasedSettings();
   const location = useLocation();
   const navigate = useNavigate();
-  const [openSettings, setOpenSettings] = useState(location.pathname.includes("/admin/settings"));
+  const [openSettings, setOpenSettings] = useState(false);
 
   // Only super_admin and admin can access admin pages
   const isAuthorized = userRole === "super_admin" || userRole === "admin";
 
-  React.useEffect(() => {
+  // Check if current path is under settings
+  useEffect(() => {
+    if (location.pathname.includes("/admin/settings")) {
+      setOpenSettings(true);
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
     if (!isAuthorized) {
       toast.error("You don't have permission to access admin pages");
       navigate("/dashboard");
@@ -128,6 +136,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description 
                 <Collapsible 
                   open={openSettings} 
                   onOpenChange={setOpenSettings}
+                  className="w-full"
                 >
                   <CollapsibleTrigger asChild>
                     <div
@@ -142,13 +151,11 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description 
                         <Settings size={18} />
                         <span>Settings</span>
                       </div>
-                      <ChevronRight 
-                        size={16} 
-                        className={cn(
-                          "transition-transform",
-                          openSettings && "transform rotate-90"
-                        )}
-                      />
+                      {openSettings ? (
+                        <ChevronDown size={16} className="transition-transform" />
+                      ) : (
+                        <ChevronRight size={16} className="transition-transform" />
+                      )}
                     </div>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
@@ -158,7 +165,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, description 
                           key={subItem.path}
                           to={subItem.path}
                           className={cn(
-                            "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
+                            "flex items-center rounded-md px-3 py-1.5 text-sm transition-colors",
                             location.pathname === subItem.path
                               ? "bg-primary text-primary-foreground"
                               : "hover:bg-accent text-muted-foreground"
