@@ -11,6 +11,7 @@ import {
   UserCog,
   Bot,
   PlugZap,
+  Sparkles,
 } from "lucide-react";
 import { SidebarItemType } from "@/types/sidebar";
 
@@ -25,7 +26,7 @@ export const settingsItems = [
   { name: "Security", path: "/settings/security", icon: <Lock size={20} /> },
   { name: "Appearance", path: "/settings/appearance", icon: <Palette size={20} /> },
   { name: "API Settings", path: "/settings/api", icon: <Bot size={20} /> },
-  { name: "AI Configuration", path: "/settings/ai-configuration", icon: <Bot size={20} /> },
+  { name: "AI Configuration", path: "/settings/ai-configuration", icon: <Sparkles size={20} /> },
 ];
 
 // Settings section for sidebar
@@ -85,7 +86,7 @@ export const settingsSection = {
         {
           title: "AI Configuration",
           href: "/settings/ai-configuration",
-          icon: <Bot size={18} />,
+          icon: <Sparkles size={18} className="text-purple-500" />,
         },
       ],
     },

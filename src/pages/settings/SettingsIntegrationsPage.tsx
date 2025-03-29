@@ -23,11 +23,14 @@ import CMSIntegrations from "@/components/settings/integrations/CMSIntegrations"
 import SEOAnalyticsIntegrations from "@/components/settings/integrations/SEOAnalyticsIntegrations";
 import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
+import useRoleBasedSettings from "@/hooks/use-role-based-settings";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const SettingsIntegrationsPage = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<string>("cms");
   const [activePlatform, setActivePlatform] = useState<string | null>(null);
+  const { userRole } = useRoleBasedSettings();
   
   // Set active tab based on location state
   useEffect(() => {
@@ -60,6 +63,8 @@ const SettingsIntegrationsPage = () => {
     }
   };
 
+  const isSuperAdmin = userRole === 'super_admin';
+
   return (
     <AppLayout>
       <div className="space-y-6 pb-8">
@@ -68,6 +73,15 @@ const SettingsIntegrationsPage = () => {
           <p className="text-muted-foreground mt-1">
             Connect your DigiHub platform with external services and tools
           </p>
+          {isSuperAdmin && (
+            <Alert className="mt-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+              <Bot className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <AlertTitle className="text-blue-800 dark:text-blue-300">Super Admin Access</AlertTitle>
+              <AlertDescription className="text-blue-800 dark:text-blue-300">
+                You have access to all advanced integration settings as a super admin. Configure organizational AI keys in <a href="/settings/ai-configuration" className="underline font-medium">AI Configuration</a>.
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -76,6 +90,7 @@ const SettingsIntegrationsPage = () => {
             <TabsTrigger value="seo-analytics">SEO Analytics</TabsTrigger>
             <TabsTrigger value="messaging">Communication</TabsTrigger>
             <TabsTrigger value="api">API Connections</TabsTrigger>
+            {isSuperAdmin && <TabsTrigger value="admin">Admin Controls</TabsTrigger>}
           </TabsList>
           
           <TabsContent value="cms" className="space-y-4">
@@ -96,6 +111,41 @@ const SettingsIntegrationsPage = () => {
           <TabsContent value="api" className="space-y-4">
             <ApiKeysIntegrations />
           </TabsContent>
+          
+          {isSuperAdmin && (
+            <TabsContent value="admin" className="space-y-4">
+              <Card className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Super Admin Integration Controls</h2>
+                <p className="mb-4 text-muted-foreground">Configure system-wide integration settings and API keys</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card className="p-4 border border-border/40 hover:bg-accent/50 transition-colors cursor-pointer" onClick={() => window.location.href = "/settings/ai-configuration"}>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 p-2 rounded-full">
+                        <Bot className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium">AI Configuration</h3>
+                        <p className="text-sm text-muted-foreground mt-1">Configure OpenAI API keys and AI models</p>
+                      </div>
+                    </div>
+                  </Card>
+                  
+                  <Card className="p-4 border border-border/40 hover:bg-accent/50 transition-colors cursor-pointer" onClick={() => window.location.href = "/settings/seo-image-integrations"}>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 p-2 rounded-full">
+                        <Image className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium">Image & SEO Services</h3>
+                        <p className="text-sm text-muted-foreground mt-1">Configure image generation and SEO services</p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </Card>
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </AppLayout>

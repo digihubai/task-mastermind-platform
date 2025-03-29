@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, RefreshCw, Maximize2, Copy, Download, Save, AlertCircle } from "lucide-react";
@@ -29,6 +29,15 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
   const [isFullscreenEdit, setIsFullscreenEdit] = useState(false);
   const { userRole, hasAccess } = useRoleBasedSettings();
   const hasApiKey = !!getOpenAIApiKey();
+  
+  // Auto-generate content when component mounts if we have API key
+  // and we don't already have content
+  useEffect(() => {
+    if (hasApiKey && !seoData.generatedContent && !isGenerating) {
+      console.log("Auto-triggering content generation");
+      onRegenerateContent();
+    }
+  }, []);
 
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(seoData.generatedContent || "");
@@ -46,6 +55,11 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast.success("Content downloaded as HTML");
+  };
+
+  const handleSaveContent = () => {
+    toast.success("Content saved successfully");
+    // In a real app, this would save the content to a database
   };
 
   return (
@@ -88,6 +102,7 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
               size="sm"
               onClick={handleCopyToClipboard}
               title="Copy to Clipboard"
+              disabled={!seoData.generatedContent}
             >
               <Copy className="h-4 w-4" />
             </Button>
@@ -96,6 +111,7 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
               size="sm"
               onClick={handleDownload}
               title="Download as HTML"
+              disabled={!seoData.generatedContent}
             >
               <Download className="h-4 w-4" />
             </Button>
@@ -106,7 +122,7 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
               disabled={isGenerating || !hasApiKey}
               title="Regenerate Content"
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className={`h-4 w-4 ${isGenerating ? "animate-spin" : ""}`} />
             </Button>
           </div>
         </div>
@@ -139,7 +155,11 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
           <ArrowLeft className="mr-2 h-4 w-4" />
           Previous Step
         </Button>
-        <Button variant="default" onClick={() => toast.success("Content saved successfully")}>
+        <Button 
+          variant="default" 
+          onClick={handleSaveContent}
+          disabled={!seoData.generatedContent}
+        >
           <Save className="mr-2 h-4 w-4" />
           Save Content
         </Button>
