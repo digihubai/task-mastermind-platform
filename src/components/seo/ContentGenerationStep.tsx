@@ -51,7 +51,7 @@ const ContentGenerationStep: React.FC<ContentGenerationStepProps> = ({
   return (
     <div className="space-y-6">
       {!hasApiKey && (
-        <Alert variant="warning" className="mb-4">
+        <Alert variant="destructive" className="mb-4">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>API Key Required</AlertTitle>
           <AlertDescription>

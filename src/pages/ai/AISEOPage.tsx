@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -80,7 +81,8 @@ const AISEOPage = () => {
     const nextStep = activeStep + 1;
     setActiveStep(nextStep);
     
-    if (nextStep === 7 && !seoData.generatedContent) {
+    // Auto-generate content when reaching the content generation step
+    if (nextStep === 7 && !seoData.generatedContent && !isGenerating && hasValidApiKey) {
       handleGenerateContent();
     }
   };

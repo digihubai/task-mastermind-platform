@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ChevronLeft, ChevronRight, Image, RefreshCw, SkipForward, Search, Loader, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { searchStockPhotos } from "@/services/seo/imageService";
 
 interface SEOImageStepProps {
   seoData: any;
@@ -33,14 +34,14 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
     }
   }, [seoData.selectedKeywords, seoData.topic, searchQuery]);
 
-  // Generate images automatically if we have a topic and selected keywords
+  // Generate images automatically when component mounts
   useEffect(() => {
-    if (seoData.topic && seoData.selectedKeywords?.length > 0 && !generatedImages.length) {
+    if ((seoData.topic || searchQuery) && !generatedImages.length) {
       handleGenerateImages();
     }
   }, []);
 
-  const handleGenerateImages = () => {
+  const handleGenerateImages = async () => {
     setIsGenerating(true);
     
     // Use topic and keywords to create a relevant prompt
@@ -53,45 +54,31 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
       }
     }
     
-    // Add a timestamp to force a new image each time
-    const timestamp = Date.now();
-    
-    // Simulate API call to generate or search for images
-    setTimeout(() => {
-      let images = [];
+    try {
+      // Use the searchStockPhotos service to get images
+      const count = seoData.imageCount || 4;
+      const source = imageSource === "ai" ? "unsplash" : "pexels"; // This is a mock distinction for now
       
-      if (imageSource === "ai") {
-        // AI-generated images with forced cache-busting
-        images = [
-          `https://source.unsplash.com/random/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp}`,
-          `https://source.unsplash.com/random/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp+1}`,
-          `https://source.unsplash.com/random/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp+2}`,
-          `https://source.unsplash.com/random/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp+3}`,
-        ];
-      } else {
-        // Stock photo API with forced cache-busting
-        images = [
-          `https://source.unsplash.com/featured/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp}`,
-          `https://source.unsplash.com/featured/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp+1}`,
-          `https://source.unsplash.com/featured/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp+2}`,
-          `https://source.unsplash.com/featured/800x600?${prompt.replace(/\s+/g, '+')}&t=${timestamp+3}`,
-        ];
-      }
-      
+      const images = await searchStockPhotos(prompt, source, count);
       setGeneratedImages(images);
+      
       if (images.length > 0) {
         setSelectedImage(images[0]);
         onDataChange("featuredImage", images[0]);
         onDataChange("selectedImages", [images[0]]);
       }
-      setIsGenerating(false);
       
       const sourceType = imageSource === "ai" ? "AI" : "stock";
       toast.success(`Generated ${sourceType} images based on your content`);
-    }, 1500);
+    } catch (error) {
+      console.error("Error generating images:", error);
+      toast.error("Failed to generate images. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
   
-  const handleSearchImages = () => {
+  const handleSearchImages = async () => {
     if (!searchQuery.trim()) {
       toast.error("Please enter a search term");
       return;
@@ -99,17 +86,9 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
     
     setIsSearching(true);
     
-    // Add a timestamp to force a new image each time
-    const timestamp = Date.now();
-    
-    // In production, this would call an actual stock photo API
-    setTimeout(() => {
-      const images = [
-        `https://source.unsplash.com/random/800x600?${searchQuery.replace(/\s+/g, '+')}&t=${timestamp}`,
-        `https://source.unsplash.com/random/800x600?${searchQuery.replace(/\s+/g, '+')}&t=${timestamp+1}`,
-        `https://source.unsplash.com/random/800x600?${searchQuery.replace(/\s+/g, '+')}&t=${timestamp+2}`,
-        `https://source.unsplash.com/random/800x600?${searchQuery.replace(/\s+/g, '+')}&t=${timestamp+3}`,
-      ];
+    try {
+      const count = seoData.imageCount || 4;
+      const images = await searchStockPhotos(searchQuery, "unsplash", count);
       
       setGeneratedImages(images);
       if (images.length > 0) {
@@ -118,9 +97,13 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
         onDataChange("selectedImages", [images[0]]);
       }
       
-      setIsSearching(false);
       toast.success(`Found ${images.length} images for "${searchQuery}"`);
-    }, 1500);
+    } catch (error) {
+      console.error("Error searching images:", error);
+      toast.error("Failed to search for images. Please try again.");
+    } finally {
+      setIsSearching(false);
+    }
   };
   
   const handleSelectImage = (image: string) => {
@@ -139,6 +122,12 @@ const SEOImageStep: React.FC<SEOImageStepProps> = ({ seoData, onDataChange, onNe
   };
   
   const handleSkipStep = () => {
+    // Set default images if none are selected
+    if (!seoData.selectedImages || seoData.selectedImages.length === 0) {
+      const defaultImage = `https://source.unsplash.com/random/800x600?${seoData.topic.replace(/\s+/g, '+')}&sig=${Date.now()}`;
+      onDataChange("selectedImages", [defaultImage]);
+      onDataChange("featuredImage", defaultImage);
+    }
     onNext();
   };
 
