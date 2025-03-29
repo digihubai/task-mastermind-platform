@@ -6,7 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { AlertCircle, Check } from "lucide-react";
-import { setOpenAIApiKey, getOpenAIApiKey } from '@/services/ai/contentGenerationAI';
+import { 
+  setOpenAIApiKey, 
+  getOpenAIApiKey, 
+  validateAPIKey 
+} from '@/services/ai';
 
 interface AIKeyConfigProps {
   onValidKeySet?: () => void;
@@ -35,15 +39,16 @@ const AIKeyConfig: React.FC<AIKeyConfigProps> = ({ onValidKeySet }) => {
     
     setIsValidating(true);
     try {
-      // For now, we'll simply accept any key (validation will be added later)
-      setOpenAIApiKey(apiKey);
-      setIsValid(true);
-      
-      if (onValidKeySet) {
-        onValidKeySet();
+      const isValid = await validateAPIKey(apiKey);
+      if (isValid) {
+        setIsValid(true);
+        
+        if (onValidKeySet) {
+          onValidKeySet();
+        }
+        
+        toast.success("API key saved successfully");
       }
-      
-      toast.success("API key saved successfully");
     } finally {
       setIsValidating(false);
     }

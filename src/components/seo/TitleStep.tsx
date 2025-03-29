@@ -1,17 +1,24 @@
+
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { generateSEOTitles } from "@/services/seo/titleService";
 
 interface TitleStepProps {
   seoData: any;
   onDataChange: (field: string, value: any) => void;
   onNext: () => void;
   onPrev: () => void;
+  generateTitles: (topic: string, keywords: string[], count?: number) => Promise<string[]>;
 }
 
-const TitleStep: React.FC<TitleStepProps> = ({ seoData, onDataChange, onNext, onPrev }) => {
+const TitleStep: React.FC<TitleStepProps> = ({ 
+  seoData, 
+  onDataChange, 
+  onNext, 
+  onPrev,
+  generateTitles
+}) => {
   const [isGenerating, setIsGenerating] = useState(false);
   
   const handleGenerateTitles = async () => {
@@ -22,11 +29,10 @@ const TitleStep: React.FC<TitleStepProps> = ({ seoData, onDataChange, onNext, on
     
     setIsGenerating(true);
     try {
-      const titles = await generateSEOTitles(
+      const titles = await generateTitles(
         seoData.topic,
         seoData.selectedKeywords,
-        seoData.numberOfTitles || 5,
-        "mixed"
+        seoData.numberOfTitles || 5
       );
       onDataChange("titles", titles);
       if (titles && titles.length > 0) {

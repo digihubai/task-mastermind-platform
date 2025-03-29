@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Link, useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import useRoleBasedSettings from "@/hooks/use-role-based-settings";
-import { getOpenAIApiKey, generateContentAI } from "@/services/ai/contentGenerationAI";
+import { getOpenAIApiKey, generateContentAI } from "@/services/ai";
 import { useContentGeneration } from "@/hooks/useContentGeneration";
 
 interface ContentGenerationStepProps {

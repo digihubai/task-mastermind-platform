@@ -10,7 +10,7 @@ import TitleStep from './TitleStep';
 import OutlineStep from './OutlineStep';
 import ContentGenerationStep from './ContentGenerationStep';
 import AIKeyConfig from './AIKeyConfig';
-import { getOpenAIApiKey } from '@/services/ai/contentGenerationAI';
+import { getOpenAIApiKey } from '@/services/ai';
 import StepIndicator from './StepIndicator';
 
 interface SEOContentGeneratorProps {
@@ -30,11 +30,13 @@ const SEOContentGenerator: React.FC<SEOContentGeneratorProps> = ({
   const [seoData, setSeoData] = useState({
     topic: '',
     keywords: [],
+    keywordCount: 10,
     selectedKeywords: [],
     titles: [],
     selectedTitle: '',
     outline: '',
-    selectedOutline: '',
+    outlines: [],
+    selectedOutline: null,
     generatedContent: '',
     images: []
   });
