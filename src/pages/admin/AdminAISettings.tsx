@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { 
@@ -67,7 +66,6 @@ const AdminAISettings = () => {
     aiVoiceIsolator: false
   });
   
-  // Redirect non-admin users
   useEffect(() => {
     if (!hasAccess("ai_models")) {
       toast.error("You don't have permission to access this page");
