@@ -53,7 +53,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
               ? 'bot text-foreground rounded-tl-sm' 
               : 'user text-white text-right rounded-tr-sm'
           }`}
-          style={message.isBot && accentColor ? { 
+          style={message.isBot ? { 
             backgroundColor: `${accentColor}20`,
             color: 'black' // Explicitly setting color to black for bot messages
           } : {}}
