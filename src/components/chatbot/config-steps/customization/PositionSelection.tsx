@@ -23,7 +23,7 @@ export const PositionSelection: React.FC<PositionSelectionProps> = ({
     <div>
       <Label>Message Position</Label>
       <p className="text-sm text-muted-foreground mb-2">
-        Choose where the AI message bubbles will appear. User messages are always on the right.
+        Choose where the AI assistant's messages will appear. User messages are always on the right.
       </p>
       
       <RadioGroup 
@@ -39,8 +39,9 @@ export const PositionSelection: React.FC<PositionSelectionProps> = ({
             onClick={() => handlePositionChange("left")}
           >
             <div className="w-full space-y-2">
-              <div className="w-3/4 h-8 bg-gray-200 rounded-lg"></div>
-              <div className="w-1/2 h-8 bg-gray-200 rounded-lg self-start"></div>
+              <div className="w-3/4 h-8 bg-gray-200 rounded-lg ml-0 mr-auto"></div>
+              <div className="w-1/2 h-8 bg-gray-200 rounded-lg ml-0 mr-auto"></div>
+              <div className="w-1/2 h-8 bg-slate-800 rounded-lg ml-auto mr-0"></div>
             </div>
             <div className="flex items-center gap-2 mt-auto">
               <RadioGroupItem value="left" id="left" className="mt-0" />
@@ -60,8 +61,9 @@ export const PositionSelection: React.FC<PositionSelectionProps> = ({
             onClick={() => handlePositionChange("right")}
           >
             <div className="w-full space-y-2 flex flex-col items-end">
-              <div className="w-3/4 h-8 bg-gray-200 rounded-lg"></div>
-              <div className="w-1/2 h-8 bg-gray-200 rounded-lg self-end"></div>
+              <div className="w-3/4 h-8 bg-gray-200 rounded-lg ml-auto mr-0"></div>
+              <div className="w-1/2 h-8 bg-gray-200 rounded-lg ml-auto mr-0"></div>
+              <div className="w-1/2 h-8 bg-slate-800 rounded-lg ml-0 mr-auto"></div>
             </div>
             <div className="flex items-center gap-2 mt-auto">
               <RadioGroupItem value="right" id="right" className="mt-0" />
@@ -77,7 +79,7 @@ export const PositionSelection: React.FC<PositionSelectionProps> = ({
       </RadioGroup>
       
       <p className="text-xs text-muted-foreground mt-2">
-        This setting controls where the AI assistant's messages appear in the chat. Left shows AI messages on the left side (traditional style), while Right shows AI messages on the right side with user messages.
+        Left: AI assistant messages on the left (traditional style) | Right: AI assistant messages on the right
       </p>
     </div>
   );

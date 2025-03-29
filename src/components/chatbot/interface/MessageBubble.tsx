@@ -21,7 +21,10 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   language
 }) => {
   const isUserMessage = !message.isBot;
-  const shouldAlignRight = isUserMessage;
+  
+  // For bot messages, respect the position setting
+  // User messages are always shown on the right
+  const shouldAlignRight = isUserMessage || (message.isBot && position === "right");
   
   const formatMessageTime = (date: Date) => {
     return date.toLocaleTimeString(language !== "auto" ? language : undefined, { hour: '2-digit', minute: '2-digit' });
@@ -49,15 +52,16 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         
         <div 
           className={`message-bubble p-3 rounded-lg ${
-            shouldAlignRight 
+            isUserMessage 
               ? 'bg-slate-800 text-white text-right' 
               : 'bg-slate-100 text-slate-800 text-left'
           }`}
+          style={message.isBot && accentColor ? { backgroundColor: `${accentColor}20` } : {}}
         >
           {message.text}
         </div>
         
-        {shouldAlignRight && showDateTime && (
+        {isUserMessage && showDateTime && (
           <div className="text-xs text-muted-foreground mt-1 text-right">
             You, 3 min ago
           </div>

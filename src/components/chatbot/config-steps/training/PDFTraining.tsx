@@ -114,39 +114,14 @@ export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
   
   return (
     <div className="space-y-6">
-      <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-10 bg-white dark:bg-gray-800/20">
-        <div className="h-12 w-12 rounded-full border flex items-center justify-center mb-3">
+      <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-10 bg-white dark:bg-gray-800/20 mb-4">
+        <div className="h-12 w-12 rounded-full border cursor-pointer flex items-center justify-center mb-3"
+             onClick={handleFileUploadClick}>
           <Plus size={24} />
         </div>
         <p className="text-center font-medium mb-1">UPLOAD PDF, XLSX, CSV</p>
         <p className="text-center text-sm text-muted-foreground mb-5">Upload a File (Max: 25Mb)</p>
         
-        <Button 
-          variant="outline"
-          className="w-full max-w-xs bg-white hover:bg-gray-50 border border-gray-200 mb-3"
-          onClick={handleFileUploadClick}
-        >
-          <Plus size={16} className="mr-2" />
-          Choose File
-        </Button>
-        
-        <Button 
-          className="w-full max-w-xs bg-emerald-500 hover:bg-emerald-600"
-          onClick={handleFileUploadClick}
-          disabled={isUploading}
-        >
-          {isUploading ? (
-            <>
-              <Loader2 size={16} className="mr-2 animate-spin" />
-              Uploading...
-            </>
-          ) : (
-            <>
-              <Upload size={16} className="mr-2" />
-              Upload
-            </>
-          )}
-        </Button>
         <input
           id="file-upload"
           type="file"
@@ -157,6 +132,24 @@ export const PDFTraining: React.FC<PDFTrainingProps> = ({ onSkip }) => {
           ref={fileInputRef}
         />
       </div>
+      
+      <Button 
+        className="w-full bg-emerald-500 hover:bg-emerald-600"
+        onClick={handleFileUploadClick}
+        disabled={isUploading}
+      >
+        {isUploading ? (
+          <>
+            <Loader2 size={16} className="mr-2 animate-spin" />
+            Uploading...
+          </>
+        ) : (
+          <>
+            <Upload size={16} className="mr-2" />
+            Upload
+          </>
+        )}
+      </Button>
       
       {uploadedFiles.length > 0 && (
         <>

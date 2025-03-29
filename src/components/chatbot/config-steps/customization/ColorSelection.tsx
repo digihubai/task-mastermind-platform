@@ -15,6 +15,7 @@ interface ColorSelectionProps {
 
 export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, updateInfo }) => {
   const [hexInputValue, setHexInputValue] = useState(selectedColor);
+  const [colorPickerOpen, setColorPickerOpen] = useState(false);
   
   // Sync the input value when the prop changes
   useEffect(() => {
@@ -49,6 +50,13 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
     updateInfo("color", color);
   };
   
+  // Close the popover and apply the color when done
+  const handleCloseColorPicker = () => {
+    setColorPickerOpen(false);
+    // Apply the current color value when closing
+    updateInfo("color", hexInputValue);
+  };
+  
   // Define color options
   const colorOptions = [
     { value: "#000000", label: "Black" },
@@ -70,7 +78,7 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
             className="relative"
           >
             {colorOption.value === "custom" ? (
-              <Popover>
+              <Popover open={colorPickerOpen} onOpenChange={setColorPickerOpen}>
                 <PopoverTrigger asChild>
                   <div 
                     className="w-10 h-10 rounded-full cursor-pointer border border-muted flex items-center justify-center"
@@ -113,6 +121,13 @@ export const ColorSelection: React.FC<ColorSelectionProps> = ({ selectedColor, u
                       className="w-full h-8 rounded"
                       style={{ backgroundColor: hexInputValue }}
                     />
+                    
+                    <Button 
+                      className="w-full" 
+                      onClick={handleCloseColorPicker}
+                    >
+                      Apply Color
+                    </Button>
                   </div>
                 </PopoverContent>
               </Popover>

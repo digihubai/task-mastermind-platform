@@ -1,12 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AppLayout from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Copy, Code, ExternalLink, MessageSquare } from "lucide-react";
@@ -20,26 +19,12 @@ const EmbedChatbotPage = () => {
     theme: 'auto',
     position: 'bottom-right',
     model: 'gpt-4o-mini',
-    language: 'auto'
+    language: 'auto',
+    iframeWidth: 420,
+    iframeHeight: 745
   });
   
-  const embedCode = `<div id="digihub-chatbot"></div>
-<script>
-  (function(w,d,s,o,f,js,fjs){
-    w['DigiHub-Chatbot']=o;w[o]=w[o]||function(){(w[o].q=w[o].q||[]).push(arguments)};
-    js=d.createElement(s),fjs=d.getElementsByTagName(s)[0];
-    js.id=o;js.src=f;js.async=1;fjs.parentNode.insertBefore(js,fjs);
-  }(window,document,'script','dhchat','https://your-app-domain.com/chatbot.js'));
-  dhchat('init', { 
-    selector: '#digihub-chatbot',
-    assistantName: "${chatConfig.assistantName}",
-    welcomeMessage: "${chatConfig.welcomeMessage}",
-    theme: "${chatConfig.theme}",
-    position: "${chatConfig.position}",
-    model: "${chatConfig.model}",
-    language: "${chatConfig.language}"
-  });
-</script>`;
+  const embedCode = `<script defer src="https://digihub.ai/vendor/chatbot/js/external-chatbot.js" data-chatbot-uuid="89aa4a9c-1119-4eef-b0d0-52ff31a4c222" data-iframe-width="${chatConfig.iframeWidth}" data-iframe-height="${chatConfig.iframeHeight}" data-language="${chatConfig.language}" ></script>`;
 
   const directLinkUrl = `https://your-app-domain.com/support/chatbot?name=${encodeURIComponent(chatConfig.assistantName)}&welcome=${encodeURIComponent(chatConfig.welcomeMessage)}&theme=${chatConfig.theme}&position=${chatConfig.position}&language=${chatConfig.language}`;
   
@@ -57,6 +42,20 @@ const EmbedChatbotPage = () => {
       title: "Direct link copied",
       description: "The direct link has been copied to your clipboard."
     });
+  };
+
+  const handleWidthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value > 0) {
+      setChatConfig({...chatConfig, iframeWidth: value});
+    }
+  };
+
+  const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value > 0) {
+      setChatConfig({...chatConfig, iframeHeight: value});
+    }
   };
   
   return (
@@ -160,6 +159,34 @@ const EmbedChatbotPage = () => {
                     <option value="ar">Arabic</option>
                   </select>
                 </div>
+
+                <div>
+                  <Label htmlFor="width">Width</Label>
+                  <div className="flex items-center gap-2">
+                    <Input 
+                      id="width" 
+                      type="number" 
+                      value={chatConfig.iframeWidth} 
+                      onChange={handleWidthChange}
+                      className="w-full"
+                    />
+                    <span className="text-sm text-muted-foreground">px</span>
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="height">Height</Label>
+                  <div className="flex items-center gap-2">
+                    <Input 
+                      id="height" 
+                      type="number" 
+                      value={chatConfig.iframeHeight} 
+                      onChange={handleHeightChange}
+                      className="w-full"
+                    />
+                    <span className="text-sm text-muted-foreground">px</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
             
@@ -188,7 +215,7 @@ const EmbedChatbotPage = () => {
                     </div>
                     
                     <div className="mt-4 text-sm text-muted-foreground">
-                      <p>Add this code to any HTML page where you want the AI chatbot to appear.</p>
+                      <p>Need help? Paste this code just before the closing &lt;/body&gt; tag in your HTML file, then save the changes. Refresh your site to ensure your chatbot works correctly.</p>
                     </div>
                   </CardContent>
                 </Card>
