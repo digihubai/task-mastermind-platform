@@ -21,7 +21,7 @@ import {
   ImageIcon,
   VideoIcon,
   FileText,
-  ArrowsUpDown,
+  ArrowUpDown,
   Lightbulb
 } from "lucide-react";
 import { toast } from "sonner";
