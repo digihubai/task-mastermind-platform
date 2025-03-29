@@ -10,7 +10,7 @@ import { TriggerSizeSlider } from "./TriggerSizeSlider";
 import { PositionSelection } from "./PositionSelection";
 
 interface CustomizationStepProps {
-  chatbotInfo: {
+  newChatbotInfo: {
     title: string;
     bubbleMessage: string;
     welcomeMessage: string;
@@ -30,13 +30,13 @@ interface CustomizationStepProps {
 }
 
 export const CustomizationStep: React.FC<CustomizationStepProps> = ({
-  chatbotInfo,
+  newChatbotInfo,
   setNewChatbotInfo,
 }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   
   const updateInfo = (key: string, value: any) => {
-    setNewChatbotInfo({ ...chatbotInfo, [key]: value });
+    setNewChatbotInfo({ ...newChatbotInfo, [key]: value });
   };
 
   return (
@@ -51,40 +51,40 @@ export const CustomizationStep: React.FC<CustomizationStepProps> = ({
       <LogoUpload fileInputRef={fileInputRef} />
       
       <LanguageSelector 
-        language={chatbotInfo.language} 
+        language={newChatbotInfo.language} 
         updateInfo={updateInfo} 
       />
       
       <FooterLinkInput 
-        footerLink={chatbotInfo.footerLink} 
+        footerLink={newChatbotInfo.footerLink} 
         updateInfo={updateInfo} 
       />
       
       <AvatarSelection 
-        selectedAvatar={chatbotInfo.avatar} 
+        selectedAvatar={newChatbotInfo.avatar} 
         updateInfo={updateInfo}
         fileInputRef={fileInputRef}
       />
       
       <ColorSelection 
-        selectedColor={chatbotInfo.color} 
+        selectedColor={newChatbotInfo.color} 
         updateInfo={updateInfo} 
       />
       
       <ToggleOptions 
-        showLogo={chatbotInfo.showLogo}
-        showDateTime={chatbotInfo.showDateTime}
-        transparentTrigger={chatbotInfo.transparentTrigger}
+        showLogo={newChatbotInfo.showLogo}
+        showDateTime={newChatbotInfo.showDateTime}
+        transparentTrigger={newChatbotInfo.transparentTrigger}
         updateInfo={updateInfo}
       />
       
       <TriggerSizeSlider 
-        triggerSize={chatbotInfo.triggerSize} 
+        triggerSize={newChatbotInfo.triggerSize} 
         updateInfo={updateInfo} 
       />
       
       <PositionSelection 
-        position={chatbotInfo.position} 
+        position={newChatbotInfo.position} 
         updateInfo={updateInfo} 
       />
     </div>

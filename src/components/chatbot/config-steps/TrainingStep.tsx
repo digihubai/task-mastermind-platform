@@ -11,7 +11,12 @@ import {
   TrainingTabs
 } from "./training";
 
-export const TrainingStep: React.FC = () => {
+interface TrainingStepProps {
+  newChatbotInfo: any;
+  setNewChatbotInfo: (info: any) => void;
+}
+
+export const TrainingStep: React.FC<TrainingStepProps> = ({ newChatbotInfo, setNewChatbotInfo }) => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"website" | "pdf" | "text" | "qa">("website");
   

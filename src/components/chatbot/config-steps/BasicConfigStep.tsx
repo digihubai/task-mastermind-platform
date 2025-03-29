@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 
 interface BasicConfigStepProps {
-  chatbotInfo: {
+  newChatbotInfo: {
     title: string;
     bubbleMessage: string;
     welcomeMessage: string;
@@ -18,7 +18,7 @@ interface BasicConfigStepProps {
 }
 
 export const BasicConfigStep: React.FC<BasicConfigStepProps> = ({
-  chatbotInfo,
+  newChatbotInfo,
   setNewChatbotInfo,
 }) => {
   return (
@@ -33,8 +33,8 @@ export const BasicConfigStep: React.FC<BasicConfigStepProps> = ({
           <Label htmlFor="chatbot-title">Chatbot Title</Label>
           <Input 
             id="chatbot-title" 
-            value={chatbotInfo.title || "digibot"} 
-            onChange={(e) => setNewChatbotInfo({...chatbotInfo, title: e.target.value})}
+            value={newChatbotInfo.title || "digibot"} 
+            onChange={(e) => setNewChatbotInfo({...newChatbotInfo, title: e.target.value})}
             placeholder="Enter a name for your chatbot"
           />
         </div>
@@ -43,8 +43,8 @@ export const BasicConfigStep: React.FC<BasicConfigStepProps> = ({
           <Label htmlFor="bubble-message">Bubble Message</Label>
           <Input 
             id="bubble-message" 
-            value={chatbotInfo.bubbleMessage} 
-            onChange={(e) => setNewChatbotInfo({...chatbotInfo, bubbleMessage: e.target.value})}
+            value={newChatbotInfo.bubbleMessage} 
+            onChange={(e) => setNewChatbotInfo({...newChatbotInfo, bubbleMessage: e.target.value})}
             placeholder="Hey there, how can I help you?"
           />
         </div>
@@ -53,8 +53,8 @@ export const BasicConfigStep: React.FC<BasicConfigStepProps> = ({
           <Label htmlFor="welcome-message">Welcome Message</Label>
           <Input 
             id="welcome-message" 
-            value={chatbotInfo.welcomeMessage} 
-            onChange={(e) => setNewChatbotInfo({...chatbotInfo, welcomeMessage: e.target.value})}
+            value={newChatbotInfo.welcomeMessage} 
+            onChange={(e) => setNewChatbotInfo({...newChatbotInfo, welcomeMessage: e.target.value})}
             placeholder="Hi, how can I help you?"
           />
         </div>
@@ -63,8 +63,8 @@ export const BasicConfigStep: React.FC<BasicConfigStepProps> = ({
           <Label htmlFor="chatbot-instructions">Chatbot Instructions</Label>
           <Textarea 
             id="chatbot-instructions" 
-            value={chatbotInfo.instructions} 
-            onChange={(e) => setNewChatbotInfo({...chatbotInfo, instructions: e.target.value})}
+            value={newChatbotInfo.instructions} 
+            onChange={(e) => setNewChatbotInfo({...newChatbotInfo, instructions: e.target.value})}
             placeholder="Explain chatbot role"
             rows={5}
           />
@@ -80,8 +80,8 @@ export const BasicConfigStep: React.FC<BasicConfigStepProps> = ({
         <div className="space-y-2">
           <Label htmlFor="language">Language</Label>
           <Select 
-            value={chatbotInfo.language}
-            onValueChange={(value) => setNewChatbotInfo({...chatbotInfo, language: value})}
+            value={newChatbotInfo.language}
+            onValueChange={(value) => setNewChatbotInfo({...newChatbotInfo, language: value})}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select a language" />
