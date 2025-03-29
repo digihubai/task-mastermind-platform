@@ -20,42 +20,51 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   accentColor,
   language
 }) => {
-  // Determine alignment: 
-  // - User messages are always right-aligned
-  // - Bot messages are aligned according to position setting
   const isUserMessage = !message.isBot;
-  const shouldAlignRight = isUserMessage || (message.isBot && position === "right");
+  const shouldAlignRight = isUserMessage;
   
   const formatMessageTime = (date: Date) => {
     return date.toLocaleTimeString(language !== "auto" ? language : undefined, { hour: '2-digit', minute: '2-digit' });
   };
 
   const formatFullDate = (date: Date) => {
-    const dateOptions = { dateStyle: 'short' } as Intl.DateTimeFormatOptions;
-    const timeOptions = { timeStyle: 'short' } as Intl.DateTimeFormatOptions;
-    
-    return date.toLocaleDateString(language !== "auto" ? language : undefined, dateOptions) + " / " + 
-           date.toLocaleTimeString(language !== "auto" ? language : undefined, timeOptions);
+    return date.toLocaleDateString(language !== "auto" ? language : undefined, { 
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit'
+    }) + ' / ' + 
+    date.toLocaleTimeString(language !== "auto" ? language : undefined, { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      second: '2-digit'
+    });
   };
 
   return (
     <div className={`message ${message.isBot ? 'bot' : 'user'} animate-fade-in w-full flex ${shouldAlignRight ? 'justify-end' : 'justify-start'}`}>
       <div className="max-w-[80%]">
+        {message.isBot && (
+          <div className="text-xs text-muted-foreground mb-1">SupportHub, 1 min ago</div>
+        )}
+        
         <div 
           className={`message-bubble p-3 rounded-lg ${
             shouldAlignRight 
-              ? 'text-primary-foreground text-right shadow-sm' 
-              : 'bg-muted text-left border border-border/30 shadow-sm'
+              ? 'bg-slate-800 text-white text-right' 
+              : 'bg-slate-100 text-slate-800 text-left'
           }`}
-          style={{ 
-            backgroundColor: shouldAlignRight ? accentColor : undefined
-          }}
         >
           {message.text}
         </div>
         
-        {showDateTime && (
-          <div className={`text-xs text-muted-foreground mt-1 ${shouldAlignRight ? 'text-right' : 'text-left'}`}>
+        {shouldAlignRight && showDateTime && (
+          <div className="text-xs text-muted-foreground mt-1 text-right">
+            You, 3 min ago
+          </div>
+        )}
+        
+        {message.isBot && message.text.includes("refund") && (
+          <div className="text-xs text-muted-foreground mt-1">
             {formatFullDate(message.timestamp)}
           </div>
         )}

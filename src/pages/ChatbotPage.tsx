@@ -1,203 +1,183 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { MessageSquare, Settings, Bot, History, Users, PlusCircle } from "lucide-react";
+import { ArrowLeft, Plus, MoreVertical } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 const ChatbotPage = () => {
   const navigate = useNavigate();
+  const [selectedChatbot, setSelectedChatbot] = useState<string | null>(null);
+  
+  const activeChatbots = [
+    {
+      id: "1",
+      name: "digibot",
+      avatar: "👤",
+      createdAt: "16 hours ago"
+    },
+    {
+      id: "2",
+      name: "digibot",
+      avatar: "👩",
+      createdAt: "18 hours ago"
+    },
+    {
+      id: "3",
+      name: "digibot",
+      avatar: "👩",
+      createdAt: "19 hours ago"
+    },
+    {
+      id: "4",
+      name: "digibot",
+      avatar: "💬",
+      createdAt: "20 hours ago"
+    },
+    {
+      id: "5",
+      name: "digibot",
+      avatar: "💬",
+      createdAt: "20 hours ago"
+    },
+    {
+      id: "6",
+      name: "digibot",
+      avatar: "👤",
+      createdAt: "4 days ago"
+    }
+  ];
 
   const handleChatHistory = () => {
-    navigate("/support/omnichannel");
-    toast.success("Redirected to Omnichannel Support");
+    toast.info("Viewing chat history");
   };
 
-  const handleCreateNewBot = () => {
-    toast.info("Create new bot feature coming soon");
+  const handleAddNewChatbot = () => {
+    toast.info("Adding new chatbot");
+  };
+
+  const handleBackToDashboard = () => {
+    navigate("/dashboard");
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">AI Chatbots</h1>
-        <p className="text-muted-foreground mt-1">
-          Create and manage intelligent chatbots powered by AI
-        </p>
-      </div>
-
-      <div className="flex flex-wrap gap-4 mb-6">
+    <div className="p-6 max-w-[1200px] mx-auto">
+      <div className="flex items-center mb-6">
         <Button 
-          variant="outline" 
-          className="gap-2"
-          onClick={handleChatHistory}
+          variant="ghost" 
+          className="flex items-center text-muted-foreground hover:text-foreground"
+          onClick={handleBackToDashboard}
         >
-          <History size={16} />
-          Chat History
-        </Button>
-        
-        <Button 
-          variant="outline" 
-          className="gap-2"
-          onClick={() => toast.info("Bot settings feature coming soon")}
-        >
-          <Settings size={16} />
-          Bot Settings
-        </Button>
-        
-        <Button 
-          className="gap-2 ml-auto"
-          onClick={handleCreateNewBot}
-        >
-          <PlusCircle size={16} />
-          Create New Bot
+          <ArrowLeft size={16} className="mr-2" />
+          Back to dashboard
         </Button>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-5 cursor-pointer hover:bg-accent/50 transition-colors border-2 border-primary/30">
-          <div className="flex items-start gap-4">
-            <div className="p-2 bg-primary/20 rounded-full">
-              <Bot className="h-5 w-5 text-primary" />
-            </div>
-            
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium">Customer Support Bot</h3>
-                <Badge variant="outline" className="bg-green-50 text-green-600 dark:bg-green-900/20">Active</Badge>
-              </div>
-              
-              <p className="text-sm text-muted-foreground mt-2">
-                Handles customer inquiries, product questions, and support requests
-              </p>
-              
-              <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
-                <Users className="h-3 w-3" />
-                <span>2,453 conversations</span>
-              </div>
-              
-              <div className="flex justify-between items-center mt-4">
-                <Button variant="outline" size="sm" className="h-8" onClick={handleChatHistory}>
-                  View History
-                </Button>
-                
-                <Button size="sm" className="h-8">
-                  Configure
-                </Button>
-              </div>
-            </div>
+      
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">digi</h1>
+          <p className="text-muted-foreground">
+            View and manage external chatbots
+          </p>
+        </div>
+        
+        <div className="flex space-x-3 mt-4 md:mt-0">
+          <Button 
+            variant="outline" 
+            onClick={handleChatHistory}
+          >
+            Chat History
+          </Button>
+          
+          <Button 
+            className="bg-indigo-600 hover:bg-indigo-700"
+            onClick={handleAddNewChatbot}
+          >
+            <Plus size={16} className="mr-2" />
+            Add New Chatbot
+          </Button>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <Card className="p-8 flex flex-col items-center text-center">
+          <div className="w-24 h-24 mb-4">
+            <img src="/lovable-uploads/08f90115-7958-43e2-b379-88702703af59.png" alt="Create chatbot" className="w-full h-full object-contain" />
           </div>
+          <h3 className="text-xl font-medium mb-2">Create and configure a chatbot that interacts with your users.</h3>
+          <Button 
+            className="mt-4"
+            onClick={handleAddNewChatbot}
+          >
+            <Plus size={16} className="mr-2" />
+            Add New Chatbot
+          </Button>
         </Card>
         
-        <Card className="p-5 cursor-pointer hover:bg-accent/50 transition-colors">
-          <div className="flex items-start gap-4">
-            <div className="p-2 bg-primary/20 rounded-full">
-              <Bot className="h-5 w-5 text-primary" />
-            </div>
-            
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium">Sales Assistant Bot</h3>
-                <Badge variant="outline" className="bg-green-50 text-green-600 dark:bg-green-900/20">Active</Badge>
-              </div>
-              
-              <p className="text-sm text-muted-foreground mt-2">
-                Qualifies leads, answers product questions, and assists with sales
-              </p>
-              
-              <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
-                <Users className="h-3 w-3" />
-                <span>1,245 conversations</span>
-              </div>
-              
-              <div className="flex justify-between items-center mt-4">
-                <Button variant="outline" size="sm" className="h-8" onClick={handleChatHistory}>
-                  View History
-                </Button>
-                
-                <Button size="sm" className="h-8">
-                  Configure
-                </Button>
-              </div>
-            </div>
+        <Card className="p-8 flex flex-col items-center text-center">
+          <div className="w-24 h-24 mb-4">
+            <img src="/lovable-uploads/a057c0b0-315a-4e15-9e99-c63a421be55a.png" alt="Recent conversations" className="w-full h-full object-contain" />
           </div>
-        </Card>
-        
-        <Card className="p-5 cursor-pointer hover:bg-accent/50 transition-colors border border-dashed">
-          <div className="flex flex-col items-center justify-center py-6 text-center">
-            <PlusCircle className="h-8 w-8 text-muted-foreground mb-3" />
-            <h3 className="font-medium mb-1">Create New Bot</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Add a specialized chatbot for your needs
-            </p>
-            <Button size="sm" onClick={handleCreateNewBot}>
-              Get Started
-            </Button>
-          </div>
+          <h3 className="text-xl font-medium mb-2">Explore recent conversations from your users.</h3>
+          <Button 
+            variant="outline" 
+            className="mt-4"
+            onClick={handleChatHistory}
+          >
+            View Chat History
+          </Button>
         </Card>
       </div>
       
-      <Card className="p-6">
-        <h3 className="text-lg font-medium mb-4">Recent Conversations</h3>
-        
-        <div className="space-y-4">
-          <div className="p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer" onClick={handleChatHistory}>
-            <div className="flex items-start gap-3">
-              <MessageSquare className="h-5 w-5 text-primary mt-0.5" />
-              <div>
-                <div className="flex items-center gap-2">
-                  <h4 className="font-medium">John Smith</h4>
-                  <Badge variant="outline" className="text-xs">Customer Support Bot</Badge>
+      <h2 className="text-2xl font-bold mb-4">Active Chatbots</h2>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {activeChatbots.map(bot => (
+          <Card key={bot.id} className="border">
+            <div className="p-4 flex justify-between items-start">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center">
+                  <span className="text-lg">{bot.avatar}</span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  I'm having trouble with my recent order #12345. The product arrived damaged...
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">Today, 2:34 PM</p>
+                <div>
+                  <h3 className="font-medium">{bot.name}</h3>
+                  <p className="text-xs text-muted-foreground">Created {bot.createdAt}</p>
+                </div>
+              </div>
+              <Button variant="ghost" size="icon">
+                <MoreVertical size={16} />
+              </Button>
+            </div>
+            <div className="px-4 pb-4">
+              <div className="flex items-center">
+                <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 px-2 py-0.5 text-xs">
+                  <span className="flex items-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1"></span>
+                    Active
+                  </span>
+                </Badge>
+              </div>
+              <div className="mt-4 flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                >
+                  Edit
+                </Button>
+                <Button 
+                  size="sm" 
+                  className="flex-1"
+                >
+                  Configure
+                </Button>
               </div>
             </div>
-          </div>
-          
-          <div className="p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer" onClick={handleChatHistory}>
-            <div className="flex items-start gap-3">
-              <MessageSquare className="h-5 w-5 text-primary mt-0.5" />
-              <div>
-                <div className="flex items-center gap-2">
-                  <h4 className="font-medium">Sarah Johnson</h4>
-                  <Badge variant="outline" className="text-xs">Sales Assistant Bot</Badge>
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  I'm interested in the premium plan. Can you tell me more about the features...
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">Yesterday, 4:12 PM</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer" onClick={handleChatHistory}>
-            <div className="flex items-start gap-3">
-              <MessageSquare className="h-5 w-5 text-primary mt-0.5" />
-              <div>
-                <div className="flex items-center gap-2">
-                  <h4 className="font-medium">Michael Brown</h4>
-                  <Badge variant="outline" className="text-xs">Customer Support Bot</Badge>
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  How do I reset my password? I've tried the forgot password option but...
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">Yesterday, 10:45 AM</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="mt-4">
-          <Button variant="outline" className="w-full" onClick={handleChatHistory}>
-            View All Conversations
-          </Button>
-        </div>
-      </Card>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };
