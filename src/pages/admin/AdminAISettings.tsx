@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { 
@@ -9,7 +10,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import useRoleBasedSettings from "@/hooks/use-role-based-settings";
 import { Button } from "@/components/ui/button";
-import { AIKeyConfig } from "@/components/seo";
+import AIKeyConfig from "@/components/settings/integrations/AIKeyConfig";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { getOpenAIApiKey } from "@/services/ai/contentGenerationAI";

@@ -6,7 +6,7 @@ import {
   generateKeywordsAI, 
   generateTitlesAI, 
   generateOutlineAI,
-  generateContentAI 
+  generateSEOContentAI
 } from '@/services/ai/contentGenerationAI';
 import { useToast } from '@/components/ui/use-toast';
 import { getOpenAIApiKey } from '@/services/ai/contentGenerationAI';
@@ -19,7 +19,7 @@ const AISEOPage = () => {
     if (!apiKey) {
       toast({
         title: "API Key Required",
-        description: "Please configure your OpenAI API key in Settings > SEO Integrations",
+        description: "Please configure your OpenAI API key in Settings > AI Configuration",
         variant: "destructive",
       });
     }
@@ -31,7 +31,7 @@ const AISEOPage = () => {
         generateKeywords={generateKeywordsAI}
         generateTitles={generateTitlesAI}
         generateOutline={generateOutlineAI}
-        generateContent={generateContentAI}
+        generateContent={generateSEOContentAI}
       />
     </AppLayout>
   );

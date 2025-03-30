@@ -57,7 +57,7 @@ export const generateKeywordsAI = async (topic: string, count: number = 10): Pro
   const apiKey = getOpenAIApiKey();
   if (!apiKey) {
     toast.error("API Key Required", {
-      description: "Please configure your OpenAI API key in Settings > SEO Integrations",
+      description: "Please configure your OpenAI API key in Settings > AI Configuration",
     });
     return [];
   }
@@ -93,7 +93,7 @@ export const generateTitlesAI = async (topic: string, keywords: string[]): Promi
   const apiKey = getOpenAIApiKey();
   if (!apiKey) {
     toast.error("API Key Required", {
-      description: "Please configure your OpenAI API key in Settings > SEO Integrations",
+      description: "Please configure your OpenAI API key in Settings > AI Configuration",
     });
     return [];
   }
@@ -126,7 +126,7 @@ export const generateOutlineAI = async (topic: string, keywords: string[], title
   const apiKey = getOpenAIApiKey();
   if (!apiKey) {
     toast.error("API Key Required", {
-      description: "Please configure your OpenAI API key in Settings > SEO Integrations",
+      description: "Please configure your OpenAI API key in Settings > AI Configuration",
     });
     return "";
   }
@@ -185,7 +185,7 @@ export const generateContentAI = async (
   const apiKey = getOpenAIApiKey();
   if (!apiKey) {
     toast.error("API Key Required", {
-      description: "Please configure your OpenAI API key in Settings > SEO Integrations",
+      description: "Please configure your OpenAI API key in Settings > AI Configuration",
     });
     return "";
   }
@@ -202,6 +202,13 @@ export const generateContentAI = async (
     toast.error("Failed to generate content");
     return "";
   }
+};
+
+// Function to export - matches the expected function signature
+export const generateSEOContentAI = (title: string, outline: string, keywords: string[]): Promise<string> => {
+  // Add a default topic based on the title
+  const topic = title.split(':')[0] || title;
+  return generateContentAI(topic, keywords, title, outline);
 };
 
 // For handling real OpenAI API calls - this is just a placeholder that would be used in production

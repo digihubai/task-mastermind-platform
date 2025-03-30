@@ -5,6 +5,7 @@ import SettingsPage from "@/pages/SettingsPage";
 import SettingsIntegrationsPage from "@/pages/settings/SettingsIntegrationsPage";
 import SEOImageIntegrations from "@/pages/admin/SEOImageIntegrations";
 import AdminAISettings from "@/pages/admin/AdminAISettings";
+import APIIntegration from "@/pages/admin/APIIntegration";
 
 const settingsRoutes: RouteObject[] = [
   {
@@ -22,6 +23,10 @@ const settingsRoutes: RouteObject[] = [
   {
     path: "/settings/ai-configuration",
     element: <AdminAISettings />,
+  },
+  {
+    path: "/settings/api-integration",
+    element: <APIIntegration />,
   },
 ];
 

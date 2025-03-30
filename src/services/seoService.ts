@@ -1,103 +1,68 @@
 
-import { generateKeywords } from './seo/keywordService';
-import { generateTitles } from './seo/titleService';
-import { generateSEOContent } from './seo/contentService';
-import { fetchSEOAnalytics } from './seo/analyticsService';
-import { fetchSEOCampaigns } from './seo/campaignService';
+import { generateKeywords } from "./seo/keywordService";
+import { generateTitles } from "./seo/titleService";
+import { generateOutline } from "./seo/outlineService";
+import { generateSEOContent } from "./seo/contentService";
 
-// Export everything for backwards compatibility
-export {
-  generateKeywords,
-  generateTitles,
-  generateSEOContent,
-  fetchSEOAnalytics,
-  fetchSEOCampaigns
-};
-
-/**
- * Generate mock SEO content for previewing
- * This function is used specifically in the AISEOWriterPage
- */
-export const generateMockSEOContent = (keyword: string, keywords: string[]): string => {
-  // Create sample content based on the keywords
-  const title = `Ultimate Guide to ${keyword}`;
-  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+export const generateMockSEOContent = (topic: string, keywords: string[], title: string, outline: string): string => {
+  const sections = outline.split("\n\n").filter(section => section.trim() !== "");
   
-  return `
-<h1>${title}</h1>
-<p class="meta">Published on ${date} | 8 min read</p>
-
-<p>This comprehensive guide explores ${keyword} with advanced insights and actionable strategies. We'll cover everything you need to know about ${keywords.slice(0, 3).join(", ")} and more.</p>
-
-<h2>Introduction to ${keyword}</h2>
-
-<p>In today's digital landscape, understanding ${keyword} is crucial for online success. With ${keywords[0] || keyword} becoming increasingly important in the industry, businesses must adapt their strategies to stay competitive.</p>
-
-<p>Our research shows that companies implementing effective ${keywords[1] || keyword} strategies see a 43% increase in organic traffic and a 27% boost in conversion rates.</p>
-
-<h2>Key Strategies for ${keywords[0] || keyword}</h2>
-
-<p>When implementing ${keywords[0] || keyword} in your business, consider these proven approaches:</p>
-
-<ul>
-  <li><strong>Data-driven decision making</strong>: Use analytics to inform your ${keyword} strategy</li>
-  <li><strong>User-centric approach</strong>: Focus on solving real problems for your audience</li>
-  <li><strong>Continuous optimization</strong>: Regularly test and refine your methods</li>
-</ul>
-
-<h2>Advanced ${keywords[1] || keyword} Techniques</h2>
-
-<p>To maximize the effectiveness of your ${keywords[1] || keyword} efforts, implement these advanced techniques:</p>
-
-<ol>
-  <li>Conduct comprehensive competitive analysis to identify gaps and opportunities</li>
-  <li>Develop a structured content calendar aligned with user search intent</li>
-  <li>Utilize semantic keyword mapping to cover topic clusters</li>
-  <li>Implement structured data for enhanced search visibility</li>
-</ol>
-
-<blockquote>
-  <p>"The integration of AI and machine learning will revolutionize how we approach ${keywords[2] || keyword} in the coming years, creating both challenges and opportunities for forward-thinking organizations."</p>
-</blockquote>
-
-<h2>Conclusion: Mastering ${keyword}</h2>
-
-<p>By implementing the strategies outlined in this guide, you'll be well-positioned to leverage ${keyword} for sustainable business growth. Remember that success requires consistent effort, data-driven decision making, and a willingness to adapt to changing market conditions.</p>
-`;
+  let content = `# ${title}\n\n`;
+  
+  sections.forEach(section => {
+    if (section.startsWith("##")) {
+      const sectionTitle = section.split("\n")[0];
+      content += `${sectionTitle}\n\n`;
+      
+      const bulletPoints = section.split("\n").slice(1).filter(line => line.trim().startsWith("-"));
+      
+      bulletPoints.forEach(point => {
+        const pointText = point.replace("- ", "").trim();
+        content += `${pointText} is an important aspect of ${topic}. When considering ${pointText}, it's essential to understand its role in the overall ${keywords[0] || topic} strategy. Experts recommend focusing on this area to maximize results.\n\n`;
+      });
+    }
+  });
+  
+  content += `## Conclusion\n\nIn conclusion, mastering ${topic} requires attention to detail and a strategic approach. By following the guidelines outlined in this article, you can improve your results and achieve your goals in ${keywords[0] || topic}. Remember to stay updated on the latest trends and best practices to maintain a competitive edge.`;
+  
+  return content;
 };
 
-// Add a helper function to replace the missing generateContentWithImages
-export const generateContentWithImages = async (
+export const generateContentWithImages = (
   topic: string, 
   keywords: string[], 
   title: string, 
-  outline: string, 
+  outline: string,
   images: string[] = []
-): Promise<string> => {
-  // In a real implementation, this would generate content with images
-  // For now, call our mock content generator
-  let content = generateMockSEOContent(topic, keywords);
+): string => {
+  let baseContent = generateMockSEOContent(topic, keywords, title, outline);
   
-  // Insert some mock images if provided
   if (images && images.length > 0) {
-    const sections = content.split('<h2>');
-    if (sections.length > 1) {
-      for (let i = 1; i < Math.min(sections.length, images.length + 1); i++) {
-        const imageHtml = `
-<figure>
-  <img src="${images[i-1]}" alt="${title} - ${keywords[i-1] || ''}" class="w-full rounded-lg my-4" />
-  <figcaption class="text-center text-sm text-muted-foreground">Image related to ${keywords[i-1] || title}</figcaption>
-</figure>
-`;
-        sections[i] = '<h2>' + sections[i];
-        const splitIndex = sections[i].indexOf('</p>') + 4;
-        if (splitIndex > 3) {
-          sections[i] = sections[i].slice(0, splitIndex) + imageHtml + sections[i].slice(splitIndex);
-        }
+    const contentParts = baseContent.split('\n\n');
+    const updatedContent: string[] = [];
+    let imageIndex = 0;
+    
+    contentParts.forEach((part, index) => {
+      updatedContent.push(part);
+      
+      // Insert image after headings and some paragraphs, but not too frequently
+      if ((part.startsWith('##') || index % 3 === 0) && imageIndex < images.length) {
+        const imageAlt = `${topic} - ${keywords[imageIndex % keywords.length] || 'image'}`;
+        updatedContent.push(`![${imageAlt}](${images[imageIndex]})`);
+        imageIndex++;
       }
-      content = sections.join('');
-    }
+    });
+    
+    return updatedContent.join('\n\n');
   }
   
-  return content;
+  return baseContent;
+};
+
+// Export the core SEO content generation functions
+export { 
+  generateKeywords, 
+  generateTitles, 
+  generateOutline, 
+  generateSEOContent
 };

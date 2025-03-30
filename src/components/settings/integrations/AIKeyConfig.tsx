@@ -1,108 +1,127 @@
 
 import React, { useState, useEffect } from 'react';
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Sparkles, Key, Info } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { AlertCircle, Check } from "lucide-react";
-import { setOpenAIApiKey, getOpenAIApiKey, validateAPIKey } from '@/services/ai/contentGenerationAI';
+import { 
+  getOpenAIApiKey, 
+  setOpenAIApiKey, 
+  validateAPIKey 
+} from "@/services/ai/contentGenerationAI";
 
 interface AIKeyConfigProps {
   onValidKeySet?: () => void;
 }
 
 const AIKeyConfig: React.FC<AIKeyConfigProps> = ({ onValidKeySet }) => {
-  const [apiKey, setApiKey] = useState('');
-  const [isValidating, setIsValidating] = useState(false);
-  const [isValid, setIsValid] = useState(false);
-  const [showKey, setShowKey] = useState(false);
+  const [openAIKey, setOpenAIKey] = useState<string>("");
+  const [isValidating, setIsValidating] = useState<boolean>(false);
+  const [hasConfiguredKey, setHasConfiguredKey] = useState<boolean>(false);
   
   useEffect(() => {
-    // Load saved API key on component mount
     const savedKey = getOpenAIApiKey();
     if (savedKey) {
-      setApiKey(savedKey);
-      setIsValid(true);
+      setOpenAIKey("•".repeat(32)); // Mask the key
+      setHasConfiguredKey(true);
     }
   }, []);
-  
-  const handleSaveKey = async () => {
-    if (!apiKey.trim()) {
-      toast.error("Please enter an API key");
+
+  const handleUpdateKey = async () => {
+    if (!openAIKey || openAIKey.trim() === "" || openAIKey === "•".repeat(32)) {
+      toast.error("Please enter a valid API key");
       return;
     }
-    
+
     setIsValidating(true);
     try {
-      const isKeyValid = await validateAPIKey(apiKey);
-      setIsValid(isKeyValid);
-      
-      if (isKeyValid) {
-        if (onValidKeySet) {
-          onValidKeySet();
-        }
+      const isValid = await validateAPIKey(openAIKey);
+      if (isValid) {
+        setHasConfiguredKey(true);
+        if (onValidKeySet) onValidKeySet();
       }
+    } catch (error) {
+      console.error("Error validating API key:", error);
+      toast.error("Failed to validate API key");
     } finally {
       setIsValidating(false);
     }
   };
-  
+
+  const handleResetKey = () => {
+    if (confirm("Are you sure you want to reset your API key? This will remove your current key.")) {
+      setOpenAIApiKey("");
+      setOpenAIKey("");
+      setHasConfiguredKey(false);
+      toast.success("API key has been reset");
+    }
+  };
+
   return (
-    <Card className="mb-6">
+    <Card>
       <CardHeader>
-        <CardTitle>AI Integration Settings</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-purple-500" />
+          OpenAI API Key Configuration
+        </CardTitle>
         <CardDescription>
-          Configure API keys for AI content generation
+          Configure your OpenAI API key to use AI-powered features
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="openai-key">OpenAI API Key</Label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Input
-                  id="openai-key"
-                  type={showKey ? "text" : "password"}
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="sk-..."
-                  className="pr-10"
-                />
-                {isValid && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <Check className="h-4 w-4 text-green-500" />
-                  </div>
-                )}
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => setShowKey(!showKey)}
-                type="button"
-              >
-                {showKey ? "Hide" : "Show"}
-              </Button>
-              <Button 
-                onClick={handleSaveKey}
-                disabled={isValidating}
-              >
-                {isValidating ? "Validating..." : "Save"}
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Your API key is stored locally and never sent to our servers.
-            </p>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 mb-1">
+            <Key className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium">Your OpenAI API Key</span>
           </div>
-          
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-sm flex gap-3">
-            <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <div className="text-blue-800 dark:text-blue-300">
-              <p className="font-medium">Need an OpenAI API key?</p>
-              <p className="mt-1">You can get one from the <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="underline">OpenAI website</a>. We recommend using gpt-4o-mini for best results.</p>
-            </div>
+          <div className="flex gap-2">
+            <Input
+              type="password"
+              value={openAIKey}
+              onChange={(e) => setOpenAIKey(e.target.value)}
+              placeholder="Enter your OpenAI API key (starts with sk-)"
+              className="flex-1"
+            />
+            <Button 
+              onClick={handleUpdateKey}
+              disabled={isValidating}
+            >
+              {isValidating ? "Validating..." : "Save Key"}
+            </Button>
+            {hasConfiguredKey && (
+              <Button variant="outline" onClick={handleResetKey}>
+                Reset
+              </Button>
+            )}
           </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Your API key is stored locally in your browser and never sent to our servers
+          </p>
         </div>
+
+        <Alert className="bg-blue-50 dark:bg-blue-900/20">
+          <Info className="h-4 w-4 text-blue-500" />
+          <AlertDescription>
+            <span className="font-medium">Where to find your API key:</span>{" "}
+            <a 
+              href="https://platform.openai.com/api-keys" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-blue-600 hover:underline dark:text-blue-400"
+            >
+              Visit OpenAI Dashboard
+            </a>
+          </AlertDescription>
+        </Alert>
+
+        <Alert className="bg-amber-50 dark:bg-amber-900/20">
+          <Info className="h-4 w-4 text-amber-500" />
+          <AlertDescription>
+            Using AI features requires an active OpenAI account with available credits.
+          </AlertDescription>
+        </Alert>
       </CardContent>
     </Card>
   );

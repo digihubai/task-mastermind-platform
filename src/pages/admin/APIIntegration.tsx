@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,11 +16,23 @@ import { toast } from "sonner";
 import AIIntegrations from "@/components/settings/integrations/AIIntegrations";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/components/ui/use-toast";
+import { getOpenAIApiKey, validateAPIKey } from "@/services/ai/contentGenerationAI";
 
 const APIIntegration = () => {
   const [activeTab, setActiveTab] = useState<string>("ai-models");
   const { toast: uiToast } = useToast();
   const [showIntegrationSuccess, setShowIntegrationSuccess] = useState(false);
+  const [openAIKey, setOpenAIKey] = useState<string>("");
+  const [hasConfiguredKey, setHasConfiguredKey] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+
+  useEffect(() => {
+    const savedKey = getOpenAIApiKey();
+    if (savedKey) {
+      setOpenAIKey("•".repeat(32)); // Mask the key
+      setHasConfiguredKey(true);
+    }
+  }, []);
 
   const handleApiIntegration = () => {
     setShowIntegrationSuccess(true);
@@ -38,12 +50,29 @@ const APIIntegration = () => {
     }
   };
 
-  const handleOpenAIApiKeyUpdate = (value: string) => {
-    if (value.startsWith("sk-")) {
-      localStorage.setItem("openai_api_key", value);
-      toast.success("OpenAI API Key Updated", {
-        description: "Your API key has been saved and will be used for AI features.",
-      });
+  const handleOpenAIApiKeyUpdate = async (value: string) => {
+    if (value.startsWith("sk-") || value === "") {
+      setIsValidating(true);
+      try {
+        if (value === "") {
+          localStorage.removeItem("openai_api_key");
+          setOpenAIKey("");
+          setHasConfiguredKey(false);
+          toast.success("OpenAI API Key Removed", {
+            description: "Your API key has been removed.",
+          });
+        } else {
+          const isValid = await validateAPIKey(value);
+          if (isValid) {
+            setOpenAIKey("•".repeat(32)); // Mask the key
+            setHasConfiguredKey(true);
+          }
+        }
+      } catch (error) {
+        console.error("Error updating OpenAI API key:", error);
+      } finally {
+        setIsValidating(false);
+      }
     } else {
       uiToast({
         title: "Invalid API Key",
@@ -82,20 +111,83 @@ const APIIntegration = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <AIIntegrations 
-                  onIntegrationToggle={(id, category) => {
-                    toast.success(`${id} ${category} integration updated`);
-                    handleApiIntegration();
-                  }}
-                  onApiKeyUpdate={(id, value) => {
-                    if (id === "openai") {
-                      handleOpenAIApiKeyUpdate(value);
-                    } else {
-                      toast.success(`${id} API key updated`);
-                    }
-                    handleApiIntegration();
-                  }}
-                />
+                <div className="space-y-6">
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-2 rounded-full">
+                          <Bot className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">OpenAI</h3>
+                          <p className="text-xs text-muted-foreground">GPT models for text generation</p>
+                        </div>
+                      </div>
+                      <Badge variant={hasConfiguredKey ? "success" : "outline"} className={hasConfiguredKey ? "bg-green-100 text-green-800 hover:bg-green-100" : ""}>
+                        {hasConfiguredKey ? "Connected" : "Not Connected"}
+                      </Badge>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="openai-key">API Key</Label>
+                        <div className="flex gap-2">
+                          <Input 
+                            id="openai-key" 
+                            type="password" 
+                            value={openAIKey} 
+                            onChange={(e) => setOpenAIKey(e.target.value)}
+                            placeholder="Enter OpenAI API key (starts with sk-)"
+                            className="flex-1" 
+                          />
+                          <Button 
+                            variant="secondary" 
+                            onClick={() => handleOpenAIApiKeyUpdate(openAIKey)}
+                            disabled={isValidating}
+                          >
+                            {isValidating ? "Validating..." : hasConfiguredKey ? "Update" : "Connect"}
+                          </Button>
+                          {hasConfiguredKey && (
+                            <Button 
+                              variant="outline" 
+                              onClick={() => handleOpenAIApiKeyUpdate("")}
+                              disabled={isValidating}
+                            >
+                              Disconnect
+                            </Button>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Your API key is stored locally in your browser and is never sent to our servers
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="openai-model">Default Model</Label>
+                        <select id="openai-model" className="w-full border rounded-md p-2 bg-transparent">
+                          <option value="gpt-4o-mini">GPT-4o mini (Best value)</option>
+                          <option value="gpt-4o">GPT-4o (Most capable)</option>
+                          <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Fast)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <AIIntegrations 
+                    onIntegrationToggle={(id, category) => {
+                      toast.success(`${id} ${category} integration updated`);
+                      handleApiIntegration();
+                    }}
+                    onApiKeyUpdate={(id, value) => {
+                      if (id === "openai") {
+                        handleOpenAIApiKeyUpdate(value);
+                      } else {
+                        toast.success(`${id} API key updated`);
+                      }
+                      handleApiIntegration();
+                    }}
+                  />
+                </div>
               </CardContent>
               <CardFooter className="flex justify-between border-t pt-6">
                 <Button variant="outline" onClick={handleResetSettings}>Reset Settings</Button>
