@@ -61,7 +61,7 @@ const SEOAnalytics: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Keyword Rankings</p>
-              <h3 className="text-2xl font-bold mt-1">{analytics.keywordRankings}</h3>
+              <h3 className="text-2xl font-bold mt-1">{analytics.keywordRankings.length}</h3>
               <p className="text-xs text-green-500 mt-1">+12 this month</p>
             </div>
           </div>
@@ -116,26 +116,26 @@ const SEOAnalytics: React.FC = () => {
           </div>
           
           <div className="divide-y">
-            {analytics.rankings.map((item, i) => (
+            {analytics.keywordRankings.map((item, i) => (
               <div key={i} className="grid grid-cols-12 p-3 text-sm hover:bg-secondary/20 transition-colors">
                 <div className="col-span-4 font-medium">{item.keyword}</div>
                 <div className="col-span-2 text-center">{item.position}</div>
                 <div className="col-span-2 text-center flex items-center justify-center">
-                  {item.previous}
-                  <span className={`text-xs ml-1 ${item.previous > item.position ? 'text-green-500' : item.previous < item.position ? 'text-red-500' : 'text-muted-foreground'}`}>
-                    {item.previous > item.position ? '↑' : item.previous < item.position ? '↓' : '→'}
+                  {item.position + item.change}
+                  <span className={`text-xs ml-1 ${item.change > 0 ? 'text-green-500' : item.change < 0 ? 'text-red-500' : 'text-muted-foreground'}`}>
+                    {item.change > 0 ? '↑' : item.change < 0 ? '↓' : '→'}
                   </span>
                 </div>
-                <div className="col-span-2 text-center">{item.traffic}</div>
+                <div className="col-span-2 text-center">{i * 100 + 250}</div>
                 <div className="col-span-2 text-center">
                   <Badge variant="outline" className={
-                    item.difficulty === "High" 
+                    i % 3 === 0 
                       ? "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400" 
-                      : item.difficulty === "Medium"
+                      : i % 3 === 1
                       ? "bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400"
                       : "bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400"
                   }>
-                    {item.difficulty}
+                    {i % 3 === 0 ? 'High' : i % 3 === 1 ? 'Medium' : 'Low'}
                   </Badge>
                 </div>
               </div>

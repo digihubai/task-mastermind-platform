@@ -1,16 +1,15 @@
 
 import { generateKeywords } from './seo/keywordService';
-import { generateSEOTitles } from './seo/titleService';
-import { generateContent, generateContentWithImages } from './seo/contentService';
+import { generateTitles } from './seo/titleService';
+import { generateSEOContent } from './seo/contentService';
 import { fetchSEOAnalytics } from './seo/analyticsService';
 import { fetchSEOCampaigns } from './seo/campaignService';
 
 // Export everything for backwards compatibility
 export {
   generateKeywords,
-  generateSEOTitles,
-  generateContent,
-  generateContentWithImages,
+  generateTitles,
+  generateSEOContent,
   fetchSEOAnalytics,
   fetchSEOCampaigns
 };
@@ -65,4 +64,40 @@ export const generateMockSEOContent = (keyword: string, keywords: string[]): str
 
 <p>By implementing the strategies outlined in this guide, you'll be well-positioned to leverage ${keyword} for sustainable business growth. Remember that success requires consistent effort, data-driven decision making, and a willingness to adapt to changing market conditions.</p>
 `;
+};
+
+// Add a helper function to replace the missing generateContentWithImages
+export const generateContentWithImages = async (
+  topic: string, 
+  keywords: string[], 
+  title: string, 
+  outline: string, 
+  images: string[] = []
+): Promise<string> => {
+  // In a real implementation, this would generate content with images
+  // For now, call our mock content generator
+  let content = generateMockSEOContent(topic, keywords);
+  
+  // Insert some mock images if provided
+  if (images && images.length > 0) {
+    const sections = content.split('<h2>');
+    if (sections.length > 1) {
+      for (let i = 1; i < Math.min(sections.length, images.length + 1); i++) {
+        const imageHtml = `
+<figure>
+  <img src="${images[i-1]}" alt="${title} - ${keywords[i-1] || ''}" class="w-full rounded-lg my-4" />
+  <figcaption class="text-center text-sm text-muted-foreground">Image related to ${keywords[i-1] || title}</figcaption>
+</figure>
+`;
+        sections[i] = '<h2>' + sections[i];
+        const splitIndex = sections[i].indexOf('</p>') + 4;
+        if (splitIndex > 3) {
+          sections[i] = sections[i].slice(0, splitIndex) + imageHtml + sections[i].slice(splitIndex);
+        }
+      }
+      content = sections.join('');
+    }
+  }
+  
+  return content;
 };
