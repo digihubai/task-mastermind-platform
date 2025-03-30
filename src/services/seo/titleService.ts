@@ -6,11 +6,10 @@ import { generateTitlesAI } from '../ai/contentGenerationAI';
  */
 export const generateTitles = async (
   topic: string,
-  keywords: string[],
-  count: number = 5
+  keywords: string[]
 ): Promise<string[]> => {
   try {
-    return await generateTitlesAI(topic, keywords, count);
+    return await generateTitlesAI(topic, keywords);
   } catch (error) {
     console.error("Error generating titles:", error);
     throw error;

@@ -6,7 +6,7 @@ export * from './types';
 export const generateContent = async (title: string, keywords: string[], topic: string, outline?: string) => {
   // This is just a wrapper to maintain backwards compatibility
   const { generateContentAI } = await import('../ai/contentGenerationAI');
-  return generateContentAI(title, outline || '', keywords);
+  return generateContentAI(topic, keywords, title, outline || '');
 };
 
 export const fetchInternalLinks = async () => {
