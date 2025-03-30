@@ -11,23 +11,6 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import { getOpenAIApiKey } from '@/services/ai/contentGenerationAI';
 
-// Create wrapper functions to match the expected interfaces
-const generateKeywords = async (topic: string, count: number = 10): Promise<string[]> => {
-  return generateKeywordsAI(topic, count);
-};
-
-const generateTitles = async (topic: string, keywords: string[], count: number = 5): Promise<string[]> => {
-  return generateTitlesAI(topic, keywords, count);
-};
-
-const generateOutline = async (topic: string, keywords: string[], title: string): Promise<any> => {
-  return generateOutlineAI(topic, keywords, title);
-};
-
-const generateContent = async (title: string, outline: string, keywords: string[]): Promise<string> => {
-  return generateContentAI(title, outline, keywords);
-};
-
 const AISEOPage = () => {
   const { toast } = useToast();
 
@@ -36,7 +19,7 @@ const AISEOPage = () => {
     if (!apiKey) {
       toast({
         title: "API Key Required",
-        description: "Please ask your admin to set up AI integration in Admin Settings",
+        description: "Please configure your OpenAI API key in Settings > SEO Integrations",
         variant: "destructive",
       });
     }
@@ -45,10 +28,10 @@ const AISEOPage = () => {
   return (
     <AppLayout>
       <SEOContentGenerator
-        generateKeywords={generateKeywords}
-        generateTitles={generateTitles}
-        generateOutline={generateOutline}
-        generateContent={generateContent}
+        generateKeywords={generateKeywordsAI}
+        generateTitles={generateTitlesAI}
+        generateOutline={generateOutlineAI}
+        generateContent={generateContentAI}
       />
     </AppLayout>
   );

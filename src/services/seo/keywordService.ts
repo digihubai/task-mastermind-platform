@@ -1,85 +1,64 @@
 
-import { SEOCampaign } from "./types";
+import { generateKeywordsAI } from '../ai/contentGenerationAI';
 
 /**
- * Generates keyword suggestions based on a topic
+ * Generate keyword suggestions based on a topic
  */
-export const generateKeywords = async (topic: string, count: number = 10) => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Process the topic to handle spacing issues
-  const processedTopic = topic.trim().toLowerCase();
-  
-  // Check if topic includes "AI chatbot" and return more specific keywords
-  if (processedTopic.includes("ai chatbot") || processedTopic.includes("ai") || processedTopic.includes("chatbot")) {
-    return [
-      "ai chatbot", "conversational ai", "chatbot development", 
-      "natural language processing", "customer service automation",
-      "ai assistant", "chatbot platform", "virtual assistant",
-      "chat automation", "machine learning chatbot", "nlp technology",
-      "enterprise chatbot", "ai solutions", "customer experience", 
-      "chatbot integration", "intelligent assistant", "digital transformation"
-    ].slice(0, count);
+export const generateKeywords = async (topic: string, count: number = 10): Promise<string[]> => {
+  try {
+    return await generateKeywordsAI(topic, count);
+  } catch (error) {
+    console.error("Error generating keywords:", error);
+    throw error;
   }
-  
-  // For other topics, generate more relevant keywords
-  const topicWords = processedTopic.split(/\s+/);
-  const generatedKeywords = [
-    processedTopic,
-    ...topicWords,
-    `${processedTopic} guide`,
-    `${processedTopic} software`,
-    `${processedTopic} solutions`,
-    `${processedTopic} best practices`,
-    `${processedTopic} strategies`,
-    `${processedTopic} tools`,
-    `${processedTopic} platform`,
-    `${processedTopic} service`,
-    `${processedTopic} technology`,
-    `${processedTopic} trends`,
-    `${processedTopic} benefits`,
-    `${processedTopic} implementation`,
-    `best ${processedTopic} tools`,
-    `how to use ${processedTopic}`,
-    `${processedTopic} examples`
-  ].slice(0, count);
-  
-  return generatedKeywords;
 };
 
 /**
- * Fetches SEO keyword rankings
+ * Analyze keyword difficulty based on various factors
  */
-export const fetchSEOKeywords = async () => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 800));
+export const analyzeKeywordDifficulty = (keyword: string): number => {
+  // This would be a more complex algorithm in a real implementation
+  // For now, return a random difficulty score between 1-100
+  return Math.floor(Math.random() * 100) + 1;
+};
+
+/**
+ * Calculate keyword relevance score for a specific topic
+ */
+export const calculateKeywordRelevance = (keyword: string, topic: string): number => {
+  // This would use NLP in a real implementation
+  // For now, return a simple score based on if the keyword contains the topic
+  if (keyword.toLowerCase().includes(topic.toLowerCase())) {
+    return Math.floor(Math.random() * 30) + 70; // 70-100
+  }
   
-  // Return mock SEO keywords
-  return [
-    {
-      id: "keyword-1",
-      keyword: "digital marketing software",
-      position: 3,
-      volume: 1240,
-      difficulty: "Medium",
-      change: 2
-    },
-    {
-      id: "keyword-2",
-      keyword: "AI content creation",
-      position: 1,
-      volume: 980,
-      difficulty: "High",
-      change: 1
-    },
-    {
-      id: "keyword-3",
-      keyword: "marketing automation",
-      position: 4,
-      volume: 820,
-      difficulty: "High",
-      change: 3
+  return Math.floor(Math.random() * 70) + 30; // 30-100
+};
+
+/**
+ * Group keywords by topic clusters
+ */
+export const groupKeywordsByCluster = (keywords: string[]): Record<string, string[]> => {
+  // This is a simplified implementation
+  const clusters: Record<string, string[]> = {};
+  
+  // Example cluster assignment - in a real implementation, this would use NLP/ML
+  keywords.forEach(keyword => {
+    const firstWord = keyword.split(' ')[0].toLowerCase();
+    
+    if (!clusters[firstWord]) {
+      clusters[firstWord] = [];
     }
-  ];
+    
+    clusters[firstWord].push(keyword);
+  });
+  
+  return clusters;
+};
+
+export default {
+  generateKeywords,
+  analyzeKeywordDifficulty,
+  calculateKeywordRelevance,
+  groupKeywordsByCluster
 };

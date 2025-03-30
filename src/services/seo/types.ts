@@ -1,13 +1,56 @@
 
-/**
- * SEO Campaign interface
- */
+export interface SEOKeyword {
+  keyword: string;
+  volume: number;
+  difficulty: number;
+  cpc: number;
+  relevance: number;
+}
+
+export interface SEOContentOutline {
+  title: string;
+  sections: string[];
+  raw: string;
+}
+
+export interface SEOContentImage {
+  url: string;
+  description: string;
+  altText: string;
+}
+
+export interface SEOContentParameters {
+  topic: string;
+  primaryKeyword: string;
+  secondaryKeywords: string[];
+  wordCount: number;
+  headingStructure: string;
+  includeTOC: boolean;
+  includeFAQ: boolean;
+  tone: string;
+}
+
+export interface SEOAnalytics {
+  organicTraffic: number;
+  keywordRankings: {
+    keyword: string;
+    position: number;
+    change: number;
+  }[];
+  pagePerformance: {
+    url: string;
+    traffic: number;
+    conversions: number;
+  }[];
+  backlinks: number;
+}
+
 export interface SEOCampaign {
   id: string;
   name: string;
   keywordCount: number;
   pageCount: number;
-  status: "active" | "in_progress" | "completed" | "inactive";
+  status: 'active' | 'completed' | 'in_progress' | 'inactive';
   startDate: string;
   endDate: string | null;
   metrics: {
@@ -15,20 +58,4 @@ export interface SEOCampaign {
     avgPosition: number;
   };
   userId: string;
-}
-
-/**
- * SEO Analytics interface
- */
-export interface SEOAnalytics {
-  keywordRankings: number;
-  organicTraffic: number;
-  backlinks: number;
-  rankings: {
-    keyword: string;
-    position: number;
-    previous: number;
-    traffic: number;
-    difficulty: string;
-  }[];
 }

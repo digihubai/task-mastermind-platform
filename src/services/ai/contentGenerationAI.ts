@@ -304,7 +304,7 @@ export const generateOutlineAI = async (
   topic: string,
   keywords: string[],
   title: string
-): Promise<string> => {
+): Promise<any> => {
   const apiKey = getOpenAIApiKey();
   
   if (!apiKey) {
@@ -355,31 +355,20 @@ export const generateOutlineAI = async (
     }
     
     const data = await response.json();
-    const outline = data.choices[0].message.content;
+    const outlineContent = data.choices[0].message.content;
     
-    return outline;
+    // Parse the outline into a structured format
+    const sections = outlineContent
+      .split(/\n+/)
+      .filter(line => line.trim().length > 0)
+      .map(line => line.trim());
+    
+    return {
+      raw: outlineContent,
+      sections: sections
+    };
   } catch (error) {
     console.error("Error generating content outline:", error);
-    throw error;
-  }
-};
-
-// Search for relevant stock photos
-export const searchStockPhotos = async (query: string): Promise<string[]> => {
-  // This is a mock function - in a real implementation, you'd call Unsplash, Pexels, etc.
-  try {
-    // For now, just return some placeholder images
-    const placeholderImages = [
-      "https://images.unsplash.com/photo-1581922819941-6ab31ab79afc?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      "https://images.unsplash.com/photo-1581291518275-97642f2he91c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    ];
-    
-    console.log("Searching stock photos for:", query);
-    return placeholderImages;
-  } catch (error) {
-    console.error("Error searching stock photos:", error);
     throw error;
   }
 };
@@ -395,5 +384,4 @@ export default {
   generateKeywordsAI,
   generateTitlesAI,
   generateOutlineAI,
-  searchStockPhotos,
 };

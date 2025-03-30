@@ -1,6 +1,3 @@
-
-// Mock service for fetching internal and external links
-
 /**
  * Fetches internal links relevant to the content
  * In a production environment, this would query your site's pages/posts
@@ -133,4 +130,36 @@ export const insertLinksIntoContent = (
   });
   
   return updatedContent;
+};
+
+/**
+ * Find relevant internal link opportunities
+ */
+export const findInternalLinkOpportunities = async (content: string): Promise<{keyword: string, url: string}[]> => {
+  // In a real implementation, this would analyze content and existing pages
+  // For now, return mock data
+  return [
+    { keyword: 'SEO strategy', url: '/blog/seo-strategy' },
+    { keyword: 'content marketing', url: '/blog/content-marketing' },
+    { keyword: 'keyword research', url: '/blog/keyword-research' }
+  ];
+};
+
+/**
+ * Get recommendations for external link building
+ */
+export const getExternalLinkRecommendations = async (topic: string): Promise<{domain: string, relevance: number}[]> => {
+  // In a real implementation, this would query a database or API
+  // For now, return mock data
+  return [
+    { domain: 'moz.com', relevance: 95 },
+    { domain: 'searchenginejournal.com', relevance: 92 },
+    { domain: 'ahrefs.com', relevance: 90 },
+    { domain: 'semrush.com', relevance: 88 }
+  ];
+};
+
+export default {
+  findInternalLinkOpportunities,
+  getExternalLinkRecommendations
 };

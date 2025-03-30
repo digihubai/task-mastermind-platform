@@ -1,24 +1,32 @@
 
-import type { SEOAnalytics } from './types';
+import { SEOAnalytics } from "./types";
 
 /**
- * Fetches SEO analytics data
+ * Fetch SEO analytics data
  */
-export const fetchSEOAnalytics = async (): Promise<SEOAnalytics> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Return mock SEO analytics data
+export const fetchSEOAnalytics = async (startDate?: string, endDate?: string): Promise<SEOAnalytics> => {
+  // In a real implementation, this would fetch from Google Analytics API or similar
+  // For now, return mock data
   return {
-    keywordRankings: 143,
-    organicTraffic: 24500,
-    backlinks: 867,
-    rankings: [
-      { keyword: "digital marketing software", position: 3, previous: 5, traffic: 1240, difficulty: "Medium" },
-      { keyword: "AI content creation", position: 1, previous: 2, traffic: 980, difficulty: "High" },
-      { keyword: "marketing automation", position: 4, previous: 7, traffic: 820, difficulty: "High" },
-      { keyword: "customer support tools", position: 2, previous: 4, traffic: 750, difficulty: "Medium" },
-      { keyword: "SEO optimization tips", position: 3, previous: 3, traffic: 620, difficulty: "Low" }
-    ]
+    organicTraffic: 24532,
+    keywordRankings: [
+      { keyword: "digital marketing services", position: 3, change: 2 },
+      { keyword: "seo agency", position: 5, change: -1 },
+      { keyword: "content marketing strategy", position: 2, change: 4 },
+      { keyword: "local seo services", position: 1, change: 0 },
+      { keyword: "best digital marketing company", position: 7, change: 3 }
+    ],
+    pagePerformance: [
+      { url: "/services/seo", traffic: 4256, conversions: 142 },
+      { url: "/blog/seo-tips", traffic: 3821, conversions: 87 },
+      { url: "/services/content-marketing", traffic: 2945, conversions: 113 },
+      { url: "/about-us", traffic: 1823, conversions: 56 },
+      { url: "/case-studies", traffic: 1654, conversions: 98 }
+    ],
+    backlinks: 1247
   };
+};
+
+export default {
+  fetchSEOAnalytics
 };
