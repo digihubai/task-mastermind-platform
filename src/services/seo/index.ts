@@ -3,22 +3,22 @@
 export * from './types';
 
 // Export content generation functions
-export const generateContent = async (title: string, keywords: string[], topic: string, outline?: string) => {
+export const generateContent = async (title: string, outline: string, keywords: string[]) => {
   // This is just a wrapper to maintain backwards compatibility
   const { generateContentAI } = await import('../ai/contentGenerationAI');
-  return generateContentAI(topic, keywords, title, outline || '');
+  return generateContentAI(title, keywords, title, outline || '');
 };
 
 // Re-export core SEO services
-export * from './keywordService';
-export * from './titleService';
-export * from './outlineService';
+export { generateKeywords } from './keywordService';
+export { generateTitles } from './titleService';
+export { generateOutline } from './outlineService';
 export * from './contentService';
 export * from './linkService';
 export * from './imageService';
 export * from './campaignService';
 export * from './reportingService';  // New reporting service
-export * from './seoAnalyticsService'; // Fix import path
+export { fetchSEOAnalytics, generateSEOReport } from './seoAnalyticsService'; // Fix import path
 export * from './clientApprovalService'; // New client approval workflow service
 export * from './topicClusterService';  // New topic cluster service
 
@@ -57,5 +57,4 @@ export const insertLinksIntoContent = (content: string, links: Array<{title: str
 };
 
 // Export analyticsService separately to avoid name conflicts
-export { fetchSEOAnalytics, generateSEOReport } from './seoAnalyticsService';
 export type { SEOAnalytics } from './types';

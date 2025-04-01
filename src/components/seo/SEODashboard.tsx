@@ -13,10 +13,10 @@ import SEOTopicClusters from './SEOTopicClusters';
 import SEOClientApproval from './SEOClientApproval';
 
 import { 
-  generateKeywords as generateKeywordsService,
-  generateTitles as generateTitlesService,
-  generateOutline as generateOutlineService,
-  generateContent as generateContentService
+  generateKeywords,
+  generateTitles,
+  generateOutline,
+  generateContent
 } from '@/services/seo';
 
 interface SEODashboardProps {
@@ -127,10 +127,10 @@ const SEODashboard: React.FC<SEODashboardProps> = ({ defaultTab = "content" }) =
         <div className="mt-6">
           <TabsContent value="content" className="m-0">
             <SEOContentGenerator 
-              generateKeywords={generateKeywordsService}
-              generateTitles={generateTitlesService}
-              generateOutline={generateOutlineService}
-              generateContent={generateContentService}
+              generateKeywords={generateKeywords}
+              generateTitles={generateTitles}
+              generateOutline={generateOutline}
+              generateContent={generateContent}
             />
           </TabsContent>
           

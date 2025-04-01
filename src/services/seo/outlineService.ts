@@ -54,12 +54,12 @@ export const generateTopicClusterOutline = async (
 ): Promise<TopicCluster> => {
   const now = new Date().toISOString();
   
-  // Generate content pieces based on supporting keywords
+  // Generate content pieces based on supporting keywords - ensure status is one of the allowed values
   const contentPieces = supportingKeywords.map((keyword, index) => ({
     id: `content_${index}`,
     title: `${mainKeyword}: Complete Guide to ${keyword}`,
     keywords: [mainKeyword, keyword],
-    status: index < 2 ? "published" : "planned",
+    status: index < 2 ? "published" : "planned" as "published" | "planned" | "draft", // Fixed status type
     contentAge: index < 2 ? Math.floor(Math.random() * 30) : undefined,
     url: index < 2 ? `/blog/${keyword.toLowerCase().replace(/\s+/g, '-')}` : undefined,
     publishedDate: index < 2 ? new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString() : undefined,
