@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AreaChart, BarChart, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { SEOAnalytics as SEOAnalyticsType } from '@/services/seo/types';
-import { fetchSEOAnalytics, generateSEOReport } from '@/services/seo';
+import { fetchSEOAnalytics, generateSEOReport } from '@/services/seo/seoAnalyticsService';
 import { ChevronDown, Download, Calendar, Globe, ArrowRight, ArrowUp, ArrowDown, Search, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 

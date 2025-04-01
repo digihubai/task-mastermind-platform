@@ -18,7 +18,7 @@ export * from './linkService';
 export * from './imageService';
 export * from './campaignService';
 export * from './reportingService';  // New reporting service
-export * from './seoAnalyticsService'; // New SEO analytics service
+export * from './seoAnalyticsService'; // Fix import path
 export * from './clientApprovalService'; // New client approval workflow service
 export * from './topicClusterService';  // New topic cluster service
 
@@ -57,5 +57,5 @@ export const insertLinksIntoContent = (content: string, links: Array<{title: str
 };
 
 // Export analyticsService separately to avoid name conflicts
-export { fetchSEOAnalytics, generateSEOReport } from './analyticsService';
+export { fetchSEOAnalytics, generateSEOReport } from './seoAnalyticsService';
 export type { SEOAnalytics } from './types';

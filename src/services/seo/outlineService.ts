@@ -1,53 +1,104 @@
 
-import { generateOutlineAI } from '../ai/contentGenerationAI';
+import { TopicCluster } from './types';
 
 /**
- * Generate outline based on a topic, keywords, and title
+ * Generate an outline for SEO content based on a topic, keywords, and title
  */
 export const generateOutline = async (
-  topic: string,
-  keywords: string[],
+  topic: string, 
+  keywords: string[], 
   title: string
-): Promise<string> => {
+): Promise<{ sections: string[] }> => {
   try {
-    return await generateOutlineAI(topic, keywords, title);
+    // In a real implementation, this would call an AI service to generate the outline
+    // For now, we'll return a mock outline
+    const sections = [
+      `## Introduction to ${topic}\n- What is ${topic}\n- Why ${topic} is important\n- Key benefits of mastering ${topic}`,
+      `## Top ${keywords[0] || topic} Strategies\n- Strategy 1: Implementation tips\n- Strategy 2: Best practices\n- Strategy 3: Common pitfalls to avoid`,
+      `## How ${keywords[1] || topic} Impacts Business\n- Measuring ROI\n- Case studies\n- Industry benchmarks`,
+      `## Future Trends in ${topic}\n- Upcoming innovations\n- Industry shifts\n- Preparing for future changes`,
+      `## Conclusion\n- Key takeaways\n- Next steps\n- Additional resources`
+    ];
+    
+    return { sections };
   } catch (error) {
-    console.error("Error generating outline:", error);
+    console.error(`Error generating outline for ${topic}:`, error);
     throw error;
   }
 };
 
 /**
- * Format outline sections for better readability
+ * Generate multiple outline variations
  */
-export const formatOutline = (outline: string): string => {
-  // Clean up the outline by ensuring proper spacing and formatting
-  return outline
-    .replace(/#{2,}([^\n]+)/g, '## $1') // Ensure space after ## markers
-    .replace(/- ([^\n]+)/g, '- $1')     // Ensure space after bullet points
-    .replace(/\n{3,}/g, '\n\n');        // Remove excessive line breaks
+export const generateOutlineVariations = async (
+  topic: string,
+  keywords: string[],
+  title: string,
+  count: number = 3
+): Promise<Array<{ sections: string[] }>> => {
+  const outlines = [];
+  
+  for (let i = 0; i < count; i++) {
+    outlines.push(await generateOutline(topic, keywords, title));
+  }
+  
+  return outlines;
 };
 
 /**
- * Parse outline string into structured sections
+ * Generate a topic cluster outline
  */
-export const parseOutlineSections = (outline: string): { title: string; bullets: string[] }[] => {
-  const sections = outline.split(/#{2,}\s+/).filter(Boolean);
+export const generateTopicClusterOutline = async (
+  mainKeyword: string,
+  supportingKeywords: string[]
+): Promise<TopicCluster> => {
+  const now = new Date().toISOString();
   
-  return sections.map(section => {
-    const lines = section.split('\n').filter(Boolean);
-    const title = lines[0].trim();
-    const bullets = lines
-      .slice(1)
-      .filter(line => line.trim().startsWith('-'))
-      .map(line => line.replace(/^-\s*/, '').trim());
-      
-    return { title, bullets };
-  });
+  // Generate content pieces based on supporting keywords
+  const contentPieces = supportingKeywords.map((keyword, index) => ({
+    id: `content_${index}`,
+    title: `${mainKeyword}: Complete Guide to ${keyword}`,
+    keywords: [mainKeyword, keyword],
+    status: index < 2 ? "published" : "planned",
+    contentAge: index < 2 ? Math.floor(Math.random() * 30) : undefined,
+    url: index < 2 ? `/blog/${keyword.toLowerCase().replace(/\s+/g, '-')}` : undefined,
+    publishedDate: index < 2 ? new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString() : undefined,
+  }));
+  
+  return {
+    id: `cluster_${Date.now()}`,
+    name: `${mainKeyword} Complete Guide`,
+    mainKeyword,
+    supportingKeywords,
+    contentPieces,
+    createdAt: now,
+    updatedAt: now
+  };
 };
 
-export default {
-  generateOutline,
-  formatOutline,
-  parseOutlineSections
+/**
+ * Create a brief for SEO content
+ */
+export const createSEOBrief = async (
+  title: string,
+  targetKeywords: string[],
+  outline: string
+) => {
+  return {
+    id: `brief_${Date.now()}`,
+    title,
+    targetKeywords,
+    secondaryKeywords: [],
+    outline,
+    wordCount: 1200,
+    references: [
+      "https://example.com/industry-research",
+      "https://example.com/best-practices"
+    ],
+    competitorUrls: [
+      "https://competitor1.com/similar-article",
+      "https://competitor2.com/related-topic"
+    ],
+    createdAt: new Date().toISOString()
+  };
 };
