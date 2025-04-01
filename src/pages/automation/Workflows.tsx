@@ -8,8 +8,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
   Search, Filter, Plus, MessageSquare, Mail, FileText, Phone,
-  Sparkles
+  Sparkles, ChevronDown
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Workflows = () => {
   const navigate = useNavigate();
@@ -73,6 +79,10 @@ const Workflows = () => {
     navigate(`/automation/editor/${id}`);
   };
 
+  const handleCreateCallFlow = () => {
+    navigate('/automation/call-flow');
+  };
+
   return (
     <AppLayout>
       <div className="space-y-8">
@@ -89,9 +99,21 @@ const Workflows = () => {
             >
               <Sparkles size={16} /> AI Generate
             </Button>
-            <Button onClick={handleCreateWorkflow} className="gap-2 bg-violet-600 hover:bg-violet-700">
-              <Plus size={16} /> Create
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className="gap-2 bg-violet-600 hover:bg-violet-700">
+                  <Plus size={16} /> Create <ChevronDown size={14} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleCreateWorkflow}>
+                  General Workflow
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleCreateCallFlow}>
+                  Call Flow
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 

@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { Phone, Edit2 } from "lucide-react";
 
 interface AICallSettingsProps {
   isOpen: boolean;
@@ -23,6 +25,8 @@ const AICallSettings: React.FC<AICallSettingsProps> = ({
   onAIEnabledChange,
   onAITakeoverChange
 }) => {
+  const navigate = useNavigate();
+  
   const handleSaveSettings = () => {
     toast.success("AI call settings saved");
     onOpenChange(false);
@@ -95,6 +99,23 @@ const AICallSettings: React.FC<AICallSettingsProps> = ({
                 Select the voice style for AI call handling
               </p>
             </div>
+          </div>
+          
+          <div className="border-t pt-4 mt-4">
+            <Button 
+              onClick={() => {
+                onOpenChange(false);
+                navigate("/automation/call-flow");
+              }}
+              variant="outline"
+              className="w-full gap-2"
+            >
+              <Edit2 size={16} />
+              <span>Create/Edit Call Flows</span>
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              Design conversational call flows for your AI call center
+            </p>
           </div>
         </div>
         

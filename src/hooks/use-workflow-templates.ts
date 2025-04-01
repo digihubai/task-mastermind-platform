@@ -1,161 +1,149 @@
 
 import { useState } from "react";
-import { 
-  MessageSquare, Mail, Phone, Users, Database, FileText, 
-  BarChart3, RefreshCw, Calendar, Bell, ArrowDownUp, CheckCircle 
-} from "lucide-react";
+import { MessageSquare, Mail, Phone, Users, Database, FileText, BarChart3, RefreshCw, Calendar, Bell, ArrowDownUp } from "lucide-react";
 import React from "react";
 
-export interface WorkflowTemplate {
-  id: number;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  categoryLabel: string;
-  category: string;
-  popular: boolean;
-}
-
-export interface TemplateCategory {
+export interface Category {
   id: string;
   label: string;
 }
 
+export interface WorkflowTemplateItem {
+  id: number;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  category: string;
+  categoryLabel: string;
+  popular?: boolean;
+}
+
 export const useWorkflowTemplates = () => {
-  const [activeCategory, setActiveCategory] = useState<string>("all");
-
-  const categories: TemplateCategory[] = [
+  const [activeCategory, setActiveCategory] = useState("all");
+  
+  const categories: Category[] = [
     { id: "all", label: "All Templates" },
-    { id: "communication", label: "Communication" },
-    { id: "customer-service", label: "Customer Service" },
-    { id: "sales", label: "Sales & CRM" },
-    { id: "project", label: "Project Management" },
-    { id: "finance", label: "Finance" },
-    { id: "hr", label: "Human Resources" }
+    { id: "support", label: "Support" },
+    { id: "sales", label: "Sales" },
+    { id: "marketing", label: "Marketing" },
+    { id: "hr", label: "HR" },
+    { id: "operations", label: "Operations" },
+    { id: "call-center", label: "Call Center" },
   ];
-
-  const templates: WorkflowTemplate[] = [
-    // Communication templates
+  
+  const templates: WorkflowTemplateItem[] = [
+    // Support templates
     {
       id: 1,
       title: "Customer Support IVR",
-      description: "Interactive voice response system for handling customer calls and routing to proper departments.",
-      icon: React.createElement(Phone, { size: 20, className: "text-violet-600" }),
-      categoryLabel: "Phone",
-      category: "communication",
+      description: "Interactive voice response system for customer support",
+      icon: React.createElement(Phone, { size: 20, className: "text-blue-500" }),
+      category: "support",
+      categoryLabel: "Support",
       popular: true
     },
     {
       id: 2,
       title: "Multi-Channel Chat Support",
-      description: "Connect with customers through multiple chat platforms with a unified inbox.",
-      icon: React.createElement(MessageSquare, { size: 20, className: "text-blue-600" }),
-      categoryLabel: "Messaging",
-      category: "communication",
-      popular: true
+      description: "Manage customer chat from multiple channels",
+      icon: React.createElement(MessageSquare, { size: 20, className: "text-indigo-500" }),
+      category: "support",
+      categoryLabel: "Support"
     },
     {
       id: 3,
-      title: "Email Response Automation",
-      description: "Automatically categorize and respond to common email inquiries.",
-      icon: React.createElement(Mail, { size: 20, className: "text-indigo-600" }),
-      categoryLabel: "Email",
-      category: "communication",
-      popular: false
+      title: "Support Ticket Escalation",
+      description: "Automatically escalate urgent support tickets",
+      icon: React.createElement(Bell, { size: 20, className: "text-red-500" }),
+      category: "support",
+      categoryLabel: "Support"
     },
     
-    // Customer Service templates
+    // Sales templates
     {
       id: 4,
-      title: "CSAT Dashboard",
-      description: "Monitor customer satisfaction scores across all touchpoints.",
-      icon: React.createElement(BarChart3, { size: 20, className: "text-green-600" }),
-      categoryLabel: "Analytics",
-      category: "customer-service",
+      title: "Sales Lead Qualification",
+      description: "Qualify incoming leads and route to sales reps",
+      icon: React.createElement(Users, { size: 20, className: "text-green-500" }),
+      category: "sales",
+      categoryLabel: "Sales",
       popular: true
     },
     {
       id: 5,
-      title: "Ticket Resolution Timer",
-      description: "Track and improve response and resolution times with automated reports.",
-      icon: React.createElement(RefreshCw, { size: 20, className: "text-blue-600" }),
-      categoryLabel: "Performance",
-      category: "customer-service",
-      popular: false
+      title: "Follow-up Email Sequence",
+      description: "Automated email follow-ups for sales prospects",
+      icon: React.createElement(Mail, { size: 20, className: "text-amber-500" }),
+      category: "sales",
+      categoryLabel: "Sales"
     },
+    
+    // Marketing templates
     {
       id: 6,
-      title: "Refund Processing",
-      description: "Streamline refund approval process with proper documentation and authorization.",
-      icon: React.createElement(Database, { size: 20, className: "text-indigo-600" }),
-      categoryLabel: "Operations",
-      category: "customer-service",
-      popular: false
-    },
-    
-    // Sales & CRM templates
-    {
-      id: 7,
-      title: "Lead Qualification",
-      description: "Score and route leads to the appropriate sales representatives.",
-      icon: React.createElement(Users, { size: 20, className: "text-amber-600" }),
-      categoryLabel: "Pipeline",
-      category: "sales",
-      popular: true
-    },
-    {
-      id: 8,
-      title: "Contract Approval Process",
-      description: "Manage the review and approval of sales contracts with role-based permissions.",
-      icon: React.createElement(FileText, { size: 20, className: "text-violet-600" }),
-      categoryLabel: "Documents",
-      category: "sales",
-      popular: false
-    },
-    
-    // Project Management templates
-    {
-      id: 9,
-      title: "Task Lifecycle Management",
-      description: "Track tasks from creation to completion with custom status transitions.",
-      icon: React.createElement(CheckCircle, { size: 20, className: "text-green-600" }),
-      categoryLabel: "Tasks",
-      category: "project",
-      popular: true
-    },
-    {
-      id: 10,
-      title: "Deadline Reminders",
-      description: "Send automated reminders about upcoming project deadlines.",
-      icon: React.createElement(Calendar, { size: 20, className: "text-blue-600" }),
-      categoryLabel: "Scheduling",
-      category: "project",
-      popular: false
-    },
-    
-    // Finance templates
-    {
-      id: 11,
-      title: "Expense Approval",
-      description: "Multi-level approval workflow for expense reports with budget validation.",
-      icon: React.createElement(Database, { size: 20, className: "text-amber-600" }),
-      categoryLabel: "Expenses",
-      category: "finance",
-      popular: true
+      title: "Campaign Performance Alerts",
+      description: "Get notified about marketing campaign performance",
+      icon: React.createElement(BarChart3, { size: 20, className: "text-purple-500" }),
+      category: "marketing",
+      categoryLabel: "Marketing"
     },
     
     // HR templates
     {
-      id: 12,
-      title: "Onboarding Process",
-      description: "Streamline new employee onboarding with automated task assignments.",
-      icon: React.createElement(Users, { size: 20, className: "text-indigo-600" }),
-      categoryLabel: "Employees",
+      id: 7,
+      title: "Employee Onboarding",
+      description: "Streamline the new employee onboarding process",
+      icon: React.createElement(Users, { size: 20, className: "text-teal-500" }),
       category: "hr",
+      categoryLabel: "HR"
+    },
+    
+    // Operations templates
+    {
+      id: 8,
+      title: "Data Sync Automation",
+      description: "Sync data between different systems automatically",
+      icon: React.createElement(RefreshCw, { size: 20, className: "text-gray-500" }),
+      category: "operations",
+      categoryLabel: "Operations"
+    },
+    
+    // Call center templates
+    {
+      id: 9,
+      title: "Customer Verification IVR",
+      description: "Verify customer identity through an automated call flow",
+      icon: React.createElement(Phone, { size: 20, className: "text-blue-500" }),
+      category: "call-center",
+      categoryLabel: "Call Center",
       popular: true
+    },
+    {
+      id: 10,
+      title: "Call Center Queue Management",
+      description: "Manage call queues and route calls efficiently",
+      icon: React.createElement(ArrowDownUp, { size: 20, className: "text-orange-500" }),
+      category: "call-center",
+      categoryLabel: "Call Center"
+    },
+    {
+      id: 11,
+      title: "Post-Call Survey",
+      description: "Collect customer feedback after call completion",
+      icon: React.createElement(FileText, { size: 20, className: "text-violet-500" }),
+      category: "call-center",
+      categoryLabel: "Call Center"
+    },
+    {
+      id: 12,
+      title: "Scheduled Callback",
+      description: "Allow customers to request callbacks during peak times",
+      icon: React.createElement(Calendar, { size: 20, className: "text-cyan-500" }),
+      category: "call-center",
+      categoryLabel: "Call Center"
     }
   ];
-
+  
   return {
     templates,
     categories,

@@ -4,6 +4,7 @@ import { RouteObject } from 'react-router-dom';
 import Workflows from '@/pages/automation/Workflows';
 import WorkflowEditor from '@/pages/automation/WorkflowEditor';
 import WorkflowTemplatesPage from '@/pages/automation/WorkflowTemplates';
+import CallFlowDesignerPage from '@/pages/automation/CallFlowDesigner';
 
 // Create placeholder component for automation settings
 const AutomationSettings = () => <div>Automation Settings Page</div>;
@@ -28,6 +29,14 @@ const automationRoutes: RouteObject[] = [
   {
     path: '/automation/settings',
     element: <AutomationSettings />,
+  },
+  {
+    path: '/automation/call-flow',
+    element: <CallFlowDesignerPage />,
+  },
+  {
+    path: '/automation/call-flow/:id',
+    element: <CallFlowDesignerPage />,
   },
 ];
 

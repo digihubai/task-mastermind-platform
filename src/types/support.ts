@@ -1,3 +1,4 @@
+
 export interface SupportTicket {
   id: string;
   subject: string;
@@ -87,6 +88,33 @@ export interface ChatConfig {
   apiKey?: string;
   maxTokens: number;
   temperature: number;
+}
+
+// Call Flow Types
+export interface CallFlowNode {
+  id: string;
+  type: 'greeting' | 'message' | 'input' | 'menu' | 'transfer' | 'condition';
+  position: { x: number; y: number };
+  data: any;
+}
+
+export interface CallFlowEdge {
+  id: string;
+  source: string;
+  target: string;
+}
+
+export interface CallFlow {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+  nodes: CallFlowNode[];
+  edges: CallFlowEdge[];
+  isActive: boolean;
+  language: string;
+  voiceType: string;
 }
 
 // Team Chat Types
