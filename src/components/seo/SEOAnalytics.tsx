@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -97,8 +96,6 @@ const SEOAnalytics = () => {
           <p>No analytics data available</p>
         </div>
       )}
-
-      {/* Add more analytics components here */}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 // Export all SEO services from a single entry point
 export * from './types';
 
@@ -18,7 +17,7 @@ export * from './linkService';
 export * from './imageService';
 export * from './campaignService';
 export * from './reportingService';  // New reporting service
-export { fetchSEOAnalytics, generateSEOReport } from './seoAnalyticsService';
+export { fetchSEOAnalytics, generateSEOReport } from './analyticsService'; // Fixed import path
 export * from './clientApprovalService'; // New client approval workflow service
 export * from './topicClusterService';  // New topic cluster service
 
