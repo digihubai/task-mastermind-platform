@@ -513,7 +513,7 @@ export function useWorkflowEditor(id?: string) {
     setIsLoading(true);
     
     // Update step nextStepId based on connections
-    const updatedSteps = steps.map(step => {
+    const updatedSteps: WorkflowStep[] = steps.map(step => {
       const stepConnections = connections.filter(conn => conn.from === step.id);
       
       if (step.type === 'condition' && step.branches) {

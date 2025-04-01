@@ -3,7 +3,16 @@ import React from "react";
 import { Handle, Position } from "reactflow";
 import { Zap } from "lucide-react";
 
-const TriggerNode = ({ data }) => {
+interface TriggerNodeProps {
+  data: {
+    name: string;
+    type: string;
+    selected?: boolean;
+    onAddStep?: (type: string, afterId: string) => void;
+  };
+}
+
+const TriggerNode: React.FC<TriggerNodeProps> = ({ data }) => {
   return (
     <div className={`rounded-lg border shadow-sm bg-white p-3 min-w-[180px] ${
       data.selected ? 'border-primary ring-2 ring-primary/20' : 'border-border'

@@ -4,7 +4,20 @@ import { Handle, Position } from "reactflow";
 import { Zap, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const IntegrationNode = ({ data }) => {
+interface IntegrationNodeProps {
+  data: {
+    name: string;
+    config?: {
+      integration?: string;
+    };
+    selected?: boolean;
+    nextStepId?: string;
+    id: string;
+    onAddStep?: (type: string, afterId: string) => void;
+  };
+}
+
+const IntegrationNode: React.FC<IntegrationNodeProps> = ({ data }) => {
   const getIntegrationLabel = () => {
     if (!data.config) return 'External Integration';
     
@@ -17,7 +30,7 @@ const IntegrationNode = ({ data }) => {
       asana: 'Asana'
     };
     
-    return integrationNames[data.config.integration] || 'External Integration';
+    return integrationNames[data.config.integration as keyof typeof integrationNames] || 'External Integration';
   };
 
   return (
@@ -48,7 +61,7 @@ const IntegrationNode = ({ data }) => {
         className="!bg-green-500 !w-3 !h-3 border-2 border-white"
       />
       
-      {!data.nextStepId && (
+      {!data.nextStepId && data.onAddStep && (
         <div className="mt-3 border-t pt-2">
           <Button
             variant="outline"

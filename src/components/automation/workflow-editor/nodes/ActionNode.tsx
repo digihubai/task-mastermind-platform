@@ -4,7 +4,20 @@ import { Handle, Position } from "reactflow";
 import { Workflow, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const ActionNode = ({ data }) => {
+interface ActionNodeProps {
+  data: {
+    name: string;
+    config?: {
+      actionType?: string;
+    };
+    selected?: boolean;
+    nextStepId?: string;
+    id: string;
+    onAddStep?: (type: string, afterId: string) => void;
+  };
+}
+
+const ActionNode: React.FC<ActionNodeProps> = ({ data }) => {
   return (
     <div className={`rounded-lg border shadow-sm bg-white p-3 min-w-[180px] ${
       data.selected ? 'border-primary ring-2 ring-primary/20' : 'border-border'
@@ -33,7 +46,7 @@ const ActionNode = ({ data }) => {
         className="!bg-blue-500 !w-3 !h-3 border-2 border-white"
       />
       
-      {!data.nextStepId && (
+      {!data.nextStepId && data.onAddStep && (
         <div className="mt-3 border-t pt-2">
           <Button
             variant="outline"

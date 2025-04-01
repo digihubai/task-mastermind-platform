@@ -9,144 +9,44 @@ import { CallNodeEditor } from "./callflow/CallNodeEditor";
 import { CallFlowPreview } from "./callflow/CallFlowPreview";
 import { CallFlowCanvas } from "./callflow/CallFlowCanvas";
 import { createNewCallNode } from "./callflow/utils";
+import { CallFlowProvider, useCallFlow } from "./callflow/CallFlowContext";
 
-export interface CallFlowDesignerProps {
+interface CallFlowDesignerProps {
   flow?: CallFlow;
   onSave?: (flow: CallFlow) => void;
 }
 
-export const CallFlowDesigner: React.FC<CallFlowDesignerProps> = ({
-  flow: initialFlow,
-  onSave,
-}) => {
-  // Default flow if none is provided
-  const defaultFlow: CallFlow = {
-    id: `flow-${Date.now()}`,
-    name: "New Call Flow",
-    description: "A new interactive voice response flow",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    nodes: [
-      {
-        id: "start-node",
-        type: "greeting",
-        position: { x: 100, y: 100 },
-        data: { message: "Hello, thank you for calling. How can we help you today?" }
-      }
-    ],
-    edges: [],
-    isActive: false,
-    language: "en",
-    voiceType: "natural-female"
-  };
+// Container component that provides context to children
+export const CallFlowDesigner: React.FC<CallFlowDesignerProps> = (props) => {
+  return (
+    <CallFlowProvider initialFlow={props.flow} onSaveProp={props.onSave}>
+      <CallFlowDesignerContent />
+    </CallFlowProvider>
+  );
+};
 
-  const [currentFlow, setCurrentFlow] = useState<CallFlow>(initialFlow || defaultFlow);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"list" | "canvas">("list");
-  const { toast } = useToast();
+// Content component that uses the context
+const CallFlowDesignerContent: React.FC = () => {
+  const { 
+    currentFlow, 
+    selectedNodeId, 
+    setSelectedNodeId,
+    viewMode,
+    setViewMode,
+    handleAddNode,
+    handleUpdateNode,
+    handleDeleteNode,
+    handleSaveFlow,
+    handleExportFlow,
+    handleUpdateFlow,
+    handleAddEdge,
+    handleRemoveEdge
+  } = useCallFlow();
 
   const selectedNode = selectedNodeId
     ? currentFlow.nodes.find((node) => node.id === selectedNodeId)
     : null;
-
-  const handleAddNode = (type: string) => {
-    const newNode = createNewCallNode(type);
     
-    setCurrentFlow({
-      ...currentFlow,
-      nodes: [...currentFlow.nodes, newNode],
-    });
-    
-    setSelectedNodeId(newNode.id);
-  };
-
-  const handleUpdateNode = (updates: Partial<any>) => {
-    if (!selectedNodeId) return;
-
-    setCurrentFlow({
-      ...currentFlow,
-      nodes: currentFlow.nodes.map((node) =>
-        node.id === selectedNodeId ? { ...node, ...updates } : node
-      ),
-    });
-  };
-
-  const handleDeleteNode = (nodeId: string) => {
-    // Don't delete the start node
-    if (nodeId === "start-node") {
-      toast({
-        title: "Cannot delete start node",
-        description: "The greeting node is required for all call flows.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setCurrentFlow({
-      ...currentFlow,
-      nodes: currentFlow.nodes.filter((node) => node.id !== nodeId),
-      // Also update any node that has this one as next
-      edges: currentFlow.edges.filter(edge => 
-        edge.source !== nodeId && edge.target !== nodeId
-      )
-    });
-    
-    setSelectedNodeId(null);
-  };
-
-  const handleSaveFlow = () => {
-    if (onSave) {
-      onSave(currentFlow);
-    } else {
-      toast({
-        title: "Flow saved",
-        description: "Your call flow has been saved successfully.",
-      });
-    }
-  };
-
-  const handleExportFlow = () => {
-    const dataStr = JSON.stringify(currentFlow, null, 2);
-    const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
-    
-    const exportFileDefaultName = `${currentFlow.name.toLowerCase().replace(/\s+/g, '-')}-flow.json`;
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-  };
-
-  const handleUpdateFlow = (updates: Partial<CallFlow>) => {
-    setCurrentFlow({
-      ...currentFlow,
-      ...updates,
-    });
-  };
-
-  const handleAddEdge = (source: string, target: string) => {
-    // Check if this edge already exists
-    const edgeExists = currentFlow.edges.some(
-      edge => edge.source === source && edge.target === target
-    );
-    
-    if (!edgeExists) {
-      setCurrentFlow({
-        ...currentFlow,
-        edges: [...currentFlow.edges, { id: `${source}-${target}`, source, target }]
-      });
-    }
-  };
-
-  const handleRemoveEdge = (source: string, target: string) => {
-    setCurrentFlow({
-      ...currentFlow,
-      edges: currentFlow.edges.filter(
-        edge => !(edge.source === source && edge.target === target)
-      )
-    });
-  };
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Card className="p-6 border border-border/40 lg:col-span-1">
@@ -187,12 +87,7 @@ export const CallFlowDesigner: React.FC<CallFlowDesignerProps> = ({
             selectedNodeId={selectedNodeId}
             onSelectNode={setSelectedNodeId}
             onUpdateNodePosition={(id, position) => {
-              setCurrentFlow({
-                ...currentFlow,
-                nodes: currentFlow.nodes.map(node => 
-                  node.id === id ? { ...node, position } : node
-                )
-              });
+              handleUpdateNode(id, { position });
             }}
             onAddEdge={handleAddEdge}
             onRemoveEdge={handleRemoveEdge}
