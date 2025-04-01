@@ -18,7 +18,7 @@ export * from './linkService';
 export * from './imageService';
 export * from './campaignService';
 export * from './reportingService';  // New reporting service
-export { fetchSEOAnalytics, generateSEOReport } from './seoAnalyticsService'; // Fix import path
+export { fetchSEOAnalytics, generateSEOReport } from './seoAnalyticsService';
 export * from './clientApprovalService'; // New client approval workflow service
 export * from './topicClusterService';  // New topic cluster service
 
