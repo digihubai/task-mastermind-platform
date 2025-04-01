@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart, Calendar, Download } from "lucide-react";
 import { format, subDays } from "date-fns";
 import { toast } from "sonner";
-import { fetchSEOAnalytics, generateSEOReport } from '@/services/seo';
+import { fetchSEOAnalytics, generateSEOReport } from '@/services/seo/analyticsService';
 
 const SEOAnalytics = () => {
   const [siteUrl, setSiteUrl] = useState("https://example.com");

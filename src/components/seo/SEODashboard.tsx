@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -17,7 +16,7 @@ import {
   generateKeywords,
   generateTitles,
   generateOutline,
-  generateContent
+  generateSEOContent
 } from '@/services/seoService';
 
 interface SEODashboardProps {
@@ -131,7 +130,7 @@ const SEODashboard: React.FC<SEODashboardProps> = ({ defaultTab = "content" }) =
               generateKeywords={generateKeywords}
               generateTitles={generateTitles}
               generateOutline={generateOutline}
-              generateContent={(title, outline, keywords) => generateContent(title, outline, keywords)}
+              generateContent={(title, outline, keywords) => generateSEOContent(title, outline, keywords)}
             />
           </TabsContent>
           
