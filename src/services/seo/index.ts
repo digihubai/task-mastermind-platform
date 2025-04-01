@@ -9,6 +9,20 @@ export const generateContent = async (title: string, keywords: string[], topic: 
   return generateContentAI(topic, keywords, title, outline || '');
 };
 
+// Re-export core SEO services
+export * from './keywordService';
+export * from './titleService';
+export * from './outlineService';
+export * from './contentService';
+export * from './linkService';
+export * from './imageService';
+export * from './campaignService';
+export * from './reportingService';  // New reporting service
+export * from './seoAnalyticsService'; // New SEO analytics service
+export * from './clientApprovalService'; // New client approval workflow service
+export * from './topicClusterService';  // New topic cluster service
+
+// Internal linking assistance
 export const fetchInternalLinks = async () => {
   // Mock function that returns some internal links
   return [
@@ -42,14 +56,6 @@ export const insertLinksIntoContent = (content: string, links: Array<{title: str
   return modifiedContent;
 };
 
-// Re-export other service functions
-export * from './keywordService';
-export * from './titleService';
-export * from './contentService';
-export * from './linkService';
-export * from './imageService';
-export * from './campaignService';
-
 // Export analyticsService separately to avoid name conflicts
-export { fetchSEOAnalytics } from './analyticsService';
+export { fetchSEOAnalytics, generateSEOReport } from './analyticsService';
 export type { SEOAnalytics } from './types';
