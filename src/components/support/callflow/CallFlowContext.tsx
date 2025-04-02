@@ -1,8 +1,8 @@
-
 import React, { createContext, useContext, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { CallFlow, CallFlowNode, CallFlowEdge } from "@/types/support";
 import { createNewCallNode } from "./utils";
+import { useFlowConnections } from "@/hooks/use-flow-connections";
 
 // Default flow if none is provided
 const createDefaultFlow = (): CallFlow => ({
@@ -32,7 +32,7 @@ interface CallFlowContextType {
   viewMode: "list" | "canvas";
   setViewMode: (mode: "list" | "canvas") => void;
   handleAddNode: (type: string) => void;
-  handleUpdateNode: (nodeId: string, updates: Partial<any>) => void;
+  handleUpdateNode: (nodeId: string, updates: Partial<CallFlowNode>) => void;
   handleDeleteNode: (nodeId: string) => void;
   handleSaveFlow: () => void;
   handleExportFlow: () => void;
@@ -59,26 +59,46 @@ export const CallFlowProvider: React.FC<CallFlowProviderProps> = ({
   const [viewMode, setViewMode] = useState<"list" | "canvas">("list");
   const { toast } = useToast();
 
+  // Use our reusable flow connections hook
+  const { 
+    edges, 
+    handleAddConnection, 
+    handleRemoveConnection, 
+    updateEdgesOnNodeChange 
+  } = useFlowConnections<CallFlowNode, CallFlowEdge>(currentFlow.edges, {
+    onConnectionAdded: (source, target, edge) => {
+      // Additional callback logic if needed for call flow
+    }
+  });
+
+  // Keep the flow's edges in sync with our connection hook state
+  React.useEffect(() => {
+    setCurrentFlow(prev => ({
+      ...prev,
+      edges: edges
+    }));
+  }, [edges]);
+
   const handleAddNode = (type: string) => {
     const newNode = createNewCallNode(type);
     
-    setCurrentFlow({
-      ...currentFlow,
-      nodes: [...currentFlow.nodes, newNode],
-    });
+    setCurrentFlow(flow => ({
+      ...flow,
+      nodes: [...flow.nodes, newNode],
+    }));
     
     setSelectedNodeId(newNode.id);
   };
 
-  const handleUpdateNode = (nodeId: string, updates: Partial<any>) => {
+  const handleUpdateNode = (nodeId: string, updates: Partial<CallFlowNode>) => {
     if (!nodeId) return;
 
-    setCurrentFlow({
-      ...currentFlow,
-      nodes: currentFlow.nodes.map((node) =>
+    setCurrentFlow(flow => ({
+      ...flow,
+      nodes: flow.nodes.map((node) =>
         node.id === nodeId ? { ...node, ...updates } : node
       ),
-    });
+    }));
   };
 
   const handleDeleteNode = (nodeId: string) => {
@@ -92,14 +112,13 @@ export const CallFlowProvider: React.FC<CallFlowProviderProps> = ({
       return;
     }
 
-    setCurrentFlow({
-      ...currentFlow,
-      nodes: currentFlow.nodes.filter((node) => node.id !== nodeId),
-      // Also update any node that has this one as next
-      edges: currentFlow.edges.filter(edge => 
-        edge.source !== nodeId && edge.target !== nodeId
-      )
-    });
+    setCurrentFlow(flow => ({
+      ...flow,
+      nodes: flow.nodes.filter((node) => node.id !== nodeId)
+    }));
+    
+    // Use our reusable connection handler to update edges
+    updateEdgesOnNodeChange(currentFlow.nodes.filter(node => node.id !== nodeId));
     
     setSelectedNodeId(null);
   };
@@ -139,27 +158,13 @@ export const CallFlowProvider: React.FC<CallFlowProviderProps> = ({
     });
   };
 
+  // Use our shared connection handlers
   const handleAddEdge = (source: string, target: string) => {
-    // Check if this edge already exists
-    const edgeExists = currentFlow.edges.some(
-      edge => edge.source === source && edge.target === target
-    );
-    
-    if (!edgeExists) {
-      setCurrentFlow({
-        ...currentFlow,
-        edges: [...currentFlow.edges, { id: `${source}-${target}`, source, target }]
-      });
-    }
+    handleAddConnection(source, target);
   };
 
   const handleRemoveEdge = (source: string, target: string) => {
-    setCurrentFlow({
-      ...currentFlow,
-      edges: currentFlow.edges.filter(
-        edge => !(edge.source === source && edge.target === target)
-      )
-    });
+    handleRemoveConnection(source, target);
   };
 
   const value = {

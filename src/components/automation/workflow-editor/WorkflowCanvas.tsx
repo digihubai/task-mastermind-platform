@@ -24,6 +24,7 @@ import ActionNode from "./nodes/ActionNode";
 import ConditionNode from "./nodes/ConditionNode";
 import DelayNode from "./nodes/DelayNode";
 import IntegrationNode from "./nodes/IntegrationNode";
+import { useFlowConnections } from "@/hooks/use-flow-connections";
 
 const nodeTypes = {
   trigger: TriggerNode,
@@ -58,12 +59,12 @@ const WorkflowCanvas = ({
   const { project } = useReactFlow();
   
   // Convert workflow steps to ReactFlow nodes
-  const initialNodes: Node[] = steps.map((step, index) => {
+  const initialNodes: Node[] = steps.map((step) => {
     // For positioning, start from top and move down
     // This is just an initial position if not already defined
     const position = step.position || {
       x: step.type === 'trigger' ? 250 : (Math.random() * 300) + 150,
-      y: step.type === 'trigger' ? 50 : (index * 100) + 150
+      y: step.type === 'trigger' ? 50 : (steps.indexOf(step) * 100) + 150
     };
     
     return {
@@ -79,7 +80,7 @@ const WorkflowCanvas = ({
   });
   
   // Convert connections to ReactFlow edges
-  const initialEdges: Edge[] = connections.map((conn, index) => {
+  const initialEdges: Edge[] = connections.map((conn) => {
     // Find if this comes from a condition branch
     const sourceStep = steps.find(s => s.id === conn.from);
     let sourceHandle: string | undefined = undefined;
@@ -161,7 +162,7 @@ const WorkflowCanvas = ({
         }
       };
     }));
-  }, [steps, connections, selectedStepId, onAddStep]);
+  }, [steps, connections, selectedStepId, onAddStep, setNodes, setEdges]);
 
   // Handle node selections
   const onNodeClick = (_: React.MouseEvent, node: Node) => {

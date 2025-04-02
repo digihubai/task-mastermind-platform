@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { useFlowConnections } from './use-flow-connections';
 
 export interface WorkflowStep {
   id: string;
@@ -312,10 +312,28 @@ export function useWorkflowEditor(id?: string) {
   const [isAiGenerating, setIsAiGenerating] = useState(false);
   const [connections, setConnections] = useState<{from: string, to: string}[]>([]);
 
+  const { 
+    edges,
+    handleAddConnection,
+    handleRemoveConnection,
+    updateEdgesOnNodeChange
+  } = useFlowConnections<WorkflowStep, { id: string; source: string; target: string }>(
+    connections.map(conn => ({ 
+      id: `${conn.from}-${conn.to}`, 
+      source: conn.from, 
+      target: conn.to 
+    }))
+  );
+
+  useEffect(() => {
+    setConnections(
+      edges.map(edge => ({ from: edge.source, to: edge.target }))
+    );
+  }, [edges]);
+
   useEffect(() => {
     if (id) {
       setIsLoading(true);
-      // In production, this would be an API call
       setTimeout(() => {
         const workflow = MOCK_WORKFLOWS.find(wf => wf.id === id);
         
@@ -324,7 +342,6 @@ export function useWorkflowEditor(id?: string) {
           setTemplateDescription(workflow.description);
           setSteps(workflow.steps);
           
-          // Set up connections
           const newConnections: {from: string, to: string}[] = [];
           workflow.steps.forEach(step => {
             if (step.nextStepId) {
@@ -352,7 +369,6 @@ export function useWorkflowEditor(id?: string) {
         setIsLoading(false);
       }, 500);
     } else {
-      // Initialize a new workflow
       setWorkflowName('New Workflow');
       setTemplateDescription('');
       setSteps([
@@ -383,7 +399,6 @@ export function useWorkflowEditor(id?: string) {
       icon: undefined
     };
     
-    // If it's a condition, initialize branches
     if (type === 'condition') {
       newStep.branches = [
         { condition: 'Yes' },
@@ -391,29 +406,22 @@ export function useWorkflowEditor(id?: string) {
       ];
     }
     
-    // If delay, add default config
     if (type === 'delay') {
       newStep.config = { delay: '1d' };
     }
     
-    // If integration, add default config
     if (type === 'integration') {
       newStep.config = { integration: 'zapier', action: 'webhook' };
     }
     
     setSteps(prev => [...prev, newStep]);
     
-    // If afterStepId is provided, connect the new step
     if (afterStepId) {
       const afterStep = steps.find(step => step.id === afterStepId);
       if (afterStep) {
         if (afterStep.type === 'condition' && afterStep.branches) {
-          // Don't auto-connect conditions, the user needs to select which branch
         } else {
-          setConnections(prev => [...prev, {
-            from: afterStepId,
-            to: newStepId
-          }]);
+          handleAddConnection(afterStepId, newStepId);
         }
       }
     }
@@ -422,20 +430,11 @@ export function useWorkflowEditor(id?: string) {
   };
 
   const handleConnectSteps = (fromId: string, toId: string, branchIndex?: number) => {
-    // Check if connection already exists
-    const connectionExists = connections.some(
-      conn => conn.from === fromId && conn.to === toId
-    );
+    handleAddConnection(fromId, toId, branchIndex ? `branch-${branchIndex}` : undefined);
     
-    if (connectionExists) return;
-    
-    // Remove any existing connections from the same source if not a condition
-    const fromStep = steps.find(step => step.id === fromId);
-    
-    if (fromStep?.type === 'condition' && typeof branchIndex === 'number') {
-      // For conditions, update the specific branch
+    if (typeof branchIndex === 'number') {
       setSteps(prev => prev.map(step => {
-        if (step.id === fromId && step.branches) {
+        if (step.id === fromId && step.type === 'condition' && step.branches) {
           const newBranches = [...step.branches];
           newBranches[branchIndex] = {
             ...newBranches[branchIndex],
@@ -448,21 +447,12 @@ export function useWorkflowEditor(id?: string) {
         }
         return step;
       }));
-    } else {
-      // For non-conditions, replace the nextStepId
-      setConnections(prev => [
-        ...prev.filter(conn => !(conn.from === fromId && !branchIndex)),
-        { from: fromId, to: toId }
-      ]);
     }
   };
 
   const handleDisconnectSteps = (fromId: string, toId: string) => {
-    setConnections(prev => prev.filter(
-      conn => !(conn.from === fromId && conn.to === toId)
-    ));
+    handleRemoveConnection(fromId, toId);
     
-    // Also update any steps that reference this connection
     setSteps(prev => prev.map(step => {
       if (step.id === fromId) {
         if (step.nextStepId === toId) {
@@ -490,7 +480,6 @@ export function useWorkflowEditor(id?: string) {
   };
 
   const handleDeleteStep = (stepId: string) => {
-    // Don't delete the trigger step
     if (steps.find(step => step.id === stepId)?.type === 'trigger') {
       toast({
         title: "Cannot delete trigger",
@@ -500,27 +489,20 @@ export function useWorkflowEditor(id?: string) {
       return;
     }
     
-    // Remove the step
     setSteps(prev => prev.filter(step => step.id !== stepId));
     
-    // Remove all connections to/from this step
-    setConnections(prev => prev.filter(
-      conn => conn.from !== stepId && conn.to !== stepId
-    ));
+    updateEdgesOnNodeChange(steps.filter(step => step.id !== stepId));
   };
 
   const handleSave = () => {
     setIsLoading(true);
     
-    // Update step nextStepId based on connections
     const updatedSteps: WorkflowStep[] = steps.map(step => {
       const stepConnections = connections.filter(conn => conn.from === step.id);
       
       if (step.type === 'condition' && step.branches) {
-        // For conditions, assign connections to branches
         return step;
       } else if (stepConnections.length > 0) {
-        // For other steps, assign the first connection as nextStepId
         return {
           ...step,
           nextStepId: stepConnections[0].to
@@ -530,7 +512,6 @@ export function useWorkflowEditor(id?: string) {
       return step;
     });
     
-    // In production, this would be an API call
     setTimeout(() => {
       toast({
         title: "Workflow saved",
@@ -539,7 +520,6 @@ export function useWorkflowEditor(id?: string) {
       
       setIsLoading(false);
       
-      // Navigate back to workflows list if this is a new workflow
       if (!id) {
         navigate('/automation/workflows');
       }
@@ -556,14 +536,12 @@ export function useWorkflowEditor(id?: string) {
   const handleAiGenerate = () => {
     setIsAiGenerating(true);
     
-    // Simulate AI generation
     setTimeout(() => {
       toast({
         title: "AI Enhancement Complete",
         description: "Your workflow has been optimized with AI suggestions.",
       });
       
-      // Add a generated step for demonstration
       handleAddStep('integration');
       
       setIsAiGenerating(false);

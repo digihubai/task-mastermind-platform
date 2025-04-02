@@ -14,7 +14,7 @@ interface CallNodeEditorProps {
   selectedNode: CallFlowNode | null;
   availableNodes: CallFlowNode[];
   edges: CallFlowEdge[];
-  onUpdateNode: (updates: Partial<CallFlowNode>) => void;
+  onUpdateNode: (nodeId: string, updates: Partial<CallFlowNode>) => void;
   onAddEdge: (source: string, target: string) => void;
   onRemoveEdge: (source: string, target: string) => void;
 }
@@ -31,6 +31,11 @@ export const CallNodeEditor: React.FC<CallNodeEditorProps> = ({
     return <NodeEditorEmpty />;
   }
 
+  // Wrapper function to match the interface expected by child components
+  const handleUpdateNode = (updates: Partial<CallFlowNode>) => {
+    onUpdateNode(selectedNode.id, updates);
+  };
+
   const renderNodeEditor = () => {
     switch (selectedNode.type) {
       case 'greeting':
@@ -38,7 +43,7 @@ export const CallNodeEditor: React.FC<CallNodeEditorProps> = ({
         return (
           <TextNodeEditor 
             node={selectedNode} 
-            onUpdateNode={onUpdateNode} 
+            onUpdateNode={handleUpdateNode} 
           />
         );
         
@@ -46,7 +51,7 @@ export const CallNodeEditor: React.FC<CallNodeEditorProps> = ({
         return (
           <InputNodeEditor 
             node={selectedNode} 
-            onUpdateNode={onUpdateNode} 
+            onUpdateNode={handleUpdateNode} 
           />
         );
         
@@ -54,7 +59,7 @@ export const CallNodeEditor: React.FC<CallNodeEditorProps> = ({
         return (
           <MenuNodeEditor 
             node={selectedNode} 
-            onUpdateNode={onUpdateNode} 
+            onUpdateNode={handleUpdateNode} 
           />
         );
         
@@ -62,7 +67,7 @@ export const CallNodeEditor: React.FC<CallNodeEditorProps> = ({
         return (
           <TransferNodeEditor 
             node={selectedNode} 
-            onUpdateNode={onUpdateNode} 
+            onUpdateNode={handleUpdateNode} 
           />
         );
         
@@ -70,7 +75,7 @@ export const CallNodeEditor: React.FC<CallNodeEditorProps> = ({
         return (
           <ConditionNodeEditor 
             node={selectedNode} 
-            onUpdateNode={onUpdateNode} 
+            onUpdateNode={handleUpdateNode} 
           />
         );
         

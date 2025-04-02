@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { CallFlow } from "@/types/support";
+import { CallFlow, CallFlowNode } from "@/types/support";
 import { useToast } from "@/hooks/use-toast";
 import { CallFlowControls } from "./callflow/CallFlowControls";
 import { CallNodeList } from "./callflow/CallNodeList";
